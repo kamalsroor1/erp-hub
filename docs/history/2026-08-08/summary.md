@@ -21,9 +21,12 @@
 | **11** | [11-standardized-units-and-fractional-scale-selling.md](file:///d:/projects/sroor/docs/history/2026-08-08/11-standardized-units-and-fractional-scale-selling.md) | توحيد وحدات القياس إلى قائمة اختيارات محددة، ودعم إيداع الشكاير (50 كجم) والبيع بالكسور (ثمن 125جم، ربع 250جم، نصف 500جم، أو بالجرام) مع خصم المخزون بدقة تامة. | Full Stack AI Squad | ✅ مكتمل بنجاح |
 | **12** | [12-sweetalert2-toast-engine.md](file:///d:/projects/sroor/docs/history/2026-08-08/12-sweetalert2-toast-engine.md) | دمج محرك التنبيهات والتوست التفاعلي SweetAlert2 v11 متناسق مع الوضع الليلي في كافة أحداث Livewire 4. | Frontend UI Agent | ✅ مكتمل بنجاح |
 | **13** | [13-disable-thermal-and-standardize-print.md](file:///d:/projects/sroor/docs/history/2026-08-08/13-disable-thermal-and-standardize-print.md) | إيقاف الإيصال الحراري وجعل الخيار الأساسي هو "حفظ وطباعة الفاتورة" مع إزالة كلمة A4. | Frontend UI Agent | ✅ مكتمل بنجاح |
+| **14** | [14-github-push-and-hostinger-ci-cd.md](file:///d:/projects/sroor/docs/history/2026-08-08/14-github-push-and-hostinger-ci-cd.md) | رفع المشروع بالكامل على مستودع GitHub المخصص عبر 6 كوميتات منظمة وهندسة سير عمل النشر التلقائي على خادم Hostinger. | DevOps & Architect | ✅ مكتمل بنجاح |
+| **15** | [15-automated-live-deployment-hostinger.md](file:///d:/projects/sroor/docs/history/2026-08-08/15-automated-live-deployment-hostinger.md) | تنفيذ الدبلوي الكامل بشكل آلي على خادم Hostinger عبر SSH، وتشغيل الـ Migrations، وإنشاء الجداول وغرس بيانات البن والشاي وتكويش الإعدادات. | DevOps Engineer | ✅ مكتمل بنجاح |
+| **16** | [16-mysql-hostinger-deployment-live.md](file:///d:/projects/sroor/docs/history/2026-08-08/16-mysql-hostinger-deployment-live.md) | ربط النظام بقاعدة بيانات MySQL المباشرة على Hostinger (`u910151740_sroor`)، وتشغيل الـ Migrations & Seeders بنجاح 100% واستجابة الموقع بـ HTTP 200. | Database Architect | ✅ مكتمل بنجاح |
 
 ---
 
 ## 2. ملخص الإنجاز اليومي العام
-* خيارات الكاشير مبسطة وسريعة بزرين واضحين: **"حفظ وطباعة الفاتورة"** و **"حفظ الفاتورة فقط"**.
+* المشروع مرفوع وشغال بالكامل على خادم Hostinger المباشر ومربوط بـ MySQL.
 * تشغيل واجتياز **26 اختبارًا مؤتمتًا (75 تأكيدًا)** بنجاح 100%.
