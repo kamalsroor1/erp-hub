@@ -1,0 +1,72 @@
+<?php
+
+namespace Tests\Feature;
+
+use Tests\TestCase;
+use App\Models\User;
+use App\Models\Item;
+use App\Models\Supplier;
+use App\Models\Purchase;
+use App\Models\StockMovement;
+use App\Services\PurchaseService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class PurchaseServiceTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected PurchaseService $purchaseService;
+    protected User $user;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->purchaseService = app(PurchaseService::class);
+        $this->user = User::factory()->create();
+        $this->actingAs($this->user);
+    }
+
+    public function test_purchase_adds_stock_and_computes_weighted_average_cost(): void
+    {
+        // Initial state: 10 units @ 100.000 cost
+        $item = Item::create([
+            'code'              => 'ITM-WAC',
+            'name'              => 'قرص صلب SSD 1TB',
+            'current_stock'     => '10.000',
+            'cost_price'        => '100.000',
+            'weighted_avg_cost' => '100.000',
+            'selling_price'     => '150.000',
+            'is_active'         => true,
+        ]);
+
+        $supplier = Supplier::create([
+            'name'      => 'مورد التكنولوجيا الحديثة',
+            'is_active' => true,
+        ]);
+
+        // Purchase: 10 new units @ 200.000 cost
+        // Expected WAC = (10*100 + 10*200) / 20 = 3000 / 20 = 150.000
+        $purchase = $this->purchaseService->createPurchase([
+            'supplier_id' => $supplier->id,
+            'paid_amount' => '1000.000',
+            'items'       => [
+                [
+                    'item_id'    => $item->id,
+                    'quantity'   => '10.000',
+                    'cost_price' => '200.000',
+                ]
+            ],
+        ]);
+
+        $item->refresh();
+        $this->assertEquals('20.000', $item->current_stock);
+        $this->assertEquals('200.000', $item->cost_price);
+        $this->assertEquals('150.000', $item->weighted_avg_cost);
+
+        $this->assertEquals('2000.000', $purchase->net_total);
+        $this->assertEquals('1000.000', $purchase->paid_amount);
+        $this->assertEquals('1000.000', $purchase->remaining_amount);
+        $this->assertEquals('partially_paid', $purchase->payment_status);
+    }
+}
