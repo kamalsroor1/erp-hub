@@ -25,6 +25,7 @@ class UserManager extends Component
 
     // Form fields
     public string $name = '';
+    public string $phone = '';
     public string $email = '';
     public string $password = '';
     public string $password_confirmation = '';
@@ -37,7 +38,8 @@ class UserManager extends Component
 
         return [
             'name'      => ['required', 'string', 'max:255'],
-            'email'     => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$userId],
+            'phone'     => ['required', 'string', 'max:20', 'unique:users,phone,'.$userId],
+            'email'     => ['nullable', 'string', 'email', 'max:255', 'unique:users,email,'.$userId],
             'password'  => [$userId ? 'nullable' : 'required', 'string', 'min:6'],
             'role'      => ['required', 'string', 'in:admin,cashier,storekeeper,accountant'],
             'is_active' => ['boolean'],
@@ -48,7 +50,8 @@ class UserManager extends Component
     {
         return [
             'name.required'     => 'يرجى إدخال اسم المستخدم.',
-            'email.required'    => 'يرجى إدخال البريد الإلكتروني.',
+            'phone.required'    => 'يرجى إدخال رقم الهاتف للدخول.',
+            'phone.unique'      => 'رقم الهاتف هذا مسجل بالفعل لمستخدم آخر.',
             'email.email'       => 'صيغة البريد الإلكتروني غير صحيحة.',
             'email.unique'      => 'هذا البريد الإلكتروني مسجل بالفعل لمستخدم آخر.',
             'password.required' => 'يرجى تحديد كلمة المرور للمستخدم الجديد.',
@@ -60,7 +63,7 @@ class UserManager extends Component
     public function openCreateModal()
     {
         $this->resetValidation();
-        $this->reset(['editingUserId', 'name', 'email', 'password', 'password_confirmation', 'role', 'is_active']);
+        $this->reset(['editingUserId', 'name', 'phone', 'email', 'password', 'password_confirmation', 'role', 'is_active']);
         $this->role = 'cashier';
         $this->is_active = true;
         $this->showUserModal = true;
@@ -72,7 +75,8 @@ class UserManager extends Component
         $user = User::findOrFail($id);
         $this->editingUserId = $user->id;
         $this->name = $user->name;
-        $this->email = $user->email;
+        $this->phone = $user->phone ?? '';
+        $this->email = $user->email ?? '';
         $this->password = '';
         $this->password_confirmation = '';
         $this->role = $user->roles->first()?->name ?? 'cashier';
@@ -88,7 +92,8 @@ class UserManager extends Component
             $user = User::findOrFail($this->editingUserId);
             $data = [
                 'name'      => $this->name,
-                'email'     => $this->email,
+                'phone'     => $this->phone,
+                'email'     => !empty($this->email) ? $this->email : "{$this->phone}@sroor.com",
                 'is_active' => $this->is_active,
             ];
 
@@ -107,7 +112,8 @@ class UserManager extends Component
         } else {
             $user = User::create([
                 'name'      => $this->name,
-                'email'     => $this->email,
+                'phone'     => $this->phone,
+                'email'     => !empty($this->email) ? $this->email : "{$this->phone}@sroor.com",
                 'password'  => Hash::make($this->password),
                 'is_active' => $this->is_active,
             ]);
@@ -122,7 +128,7 @@ class UserManager extends Component
         }
 
         $this->showUserModal = false;
-        $this->reset(['editingUserId', 'name', 'email', 'password', 'password_confirmation']);
+        $this->reset(['editingUserId', 'name', 'phone', 'email', 'password', 'password_confirmation']);
     }
 
     public function toggleUserStatus(int $id)

@@ -8,19 +8,20 @@ use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use App\Models\User;
 
 #[Layout('components.layouts.app')]
-#[Title('تسجيل الدخول | سرور POS')]
+#[Title('تسجيل الدخول برقم الهاتف | سرور POS')]
 class Login extends Component
 {
-    public string $email = '';
+    public string $phone = '';
     public string $password = '';
     public bool $remember = true;
 
     protected function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'phone'    => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
     }
@@ -28,8 +29,7 @@ class Login extends Component
     protected function messages(): array
     {
         return [
-            'email.required' => 'يرجى إدخال البريد الإلكتروني.',
-            'email.email' => 'صيغة البريد الإلكتروني غير صحيحة.',
+            'phone.required'    => 'يرجى إدخال رقم الهاتف أو اسم المستخدم.',
             'password.required' => 'يرجى إدخال كلمة المرور.',
         ];
     }
@@ -38,27 +38,36 @@ class Login extends Component
     {
         $this->validate();
 
-        $throttleKey = Str::transliterate(Str::lower($this->email).'|'.request()->ip());
+        $cleanPhone = trim($this->phone);
+        $throttleKey = Str::transliterate(Str::lower($cleanPhone).'|'.request()->ip());
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
-            $this->addError('email', "تم تجاوز عدد المحاولات المسموح بها. يرجى المحاولة بعد {$seconds} ثانية.");
+            $this->addError('phone', "تم تجاوز عدد المحاولات المسموح بها. يرجى المحاولة بعد {$seconds} ثانية.");
             $this->dispatch('swal:toast', [
-                'type' => 'error',
+                'type'  => 'error',
                 'title' => 'محاولات دخول كثيرة',
-                'text' => "يرجى الانتظار {$seconds} ثانية قبل إعادة المحاولة."
+                'text'  => "يرجى الانتظار {$seconds} ثانية قبل إعادة المحاولة."
             ]);
             return;
         }
 
-        if (!Auth::attempt(['email' => $this->email, 'password' => $this->password, 'is_active' => true], $this->remember)) {
+        // Try login by phone first, then by email fallback
+        $attemptPhone = Auth::attempt(['phone' => $cleanPhone, 'password' => $this->password, 'is_active' => true], $this->remember);
+        $attemptEmail = false;
+
+        if (!$attemptPhone) {
+            $attemptEmail = Auth::attempt(['email' => $cleanPhone, 'password' => $this->password, 'is_active' => true], $this->remember);
+        }
+
+        if (!$attemptPhone && !$attemptEmail) {
             RateLimiter::hit($throttleKey, 60);
 
-            $this->addError('email', 'بيانات الدخول غير صحيحة أو الحساب غير مفعل.');
+            $this->addError('phone', 'رقم الهاتف أو كلمة المرور غير صحيحة أو الحساب معطل.');
             $this->dispatch('swal:toast', [
-                'type' => 'error',
+                'type'  => 'error',
                 'title' => 'فشل تسجيل الدخول',
-                'text' => 'يرجى التحقق من صحة البريد الإلكتروني وكلمة المرور.'
+                'text'  => 'يرجى التأكد من كتابة رقم الهاتف وكلمة المرور بشكل سليم.'
             ]);
             return;
         }
@@ -67,9 +76,9 @@ class Login extends Component
         session()->regenerate();
 
         session()->flash('swal:toast', [
-            'type' => 'success',
+            'type'  => 'success',
             'title' => 'مرحباً بك!',
-            'text' => 'تم تسجيل الدخول بنجاح إلى منظومة سرور.'
+            'text'  => 'تم تسجيل الدخول بنجاح إلى منظومة سرور POS.'
         ]);
 
         return redirect()->intended(route('dashboard'));

@@ -42,7 +42,7 @@
                 <thead class="bg-slate-950/80 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800">
                     <tr>
                         <th class="px-6 py-4">المستخدم</th>
-                        <th class="px-6 py-4">البريد الإلكتروني</th>
+                        <th class="px-6 py-4">رقم الهاتف للدخول</th>
                         <th class="px-6 py-4">الصلاحية / الدور</th>
                         <th class="px-6 py-4">الحالة</th>
                         <th class="px-6 py-4">تاريخ الإنشاء</th>
@@ -63,8 +63,8 @@
                                     @endif
                                 </div>
                             </td>
-                            <td class="px-6 py-4 font-mono text-xs text-slate-300" dir="ltr">
-                                {{ $user->email }}
+                            <td class="px-6 py-4 font-mono text-sm text-amber-300 font-bold" dir="ltr">
+                                📱 {{ $user->phone ?? $user->email }}
                             </td>
                             <td class="px-6 py-4">
                                 @php
@@ -167,7 +167,7 @@
                             wire:model.defer="name"
                             type="text"
                             required
-                            placeholder="مثال: أحمد محمد (كاشير الفرع)"
+                            placeholder="مثال: أحمد محمود (كاشير)"
                             class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
                         >
                         @error('name') <span class="text-xs text-rose-400 mt-1 block">{{ $message }}</span> @enderror
@@ -175,14 +175,28 @@
 
                     <div>
                         <label class="block text-xs font-bold text-slate-300 mb-1.5">
-                            البريد الإلكتروني / تسجيل الدخول <span class="text-rose-400">*</span>
+                            رقم الهاتف للدخول <span class="text-rose-400">*</span>
+                        </label>
+                        <input
+                            wire:model.defer="phone"
+                            type="text"
+                            required
+                            dir="ltr"
+                            placeholder="مثال: 01012316954"
+                            class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm font-mono focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                        >
+                        @error('phone') <span class="text-xs text-rose-400 mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1.5">
+                            البريد الإلكتروني (اختياري)
                         </label>
                         <input
                             wire:model.defer="email"
                             type="email"
-                            required
                             dir="ltr"
-                            placeholder="cashier2@sroor.com"
+                            placeholder="cashier@sroor.com"
                             class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
                         >
                         @error('email') <span class="text-xs text-rose-400 mt-1 block">{{ $message }}</span> @enderror
