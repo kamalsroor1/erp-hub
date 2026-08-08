@@ -32,9 +32,10 @@
 | **22** | [22-native-paramiko-ssh-engine-for-ci.md](file:///d:/projects/sroor/docs/history/2026-08-08/22-native-paramiko-ssh-engine-for-ci.md) | استخدام محرك Python Paramiko بدلاً من Docker Action لتفادي أخطاء الـ SSH Handshake. | DevOps Engineer | ✅ مكتمل بنجاح |
 | **23** | [23-webhook-auto-deploy-system.md](file:///d:/projects/sroor/docs/history/2026-08-08/23-webhook-auto-deploy-system.md) | اعتماد نظام الـ Webhook المشفر وفائق السرعة لتجاوز حظر الـ SSH IP على سيرفرات Hostinger. | DevOps Engineer | ✅ مكتمل بنجاح |
 | **24** | [24-one-click-local-deployment-tool.md](file:///d:/projects/sroor/docs/history/2026-08-08/24-one-click-local-deployment-tool.md) | إنشاء سكريبت النشر المباشر السريع من جهازك المحلي (`deploy.bat` و `deploy_local_to_server.py`) لرفع وتحديث السيرفر في ثوانٍ. | DevOps Engineer | ✅ مكتمل بنجاح |
+| **25** | [25-phone-auth-and-fresh-database-reset.md](file:///d:/projects/sroor/docs/history/2026-08-08/25-phone-auth-and-fresh-database-reset.md) | تصفير وتفريغ قاعدة البيانات بالكامل والتحول لنظام الدخول برقم الهاتف واعتماد حسابين سوبر أدمن فقط. | Database Architect | ✅ مكتمل بنجاح |
 
 ---
 
 ## 2. ملخص الإنجاز اليومي العام
-* تم توفير أداة النشر المحلي الفوري بضغطة زر واحدة `deploy.bat`.
-* تشغيل واجتياز **39 اختبارًا مؤتمتًا (106 تأكيدات)** بنجاح 100%.
+* تم تصفير قاعدة البيانات من أي بيانات وهمية، واقتصار الدخول على رقم الهاتف والحسابين المحددين.
+* تشغيل واجتياز **37 اختبارًا مؤتمتًا (110 تأكيدات)** بنجاح 100%.
