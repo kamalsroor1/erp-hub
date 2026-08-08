@@ -24,9 +24,10 @@
 | **14** | [14-github-push-and-hostinger-ci-cd.md](file:///d:/projects/sroor/docs/history/2026-08-08/14-github-push-and-hostinger-ci-cd.md) | رفع المشروع بالكامل على مستودع GitHub المخصص عبر 6 كوميتات منظمة وهندسة سير عمل النشر التلقائي على خادم Hostinger. | DevOps & Architect | ✅ مكتمل بنجاح |
 | **15** | [15-automated-live-deployment-hostinger.md](file:///d:/projects/sroor/docs/history/2026-08-08/15-automated-live-deployment-hostinger.md) | تنفيذ الدبلوي الكامل بشكل آلي على خادم Hostinger عبر SSH، وتشغيل الـ Migrations، وإنشاء الجداول وغرس بيانات البن والشاي وتكويش الإعدادات. | DevOps Engineer | ✅ مكتمل بنجاح |
 | **16** | [16-mysql-hostinger-deployment-live.md](file:///d:/projects/sroor/docs/history/2026-08-08/16-mysql-hostinger-deployment-live.md) | ربط النظام بقاعدة بيانات MySQL المباشرة على Hostinger (`u910151740_sroor`)، وتشغيل الـ Migrations & Seeders بنجاح 100% واستجابة الموقع بـ HTTP 200. | Database Architect | ✅ مكتمل بنجاح |
+| **17** | [17-sroor-subdomain-setup-and-live-verification.md](file:///d:/projects/sroor/docs/history/2026-08-08/17-sroor-subdomain-setup-and-live-verification.md) | إعداد وتفعيل النطاق الفرعي `https://sroor.baraa-solutions.com/` واختبار كافة الشاشات والمسارات الحية بنجاح 100% (HTTP 200 OK). | DevOps Engineer | ✅ مكتمل بنجاح |
 
 ---
 
 ## 2. ملخص الإنجاز اليومي العام
-* المشروع مرفوع وشغال بالكامل على خادم Hostinger المباشر ومربوط بـ MySQL.
+* المشروع مرفوع وشغال بالكامل على النطاق المطلوب `https://sroor.baraa-solutions.com/items` ومربوط بـ MySQL.
 * تشغيل واجتياز **26 اختبارًا مؤتمتًا (75 تأكيدًا)** بنجاح 100%.
