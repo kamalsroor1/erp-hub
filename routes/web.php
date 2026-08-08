@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\Livewire\Auth\Login;
 use App\Livewire\Dashboard;
 use App\Livewire\InvoiceCreate;
 use App\Livewire\InvoiceIndex;
@@ -17,52 +19,68 @@ use App\Livewire\ReturnIndex;
 use App\Livewire\ReportsIndex;
 use App\Models\Invoice;
 
-// Dashboard
-Route::get('/', Dashboard::class)->name('dashboard');
+// 1. Guest Authentication Routes
+Route::middleware('guest')->group(function () {
+    Route::get('/login', Login::class)->name('login');
+});
 
-// Invoices & POS
-Route::get('/invoices', InvoiceIndex::class)->name('invoices.index');
-Route::get('/invoices/create', InvoiceCreate::class)->name('invoices.create');
-Route::get('/invoices/{id}', InvoiceShow::class)->name('invoices.show');
+// 2. Logout Route
+Route::post('/logout', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect()->route('login');
+})->name('logout')->middleware('auth');
 
-// Printing Routes
-Route::get('/invoices/{id}/print/thermal', function ($id) {
-    $invoice = Invoice::with(['customer', 'items.item'])->findOrFail($id);
-    return view('layouts.print-thermal', compact('invoice'));
-})->name('invoices.print.thermal');
+// 3. Protected POS, ERP & Inventory Routes
+Route::middleware('auth')->group(function () {
+    // Dashboard
+    Route::get('/', Dashboard::class)->name('dashboard');
 
-Route::get('/invoices/{id}/print/a4', function ($id) {
-    $invoice = Invoice::with(['customer', 'items.item'])->findOrFail($id);
-    return view('layouts.print-a4', compact('invoice'));
-})->name('invoices.print.a4');
+    // Invoices & POS
+    Route::get('/invoices', InvoiceIndex::class)->name('invoices.index');
+    Route::get('/invoices/create', InvoiceCreate::class)->name('invoices.create');
+    Route::get('/invoices/{id}', InvoiceShow::class)->name('invoices.show');
 
-// Items & Inventory
-Route::get('/items', ItemIndex::class)->name('items.index');
+    // Printing Routes
+    Route::get('/invoices/{id}/print/thermal', function ($id) {
+        $invoice = Invoice::with(['customer', 'items.item'])->findOrFail($id);
+        return view('layouts.print-thermal', compact('invoice'));
+    })->name('invoices.print.thermal');
 
-// Customers & Statements
-Route::get('/customers', CustomerIndex::class)->name('customers.index');
-Route::get('/customers/{id}/statement', CustomerStatement::class)->name('customers.statement');
+    Route::get('/invoices/{id}/print/a4', function ($id) {
+        $invoice = Invoice::with(['customer', 'items.item'])->findOrFail($id);
+        return view('layouts.print-a4', compact('invoice'));
+    })->name('invoices.print.a4');
 
-// Suppliers & Purchases & Statements
-Route::get('/suppliers', SupplierIndex::class)->name('suppliers.index');
-Route::get('/suppliers/{id}/statement', SupplierStatement::class)->name('suppliers.statement');
-Route::get('/purchases', PurchaseIndex::class)->name('purchases.index');
-Route::get('/purchases/create', PurchaseCreate::class)->name('purchases.create');
+    // Items & Inventory
+    Route::get('/items', ItemIndex::class)->name('items.index');
 
-// Returns & Reversals
-Route::get('/returns', ReturnIndex::class)->name('returns.index');
-Route::get('/returns/create', ReturnCreate::class)->name('returns.create');
+    // Customers & Statements
+    Route::get('/customers', CustomerIndex::class)->name('customers.index');
+    Route::get('/customers/{id}/statement', CustomerStatement::class)->name('customers.statement');
 
-// Financial & Profit Reports
-Route::get('/reports', ReportsIndex::class)->name('reports.index');
+    // Suppliers & Purchases & Statements
+    Route::get('/suppliers', SupplierIndex::class)->name('suppliers.index');
+    Route::get('/suppliers/{id}/statement', SupplierStatement::class)->name('suppliers.statement');
+    Route::get('/purchases', PurchaseIndex::class)->name('purchases.index');
+    Route::get('/purchases/create', PurchaseCreate::class)->name('purchases.create');
 
-// Coffee Blending Master & Roastery Recipe
-Route::get('/coffee-blender', App\Livewire\CoffeeBlender::class)->name('coffee.blender');
+    // Returns & Reversals
+    Route::get('/returns', ReturnIndex::class)->name('returns.index');
+    Route::get('/returns/create', ReturnCreate::class)->name('returns.create');
 
-// Cashier Shifts & Drawer Z-Reports
-Route::get('/shifts', App\Livewire\CashShiftManager::class)->name('shifts.index');
+    // Financial & Profit Reports
+    Route::get('/reports', ReportsIndex::class)->name('reports.index');
 
-// Excel & CSV Exports
-Route::get('/customers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportCustomerStatement'])->name('customers.export.csv');
-Route::get('/suppliers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportSupplierStatement'])->name('suppliers.export.csv');
-Route::get('/items/export-csv', [App\Http\Controllers\ExportController::class, 'exportInventory'])->name('items.export.csv');
+    // Coffee Blending Master & Roastery Recipe
+    Route::get('/coffee-blender', App\Livewire\CoffeeBlender::class)->name('coffee.blender');
+
+    // Cashier Shifts & Drawer Z-Reports
+    Route::get('/shifts', App\Livewire\CashShiftManager::class)->name('shifts.index');
+
+    // Excel & CSV Exports
+    Route::get('/customers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportCustomerStatement'])->name('customers.export.csv');
+    Route::get('/suppliers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportSupplierStatement'])->name('suppliers.export.csv');
+    Route::get('/items/export-csv', [App\Http\Controllers\ExportController::class, 'exportInventory'])->name('items.export.csv');
+});

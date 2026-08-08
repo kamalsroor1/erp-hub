@@ -26,6 +26,7 @@
                 extend: {
                     fontFamily: {
                         sans: ['Cairo', 'Tajawal', 'sans-serif'],
+                        tajawal: ['Tajawal', 'sans-serif'],
                     },
                     colors: {
                         primary: {
@@ -70,128 +71,154 @@
     </style>
     @livewireStyles
 </head>
-<body class="h-full bg-slate-950 text-slate-100 flex overflow-hidden selection:bg-emerald-500 selection:text-white" x-data="{ sidebarOpen: false }">
+<body class="h-full bg-slate-950 text-slate-100 flex overflow-hidden selection:bg-amber-500 selection:text-white" x-data="{ sidebarOpen: false }">
 
-    <!-- Mobile sidebar backdrop -->
-    <div x-show="sidebarOpen" @click="sidebarOpen = false" x-cloak class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"></div>
+    @auth
+        <!-- Mobile sidebar backdrop -->
+        <div x-show="sidebarOpen" @click="sidebarOpen = false" x-cloak class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"></div>
 
-    <!-- Sidebar Navigation -->
-    <aside :class="sidebarOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'" class="fixed lg:static inset-y-0 right-0 z-50 w-72 bg-slate-900 border-l border-slate-800 flex flex-col transition-transform duration-300 ease-in-out">
-        <!-- Brand Header -->
-        <div class="h-16 px-6 flex items-center justify-between border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 font-black text-xl text-white">
-                    س
+        <!-- Sidebar Navigation -->
+        <aside :class="sidebarOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'" class="fixed lg:static inset-y-0 right-0 z-50 w-72 bg-slate-900 border-l border-slate-800 flex flex-col transition-transform duration-300 ease-in-out">
+            <!-- Brand Header -->
+            <div class="h-16 px-6 flex items-center justify-between border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-amber-400 flex items-center justify-center shadow-lg shadow-amber-500/20 font-black text-xl text-white">
+                        ☕
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-base tracking-tight text-white flex items-center gap-1.5 font-tajawal">
+                            سرور POS
+                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">V1.0</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">إدارة الفواتير والمخزون</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="font-extrabold text-base tracking-tight text-white flex items-center gap-1.5">
-                        سرور للمبيعات
-                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">MVP</span>
-                    </h1>
-                    <p class="text-xs text-slate-400">إدارة الفواتير والمخزون</p>
-                </div>
-            </div>
-            <button @click="sidebarOpen = false" class="lg:hidden text-slate-400 hover:text-white">
-                ✕
-            </button>
-        </div>
-
-        <!-- Quick POS Button -->
-        <div class="p-4 border-b border-slate-800/60">
-            <a href="{{ route('invoices.create') }}" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition-all duration-200 active:scale-95 group">
-                <svg class="w-5 h-5 transition-transform group-hover:rotate-90 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                <span>فاتورة بيع جديدة (F2)</span>
-            </a>
-        </div>
-
-        <!-- Nav Links -->
-        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-            <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('dashboard') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                <span>لوحة التحكم (Dashboard)</span>
-            </a>
-
-            <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">المبيعات والفواتير</div>
-
-            <a href="{{ route('invoices.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('invoices.index') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                <span>فواتير المبيعات</span>
-            </a>
-
-            <a href="{{ route('customers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('customers.*') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                <span>العملاء والحسابات</span>
-            </a>
-
-            <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">المشتريات والمخزون</div>
-
-            <a href="{{ route('items.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('items.*') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                <span>الأصناف والمخزون</span>
-            </a>
-
-            <a href="{{ route('purchases.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('purchases.*') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                <span>فواتير المشتريات</span>
-            </a>
-
-            <a href="{{ route('suppliers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('suppliers.*') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                <span>الموردون</span>
-            </a>
-
-            <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">المرتجعات والتقارير المالية</div>
-
-            <a href="{{ route('returns.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('returns.*') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                <span>سجل المرتجعات</span>
-            </a>
-
-            <a href="{{ route('reports.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('reports.*') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                <span>التقارير والأرباح (COGS)</span>
-            </a>
-        </nav>
-
-        <!-- System Footer -->
-        <div class="p-4 border-t border-slate-800/80 bg-slate-900/40 text-xs text-slate-400 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>الخادم نشط (Live)</span>
-            </div>
-            <span class="font-mono text-slate-400">v1.0.0</span>
-        </div>
-    </aside>
-
-    <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <!-- Top App Bar -->
-        <header class="h-16 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 flex items-center justify-between px-4 lg:px-8 shrink-0 z-30">
-            <div class="flex items-center gap-3">
-                <button @click="sidebarOpen = true" class="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                <button @click="sidebarOpen = false" class="lg:hidden text-slate-400 hover:text-white">
+                    ✕
                 </button>
-                <div class="text-sm font-semibold text-slate-300 hidden sm:flex items-center gap-2">
-                    <span>📅 {{ now()->translatedFormat('l, d F Y') }}</span>
-                    <span class="text-slate-600">|</span>
-                    <span class="text-emerald-400 font-mono" x-data="{ time: new Date().toLocaleTimeString('ar-EG') }" x-init="setInterval(() => time = new Date().toLocaleTimeString('ar-EG'), 1000)" x-text="time"></span>
-                </div>
             </div>
 
-            <!-- Header Actions -->
-            <div class="flex items-center gap-3">
-                <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/60 text-xs">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                    <span class="font-bold text-slate-200">المدير العام</span>
-                </div>
+            <!-- Quick POS Button -->
+            <div class="p-4 border-b border-slate-800/60">
+                <a href="{{ route('invoices.create') }}" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-500 text-white font-bold rounded-xl shadow-lg shadow-amber-600/30 transition-all duration-200 active:scale-95 group font-tajawal">
+                    <svg class="w-5 h-5 transition-transform group-hover:rotate-90 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                    <span>فاتورة بيع جديدة (F2)</span>
+                </a>
             </div>
-        </header>
 
-        <!-- Dynamic Body Page Content -->
-        <main class="flex-1 overflow-y-auto bg-slate-950 p-4 lg:p-6">
+            <!-- Nav Links -->
+            <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('dashboard') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    <span>لوحة التحكم (Dashboard)</span>
+                </a>
+
+                <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">المبيعات والفواتير</div>
+
+                <a href="{{ route('invoices.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('invoices.index') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <span>فواتير المبيعات</span>
+                </a>
+
+                <a href="{{ route('customers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('customers.*') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <span>العملاء والحسابات</span>
+                </a>
+
+                <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">المشتريات والمخزون</div>
+
+                <a href="{{ route('items.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('items.*') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    <span>الأصناف والمخزون</span>
+                </a>
+
+                <a href="{{ route('purchases.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('purchases.*') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <span>فواتير المشتريات</span>
+                </a>
+
+                <a href="{{ route('suppliers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('suppliers.*') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    <span>الموردون</span>
+                </a>
+
+                <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">المرتجعات والتقارير المالية</div>
+
+                <a href="{{ route('returns.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('returns.*') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    <span>سجل المرتجعات</span>
+                </a>
+
+                <a href="{{ route('reports.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('reports.*') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <span>التقارير والأرباح (COGS)</span>
+                </a>
+            </nav>
+
+            <!-- User Info & Logout -->
+            <div class="p-4 border-t border-slate-800/80 bg-slate-900/60 flex items-center justify-between">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 flex items-center justify-center font-bold text-xs shrink-0">
+                        {{ mb_substr(auth()->user()->name ?? 'م', 0, 1) }}
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-slate-200 truncate">{{ auth()->user()->name ?? 'مستخدم' }}</p>
+                        <p class="text-[10px] text-amber-400/80 truncate">مدير مصرح له</p>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors" title="تسجيل الخروج">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            <!-- Top App Bar -->
+            <header class="h-16 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 flex items-center justify-between px-4 lg:px-8 shrink-0 z-30">
+                <div class="flex items-center gap-3">
+                    <button @click="sidebarOpen = true" class="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                    <div class="text-sm font-semibold text-slate-300 hidden sm:flex items-center gap-2">
+                        <span>📅 {{ now()->translatedFormat('l, d F Y') }}</span>
+                        <span class="text-slate-600">|</span>
+                        <span class="text-amber-400 font-mono" x-data="{ time: new Date().toLocaleTimeString('ar-EG') }" x-init="setInterval(() => time = new Date().toLocaleTimeString('ar-EG'), 1000)" x-text="time"></span>
+                    </div>
+                </div>
+
+                <!-- Header Actions -->
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/60 text-xs">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="font-bold text-slate-200">{{ auth()->user()->name ?? 'المدير العام' }}</span>
+                    </div>
+
+                    <form method="POST" action="{{ route('logout') }}" class="hidden sm:block">
+                        @csrf
+                        <button type="submit" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-xl transition-all">
+                            <span>🚪</span>
+                            <span>خروج</span>
+                        </button>
+                    </form>
+                </div>
+            </header>
+
+            <!-- Dynamic Body Page Content -->
+            <main class="flex-1 overflow-y-auto bg-slate-950 p-4 lg:p-6">
+                {{ $slot }}
+            </main>
+        </div>
+    @else
+        <!-- Guest View (Full screen Login) -->
+        <main class="flex-1 min-h-screen">
             {{ $slot }}
         </main>
-    </div>
+    @endauth
 
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -236,7 +263,7 @@
         window.addEventListener('swal:toast', event => {
             const detail = Array.isArray(event.detail) ? event.detail[0] : (event.detail || {});
             Toast.fire({
-                icon: detail.icon || 'success',
+                icon: detail.icon || detail.type || 'success',
                 title: detail.title || detail.message || 'تمت العملية بنجاح'
             });
         });
@@ -244,11 +271,11 @@
         window.addEventListener('swal:alert', event => {
             const detail = Array.isArray(event.detail) ? event.detail[0] : (event.detail || {});
             Swal.fire({
-                icon: detail.icon || 'info',
+                icon: detail.icon || detail.type || 'info',
                 title: detail.title || 'إشعار',
                 text: detail.text || detail.message || '',
                 confirmButtonText: 'حسناً',
-                confirmButtonColor: '#059669',
+                confirmButtonColor: '#d97706',
                 background: '#0f172a',
                 color: '#f8fafc',
                 customClass: {
