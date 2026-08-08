@@ -29,6 +29,11 @@ jobs:
       - name: Install Composer Dependencies
         run: composer update --prefer-dist --no-progress --no-interaction --optimize-autoloader
 
+      - name: Setup Application Key for Testing
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
       - name: Execute Tests via PHPUnit
         run: php artisan test
 
