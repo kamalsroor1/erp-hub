@@ -14,15 +14,44 @@ class DatabaseSeeder extends Seeder
 {
     public function run(StockService $stockService, InvoiceService $invoiceService): void
     {
-        // 1. Admin User
-        $user = User::firstOrCreate(
+        // 1. Roles & Permissions setup
+        $adminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin']);
+        $cashierRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'cashier']);
+        $storeRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'storekeeper']);
+        $accountantRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'accountant']);
+
+        // 2. Admin User
+        $adminUser = User::firstOrCreate(
             ['email' => 'admin@sroor.com'],
             [
-                'name' => 'المدير العام',
+                'name' => 'كمال سرور - المدير العام',
                 'password' => bcrypt('password'),
                 'is_active' => true,
             ]
         );
+        $adminUser->syncRoles([$adminRole]);
+
+        // 3. Cashier User
+        $cashierUser = User::firstOrCreate(
+            ['email' => 'cashier@sroor.com'],
+            [
+                'name' => 'أحمد محمود - كاشير مبيعات',
+                'password' => bcrypt('password'),
+                'is_active' => true,
+            ]
+        );
+        $cashierUser->syncRoles([$cashierRole]);
+
+        // 4. Storekeeper User
+        $storeUser = User::firstOrCreate(
+            ['email' => 'store@sroor.com'],
+            [
+                'name' => 'محمد رجب - أمين المخزن',
+                'password' => bcrypt('password'),
+                'is_active' => true,
+            ]
+        );
+        $storeUser->syncRoles([$storeRole]);
 
         // 2. Specialized Customers (Cafes, Supermarkets, Retail walk-ins)
         $c1 = Customer::firstOrCreate(['name' => 'كافيه وكوفي شوب البستان'], [

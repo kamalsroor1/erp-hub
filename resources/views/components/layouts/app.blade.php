@@ -149,27 +149,34 @@
                     <span>سجل المرتجعات</span>
                 </a>
 
-                <a href="{{ route('reports.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('reports.*') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    <span>التقارير والأرباح (COGS)</span>
+                <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">إدارة النظام والمستخدمين</div>
+
+                <a href="{{ route('users.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('users.*') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <span>المستخدمون والكاشير</span>
+                </a>
+
+                <a href="{{ route('profile') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('profile') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    <span>الملف الشخصي والأمان</span>
                 </a>
             </nav>
 
             <!-- User Info & Logout -->
             <div class="p-4 border-t border-slate-800/80 bg-slate-900/60 flex items-center justify-between">
-                <div class="flex items-center gap-2.5 min-w-0">
+                <a href="{{ route('profile') }}" class="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition-opacity">
                     <div class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 flex items-center justify-center font-bold text-xs shrink-0">
                         {{ mb_substr(auth()->user()->name ?? 'م', 0, 1) }}
                     </div>
                     <div class="min-w-0">
                         <p class="text-xs font-bold text-slate-200 truncate">{{ auth()->user()->name ?? 'مستخدم' }}</p>
-                        <p class="text-[10px] text-amber-400/80 truncate">مدير مصرح له</p>
+                        <p class="text-[10px] text-amber-400/80 truncate">⚙️ إعدادات الحساب</p>
                     </div>
-                </div>
+                </a>
 
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors" title="تسجيل الخروج">
+                    <button type="submit" class="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer" title="تسجيل الخروج">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     </button>
                 </form>
@@ -192,19 +199,49 @@
                 </div>
 
                 <!-- Header Actions -->
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/60 text-xs">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span class="font-bold text-slate-200">{{ auth()->user()->name ?? 'المدير العام' }}</span>
-                    </div>
-
-                    <form method="POST" action="{{ route('logout') }}" class="hidden sm:block">
-                        @csrf
-                        <button type="submit" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-xl transition-all">
-                            <span>🚪</span>
-                            <span>خروج</span>
+                <div class="flex items-center gap-3" x-data="{ userMenuOpen: false }">
+                    <div class="relative">
+                        <button
+                            @click="userMenuOpen = !userMenuOpen"
+                            class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 text-xs transition-colors cursor-pointer"
+                        >
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span class="font-bold text-slate-200">{{ auth()->user()->name ?? 'المدير العام' }}</span>
+                            <span class="text-slate-400 text-[10px]">▼</span>
                         </button>
-                    </form>
+
+                        <!-- Dropdown Menu -->
+                        <div
+                            x-show="userMenuOpen"
+                            @click.away="userMenuOpen = false"
+                            x-cloak
+                            class="absolute left-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl py-2 z-50 divide-y divide-slate-800/80 font-sans"
+                        >
+                            <div class="px-4 py-2 text-xs">
+                                <p class="font-bold text-white">{{ auth()->user()->name }}</p>
+                                <p class="text-[10px] text-slate-400 font-mono" dir="ltr">{{ auth()->user()->email }}</p>
+                            </div>
+                            <div class="py-1">
+                                <a href="{{ route('profile') }}" class="flex items-center gap-2 px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                                    <span>⚙️</span>
+                                    <span>الملف الشخصي والأمان</span>
+                                </a>
+                                <a href="{{ route('users.index') }}" class="flex items-center gap-2 px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                                    <span>👥</span>
+                                    <span>إدارة المستخدمين</span>
+                                </a>
+                            </div>
+                            <div class="pt-1">
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="w-full flex items-center gap-2 px-4 py-2 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer text-right">
+                                        <span>🚪</span>
+                                        <span>تسجيل الخروج</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </header>
 

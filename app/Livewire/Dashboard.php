@@ -8,9 +8,12 @@ use App\Models\Item;
 use App\Models\Customer;
 use App\Models\Purchase;
 use App\Services\ProfitService;
+use App\Livewire\Traits\RequiresAuth;
 
 class Dashboard extends Component
 {
+    use RequiresAuth;
+
     public function render(ProfitService $profitService)
     {
         $today = now()->toDateString();

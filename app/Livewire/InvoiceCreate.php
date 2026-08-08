@@ -6,10 +6,13 @@ use Livewire\Component;
 use App\Models\Item;
 use App\Models\Customer;
 use App\Services\InvoiceService;
+use App\Livewire\Traits\RequiresAuth;
 use Exception;
 
 class InvoiceCreate extends Component
 {
+    use RequiresAuth;
+
     public $customer_id;
     public $invoice_date;
     public $payment_type = 'cash'; // cash, credit, partial

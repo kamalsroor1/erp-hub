@@ -79,6 +79,10 @@ Route::middleware('auth')->group(function () {
     // Cashier Shifts & Drawer Z-Reports
     Route::get('/shifts', App\Livewire\CashShiftManager::class)->name('shifts.index');
 
+    // Auth, Profile & User Management
+    Route::get('/profile', App\Livewire\Auth\Profile::class)->name('profile');
+    Route::get('/users', App\Livewire\Auth\UserManager::class)->name('users.index');
+
     // Excel & CSV Exports
     Route::get('/customers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportCustomerStatement'])->name('customers.export.csv');
     Route::get('/suppliers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportSupplierStatement'])->name('suppliers.export.csv');

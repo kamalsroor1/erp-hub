@@ -6,10 +6,11 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Item;
 use App\Services\StockService;
+use App\Livewire\Traits\RequiresAuth;
 
 class ItemIndex extends Component
 {
-    use WithPagination;
+    use WithPagination, RequiresAuth;
 
     public $search = '';
     public $filterStock = 'all'; // all, low, out
