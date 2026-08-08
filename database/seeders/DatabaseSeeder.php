@@ -15,7 +15,7 @@ use App\Models\StockMovement;
 use App\Models\AuditLog;
 use App\Models\Payment;
 use App\Models\ReturnRecord;
-use App\Models\ReturnRecordItem;
+use App\Models\ReturnItem;
 use App\Models\CashShift;
 use App\Services\StockService;
 use App\Services\InvoiceService;
@@ -43,7 +43,9 @@ class DatabaseSeeder extends Seeder
         Invoice::query()->delete();
         PurchaseItem::query()->delete();
         Purchase::query()->delete();
-        ReturnRecordItem::query()->delete();
+        if (class_exists(ReturnItem::class)) {
+            ReturnItem::query()->delete();
+        }
         ReturnRecord::query()->delete();
         StockMovement::query()->delete();
         Payment::query()->delete();
