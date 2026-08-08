@@ -30,10 +30,11 @@
 | **20** | [20-fix-github-actions-yaml-syntax.md](file:///d:/projects/sroor/docs/history/2026-08-08/20-fix-github-actions-yaml-syntax.md) | تصحيح خطأ مسافات الـ YAML (Indentation Syntax) في `.github/workflows/deploy.yml` ليعمل الـ CI/CD بنجاح تام. | DevOps Engineer | ✅ مكتمل بنجاح |
 | **21** | [21-resolve-ci-missing-app-key-exception.md](file:///d:/projects/sroor/docs/history/2026-08-08/21-resolve-ci-missing-app-key-exception.md) | حل خطأ `MissingAppKeyException` في بيئة اختبارات GitHub Actions بتعريف مفتاح التشفير في `phpunit.xml`. | QA & DevOps | ✅ مكتمل بنجاح |
 | **22** | [22-native-paramiko-ssh-engine-for-ci.md](file:///d:/projects/sroor/docs/history/2026-08-08/22-native-paramiko-ssh-engine-for-ci.md) | استخدام محرك Python Paramiko بدلاً من Docker Action لتفادي أخطاء الـ SSH Handshake. | DevOps Engineer | ✅ مكتمل بنجاح |
-| **23** | [23-webhook-auto-deploy-system.md](file:///d:/projects/sroor/docs/history/2026-08-08/23-webhook-auto-deploy-system.md) | اعتماد نظام الـ Webhook المشفر وفائق السرعة لتجاوز حظر الـ SSH IP على سيرفرات Hostinger وتوفير نشر فوري 100%. | DevOps Engineer | ✅ مكتمل بنجاح |
+| **23** | [23-webhook-auto-deploy-system.md](file:///d:/projects/sroor/docs/history/2026-08-08/23-webhook-auto-deploy-system.md) | اعتماد نظام الـ Webhook المشفر وفائق السرعة لتجاوز حظر الـ SSH IP على سيرفرات Hostinger. | DevOps Engineer | ✅ مكتمل بنجاح |
+| **24** | [24-one-click-local-deployment-tool.md](file:///d:/projects/sroor/docs/history/2026-08-08/24-one-click-local-deployment-tool.md) | إنشاء سكريبت النشر المباشر السريع من جهازك المحلي (`deploy.bat` و `deploy_local_to_server.py`) لرفع وتحديث السيرفر في ثوانٍ. | DevOps Engineer | ✅ مكتمل بنجاح |
 
 ---
 
 ## 2. ملخص الإنجاز اليومي العام
-* تم الانتقال إلى معمارية الـ Webhook الفورية للنشر التلقائي الآمن على Hostinger.
+* تم توفير أداة النشر المحلي الفوري بضغطة زر واحدة `deploy.bat`.
 * تشغيل واجتياز **39 اختبارًا مؤتمتًا (106 تأكيدات)** بنجاح 100%.
