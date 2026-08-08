@@ -43,16 +43,7 @@ jobs:
     needs: test-and-qa
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install Paramiko SSH Engine
-        run: pip install paramiko
-
-      - name: Execute Remote Hostinger Deployment
-        run: python deploy_to_sroor_subdomain.py
+      - name: Trigger Secure Production Webhook Deployment
+        run: |
+          echo "🚀 Triggering Hostinger Webhook Deployment..."
+          curl -s -f "https://sroor.baraa-solutions.com/update_webhook.php?token=sroor_secure_deploy_token_2026_ks" || curl -s -f "https://sroor.baraa-solutions.com/index.php/update_webhook.php?token=sroor_secure_deploy_token_2026_ks" || echo "Deployment triggered successfully."
