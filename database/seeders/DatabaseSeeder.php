@@ -27,36 +27,18 @@ class DatabaseSeeder extends Seeder
 {
     public function run(StockService $stockService, InvoiceService $invoiceService): void
     {
-        // 1. Setup Roles
+        // 1. Disable Foreign Key checks to cleanly wipe previous dummy data
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        }
+
+        // 2. Setup Roles
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $cashierRole = Role::firstOrCreate(['name' => 'cashier']);
         $storeRole = Role::firstOrCreate(['name' => 'storekeeper']);
         $accountantRole = Role::firstOrCreate(['name' => 'accountant']);
 
-        // 2. Clear old users to ensure ONLY 2 Super Admins exist
-        User::query()->delete();
-
-        // 3. Super Admin User 1 (كمال سرور)
-        $admin1 = User::create([
-            'name'      => 'كمال سرور - المدير العام',
-            'phone'     => '01012316954',
-            'email'     => '01012316954@sroor.com',
-            'password'  => bcrypt('password'),
-            'is_active' => true,
-        ]);
-        $admin1->syncRoles([$adminRole]);
-
-        // 4. Super Admin User 2 (المدير العام 2)
-        $admin2 = User::create([
-            'name'      => 'المدير العام 2',
-            'phone'     => '01558088841',
-            'email'     => '01558088841@sroor.com',
-            'password'  => bcrypt('123456789'),
-            'is_active' => true,
-        ]);
-        $admin2->syncRoles([$adminRole]);
-
-        // 5. Clear all dummy transactions & data to leave the database clean and fresh
+        // 3. Clear all dummy transactions & inventory data
         InvoiceItem::query()->delete();
         Invoice::query()->delete();
         PurchaseItem::query()->delete();
@@ -72,6 +54,34 @@ class DatabaseSeeder extends Seeder
 
         if (Schema::hasTable('cash_shifts')) {
             CashShift::query()->delete();
+        }
+
+        // 4. Wipe users table to leave ONLY the 2 requested Super Admins
+        User::query()->delete();
+
+        // 5. Super Admin 1: كمال سرور (01012316954 / password)
+        $admin1 = User::create([
+            'name'      => 'كمال سرور - المدير العام',
+            'phone'     => '01012316954',
+            'email'     => '01012316954@sroor.com',
+            'password'  => bcrypt('password'),
+            'is_active' => true,
+        ]);
+        $admin1->syncRoles([$adminRole]);
+
+        // 6. Super Admin 2: المدير العام 2 (01558088841 / 123456789)
+        $admin2 = User::create([
+            'name'      => 'المدير العام 2',
+            'phone'     => '01558088841',
+            'email'     => '01558088841@sroor.com',
+            'password'  => bcrypt('123456789'),
+            'is_active' => true,
+        ]);
+        $admin2->syncRoles([$adminRole]);
+
+        // 7. Re-enable Foreign Key checks
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         }
     }
 }
