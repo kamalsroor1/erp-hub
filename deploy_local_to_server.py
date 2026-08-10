@@ -52,7 +52,6 @@ def main():
             f"cd {target} && rm -f bootstrap/cache/*.php",
             f"cd {target} && {PHP84} artisan optimize:clear",
             f"cd {target} && {PHP84} artisan migrate --force",
-            f"cd {target} && {PHP84} artisan db:seed --force",
             f"cd {target} && [ -f index.html ] && mv index.html index.html.bak 2>/dev/null || true",
             f"cd {target} && chmod -R 775 storage bootstrap/cache",
         ]
