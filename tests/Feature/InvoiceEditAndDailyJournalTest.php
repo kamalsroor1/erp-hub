@@ -191,4 +191,38 @@ class InvoiceEditAndDailyJournalTest extends TestCase
 
         $this->assertNull($shiftService->getActiveShift());
     }
+
+    public function test_opening_cash_plus_sales_calculates_exact_expected_drawer_cash()
+    {
+        $this->actingAs($this->admin);
+
+        $shiftService = app(ShiftService::class);
+        $invoiceService = app(InvoiceService::class);
+
+        // 1. Open shift with 500 LE
+        $shiftService->openShift('500.000', 'افتتاح الوردية');
+
+        // 2. Make cash sale of 250 LE
+        $invoiceService->confirmInvoice([
+            'customer_id'   => $this->customer->id,
+            'invoice_date'  => now()->toDateString(),
+            'payment_type'  => 'cash',
+            'discount_type' => 'fixed',
+            'discount_value'=> '0.000',
+            'items'         => [
+                [
+                    'item_id'    => $this->coffeeItem->id,
+                    'quantity'   => '1.000',
+                    'unit_price' => '250.000',
+                ]
+            ]
+        ]);
+
+        // 3. Daily Journal MUST show 750.00 LE (500 + 250)
+        Livewire::test(DailyJournalIndex::class)
+            ->assertSee('500.00') // opening balance
+            ->assertSee('250.00') // cash sales
+            ->assertSee('750.00') // total expected in drawer
+            ->assertHasNoErrors();
+    }
 }

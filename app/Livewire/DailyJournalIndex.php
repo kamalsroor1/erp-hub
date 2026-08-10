@@ -125,7 +125,7 @@ class DailyJournalIndex extends Component
             ->whereDate('payment_date', $date)
             ->whereNotNull('customer_id')
             ->get();
-        $totalCashCollected = (string)($customerPayments->sum('amount') ?: '0.000');
+        $totalCashCollected = (string)($customerPayments->sum('amount') ?: ($cashSales + $partialSales));
 
         // 3. Operational Expenses on this day
         $expenses = Expense::whereDate('expense_date', $date)->latest('id')->get();
@@ -146,33 +146,52 @@ class DailyJournalIndex extends Component
             ->get();
         $totalSupplierPaid = (string)($supplierPayments->sum('amount') ?: '0.000');
 
-        // 6. Net Drawer Balance for this day = Cash In - (Expenses + Supplier Payments)
+        // 6. Net Movement for this day = Cash In - (Expenses + Supplier Payments)
         $totalOutflows = bcadd($totalExpenses, $totalSupplierPaid, 3);
-        $netCashToday = bcsub($totalCashCollected, $totalOutflows, 3);
+        $netCashToday = bcsub((string)$totalCashCollected, $totalOutflows, 3);
 
-        // 7. Shifts for this day
+        // 7. Shifts on this day & Opening Balance
         $shiftsOnDate = CashShift::with('user')
             ->whereDate('opened_at', $date)
             ->latest('id')
             ->get();
 
+        $openingCashBalance = '0.000';
+        if ($this->activeShift && $this->activeShift->opened_at->format('Y-m-d') === $date) {
+            $openingCashBalance = (string)$this->activeShift->opening_cash_balance;
+        } elseif ($shiftsOnDate->count() > 0) {
+            $openingCashBalance = (string)$shiftsOnDate->first()->opening_cash_balance;
+        }
+
+        // 8. Expected Total Cash Physically in Drawer Right Now = Opening Balance + Net Cash Today
+        $expectedCashInDrawer = bcadd($openingCashBalance, $netCashToday, 3);
+
+        // Calculate live shift stats if active
+        $activeShiftTotals = null;
+        if ($this->activeShift) {
+            $activeShiftTotals = $shiftService->calculateShiftTotals($this->activeShift);
+        }
+
         return view('livewire.daily-journal-index', [
-            'invoices'           => $invoices,
-            'invoicesCount'      => $invoicesCount,
-            'totalSales'         => $totalSales,
-            'cashSales'          => $cashSales,
-            'creditSales'        => $creditSales,
-            'partialSales'       => $partialSales,
-            'customerPayments'   => $customerPayments,
-            'totalCashCollected' => $totalCashCollected,
-            'expenses'           => $expenses,
-            'totalExpenses'      => $totalExpenses,
-            'purchases'          => $purchases,
-            'totalPurchases'     => $totalPurchases,
-            'supplierPayments'   => $supplierPayments,
-            'totalSupplierPaid'  => $totalSupplierPaid,
-            'netCashToday'       => $netCashToday,
-            'shiftsOnDate'       => $shiftsOnDate,
+            'invoices'             => $invoices,
+            'invoicesCount'        => $invoicesCount,
+            'totalSales'           => $totalSales,
+            'cashSales'            => $cashSales,
+            'creditSales'          => $creditSales,
+            'partialSales'         => $partialSales,
+            'customerPayments'     => $customerPayments,
+            'totalCashCollected'   => $totalCashCollected,
+            'expenses'             => $expenses,
+            'totalExpenses'        => $totalExpenses,
+            'purchases'            => $purchases,
+            'totalPurchases'       => $totalPurchases,
+            'supplierPayments'     => $supplierPayments,
+            'totalSupplierPaid'    => $totalSupplierPaid,
+            'netCashToday'         => $netCashToday,
+            'openingCashBalance'   => $openingCashBalance,
+            'expectedCashInDrawer' => $expectedCashInDrawer,
+            'shiftsOnDate'         => $shiftsOnDate,
+            'activeShiftTotals'    => $activeShiftTotals,
         ])->layout('components.layouts.app', ['title' => "يومية المبيعات وحركة الدرج - {$date}"]);
     }
 }

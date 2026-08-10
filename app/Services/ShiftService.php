@@ -50,37 +50,59 @@ class ShiftService
     {
         $openedAt = $shift->opened_at;
 
-        // Cash sales
+        // Total cash sales (invoices paid in cash)
         $cashSales = Invoice::where('status', 'confirmed')
             ->where('payment_type', 'cash')
             ->where('created_at', '>=', $openedAt)
-            ->sum('paid_amount');
+            ->sum('paid_amount') ?: '0.000';
 
-        // Credit sales
+        // Credit sales on account
         $creditSales = Invoice::where('status', 'confirmed')
             ->whereIn('payment_type', ['credit', 'partial'])
             ->where('created_at', '>=', $openedAt)
-            ->sum('remaining_amount');
+            ->sum('remaining_amount') ?: '0.000';
 
-        // Customer payments collected into cash drawer
+        // Total cash inflows from customers (all cash payments)
         $paymentsCollected = Payment::where('created_at', '>=', $openedAt)
             ->whereNotNull('customer_id')
-            ->sum('amount');
+            ->where('payment_method', 'cash')
+            ->sum('amount') ?: '0.000';
+
+        // If no payment records found, fallback to cash sales
+        $totalCashIn = bccomp((string)$paymentsCollected, '0.000', 3) > 0
+            ? (string)$paymentsCollected
+            : (string)$cashSales;
+
+        // Cash outflows: Operational expenses paid in cash
+        $expenses = \App\Models\Expense::where('created_at', '>=', $openedAt)
+            ->where('payment_method', 'cash')
+            ->sum('amount') ?: '0.000';
+
+        // Cash outflows: Supplier payments paid in cash
+        $supplierPaid = Payment::where('created_at', '>=', $openedAt)
+            ->whereNotNull('supplier_id')
+            ->where('payment_method', 'cash')
+            ->sum('amount') ?: '0.000';
 
         // Sales Returns refunded in cash
         $refunds = ReturnDocument::where('created_at', '>=', $openedAt)
             ->where('return_type', 'sales_return')
-            ->sum('total_amount');
+            ->sum('total_amount') ?: '0.000';
 
-        // Expected in drawer = Opening Cash + Cash Sales + Customer Payments Collected - Refunds
-        $expectedCash = bcadd((string)$shift->opening_cash_balance, (string)$cashSales, 3);
-        $expectedCash = bcadd($expectedCash, (string)$paymentsCollected, 3);
-        $expectedCash = bcsub($expectedCash, (string)$refunds, 3);
+        $totalCashOut = bcadd((string)$expenses, (string)$supplierPaid, 3);
+        $totalCashOut = bcadd($totalCashOut, (string)$refunds, 3);
+
+        // Expected in drawer = Opening Cash + Total Cash In - Total Cash Out
+        $expectedCash = bcadd((string)$shift->opening_cash_balance, $totalCashIn, 3);
+        $expectedCash = bcsub($expectedCash, $totalCashOut, 3);
 
         return [
+            'opening_cash_balance'      => (string) $shift->opening_cash_balance,
             'total_cash_sales'          => (string) $cashSales,
             'total_credit_sales'        => (string) $creditSales,
-            'total_payments_collected'  => (string) $paymentsCollected,
+            'total_payments_collected'  => $totalCashIn,
+            'total_expenses'            => (string) $expenses,
+            'total_supplier_paid'       => (string) $supplierPaid,
             'total_refunds'             => (string) $refunds,
             'expected_cash_balance'     => (string) $expectedCash,
         ];

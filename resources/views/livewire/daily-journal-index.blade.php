@@ -43,35 +43,50 @@
     @endif
 
     <!-- Shift / Drawer Action Bar -->
-    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-            <div class="w-3 h-3 rounded-full {{ $activeShift ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600' }}"></div>
+    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-sm">
+        <div class="flex items-start sm:items-center gap-3">
+            <div class="w-3.5 h-3.5 rounded-full mt-1 sm:mt-0 shrink-0 {{ $activeShift ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600' }}"></div>
             <div>
-                <div class="text-xs font-bold text-white flex items-center gap-2">
-                    <span>حالة اليومية / الوردية الحالية:</span>
+                <div class="text-xs font-bold text-white flex flex-wrap items-center gap-2">
+                    <span>حالة الوردية / اليومية:</span>
                     @if($activeShift)
-                        <span class="px-2 py-0.5 rounded-full text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">مفتوحة (وردية #{{ $activeShift->shift_number }})</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold">
+                            🟢 مفتوحة (#{{ $activeShift->shift_number }})
+                        </span>
+                        <span class="text-slate-400 font-normal">| الكاشير: <strong class="text-white">{{ $activeShift->user->name ?? 'الكاشير' }}</strong></span>
                     @else
-                        <span class="px-2 py-0.5 rounded-full text-[11px] bg-slate-800 text-slate-400">مغلقة / غير مفتوحة</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] bg-slate-800 text-slate-400 border border-slate-700">
+                            مغلقة / غير مفتوحة
+                        </span>
                     @endif
                 </div>
-                <div class="text-[11px] text-slate-400 mt-0.5">
-                    @if($activeShift)
-                        فُتحت بواسطة: <span class="text-slate-200 font-bold">{{ $activeShift->user->name ?? 'الكاشير' }}</span> الساعة {{ $activeShift->opened_at->format('h:i A') }} (رصيد افتتاحي: {{ number_format($activeShift->opening_cash_balance, 2) }} ج.م)
-                    @else
-                        يمكنك فتح اليومية وبدء تسجيل الرصيد الافتتاحي للدرج
+
+                @if($activeShift)
+                <div class="text-xs text-slate-300 mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono">
+                    <span>الافتتاحي: <strong class="text-white">{{ number_format($activeShift->opening_cash_balance, 2) }}</strong> ج.م</span>
+                    <span>+ المقبوض: <strong class="text-emerald-400">{{ number_format($totalCashCollected, 2) }}</strong> ج.م</span>
+                    @if(bccomp($totalExpenses, '0.000', 3) > 0)
+                    <span>- المصروفات: <strong class="text-rose-400">{{ number_format($totalExpenses, 2) }}</strong> ج.م</span>
                     @endif
+                    <span class="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-lg border border-amber-500/30 font-bold">
+                        💰 المفروض بالدرج الآن: {{ number_format($expectedCashInDrawer, 2) }} ج.م
+                    </span>
                 </div>
+                @else
+                <div class="text-[11px] text-slate-400 mt-1">
+                    يمكنك فتح اليومية وبدء تسجيل الرصيد الافتتاحي (العهدة/الفكة) للدرج.
+                </div>
+                @endif
             </div>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 shrink-0">
             @if($activeShift)
-                <button wire:click="openCloseModal" class="px-4 py-2 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white text-xs font-bold rounded-xl shadow-lg shadow-rose-600/30 flex items-center gap-1.5 transition-all">
+                <button wire:click="openCloseModal" class="px-4 py-2.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white text-xs font-bold rounded-xl shadow-lg shadow-rose-600/30 flex items-center gap-1.5 transition-all cursor-pointer">
                     <span>🔴 تقفيل اليومية (Z-Report)</span>
                 </button>
             @else
-                <button wire:click="openShiftModal" class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all">
+                <button wire:click="openShiftModal" class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all cursor-pointer">
                     <span>🟢 فتح يومية جديدة</span>
                 </button>
             @endif
@@ -80,19 +95,18 @@
 
     <!-- 5 Daily High-Level Metric Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        <!-- 1. Total Sales Invoices -->
+        <!-- 1. Opening Cash Balance -->
         <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-1">
-            <div class="text-xs font-bold text-slate-400">إجمالي مبيعات اليوم</div>
-            <div class="text-xl font-black text-white font-mono mt-2">{{ number_format($totalSales, 2) }} <span class="text-xs text-amber-400">ج.م</span></div>
-            <div class="text-[10px] text-slate-400 pt-1 border-t border-slate-800/80 flex justify-between">
-                <span>{{ $invoicesCount }} فاتورة</span>
-                <span>نقدي: {{ number_format($cashSales + $partialSales, 1) }}</span>
+            <div class="text-xs font-bold text-slate-400">الرصيد الافتتاحي للدرج (الفكة)</div>
+            <div class="text-xl font-black text-slate-200 font-mono mt-2">{{ number_format($openingCashBalance, 2) }} <span class="text-xs text-slate-400">ج.م</span></div>
+            <div class="text-[10px] text-slate-400 pt-1 border-t border-slate-800/80">
+                العهدة الافتتاحية لبداية اليوم
             </div>
         </div>
 
         <!-- 2. Cash Inflow Collected -->
         <div class="bg-slate-900 border border-emerald-500/30 p-4 rounded-2xl space-y-1 bg-gradient-to-b from-slate-900 to-emerald-950/20">
-            <div class="text-xs font-bold text-emerald-400">النقدية المقبوضة (داخل الدرج)</div>
+            <div class="text-xs font-bold text-emerald-400">النقدية المقبوضة لليوم (كاش)</div>
             <div class="text-xl font-black text-emerald-300 font-mono mt-2">{{ number_format($totalCashCollected, 2) }} <span class="text-xs text-emerald-400">ج.م</span></div>
             <div class="text-[10px] text-slate-400 pt-1 border-t border-slate-800/80">
                 مبيعات كاش + سندات قبض
@@ -100,34 +114,38 @@
         </div>
 
         <!-- 3. Expenses Paid Out -->
-        <div class="bg-slate-900 border border-amber-500/30 p-4 rounded-2xl space-y-1 bg-gradient-to-b from-slate-900 to-amber-950/20">
-            <div class="text-xs font-bold text-amber-400 flex items-center justify-between">
+        <div class="bg-slate-900 border border-rose-500/30 p-4 rounded-2xl space-y-1 bg-gradient-to-b from-slate-900 to-rose-950/20">
+            <div class="text-xs font-bold text-rose-400 flex items-center justify-between">
                 <span>المصروفات والنثريات</span>
-                <a href="{{ route('expenses.index') }}" class="text-[10px] hover:underline">عرض</a>
+                <a href="{{ route('expenses.index') }}" class="text-[10px] text-amber-400 hover:underline">عرض</a>
             </div>
-            <div class="text-xl font-black text-amber-300 font-mono mt-2">{{ number_format($totalExpenses, 2) }} <span class="text-xs text-amber-400">ج.م</span></div>
+            <div class="text-xl font-black text-rose-300 font-mono mt-2">{{ number_format($totalExpenses, 2) }} <span class="text-xs text-rose-400">ج.م</span></div>
             <div class="text-[10px] text-slate-400 pt-1 border-t border-slate-800/80">
                 {{ $expenses->count() }} مصروف (شنط، أكواب، صيانة)
             </div>
         </div>
 
-        <!-- 4. Purchases & Supplier Payments -->
+        <!-- 4. Total Sales Volume -->
         <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-1">
-            <div class="text-xs font-bold text-slate-400">المشتريات وسداد الموردين</div>
-            <div class="text-xl font-black text-indigo-300 font-mono mt-2">{{ number_format($totalPurchases, 2) }} <span class="text-xs text-indigo-400">ج.م</span></div>
-            <div class="text-[10px] text-slate-400 pt-1 border-t border-slate-800/80">
-                مسدد للموردين: {{ number_format($totalSupplierPaid, 2) }} ج.م
+            <div class="text-xs font-bold text-slate-400">إجمالي مبيعات اليوم</div>
+            <div class="text-xl font-black text-white font-mono mt-2">{{ number_format($totalSales, 2) }} <span class="text-xs text-amber-400">ج.م</span></div>
+            <div class="text-[10px] text-slate-400 pt-1 border-t border-slate-800/80 flex justify-between">
+                <span>{{ $invoicesCount }} فاتورة</span>
+                <span>آجل: {{ number_format($creditSales, 1) }}</span>
             </div>
         </div>
 
-        <!-- 5. Net Cash In Drawer Today -->
-        <div class="bg-slate-900 border border-amber-500/40 p-4 rounded-2xl space-y-1 relative overflow-hidden bg-gradient-to-b from-slate-900 to-amber-950/30">
-            <div class="text-xs font-bold text-amber-400">صافي حركة الدرج لليوم</div>
-            <div class="text-xl font-black {{ bccomp($netCashToday, '0.000', 3) >= 0 ? 'text-emerald-400' : 'text-rose-400' }} font-mono mt-2">
-                {{ number_format($netCashToday, 2) }} <span class="text-xs text-amber-400">ج.م</span>
+        <!-- 5. Total Expected Cash Physically in Drawer Right Now (CRITICAL) -->
+        <div class="bg-slate-900 border-2 border-amber-500/60 p-4 rounded-2xl space-y-1 relative overflow-hidden bg-gradient-to-b from-slate-900 to-amber-950/40 shadow-lg shadow-amber-500/10">
+            <div class="text-xs font-black text-amber-400 flex items-center justify-between">
+                <span>💰 المفروض في الدرج الآن</span>
+                <span class="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-mono">الافتتاحي + المقبوض - المصروف</span>
             </div>
-            <div class="text-[10px] text-slate-400 pt-1 border-t border-slate-800/80">
-                المقبوض نقداً - المنصرف نقداً
+            <div class="text-2xl font-black text-amber-300 font-mono mt-2">
+                {{ number_format($expectedCashInDrawer, 2) }} <span class="text-xs text-amber-400">ج.م</span>
+            </div>
+            <div class="text-[10px] text-slate-300 pt-1 border-t border-amber-500/30">
+                النقدية الفعلية المفترض تسليمها في الدرج
             </div>
         </div>
     </div>
@@ -315,8 +333,8 @@
         <!-- Right Col: Daily Shifts Log & Drawer Reconciliation -->
         <div class="space-y-4">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                <h3 class="text-sm font-bold text-white border-b border-slate-800 pb-2">
-                    ⏱️ سجل الورديات وتقفيل الـ Z-Report لليوم
+                <h3 class="text-sm font-bold text-white border-b border-slate-800 pb-2 flex items-center justify-between">
+                    <span>⏱️ سجل الورديات وتقفيل الـ Z-Report</span>
                 </h3>
 
                 @forelse($shiftsOnDate as $sh)
@@ -324,15 +342,21 @@
                     <div class="flex items-center justify-between font-bold">
                         <span class="text-amber-400">وردية رقم #{{ $sh->shift_number }}</span>
                         <span class="px-2 py-0.5 rounded text-[10px] {{ $sh->status === 'closed' ? 'bg-slate-800 text-slate-400' : 'bg-emerald-500/10 text-emerald-400' }}">
-                            {{ $sh->status === 'closed' ? 'مقفلة' : 'جارية' }}
+                            {{ $sh->status === 'closed' ? 'مقفلة' : '🟢 جارية الآن' }}
                         </span>
                     </div>
                     <div class="text-[11px] text-slate-400">
                         الكاشير: <span class="text-slate-200 font-bold">{{ $sh->user->name ?? 'مستخدم' }}</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-900 text-[11px]">
+                    <div class="grid grid-cols-2 gap-2 pt-1.5 border-t border-slate-900 text-[11px]">
                         <div>الافتتاحي: <span class="font-mono text-white font-bold">{{ number_format($sh->opening_cash_balance, 2) }}</span></div>
-                        <div>الفعلي: <span class="font-mono text-white font-bold">{{ number_format($sh->actual_cash_balance, 2) }}</span></div>
+                        <div>
+                            @if($sh->status === 'open')
+                                <span class="text-amber-400 font-bold">المتوقع: {{ number_format($expectedCashInDrawer, 2) }}</span>
+                            @else
+                                الفعلي: <span class="font-mono text-white font-bold">{{ number_format($sh->actual_cash_balance, 2) }}</span>
+                            @endif
+                        </div>
                     </div>
                     @if($sh->status === 'closed' && bccomp((string)$sh->cash_difference, '0.000', 3) != 0)
                     <div class="pt-1 text-[11px] font-bold {{ bccomp((string)$sh->cash_difference, '0.000', 3) < 0 ? 'text-rose-400' : 'text-emerald-400' }}">
@@ -389,6 +413,27 @@
             </div>
 
             <div class="space-y-3 text-xs">
+                <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 font-mono space-y-1">
+                    <div class="flex justify-between text-slate-400">
+                        <span>الرصيد الافتتاحي:</span>
+                        <span class="text-white">{{ number_format($activeShift->opening_cash_balance, 2) }} ج.م</span>
+                    </div>
+                    <div class="flex justify-between text-emerald-400">
+                        <span>+ النقدية المقبوضة:</span>
+                        <span>{{ number_format($totalCashCollected, 2) }} ج.م</span>
+                    </div>
+                    @if(bccomp($totalExpenses, '0.000', 3) > 0)
+                    <div class="flex justify-between text-rose-400">
+                        <span>- المصروفات:</span>
+                        <span>{{ number_format($totalExpenses, 2) }} ج.م</span>
+                    </div>
+                    @endif
+                    <div class="flex justify-between text-amber-400 font-bold pt-1 border-t border-slate-800 text-sm">
+                        <span>💰 المفروض بالدرج:</span>
+                        <span>{{ number_format($expectedCashInDrawer, 2) }} ج.م</span>
+                    </div>
+                </div>
+
                 <div>
                     <label class="block font-bold text-slate-300 mb-1">النقدية الفعلية الموجودة في الدرج بعد العد والفرز:</label>
                     <input type="number" step="0.001" wire:model="actual_cash_balance" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-rose-500">
