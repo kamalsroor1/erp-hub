@@ -71,8 +71,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/returns', ReturnIndex::class)->name('returns.index');
     Route::get('/returns/create', ReturnCreate::class)->name('returns.create');
 
-    // Financial & Profit Reports
-    Route::get('/reports', ReportsIndex::class)->name('reports.index');
+    // Financial & Profit Reports (Admin & Accountant only)
+    Route::get('/reports', ReportsIndex::class)->name('reports.index')->middleware('role:admin|accountant');
 
     // Operational Expenses & Supplies
     Route::get('/expenses', App\Livewire\ExpenseIndex::class)->name('expenses.index');
@@ -84,9 +84,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/daily-journal', App\Livewire\DailyJournalIndex::class)->name('daily.journal');
     Route::get('/shifts', App\Livewire\DailyJournalIndex::class)->name('shifts.index');
 
-    // Auth, Profile & User Management
+    // Auth, Profile & User Management (Admin only)
     Route::get('/profile', App\Livewire\Auth\Profile::class)->name('profile');
-    Route::get('/users', App\Livewire\Auth\UserManager::class)->name('users.index');
+    Route::get('/users', App\Livewire\Auth\UserManager::class)->name('users.index')->middleware('role:admin');
 
     // Excel & CSV Exports
     Route::get('/customers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportCustomerStatement'])->name('customers.export.csv');

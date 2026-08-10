@@ -23,7 +23,9 @@ class LivewirePagesTest extends TestCase
     {
         parent::setUp();
 
+        $adminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin']);
         $this->user = User::factory()->create();
+        $this->user->assignRole($adminRole);
         $this->actingAs($this->user);
 
         $this->customer = Customer::create([

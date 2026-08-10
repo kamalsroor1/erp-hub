@@ -32,6 +32,13 @@ class UserManager extends Component
     public string $role = 'cashier'; // admin, cashier, storekeeper, accountant
     public bool $is_active = true;
 
+    public function mount()
+    {
+        if (!auth()->check() || !auth()->user()->hasRole('admin')) {
+            abort(403, 'غير مصرح لك بالوصول لإدارة المستخدمين والصلاحيات.');
+        }
+    }
+
     protected function rules(): array
     {
         $userId = $this->editingUserId;

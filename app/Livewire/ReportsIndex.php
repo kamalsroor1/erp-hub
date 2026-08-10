@@ -18,6 +18,9 @@ class ReportsIndex extends Component
 
     public function mount()
     {
+        if (!auth()->check() || !auth()->user()->hasAnyRole(['admin', 'accountant'])) {
+            abort(403, 'غير مصرح لك بالوصول للتقارير المالية والأرباح.');
+        }
         $this->setFilter('this_month');
     }
 
