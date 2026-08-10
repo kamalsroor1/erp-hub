@@ -165,6 +165,13 @@ class LivewirePagesTest extends TestCase
     {
         $this->get(route('shifts.index'))
             ->assertStatus(200)
-            ->assertSee('إدارة ورديات الكاشير');
+            ->assertSee('يومية المبيعات');
+    }
+
+    public function test_daily_journal_renders_successfully(): void
+    {
+        $this->get(route('daily.journal'))
+            ->assertStatus(200)
+            ->assertSee('يومية المبيعات');
     }
 }

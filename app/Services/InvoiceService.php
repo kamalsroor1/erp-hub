@@ -229,6 +229,178 @@ class InvoiceService
     }
 
     /**
+     * Update an existing confirmed invoice atomically with inventory and balance adjustments
+     */
+    public function updateInvoice(Invoice $invoice, array $data): Invoice
+    {
+        return DB::transaction(function () use ($invoice, $data) {
+            $lockedInvoice = Invoice::where('id', $invoice->id)->lockForUpdate()->firstOrFail();
+            $oldCustomerId = $lockedInvoice->customer_id;
+            $newCustomerId = $data['customer_id'];
+
+            // 1. If invoice was confirmed, reverse previous stock back to warehouse
+            if ($lockedInvoice->status === 'confirmed') {
+                foreach ($lockedInvoice->items as $oldLine) {
+                    $item = Item::where('id', $oldLine->item_id)->lockForUpdate()->first();
+                    if ($item) {
+                        $this->stockService->addStock(
+                            item: $item,
+                            quantity: $oldLine->quantity,
+                            unitCost: $oldLine->cost_price,
+                            source: $lockedInvoice,
+                            documentNumber: $lockedInvoice->invoice_number,
+                            movementType: 'cancellation_in',
+                            notes: "إرجاع مخزون لتعديل الفاتورة رقم {$lockedInvoice->invoice_number}"
+                        );
+                    }
+                }
+            }
+
+            // Delete old items and previous stock movements for this invoice
+            $lockedInvoice->items()->delete();
+            \App\Models\StockMovement::where('source_type', Invoice::class)
+                ->where('source_id', $lockedInvoice->id)
+                ->delete();
+
+            // 2. Add new items, deduct new stock, calculate new subtotal and total cost
+            $subtotal = '0.000';
+            $totalCost = '0.000';
+
+            foreach ($data['items'] as $line) {
+                $item = Item::where('id', $line['item_id'])->lockForUpdate()->firstOrFail();
+                $qty = (string)$line['quantity'];
+                $unitPrice = (string)$line['unit_price'];
+                $itemDiscount = (string)($line['discount_amount'] ?? '0.000');
+
+                $grossLineTotal = bcmul($qty, $unitPrice, 3);
+                $netLineTotal = bcsub($grossLineTotal, $itemDiscount, 3);
+                if (bccomp($netLineTotal, '0.000', 3) < 0) {
+                    $netLineTotal = '0.000';
+                }
+
+                $effectiveCost = bccomp($item->weighted_avg_cost, '0.000', 3) > 0
+                    ? $item->weighted_avg_cost
+                    : $item->cost_price;
+
+                $lineCost = bcmul($qty, $effectiveCost, 3);
+                $totalCost = bcadd($totalCost, $lineCost, 3);
+
+                $lockedInvoice->items()->create([
+                    'item_id'         => $item->id,
+                    'quantity'        => $qty,
+                    'cost_price'      => $effectiveCost,
+                    'unit_price'      => $unitPrice,
+                    'discount_amount' => $itemDiscount,
+                    'total_price'     => $netLineTotal,
+                ]);
+
+                $this->stockService->deductStock(
+                    item: $item,
+                    quantity: $qty,
+                    source: $lockedInvoice,
+                    documentNumber: $lockedInvoice->invoice_number,
+                    movementType: 'sales_out',
+                    notes: "صرف مبيعات بتعديل الفاتورة رقم {$lockedInvoice->invoice_number}"
+                );
+
+                $subtotal = bcadd($subtotal, $netLineTotal, 3);
+            }
+
+            // 3. Invoice-level discount calculation
+            $discountType = $data['discount_type'] ?? 'fixed';
+            $discountValue = (string)($data['discount_value'] ?? '0.000');
+            $invoiceDiscountAmount = '0.000';
+
+            if ($discountType === 'percentage') {
+                $invoiceDiscountAmount = bcdiv(bcmul($subtotal, $discountValue, 4), '100', 3);
+            } else {
+                $invoiceDiscountAmount = $discountValue;
+            }
+
+            if (bccomp($invoiceDiscountAmount, $subtotal, 3) > 0) {
+                $invoiceDiscountAmount = $subtotal;
+            }
+
+            $netTotal = bcsub($subtotal, $invoiceDiscountAmount, 3);
+
+            // 4. Payment calculations
+            $paymentType = $data['payment_type'] ?? 'cash';
+            $paidAmount = '0.000';
+
+            if ($paymentType === 'cash') {
+                $paidAmount = $netTotal;
+            } elseif ($paymentType === 'partial') {
+                $paidAmount = (string)($data['paid_amount'] ?? '0.000');
+            } else {
+                $paidAmount = '0.000';
+            }
+
+            $remainingAmount = bcsub($netTotal, $paidAmount, 3);
+            if (bccomp($remainingAmount, '0.000', 3) < 0) {
+                $remainingAmount = '0.000';
+            }
+
+            $paymentStatus = 'unpaid';
+            if (bccomp($remainingAmount, '0.000', 3) === 0) {
+                $paymentStatus = 'paid';
+            } elseif (bccomp($paidAmount, '0.000', 3) > 0) {
+                $paymentStatus = 'partially_paid';
+            }
+
+            // 5. Update invoice fields
+            $lockedInvoice->update([
+                'customer_id'      => $newCustomerId,
+                'invoice_date'     => $data['invoice_date'] ?? $lockedInvoice->invoice_date,
+                'payment_type'     => $paymentType,
+                'subtotal'         => $subtotal,
+                'discount_type'    => $discountType,
+                'discount_value'   => $discountValue,
+                'discount_amount'  => $invoiceDiscountAmount,
+                'net_total'        => $netTotal,
+                'paid_amount'      => $paidAmount,
+                'remaining_amount' => $remainingAmount,
+                'payment_status'   => $paymentStatus,
+                'total_cost'       => $totalCost,
+                'notes'            => $data['notes'] ?? $lockedInvoice->notes,
+            ]);
+
+            // 6. Delete previous payments and re-create payment voucher if paid
+            Payment::where('invoice_id', $lockedInvoice->id)->delete();
+
+            if (bccomp($paidAmount, '0.000', 3) > 0) {
+                Payment::create([
+                    'payment_number' => 'PAY-INV-' . strtoupper(uniqid()),
+                    'customer_id'    => $newCustomerId,
+                    'invoice_id'     => $lockedInvoice->id,
+                    'user_id'        => Auth::id() ?? 1,
+                    'amount'         => $paidAmount,
+                    'payment_date'   => $lockedInvoice->invoice_date,
+                    'payment_method' => $data['payment_method'] ?? 'cash',
+                    'notes'          => "سداد عند تعديل الفاتورة رقم {$lockedInvoice->invoice_number}",
+                ]);
+            }
+
+            // 7. Recalculate customer balances (both old and new)
+            if ($oldCustomerId) {
+                $this->customerBalanceService->updateBalance($oldCustomerId);
+            }
+            if ($newCustomerId && $newCustomerId !== $oldCustomerId) {
+                $this->customerBalanceService->updateBalance($newCustomerId);
+            }
+
+            // 8. Audit log
+            $this->auditLogService->log(
+                action: 'invoice_updated',
+                auditable: $lockedInvoice,
+                oldValues: null,
+                newValues: $lockedInvoice->toArray()
+            );
+
+            return $lockedInvoice;
+        });
+    }
+
+    /**
      * Permanently delete an invoice with complete stock and financial reversal
      */
     public function deleteInvoice(Invoice $invoice): bool

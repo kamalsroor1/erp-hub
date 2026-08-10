@@ -79,6 +79,11 @@
                             <a href="{{ route('invoices.show', $inv->id) }}" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-[11px] transition-colors">
                                 تفاصيل / طباعة
                             </a>
+                            @if($inv->status !== 'cancelled')
+                            <a href="{{ route('invoices.edit', $inv->id) }}" class="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-600 hover:text-slate-950 text-amber-400 text-[11px] font-bold border border-amber-500/30 transition-all flex items-center gap-1" title="تعديل الفاتورة">
+                                <span>✏️ تعديل</span>
+                            </a>
+                            @endif
                             <button
                                 wire:click="deleteInvoice({{ $inv->id }})"
                                 wire:confirm="هل أنت متأكد من حذف الفاتورة رقم {{ $inv->invoice_number }} نهائياً؟ سيتم إرجاع البضاعة للمخزن وحذف الفاتورة تماماً."

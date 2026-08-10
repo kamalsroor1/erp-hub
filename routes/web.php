@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/invoices', InvoiceIndex::class)->name('invoices.index');
     Route::get('/invoices/create', InvoiceCreate::class)->name('invoices.create');
     Route::get('/invoices/{id}', InvoiceShow::class)->name('invoices.show');
+    Route::get('/invoices/{id}/edit', App\Livewire\InvoiceEdit::class)->name('invoices.edit');
 
     // Printing Routes
     Route::get('/invoices/{id}/print/thermal', function ($id) {
@@ -79,8 +80,9 @@ Route::middleware('auth')->group(function () {
     // Coffee Blending Master & Roastery Recipe
     Route::get('/coffee-blender', App\Livewire\CoffeeBlender::class)->name('coffee.blender');
 
-    // Cashier Shifts & Drawer Z-Reports
-    Route::get('/shifts', App\Livewire\CashShiftManager::class)->name('shifts.index');
+    // Daily Journal & Cashier Shifts (يوم بيوم)
+    Route::get('/daily-journal', App\Livewire\DailyJournalIndex::class)->name('daily.journal');
+    Route::get('/shifts', App\Livewire\DailyJournalIndex::class)->name('shifts.index');
 
     // Auth, Profile & User Management
     Route::get('/profile', App\Livewire\Auth\Profile::class)->name('profile');

@@ -1,0 +1,178 @@
+<?php
+
+namespace App\Livewire;
+
+use Livewire\Component;
+use App\Models\Invoice;
+use App\Models\Payment;
+use App\Models\Expense;
+use App\Models\Purchase;
+use App\Models\ReturnModel;
+use App\Models\CashShift;
+use App\Services\ShiftService;
+use Illuminate\Support\Facades\Auth;
+use Exception;
+
+class DailyJournalIndex extends Component
+{
+    public $selectedDate;
+    
+    // Shift Management
+    public ?CashShift $activeShift = null;
+    public $opening_cash_balance = '0.000';
+    public $open_notes = '';
+    public $actual_cash_balance = '0.000';
+    public $close_notes = '';
+    public $showOpenModal = false;
+    public $showCloseModal = false;
+
+    public $errorMessage = '';
+    public $successMessage = '';
+
+    public function mount(ShiftService $shiftService)
+    {
+        $this->selectedDate = now()->toDateString();
+        $this->loadActiveShift($shiftService);
+    }
+
+    public function setDate($datePreset)
+    {
+        if ($datePreset === 'today') {
+            $this->selectedDate = now()->toDateString();
+        } elseif ($datePreset === 'yesterday') {
+            $this->selectedDate = now()->subDay()->toDateString();
+        }
+    }
+
+    public function loadActiveShift(ShiftService $shiftService)
+    {
+        $this->activeShift = $shiftService->getActiveShift();
+    }
+
+    public function openShiftModal()
+    {
+        $this->opening_cash_balance = '0.000';
+        $this->open_notes = '';
+        $this->showOpenModal = true;
+    }
+
+    public function startShift(ShiftService $shiftService)
+    {
+        $this->errorMessage = '';
+        $this->successMessage = '';
+
+        try {
+            $this->activeShift = $shiftService->openShift(
+                openingCash: $this->opening_cash_balance ?: '0.000',
+                notes: $this->open_notes
+            );
+            $this->showOpenModal = false;
+            $this->successMessage = "تم فتح يومية العمل رقم {$this->activeShift->shift_number} بنجاح.";
+        } catch (Exception $e) {
+            $this->errorMessage = $e->getMessage();
+        }
+    }
+
+    public function openCloseModal(ShiftService $shiftService)
+    {
+        if (!$this->activeShift) return;
+        $totals = $shiftService->calculateShiftTotals($this->activeShift);
+        $this->actual_cash_balance = $totals['expected_cash_balance'];
+        $this->showCloseModal = true;
+    }
+
+    public function submitCloseShift(ShiftService $shiftService)
+    {
+        $this->errorMessage = '';
+        $this->successMessage = '';
+
+        if (!$this->activeShift) return;
+
+        try {
+            $closed = $shiftService->closeShift(
+                shift: $this->activeShift,
+                actualCash: $this->actual_cash_balance ?: '0.000',
+                notes: $this->close_notes
+            );
+
+            $this->showCloseModal = false;
+            $this->activeShift = null;
+            $this->successMessage = "تم تقفيل اليومية رقم {$closed->shift_number} بنجاح وتسجيل تقرير الـ Z-Report.";
+        } catch (Exception $e) {
+            $this->errorMessage = $e->getMessage();
+        }
+    }
+
+    public function render(ShiftService $shiftService)
+    {
+        $date = $this->selectedDate ?: now()->toDateString();
+
+        // 1. Invoices on this day
+        $invoices = Invoice::with('customer')
+            ->whereDate('invoice_date', $date)
+            ->where('status', 'confirmed')
+            ->latest('id')
+            ->get();
+
+        $invoicesCount = $invoices->count();
+        $totalSales = $invoices->sum('net_total');
+        $cashSales = $invoices->where('payment_type', 'cash')->sum('net_total');
+        $creditSales = $invoices->where('payment_type', 'credit')->sum('net_total');
+        $partialSales = $invoices->where('payment_type', 'partial')->sum('paid_amount');
+
+        // 2. Total Cash Inflows (Collected payments from customers & sales)
+        $customerPayments = Payment::with('customer')
+            ->whereDate('payment_date', $date)
+            ->whereNotNull('customer_id')
+            ->get();
+        $totalCashCollected = (string)($customerPayments->sum('amount') ?: '0.000');
+
+        // 3. Operational Expenses on this day
+        $expenses = Expense::whereDate('expense_date', $date)->latest('id')->get();
+        $totalExpenses = (string)($expenses->sum('amount') ?: '0.000');
+
+        // 4. Purchases on this day
+        $purchases = Purchase::with('supplier')
+            ->whereDate('purchase_date', $date)
+            ->where('status', 'confirmed')
+            ->latest('id')
+            ->get();
+        $totalPurchases = (string)($purchases->sum('net_total') ?: '0.000');
+
+        // 5. Supplier Payments on this day
+        $supplierPayments = Payment::with('supplier')
+            ->whereDate('payment_date', $date)
+            ->whereNotNull('supplier_id')
+            ->get();
+        $totalSupplierPaid = (string)($supplierPayments->sum('amount') ?: '0.000');
+
+        // 6. Net Drawer Balance for this day = Cash In - (Expenses + Supplier Payments)
+        $totalOutflows = bcadd($totalExpenses, $totalSupplierPaid, 3);
+        $netCashToday = bcsub($totalCashCollected, $totalOutflows, 3);
+
+        // 7. Shifts for this day
+        $shiftsOnDate = CashShift::with('user')
+            ->whereDate('opened_at', $date)
+            ->latest('id')
+            ->get();
+
+        return view('livewire.daily-journal-index', [
+            'invoices'           => $invoices,
+            'invoicesCount'      => $invoicesCount,
+            'totalSales'         => $totalSales,
+            'cashSales'          => $cashSales,
+            'creditSales'        => $creditSales,
+            'partialSales'       => $partialSales,
+            'customerPayments'   => $customerPayments,
+            'totalCashCollected' => $totalCashCollected,
+            'expenses'           => $expenses,
+            'totalExpenses'      => $totalExpenses,
+            'purchases'          => $purchases,
+            'totalPurchases'     => $totalPurchases,
+            'supplierPayments'   => $supplierPayments,
+            'totalSupplierPaid'  => $totalSupplierPaid,
+            'netCashToday'       => $netCashToday,
+            'shiftsOnDate'       => $shiftsOnDate,
+        ])->layout('components.layouts.app', ['title' => "يومية المبيعات وحركة الدرج - {$date}"]);
+    }
+}

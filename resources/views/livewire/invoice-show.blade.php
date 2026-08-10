@@ -14,6 +14,11 @@
         </div>
 
         <div class="flex items-center gap-2">
+            @if($invoice->status !== 'cancelled')
+            <a href="{{ route('invoices.edit', $invoice->id) }}" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-600/30 flex items-center gap-1.5 transition-all">
+                <span>✏️ تعديل الفاتورة</span>
+            </a>
+            @endif
             <a href="{{ route('invoices.print.thermal', $invoice->id) }}" target="_blank" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all">
                 <span>🖨️ طباعة إيصال</span>
             </a>
