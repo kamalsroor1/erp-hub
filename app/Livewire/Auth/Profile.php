@@ -9,17 +9,25 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use App\Livewire\Traits\RequiresAuth;
+use App\Models\Setting;
 
 #[Layout('components.layouts.app')]
-#[Title('الملف الشخصي وإعدادات الأمان | سرور POS')]
+#[Title('الملف الشخصي وإعدادات النظام والطباعة | سرور POS')]
 class Profile extends Component
 {
     use RequiresAuth;
 
+    // Personal Info
     public string $name = '';
     public string $email = '';
     public string $theme_preference = 'dark';
 
+    // General & Printing Settings (System-Wide)
+    public string $company_name = 'سرور كوفي';
+    public string $company_subtitle = 'لتوزيع خامات مطاحن البن';
+    public bool $show_print_subtitle = true;
+
+    // Security
     public string $current_password = '';
     public string $new_password = '';
     public string $new_password_confirmation = '';
@@ -30,6 +38,11 @@ class Profile extends Component
         $this->name = $user->name;
         $this->email = $user->email;
         $this->theme_preference = $user->theme_preference ?? 'dark';
+
+        // Load General Settings
+        $this->company_name = Setting::get('company_name', 'سرور كوفي');
+        $this->company_subtitle = Setting::get('company_subtitle', 'لتوزيع خامات مطاحن البن');
+        $this->show_print_subtitle = Setting::getBool('show_print_subtitle', true);
     }
 
     public function updateProfile()
@@ -59,6 +72,27 @@ class Profile extends Component
             'text' => 'تم تحديث البيانات الشخصية والمظهر بنجاح.'
         ]);
         $this->dispatch('theme-changed', $this->theme_preference);
+    }
+
+    public function updateGeneralSettings()
+    {
+        $this->validate([
+            'company_name'        => ['required', 'string', 'max:255'],
+            'company_subtitle'    => ['nullable', 'string', 'max:255'],
+            'show_print_subtitle' => ['boolean'],
+        ], [
+            'company_name.required' => 'يرجى إدخال اسم المؤسسة أو النشاط.',
+        ]);
+
+        Setting::set('company_name', $this->company_name);
+        Setting::set('company_subtitle', $this->company_subtitle ?? '');
+        Setting::set('show_print_subtitle', $this->show_print_subtitle ? '1' : '0');
+
+        $this->dispatch('swal:toast', [
+            'type' => 'success',
+            'title' => 'تم حفظ إعدادات الطباعة العامة!',
+            'text' => 'تم تطبيق إعدادات الطباعة على كافة فواتير النظام بنجاح.'
+        ]);
     }
 
     public function updatePassword()

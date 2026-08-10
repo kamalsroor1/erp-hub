@@ -149,12 +149,23 @@
         <button onclick="window.history.back()" style="padding: 10px 20px; background: #475569; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: 700; font-size: 14px;">رجوع</button>
     </div>
 
+    @php
+        $companyName = \App\Models\Setting::get('company_name', 'سرور كوفي');
+        $companySubtitle = \App\Models\Setting::get('company_subtitle', 'لتوزيع خامات مطاحن البن');
+        $showSubtitle = \App\Models\Setting::getBool('show_print_subtitle', true);
+    @endphp
+
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div>
-                <h1 class="brand-title">سرور كوفي</h1>
-                <p class="brand-subtitle">لتوزيع خامات مطاحن البن</p>
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <img src="{{ asset('logo.png') }}" alt="{{ $companyName }}" style="max-height: 75px; max-width: 130px; object-fit: contain;">
+                <div>
+                    <h1 class="brand-title">{{ $companyName }}</h1>
+                    @if($showSubtitle && !empty($companySubtitle))
+                        <p class="brand-subtitle">{{ $companySubtitle }}</p>
+                    @endif
+                </div>
             </div>
             <div class="invoice-meta">
                 <h2 class="invoice-title">فاتورة مبيعات</h2>

@@ -195,4 +195,35 @@ class SystemImprovementsTest extends TestCase
 
         $this->assertDatabaseMissing('expenses', ['id' => $expense->id]);
     }
+
+    public function test_setting_model_and_caching()
+    {
+        \App\Models\Setting::set('company_name', 'مؤسسة سرور لتجارة البن');
+        \App\Models\Setting::set('show_print_subtitle', '0');
+
+        $this->assertEquals('مؤسسة سرور لتجارة البن', \App\Models\Setting::get('company_name'));
+        $this->assertFalse(\App\Models\Setting::getBool('show_print_subtitle'));
+
+        // Test caching retrieval
+        $all = \App\Models\Setting::allCached();
+        $this->assertEquals('مؤسسة سرور لتجارة البن', $all['company_name']);
+        $this->assertEquals('0', $all['show_print_subtitle']);
+    }
+
+    public function test_profile_general_printing_settings_update()
+    {
+        $this->actingAs($this->admin);
+
+        Livewire::test(\App\Livewire\Auth\Profile::class)
+            ->set('company_name', 'سرور كوفي والمطاحن الحديثة')
+            ->set('company_subtitle', 'أجود أنواع البن والشاي')
+            ->set('show_print_subtitle', false)
+            ->call('updateGeneralSettings')
+            ->assertHasNoErrors()
+            ->assertDispatched('swal:toast');
+
+        $this->assertEquals('سرور كوفي والمطاحن الحديثة', \App\Models\Setting::get('company_name'));
+        $this->assertEquals('أجود أنواع البن والشاي', \App\Models\Setting::get('company_subtitle'));
+        $this->assertFalse(\App\Models\Setting::getBool('show_print_subtitle'));
+    }
 }

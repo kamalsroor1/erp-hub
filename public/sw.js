@@ -1,7 +1,8 @@
-const CACHE_NAME = 'sroor-pos-v1';
+const CACHE_NAME = 'sroor-pos-v2';
 const STATIC_ASSETS = [
     '/',
-    '/manifest.json'
+    '/manifest.json',
+    '/logo.png'
 ];
 
 self.addEventListener('install', (event) => {

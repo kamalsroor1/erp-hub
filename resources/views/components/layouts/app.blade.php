@@ -28,7 +28,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     
-    <!-- PWA Settings -->
+    <!-- Favicon & PWA Icons -->
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -143,8 +145,8 @@
             <!-- Brand Header -->
             <div class="h-16 px-6 flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/50 backdrop-blur-md">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-amber-400 flex items-center justify-center shadow-lg shadow-amber-500/20 font-black text-xl text-white">
-                        ☕
+                    <div class="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 p-1 flex items-center justify-center shadow-md shadow-amber-500/10 border border-slate-200 dark:border-slate-700 shrink-0">
+                        <img src="{{ asset('logo.png') }}" alt="سرور POS" class="w-full h-full object-contain">
                     </div>
                     <div>
                         <h1 class="font-extrabold text-base tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5 font-tajawal">
@@ -251,6 +253,13 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     <span>الملف الشخصي والأمان</span>
                 </a>
+
+                <!-- 📲 PWA Mobile Install Button -->
+                <div id="pwa-install-container" class="hidden pt-2 px-1">
+                    <button id="pwa-install-btn" type="button" class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-600/20 to-amber-500/10 hover:from-amber-600/30 hover:to-amber-500/20 text-amber-600 dark:text-amber-400 font-bold rounded-xl text-xs border border-amber-500/30 shadow-sm transition-all cursor-pointer">
+                        <span>📲 تثبيت التطبيق على الهاتف</span>
+                    </button>
+                </div>
             </nav>
 
             <!-- User Info & Logout -->
@@ -308,16 +317,16 @@
                     <button
                         type="button"
                         onclick="toggleAppTheme()"
-                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 transition-all cursor-pointer shadow-sm active:scale-95"
+                        class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 transition-all cursor-pointer shadow-sm active:scale-95 shrink-0"
                         title="تبديل الوضع النهاري / الليلي"
                     >
                         <span class="dark:hidden flex items-center gap-1 text-slate-800 font-bold">
-                            <span>🌙</span>
-                            <span>الوضع الليلي</span>
+                            <span class="text-sm">🌙</span>
+                            <span class="hidden sm:inline">الوضع الليلي</span>
                         </span>
                         <span class="hidden dark:flex items-center gap-1 text-amber-400 font-bold">
-                            <span>☀️</span>
-                            <span>الوضع النهاري</span>
+                            <span class="text-sm">☀️</span>
+                            <span class="hidden sm:inline">الوضع النهاري</span>
                         </span>
                     </button>
 
@@ -325,11 +334,11 @@
                     <div class="relative">
                         <button
                             @click="userMenuOpen = !userMenuOpen"
-                            class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700/60 text-xs transition-colors cursor-pointer text-slate-800 dark:text-slate-200"
+                            class="flex items-center gap-1.5 sm:gap-2.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700/60 text-xs transition-colors cursor-pointer text-slate-800 dark:text-slate-200 max-w-[140px] sm:max-w-none"
                         >
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span class="font-bold">{{ auth()->user()->name ?? 'المدير العام' }}</span>
-                            <span class="text-slate-400 text-[10px]">▼</span>
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                            <span class="font-bold truncate">{{ auth()->user()->name ?? 'المدير العام' }}</span>
+                            <span class="text-slate-400 text-[10px] shrink-0">▼</span>
                         </button>
 
                         <!-- Dropdown Menu -->
@@ -539,6 +548,32 @@
                     startTopLoader();
                     succeed(() => finishTopLoader());
                     fail(() => finishTopLoader());
+                });
+            }
+        });
+
+        // 📲 PWA Service Worker & Install Prompt Controller
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const container = document.getElementById('pwa-install-container');
+            if (container) container.classList.remove('hidden');
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const pwaBtn = document.getElementById('pwa-install-btn');
+            if (pwaBtn) {
+                pwaBtn.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        if (outcome === 'accepted') {
+                            const container = document.getElementById('pwa-install-container');
+                            if (container) container.classList.add('hidden');
+                        }
+                        deferredPrompt = null;
+                    }
                 });
             }
         });
