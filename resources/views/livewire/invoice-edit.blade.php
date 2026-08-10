@@ -323,10 +323,26 @@
                         wire:loading.attr="disabled"
                         class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer border border-slate-700"
                     >
-                        <span>🖨️ حفظ وطباعة الفاتورة</span>
+                        <span>🖨️ حفظ وطباعة الفاتورة (F9 أو Ctrl+Enter)</span>
                     </button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Edit Specific Keydown Shortcuts -->
+    <script>
+        document.addEventListener('keydown', function(e) {
+            // F9 or Ctrl+Enter: Save and Print
+            if (e.key === 'F9' || (e.ctrlKey && e.key === 'Enter')) {
+                e.preventDefault();
+                @this.call('updateInvoice', null, 'print');
+            }
+            // F8: Save only
+            if (e.key === 'F8') {
+                e.preventDefault();
+                @this.call('updateInvoice');
+            }
+        });
+    </script>
 </div>

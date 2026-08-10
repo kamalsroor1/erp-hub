@@ -295,17 +295,33 @@
                         wire:click="saveInvoice('print')" 
                         class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all active:scale-95 text-xs"
                     >
-                        <span>🖨️ حفظ وطباعة الفاتورة</span>
+                        <span>🖨️ حفظ وطباعة الفاتورة (F9 أو Ctrl+Enter)</span>
                     </button>
                     <button 
                         type="button" 
                         wire:click="saveInvoice" 
                         class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition-all"
                     >
-                        <span>💾 حفظ الفاتورة فقط (بدون طباعة)</span>
+                        <span>💾 حفظ الفاتورة فقط (F8)</span>
                     </button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- POS Specific Keydown Shortcuts -->
+    <script>
+        document.addEventListener('keydown', function(e) {
+            // F9 or Ctrl+Enter: Save and Print
+            if (e.key === 'F9' || (e.ctrlKey && e.key === 'Enter')) {
+                e.preventDefault();
+                @this.call('saveInvoice', 'print');
+            }
+            // F8: Save only
+            if (e.key === 'F8') {
+                e.preventDefault();
+                @this.call('saveInvoice');
+            }
+        });
+    </script>
 </div>

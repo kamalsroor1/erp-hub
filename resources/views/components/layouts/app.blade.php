@@ -336,6 +336,23 @@
             });
         });
 
+        // ⌨️ Global Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            // F2: Open New Invoice (POS) from any screen
+            if (e.key === 'F2') {
+                e.preventDefault();
+                if (window.location.pathname !== '/invoices/create') {
+                    window.location.href = "{{ route('invoices.create') }}";
+                } else {
+                    const searchInput = document.querySelector('input[placeholder*="ابحث"]');
+                    if (searchInput) {
+                        searchInput.focus();
+                        searchInput.select();
+                    }
+                }
+            }
+        });
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js').catch(err => {
