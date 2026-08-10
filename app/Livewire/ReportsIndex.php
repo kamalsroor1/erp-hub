@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Item;
+use App\Models\Expense;
 use App\Services\ProfitService;
 use Illuminate\Support\Facades\DB;
 
@@ -41,7 +42,15 @@ class ReportsIndex extends Component
         // 1. Overall Periodic Profit
         $periodic = $profitService->getPeriodicProfits($this->fromDate, $this->toDate);
 
-        // 2. Item-level Profitability
+        // 2. Operational Expenses
+        $totalExpenses = Expense::when($this->fromDate, fn($q) => $q->whereDate('expense_date', '>=', $this->fromDate))
+            ->when($this->toDate, fn($q) => $q->whereDate('expense_date', '<=', $this->toDate))
+            ->sum('amount') ?: '0.000';
+
+        $grossProfit = $periodic['gross_profit'] ?? '0.000';
+        $netProfitAfterExpenses = bcsub((string)$grossProfit, (string)$totalExpenses, 3);
+
+        // 3. Item-level Profitability
         $itemProfits = InvoiceItem::whereHas('invoice', function ($q) {
                 $q->where('status', 'confirmed')
                   ->when($this->fromDate, fn($sub) => $sub->whereDate('invoice_date', '>=', $this->fromDate))
@@ -72,7 +81,7 @@ class ReportsIndex extends Component
                 ];
             });
 
-        // 3. Stock Inventory Valuation
+        // 4. Stock Inventory Valuation
         $allItems = Item::active()->get();
         $stockCostValuation = '0.000';
         $stockSellingValuation = '0.000';
@@ -87,11 +96,13 @@ class ReportsIndex extends Component
         $expectedStockProfit = bcsub($stockSellingValuation, $stockCostValuation, 3);
 
         return view('livewire.reports-index', [
-            'periodic'              => $periodic,
-            'itemProfits'           => $itemProfits,
-            'stockCostValuation'    => $stockCostValuation,
-            'stockSellingValuation' => $stockSellingValuation,
-            'expectedStockProfit'   => $expectedStockProfit,
+            'periodic'               => $periodic,
+            'totalExpenses'          => $totalExpenses,
+            'netProfitAfterExpenses' => $netProfitAfterExpenses,
+            'itemProfits'            => $itemProfits,
+            'stockCostValuation'     => $stockCostValuation,
+            'stockSellingValuation'  => $stockSellingValuation,
+            'expectedStockProfit'    => $expectedStockProfit,
         ])->layout('components.layouts.app', ['title' => 'التقارير المالية وحسابات الأرباح']);
     }
 }

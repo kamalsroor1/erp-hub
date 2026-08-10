@@ -5,7 +5,7 @@
             <h2 class="text-xl font-black text-white flex items-center gap-2">
                 <span>🏭 دليل الموردين والشركات</span>
             </h2>
-            <p class="text-xs text-slate-400">إدارة حسابات الشركات والمصانع الموردة ومتابعة مستحقاتهم وكشوفات الحساب</p>
+            <p class="text-xs text-slate-400">إدارة حسابات الشركات والمصانع الموردة ومتابعة مستحقاتهم وسداد الدفعات وتنزيل المديونيات</p>
         </div>
         <button wire:click="openCreateModal" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all">
             <span>+ إضافة مورد جديد</span>
@@ -38,7 +38,7 @@
                         <th class="p-3.5">الشركة / المصنع</th>
                         <th class="p-3.5">الهاتف</th>
                         <th class="p-3.5">العنوان</th>
-                        <th class="p-3.5">المستحق له (الرصيد)</th>
+                        <th class="p-3.5">المستحق له (المديونية)</th>
                         <th class="p-3.5 text-center">إجراءات</th>
                     </tr>
                 </thead>
@@ -53,7 +53,16 @@
                             {{ number_format($s->current_balance, 2) }} ج.م
                         </td>
                         <td class="p-3.5 text-center">
-                            <div class="flex items-center justify-center gap-2">
+                            <div class="flex items-center justify-center gap-1.5">
+                                @if(bccomp($s->current_balance, '0.000', 3) > 0)
+                                <button 
+                                    wire:click="openPaymentModal({{ $s->id }})" 
+                                    title="تسجيل سند صرف وسداد دفعة للمورد لتنزيل المديونية"
+                                    class="px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white rounded-lg text-xs font-bold border border-emerald-500/30 transition-all inline-flex items-center gap-1"
+                                >
+                                    <span>💵 سداد دفعة</span>
+                                </button>
+                                @endif
                                 <button 
                                     wire:click="openEditModal({{ $s->id }})" 
                                     title="تعديل بيانات المورد"
@@ -125,6 +134,54 @@
                     </button>
                     <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/30">
                         {{ $isEditMode ? '💾 حفظ التعديلات' : '➕ إضافة المورد' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
+
+    <!-- Supplier Payment Voucher Modal (سند صرف سداد مديونية) -->
+    @if($showPaymentModal)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-emerald-400 text-base flex items-center gap-2">
+                    <span>💵 سند صرف / سداد مديونية مورد</span>
+                </h3>
+                <button wire:click="$set('showPaymentModal', false)" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800 text-xs">
+                <span class="text-slate-400">المورد:</span>
+                <strong class="text-white text-sm block mt-0.5">{{ $selectedSupplierName }}</strong>
+            </div>
+
+            <form wire:submit.prevent="savePayment" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">المبلغ المسدد للمورد (ج.م):</label>
+                    <input type="number" step="0.001" wire:model="paymentAmount" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-white font-mono font-bold focus:outline-none focus:border-emerald-500">
+                    @error('paymentAmount') <span class="text-rose-400 text-[10px]">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">طريقة الدفع:</label>
+                    <select wire:model="paymentMethod" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white">
+                        <option value="cash">💵 نقدي (خزينة الكاشير)</option>
+                        <option value="bank_transfer">🏦 تحويل بنكي / فودافون كاش / إنستاباي</option>
+                        <option value="cheque">📝 شيك بنكي</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">ملاحظات / رقم الإيصال:</label>
+                    <textarea wire:model="paymentNotes" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white" placeholder="مثال: سداد دفعة توريد شكاير بن أخضر"></textarea>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+                    <button type="button" wire:click="$set('showPaymentModal', false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold">إلغاء</button>
+                    <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/30">
+                        💾 حفظ السند وخصم المديونية
                     </button>
                 </div>
             </form>

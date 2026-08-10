@@ -96,12 +96,14 @@ class ItemIndex extends Component
             session()->flash('success', "تم تعديل بيانات الصنف [{$item->name}] بنجاح.");
             $this->dispatch('swal:toast', ['icon' => 'success', 'title' => "تم تعديل بيانات الصنف [{$item->name}] بنجاح!"]);
         } else {
+            $initialStock = $this->current_stock;
+
             $item = Item::create([
                 'code'              => $this->code,
                 'name'              => $this->name,
                 'category'          => $this->category,
                 'unit'              => $this->unit,
-                'current_stock'     => $this->current_stock,
+                'current_stock'     => '0.000',
                 'cost_price'        => $this->cost_price,
                 'weighted_avg_cost' => $this->cost_price,
                 'selling_price'     => $this->selling_price,
@@ -110,10 +112,10 @@ class ItemIndex extends Component
                 'notes'             => $this->notes,
             ]);
 
-            if (bccomp($this->current_stock, '0.000', 3) > 0) {
+            if (bccomp($initialStock, '0.000', 3) > 0) {
                 $stockService->depositStock(
                     item: $item,
-                    quantity: $this->current_stock,
+                    quantity: $initialStock,
                     costPrice: $this->cost_price,
                     depositType: 'opening_balance',
                     reason: 'رصيد أول المدة عند تعريف الصنف'

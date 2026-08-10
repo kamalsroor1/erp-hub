@@ -13,6 +13,7 @@ class PurchaseService
 {
     public function __construct(
         protected StockService $stockService,
+        protected SupplierBalanceService $supplierBalanceService,
         protected AuditLogService $auditLogService
     ) {}
 
@@ -112,6 +113,9 @@ class PurchaseService
                     'notes'          => "سداد دفعة توريد للفاتورة رقم {$purchase->purchase_number}",
                 ]);
             }
+
+            // Update supplier balance
+            $this->supplierBalanceService->updateBalance($purchase->supplier_id);
 
             $this->auditLogService->log(
                 action: 'purchase_confirmed',

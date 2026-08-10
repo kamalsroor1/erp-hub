@@ -7,6 +7,7 @@ use App\Models\Supplier;
 use App\Models\Purchase;
 use App\Models\Payment;
 use App\Models\ReturnDocument;
+use App\Services\PaymentService;
 
 class SupplierStatement extends Component
 {
@@ -14,11 +15,45 @@ class SupplierStatement extends Component
     public $fromDate;
     public $toDate;
 
+    // Quick Supplier Payment Voucher Modal (سند صرف سداد مديونية)
+    public $showPaymentModal = false;
+    public $paymentAmount = '0.000';
+    public $paymentMethod = 'cash';
+    public $paymentNotes = '';
+
     public function mount($id)
     {
         $this->supplier = Supplier::findOrFail($id);
         $this->fromDate = now()->startOfYear()->toDateString();
         $this->toDate = now()->toDateString();
+    }
+
+    public function openPaymentModal()
+    {
+        $this->supplier->refresh();
+        $this->paymentAmount = $this->supplier->current_balance;
+        $this->paymentMethod = 'cash';
+        $this->paymentNotes = 'سداد دفعة من الحساب للمورد';
+        $this->showPaymentModal = true;
+    }
+
+    public function savePayment(PaymentService $paymentService)
+    {
+        $this->validate([
+            'paymentAmount' => 'required|numeric|min:0.01',
+        ]);
+
+        $paymentService->recordSupplierPayment([
+            'supplier_id'    => $this->supplier->id,
+            'amount'         => $this->paymentAmount,
+            'payment_method' => $this->paymentMethod,
+            'notes'          => $this->paymentNotes,
+        ]);
+
+        $this->supplier->refresh();
+        $this->showPaymentModal = false;
+        session()->flash('success', "تم تسجيل سند الصرف بنجاح وتخفيض مديونية المورد.");
+        $this->dispatch('swal:toast', ['icon' => 'success', 'title' => "تم تسجيل سند الصرف وتخفيض مديونية المورد بنجاح!"]);
     }
 
     public function render()
@@ -63,22 +98,24 @@ class SupplierStatement extends Component
         }
 
         // 3. Purchase Returns (Credit)
-        $returns = ReturnDocument::where('supplier_id', $this->supplier->id)
-            ->where('return_type', 'purchase_return')
-            ->when($this->fromDate, fn($q) => $q->whereDate('return_date', '>=', $this->fromDate))
-            ->when($this->toDate, fn($q) => $q->whereDate('return_date', '<=', $this->toDate))
-            ->get();
+        if (class_exists(ReturnDocument::class)) {
+            $returns = ReturnDocument::where('supplier_id', $this->supplier->id)
+                ->where('return_type', 'purchase_return')
+                ->when($this->fromDate, fn($q) => $q->whereDate('return_date', '>=', $this->fromDate))
+                ->when($this->toDate, fn($q) => $q->whereDate('return_date', '<=', $this->toDate))
+                ->get();
 
-        foreach ($returns as $ret) {
-            $entries->push([
-                'date'        => $ret->return_date->format('Y-m-d'),
-                'type'        => 'مرتجع مشتريات',
-                'ref_number'  => $ret->return_number,
-                'debit'       => '0.000',
-                'credit'      => $ret->total_amount,
-                'notes'       => $ret->reason,
-                'timestamp'   => $ret->created_at->timestamp,
-            ]);
+            foreach ($returns as $ret) {
+                $entries->push([
+                    'date'        => $ret->return_date->format('Y-m-d'),
+                    'type'        => 'مرتجع مشتريات',
+                    'ref_number'  => $ret->return_number,
+                    'debit'       => '0.000',
+                    'credit'      => $ret->total_amount,
+                    'notes'       => $ret->reason,
+                    'timestamp'   => $ret->created_at->timestamp,
+                ]);
+            }
         }
 
         // Sort chronologically and compute running balance

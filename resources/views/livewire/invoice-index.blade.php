@@ -75,15 +75,18 @@
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">آجل</span>
                             @endif
                         </td>
-                        <td class="p-3.5 text-center flex items-center justify-center gap-2">
+                        <td class="p-3.5 text-center flex items-center justify-center gap-1.5">
                             <a href="{{ route('invoices.show', $inv->id) }}" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-[11px] transition-colors">
                                 تفاصيل / طباعة
                             </a>
-                            @if($inv->status === 'confirmed')
-                            <button wire:click="openCancelModal({{ $inv->id }})" class="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-[11px] font-bold border border-rose-500/20 transition-colors">
-                                إلغاء
+                            <button
+                                wire:click="deleteInvoice({{ $inv->id }})"
+                                wire:confirm="هل أنت متأكد من حذف الفاتورة رقم {{ $inv->invoice_number }} نهائياً؟ سيتم إرجاع البضاعة للمخزن وحذف الفاتورة تماماً."
+                                class="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-400 text-[11px] font-bold border border-rose-500/30 transition-all flex items-center gap-1"
+                                title="حذف نهائي للفاتورة"
+                            >
+                                <span>🗑️ حذف</span>
                             </button>
-                            @endif
                         </td>
                     </tr>
                     @empty

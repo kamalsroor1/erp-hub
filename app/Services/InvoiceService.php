@@ -228,6 +228,65 @@ class InvoiceService
         });
     }
 
+    /**
+     * Permanently delete an invoice with complete stock and financial reversal
+     */
+    public function deleteInvoice(Invoice $invoice): bool
+    {
+        return DB::transaction(function () use ($invoice) {
+            $lockedInvoice = Invoice::where('id', $invoice->id)->lockForUpdate()->firstOrFail();
+            $customerId = $lockedInvoice->customer_id;
+            $invoiceNumber = $lockedInvoice->invoice_number;
+
+            // 1. If invoice was confirmed, reverse the inventory back to warehouse
+            if ($lockedInvoice->status === 'confirmed') {
+                foreach ($lockedInvoice->items as $itemLine) {
+                    $item = Item::where('id', $itemLine->item_id)->lockForUpdate()->first();
+                    if ($item) {
+                        $this->stockService->addStock(
+                            item: $item,
+                            quantity: $itemLine->quantity,
+                            unitCost: $itemLine->cost_price,
+                            source: $lockedInvoice,
+                            documentNumber: $invoiceNumber,
+                            movementType: 'cancellation_in',
+                            notes: "إرجاع مخزون بسبب حذف الفاتورة رقم {$invoiceNumber}"
+                        );
+                    }
+                }
+            }
+
+            // 2. Delete any payment vouchers linked directly to this invoice
+            Payment::where('invoice_id', $lockedInvoice->id)->delete();
+
+            // 3. Delete Stock movements linked to this invoice
+            \App\Models\StockMovement::where('source_type', Invoice::class)
+                ->where('source_id', $lockedInvoice->id)
+                ->delete();
+
+            // 4. Delete invoice items
+            $lockedInvoice->items()->delete();
+
+            // 5. Delete the invoice itself
+            $lockedInvoice->delete();
+
+            // 6. Recalculate customer balance
+            if ($customerId) {
+                $this->customerBalanceService->updateBalance($customerId);
+            }
+
+            // 7. Audit log
+            $this->auditLogService->log(
+                action: 'invoice_deleted',
+                auditable: $lockedInvoice,
+                oldValues: ['invoice_number' => $invoiceNumber],
+                newValues: null
+            );
+
+            return true;
+        });
+    }
+
     public function generateUniqueNumber(): string
     {
         $prefix = 'INV-' . date('Ymd');

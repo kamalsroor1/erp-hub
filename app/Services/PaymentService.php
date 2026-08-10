@@ -15,6 +15,7 @@ class PaymentService
 {
     public function __construct(
         protected CustomerBalanceService $customerBalanceService,
+        protected SupplierBalanceService $supplierBalanceService,
         protected AuditLogService $auditLogService
     ) {}
 
@@ -115,13 +116,8 @@ class PaymentService
                 'notes'          => $data['notes'] ?? 'سند صرف نقدي للمورد',
             ]);
 
-            // Update supplier balance: Purchases - Payments
-            $totalPurchases = Purchase::where('supplier_id', $supplier->id)
-                ->where('status', 'confirmed')
-                ->sum('net_total');
-            $totalPayments = Payment::where('supplier_id', $supplier->id)->sum('amount');
-            $supplier->current_balance = bcsub((string)$totalPurchases, (string)$totalPayments, 3);
-            $supplier->save();
+            // Update supplier balance atomically
+            $this->supplierBalanceService->updateBalance($supplier->id);
 
             $this->auditLogService->log(
                 action: 'supplier_payment_recorded',

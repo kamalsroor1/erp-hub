@@ -73,6 +73,9 @@ Route::middleware('auth')->group(function () {
     // Financial & Profit Reports
     Route::get('/reports', ReportsIndex::class)->name('reports.index');
 
+    // Operational Expenses & Supplies
+    Route::get('/expenses', App\Livewire\ExpenseIndex::class)->name('expenses.index');
+
     // Coffee Blending Master & Roastery Recipe
     Route::get('/coffee-blender', App\Livewire\CoffeeBlender::class)->name('coffee.blender');
 

@@ -14,13 +14,20 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <a href="{{ route('invoices.print.thermal', $invoice->id) }}" target="_blank" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all">
-                <span>🖨️ طباعة إيصال (80mm)</span>
+            <a href="{{ route('invoices.print.thermal', $invoice->id) }}" target="_blank" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all">
+                <span>🖨️ طباعة إيصال</span>
             </a>
-            <a href="{{ route('invoices.print.a4', $invoice->id) }}" target="_blank" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 flex items-center gap-2 transition-all">
-                <span>📄 طباعة ضريبية (A4)</span>
+            <a href="{{ route('invoices.print.a4', $invoice->id) }}" target="_blank" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 flex items-center gap-1.5 transition-all">
+                <span>📄 طباعة الفاتورة</span>
             </a>
-            <a href="{{ route('invoices.index') }}" class="px-3 py-2.5 bg-slate-950 text-slate-400 hover:text-white text-xs font-bold rounded-xl border border-slate-800 transition-colors">
+            <button
+                wire:click="deleteInvoice"
+                wire:confirm="هل أنت متأكد من حذف هذه الفاتورة نهائياً؟ سيتم إرجاع البضاعة للمخزن وتحديث الرصيد وحذف السجل تماماً."
+                class="px-3.5 py-2 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white text-xs font-bold rounded-xl border border-rose-500/30 flex items-center gap-1.5 transition-all"
+            >
+                <span>🗑️ حذف نهائي</span>
+            </button>
+            <a href="{{ route('invoices.index') }}" class="px-3 py-2 bg-slate-950 text-slate-400 hover:text-white text-xs font-bold rounded-xl border border-slate-800 transition-colors">
                 ← رجوع
             </a>
         </div>

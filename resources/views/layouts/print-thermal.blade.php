@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>إيصال حراري - {{ $invoice->invoice_number }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <title>إيصال - {{ $invoice->invoice_number }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&display=swap" rel="stylesheet">
     <style>
         @page {
             size: 80mm auto;
@@ -18,10 +18,16 @@
             .no-print {
                 display: none !important;
             }
+            * {
+                color: #000 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
         }
         body {
             font-family: 'Cairo', sans-serif;
-            font-size: 11px;
+            font-size: 12px;
+            font-weight: 700;
             color: #000;
             background: #fff;
             width: 78mm;
@@ -34,27 +40,27 @@
         .text-left { text-align: left; }
         .font-bold { font-weight: bold; }
         .font-black { font-weight: 900; }
-        .border-t { border-top: 1px dashed #000; }
-        .border-b { border-bottom: 1px dashed #000; }
-        .py-1 { padding-top: 2px; padding-bottom: 2px; }
-        .py-2 { padding-top: 5px; padding-bottom: 5px; }
-        .my-2 { margin-top: 5px; margin-bottom: 5px; }
+        .border-t { border-top: 1.5px dashed #000; }
+        .border-b { border-bottom: 1.5px dashed #000; }
+        .py-1 { padding-top: 3px; padding-bottom: 3px; }
+        .py-2 { padding-top: 6px; padding-bottom: 6px; }
+        .my-2 { margin-top: 6px; margin-bottom: 6px; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 3px 1px; font-size: 10px; }
+        th, td { padding: 4px 1px; font-size: 11px; font-weight: 700; }
+        th { font-weight: 900; }
     </style>
 </head>
 <body onload="window.print()">
 
     <div class="no-print" style="margin-bottom: 10px; text-align: center;">
-        <button onclick="window.print()" style="padding: 6px 16px; font-family: 'Cairo'; background: #10b981; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🖨️ طباعة الإيصال (80mm)</button>
-        <button onclick="window.history.back()" style="padding: 6px 12px; font-family: 'Cairo'; background: #64748b; color: #fff; border: none; border-radius: 4px; cursor: pointer;">رجوع</button>
+        <button onclick="window.print()" style="padding: 8px 18px; font-family: 'Cairo'; background: #10b981; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 900;">🖨️ طباعة الإيصال</button>
+        <button onclick="window.history.back()" style="padding: 8px 14px; font-family: 'Cairo'; background: #475569; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">رجوع</button>
     </div>
 
     <!-- Header -->
     <div class="text-center">
-        <h2 class="font-black" style="font-size: 16px; margin: 0;">مؤسسة سرور التجارية</h2>
-        <p style="margin: 2px 0;">لتجارة التجزئة والجملة</p>
-        <p style="margin: 2px 0;">هاتف: 01000000000 | الرقم الضريبي: 123456789</p>
+        <h2 class="font-black" style="font-size: 18px; margin: 0; color: #000;">سرور كوفي</h2>
+        <p style="margin: 2px 0; font-size: 12px; font-weight: 800;">لتوزيع خامات مطاحن البن</p>
     </div>
 
     <div class="border-t border-b py-1 my-2">
@@ -82,11 +88,11 @@
             @foreach($invoice->items as $item)
             <tr>
                 <td class="text-right">
-                    <strong>{{ $item->item->name }}</strong>
+                    <strong style="font-weight: 900;">{{ $item->item->name }}</strong>
                 </td>
-                <td class="text-center">{{ number_format($item->quantity, 2) }}</td>
-                <td class="text-center">{{ number_format($item->unit_price, 2) }}</td>
-                <td class="text-left font-bold">{{ number_format($item->total_price, 2) }}</td>
+                <td class="text-center" style="font-weight: 800;">{{ number_format($item->quantity, 2) }}</td>
+                <td class="text-center" style="font-weight: 800;">{{ number_format($item->unit_price, 2) }}</td>
+                <td class="text-left font-black">{{ number_format($item->total_price, 2) }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -96,7 +102,7 @@
     <div class="border-t py-1 my-2">
         <div style="display: flex; justify-content: space-between;">
             <span>المجموع:</span>
-            <span>{{ number_format($invoice->subtotal, 2) }} ج.م</span>
+            <span style="font-weight: 800;">{{ number_format($invoice->subtotal, 2) }} ج.م</span>
         </div>
         @if(bccomp($invoice->discount_amount, '0.000', 3) > 0)
         <div style="display: flex; justify-content: space-between;">
@@ -104,24 +110,23 @@
             <span>-{{ number_format($invoice->discount_amount, 2) }} ج.م</span>
         </div>
         @endif
-        <div style="display: flex; justify-content: space-between; font-size: 13px;" class="font-black border-t py-1">
-            <span>الصافي المطلوب:</span>
+        <div style="display: flex; justify-content: space-between; font-size: 14px;" class="font-black">
+            <span>الصافي:</span>
             <span>{{ number_format($invoice->net_total, 2) }} ج.م</span>
         </div>
         <div style="display: flex; justify-content: space-between;">
             <span>المدفوع:</span>
             <span>{{ number_format($invoice->paid_amount, 2) }} ج.م</span>
         </div>
-        <div style="display: flex; justify-content: space-between;">
+        <div style="display: flex; justify-content: space-between;" class="font-bold">
             <span>المتبقي:</span>
             <span>{{ number_format($invoice->remaining_amount, 2) }} ج.م</span>
         </div>
     </div>
 
-    <!-- Footer -->
-    <div class="text-center border-t py-2">
-        <p style="margin: 0;" class="font-bold">شكراً لتعاملكم معنا!</p>
-        <p style="margin: 2px 0; font-size: 9px; color: #555;">البضاعة المباعة لا ترد ولا تستبدل إلا بالفاتورة خلال 14 يوماً</p>
+    <div class="text-center py-2 border-t" style="margin-top: 8px;">
+        <p style="margin: 0; font-size: 11px; font-weight: 800;">شكراً لتعاملكم معنا</p>
     </div>
+
 </body>
 </html>

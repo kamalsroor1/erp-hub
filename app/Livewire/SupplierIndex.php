@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Supplier;
+use App\Services\PaymentService;
 
 class SupplierIndex extends Component
 {
@@ -12,6 +13,7 @@ class SupplierIndex extends Component
 
     public $search = '';
 
+    // Quick Add / Edit Supplier Modal
     public $showSupplierModal = false;
     public $isEditMode = false;
     public $editSupplierId = null;
@@ -21,6 +23,14 @@ class SupplierIndex extends Component
     public $phone = '';
     public $address = '';
     public $notes = '';
+
+    // Quick Supplier Payment Voucher Modal (سند صرف سداد مديونية)
+    public $showPaymentModal = false;
+    public $selectedSupplierId;
+    public $selectedSupplierName = '';
+    public $paymentAmount = '0.000';
+    public $paymentMethod = 'cash';
+    public $paymentNotes = '';
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -78,6 +88,35 @@ class SupplierIndex extends Component
         }
 
         $this->showSupplierModal = false;
+    }
+
+    public function openPaymentModal($supplierId)
+    {
+        $supplier = Supplier::findOrFail($supplierId);
+        $this->selectedSupplierId = $supplier->id;
+        $this->selectedSupplierName = $supplier->name;
+        $this->paymentAmount = $supplier->current_balance;
+        $this->paymentMethod = 'cash';
+        $this->paymentNotes = 'سداد دفعة من الحساب للمورد';
+        $this->showPaymentModal = true;
+    }
+
+    public function savePayment(PaymentService $paymentService)
+    {
+        $this->validate([
+            'paymentAmount' => 'required|numeric|min:0.01',
+        ]);
+
+        $paymentService->recordSupplierPayment([
+            'supplier_id'    => $this->selectedSupplierId,
+            'amount'         => $this->paymentAmount,
+            'payment_method' => $this->paymentMethod,
+            'notes'          => $this->paymentNotes,
+        ]);
+
+        $this->showPaymentModal = false;
+        session()->flash('success', "تم تسجيل سند الصرف بنجاح وتخفيض مديونية المورد.");
+        $this->dispatch('swal:toast', ['icon' => 'success', 'title' => "تم تسجيل سند الصرف وتخفيض مديونية المورد بنجاح!"]);
     }
 
     public function render()

@@ -48,6 +48,23 @@ class InvoiceIndex extends Component
         }
     }
 
+    public function deleteInvoice($invoiceId, InvoiceService $invoiceService)
+    {
+        try {
+            $invoice = Invoice::findOrFail($invoiceId);
+            $num = $invoice->invoice_number;
+            $invoiceService->deleteInvoice($invoice);
+
+            session()->flash('success', "تم حذف الفاتورة رقم {$num} نهائياً وإرجاع المخزون بنجاح.");
+            $this->dispatch('swal:toast', [
+                'icon'  => 'success',
+                'title' => "تم حذف الفاتورة {$num} نهائياً وإرجاع المخزون!"
+            ]);
+        } catch (Exception $e) {
+            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => $e->getMessage()]);
+        }
+    }
+
     public function render()
     {
         $query = Invoice::with(['customer', 'user'])

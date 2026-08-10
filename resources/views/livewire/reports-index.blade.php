@@ -16,34 +16,46 @@
         </div>
     </div>
 
-    <!-- 4 High Level Financial Summary Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- 5 High Level Financial Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <!-- Revenue -->
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
             <div class="text-xs font-bold text-slate-400">إجمالي المبيعات (الإيراد)</div>
-            <div class="text-2xl font-black text-white font-mono mt-2">{{ number_format($periodic['total_sales'], 2) }} <span class="text-xs text-emerald-400">ج.م</span></div>
+            <div class="text-xl font-black text-white font-mono mt-2">{{ number_format($periodic['total_sales'], 2) }} <span class="text-xs text-emerald-400">ج.م</span></div>
             <div class="text-[11px] text-slate-400 mt-1">{{ $periodic['invoice_count'] }} فاتورة معتمدة</div>
         </div>
 
         <!-- COGS -->
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
             <div class="text-xs font-bold text-slate-400">تكلفة البضاعة المباعة (COGS)</div>
-            <div class="text-2xl font-black text-rose-400 font-mono mt-2">{{ number_format($periodic['total_cost'], 2) }} <span class="text-xs text-rose-300">ج.م</span></div>
-            <div class="text-[11px] text-slate-400 mt-1">تكلفة الشراء الفعلية للبضاعة</div>
+            <div class="text-xl font-black text-rose-400 font-mono mt-2">{{ number_format($periodic['total_cost'], 2) }} <span class="text-xs text-rose-300">ج.م</span></div>
+            <div class="text-[11px] text-slate-400 mt-1">تكلفة الشراء للبضاعة المباعة</div>
         </div>
 
-        <!-- Gross Profit -->
-        <div class="bg-slate-900 border border-emerald-500/30 p-5 rounded-2xl relative overflow-hidden bg-gradient-to-b from-slate-900 to-emerald-950/20">
-            <div class="text-xs font-bold text-emerald-400">صافي مجمل الربح المحقق</div>
-            <div class="text-2xl font-black text-emerald-300 font-mono mt-2">{{ number_format($periodic['gross_profit'], 2) }} <span class="text-xs text-emerald-400">ج.م</span></div>
-            <div class="text-[11px] text-slate-400 mt-1">هامش ربح إجمالي: <span class="text-white font-bold font-mono">{{ $periodic['margin_percentage'] }}%</span></div>
+        <!-- Operational Expenses -->
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+            <div class="text-xs font-bold text-slate-400 flex items-center justify-between">
+                <span>المصروفات والنثريات</span>
+                <a href="{{ route('expenses.index') }}" class="text-[10px] text-amber-400 hover:underline">عرض</a>
+            </div>
+            <div class="text-xl font-black text-amber-400 font-mono mt-2">{{ number_format($totalExpenses, 2) }} <span class="text-xs text-amber-300">ج.م</span></div>
+            <div class="text-[11px] text-slate-400 mt-1">شنط، أكواب، لاصق، تشغيل</div>
+        </div>
+
+        <!-- Net Profit After Expenses -->
+        <div class="bg-slate-900 border border-emerald-500/40 p-4 rounded-2xl relative overflow-hidden bg-gradient-to-b from-slate-900 to-emerald-950/30">
+            <div class="text-xs font-bold text-emerald-400">صافي الربح بعد المصاريف</div>
+            <div class="text-xl font-black {{ bccomp($netProfitAfterExpenses, '0.000', 3) >= 0 ? 'text-emerald-300' : 'text-rose-400' }} font-mono mt-2">
+                {{ number_format($netProfitAfterExpenses, 2) }} <span class="text-xs text-emerald-400">ج.م</span>
+            </div>
+            <div class="text-[11px] text-slate-400 mt-1">الربح الصافي الفعلي بعد النفقات</div>
         </div>
 
         <!-- Stock Valuation -->
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-            <div class="text-xs font-bold text-slate-400">تقييم بضاعة المخزن بالتكلفة</div>
-            <div class="text-2xl font-black text-amber-400 font-mono mt-2">{{ number_format($stockCostValuation, 2) }} <span class="text-xs text-amber-300">ج.م</span></div>
-            <div class="text-[11px] text-slate-400 mt-1">القيمة بسعر البيع: <span class="text-white font-mono">{{ number_format($stockSellingValuation, 2) }}</span></div>
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+            <div class="text-xs font-bold text-slate-400">تقييم بضاعة المخزن (التكلفة)</div>
+            <div class="text-xl font-black text-amber-300 font-mono mt-2">{{ number_format($stockCostValuation, 2) }} <span class="text-xs text-amber-300">ج.م</span></div>
+            <div class="text-[11px] text-slate-400 mt-1">بسعر البيع: <span class="text-white font-mono">{{ number_format($stockSellingValuation, 2) }}</span></div>
         </div>
     </div>
 
