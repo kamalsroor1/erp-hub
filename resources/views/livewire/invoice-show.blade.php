@@ -16,15 +16,18 @@
         <div class="flex flex-wrap items-center gap-2">
             @if($invoice->status !== 'cancelled')
             <a href="{{ route('invoices.edit', $invoice->id) }}" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-500/20 flex items-center gap-1.5 transition-all cursor-pointer">
-                <span>✏️ تعديل الفاتورة</span>
+                <span>✏️ تعديل</span>
             </a>
             @endif
             <a href="{{ route('invoices.print.thermal', $invoice->id) }}" target="_blank" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all">
                 <span>🖨️ إيصال كاشير</span>
             </a>
             <a href="{{ route('invoices.print.a4', $invoice->id) }}" target="_blank" class="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-700 flex items-center gap-1.5 transition-all">
-                <span>📄 فاتورة A4</span>
+                <span>📄 فاتورة A4 / PDF</span>
             </a>
+            <button onclick="downloadCardAsImage()" id="btn-show-img" class="px-3 py-2 bg-amber-500/10 hover:bg-amber-500 text-amber-700 dark:text-amber-300 hover:text-slate-950 text-xs font-bold rounded-xl border border-amber-500/30 flex items-center gap-1.5 transition-all cursor-pointer">
+                <span>📸 تحميل صورة (PNG)</span>
+            </button>
             @hasrole('admin')
             <button
                 wire:click="deleteInvoice"
@@ -32,7 +35,7 @@
                 class="px-3 py-2 bg-rose-500/10 hover:bg-rose-600 text-rose-600 hover:text-white dark:text-rose-400 text-xs font-bold rounded-xl border border-rose-500/30 flex items-center gap-1.5 transition-all cursor-pointer"
                 title="حذف نهائي للفاتورة (المدير العام فقط)"
             >
-                <span>🗑️ حذف نهائي</span>
+                <span>🗑️ حذف</span>
             </button>
             @endhasrole
             <a href="{{ route('invoices.index') }}" class="px-3 py-2 bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-800 transition-colors">
@@ -122,4 +125,39 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        function downloadCardAsImage() {
+            const btn = document.getElementById('btn-show-img');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span>جاري التجهيز... ⏳</span>';
+            btn.style.opacity = '0.7';
+
+            const card = document.querySelector('.bg-white.dark\\:bg-slate-900.border.rounded-2xl') || document.querySelector('.space-y-6');
+
+            html2canvas(card, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff',
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'فاتورة-مبيعات-{{ $invoice->invoice_number }}.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                btn.innerHTML = '<span>تم التحميل ✅</span>';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.opacity = '1';
+                }, 2000);
+            }).catch(err => {
+                console.error(err);
+                btn.innerHTML = originalText;
+                btn.style.opacity = '1';
+                alert('حدث خطأ أثناء حفظ الفاتورة.');
+            });
+        }
+    </script>
 </div>

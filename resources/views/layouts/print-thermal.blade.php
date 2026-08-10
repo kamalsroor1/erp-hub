@@ -47,15 +47,17 @@
         .my-2 { margin-top: 6px; margin-bottom: 6px; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 4px 1px; font-size: 11px; font-weight: 700; }
-        th { font-weight: 900; }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body onload="window.print()">
 
-    <div class="no-print" style="margin-bottom: 10px; text-align: center;">
-        <button onclick="window.print()" style="padding: 8px 18px; font-family: 'Cairo'; background: #10b981; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 900;">🖨️ طباعة الإيصال</button>
-        <button onclick="window.history.back()" style="padding: 8px 14px; font-family: 'Cairo'; background: #475569; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">رجوع</button>
+    <div class="no-print" style="margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center;">
+        <button onclick="window.print()" style="padding: 7px 14px; font-family: 'Cairo'; background: #10b981; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 900; font-size: 12px;">🖨️ طباعة الإيصال</button>
+        <button onclick="downloadReceiptAsImage()" id="btn-thermal-img" style="padding: 7px 14px; font-family: 'Cairo'; background: #d97706; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 900; font-size: 12px;">📸 تحميل صورة</button>
+        <button onclick="window.history.back()" style="padding: 7px 12px; font-family: 'Cairo'; background: #475569; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 12px;">رجوع</button>
     </div>
+
+    <div id="receipt-container" style="background: #ffffff; padding: 4px;">
 
     @php
         $companyName = \App\Models\Setting::get('company_name', 'سرور كوفي');
@@ -137,5 +139,40 @@
         <p style="margin: 0; font-size: 11px; font-weight: 800;">شكراً لتعاملكم معنا</p>
     </div>
 
+    </div>
+
+    <script>
+        function downloadReceiptAsImage() {
+            const btn = document.getElementById('btn-thermal-img');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span>جاري التجهيز... ⏳</span>';
+            btn.style.opacity = '0.7';
+
+            const element = document.getElementById('receipt-container');
+            
+            html2canvas(element, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'إيصال-كاشير-{{ $invoice->invoice_number }}.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                btn.innerHTML = '<span>تم التحميل ✅</span>';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.opacity = '1';
+                }, 2000);
+            }).catch(err => {
+                console.error('Error generating receipt image:', err);
+                btn.innerHTML = originalText;
+                btn.style.opacity = '1';
+                alert('حدث خطأ أثناء تحميل الإيصال كصورة.');
+            });
+        }
+    </script>
 </body>
 </html>

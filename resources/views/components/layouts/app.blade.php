@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'نظام إدارة الفواتير والمخزون' }} | سرور POS</title>
+    @php
+        $siteCompanyName = \App\Models\Setting::get('company_name', 'سرور كوفي');
+        $siteSubtitle = \App\Models\Setting::get('company_subtitle', 'لتوريدات خامات مطاحن البن');
+    @endphp
+    <title>{{ $title ?? $siteCompanyName }} | {{ $siteCompanyName }} - {{ $siteSubtitle }}</title>
     
     <!-- Theme Early Initialization (Zero-lag / Anti-flicker) -->
     <script>
@@ -150,10 +154,10 @@
                     </div>
                     <div>
                         <h1 class="font-extrabold text-base tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5 font-tajawal">
-                            سرور POS
+                            {{ $siteCompanyName }}
                             <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">V1.0</span>
                         </h1>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">إدارة الفواتير والمخزون</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[150px]">{{ $siteSubtitle }}</p>
                     </div>
                 </div>
                 <button @click="sidebarOpen = false" class="lg:hidden text-slate-400 hover:text-slate-700 dark:hover:text-white">
@@ -254,10 +258,10 @@
                     <span>الملف الشخصي والأمان</span>
                 </a>
 
-                <!-- 📲 PWA Mobile Install Button -->
-                <div id="pwa-install-container" class="hidden pt-2 px-1">
-                    <button id="pwa-install-btn" type="button" class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-600/20 to-amber-500/10 hover:from-amber-600/30 hover:to-amber-500/20 text-amber-600 dark:text-amber-400 font-bold rounded-xl text-xs border border-amber-500/30 shadow-sm transition-all cursor-pointer">
-                        <span>📲 تثبيت التطبيق على الهاتف</span>
+                <!-- 📲 PWA Mobile Install Button (Permanent) -->
+                <div class="pt-2 px-1">
+                    <button onclick="triggerPwaInstall()" type="button" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-amber-600/15 via-amber-500/20 to-amber-600/15 hover:from-amber-600/30 hover:to-amber-500/30 text-amber-600 dark:text-amber-400 font-bold rounded-xl text-xs border border-amber-500/30 shadow-sm transition-all cursor-pointer">
+                        <span>📲 تثبيت التطبيق (PWA)</span>
                     </button>
                 </div>
             </nav>
@@ -311,8 +315,19 @@
                 </div>
 
                 <!-- Header Actions -->
-                <div class="flex items-center gap-3" x-data="{ userMenuOpen: false }">
+                <div class="flex items-center gap-2 sm:gap-3" x-data="{ userMenuOpen: false }">
                     
+                    <!-- 📲 PWA Install Button (Permanent in Top Bar) -->
+                    <button
+                        type="button"
+                        onclick="triggerPwaInstall()"
+                        class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs shadow-md shadow-amber-500/20 transition-all cursor-pointer active:scale-95 shrink-0"
+                        title="تثبيت النظام كتطبيق على الهاتف أو الكمبيوتر"
+                    >
+                        <span class="text-sm">📲</span>
+                        <span class="hidden sm:inline font-tajawal">تثبيت التطبيق</span>
+                    </button>
+
                     <!-- ☀️ / 🌙 Theme Toggle Button -->
                     <button
                         type="button"
@@ -552,31 +567,82 @@
             }
         });
 
+    <!-- 📲 PWA Install Guide Modal -->
+    <div id="pwa-guide-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md p-6 space-y-5 shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <img src="{{ asset('logo.png') }}" class="w-10 h-10 object-contain rounded-xl p-1 bg-slate-50 dark:bg-slate-800 border" alt="لوجو">
+                    <div>
+                        <h3 class="font-black text-slate-900 dark:text-white text-base">تثبيت تطبيق سرور كوفي</h3>
+                        <p class="text-xs text-slate-500">على الشاشة الرئيسية للهاتف أو الكمبيوتر</p>
+                    </div>
+                </div>
+                <button onclick="closePwaModal()" class="text-slate-400 hover:text-slate-700 dark:hover:text-white text-lg">✕</button>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-700 dark:text-slate-300">
+                <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-1.5">
+                    <p class="font-bold text-amber-800 dark:text-amber-300 text-sm">📱 لهواتف الأندرويد (Chrome):</p>
+                    <p>انقر على زر <strong>"تثبيت التطبيق الآن"</strong> بالأسفل، أو اضغط على قائمة المتصفح (⋮) ثم اختر <strong>"تثبيت التطبيق"</strong> أو <strong>"إضافة إلى الشاشة الرئيسية"</strong>.</p>
+                </div>
+
+                <div class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1.5">
+                    <p class="font-bold text-slate-900 dark:text-white text-sm">🍏 لهواتف الآيفون (Safari):</p>
+                    <p>1. اضغط على زر المشاركة بالأسفل <strong>(⎋ Share)</strong>.</p>
+                    <p>2. مرر للأسفل واختر <strong>"إضافة إلى الشاشة الرئيسية ➕ (Add to Home Screen)"</strong>.</p>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <button onclick="closePwaModal()" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs">إغلاق</button>
+                <button id="pwa-prompt-btn" onclick="executeNativeInstall()" class="px-5 py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-xl text-xs shadow-lg shadow-amber-500/20">📲 تثبيت التطبيق الآن</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
         // 📲 PWA Service Worker & Install Prompt Controller
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            const container = document.getElementById('pwa-install-container');
-            if (container) container.classList.remove('hidden');
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const pwaBtn = document.getElementById('pwa-install-btn');
-            if (pwaBtn) {
-                pwaBtn.addEventListener('click', async () => {
-                    if (deferredPrompt) {
-                        deferredPrompt.prompt();
-                        const { outcome } = await deferredPrompt.userChoice;
-                        if (outcome === 'accepted') {
-                            const container = document.getElementById('pwa-install-container');
-                            if (container) container.classList.add('hidden');
-                        }
-                        deferredPrompt = null;
-                    }
-                });
+        function triggerPwaInstall() {
+            if (deferredPrompt) {
+                executeNativeInstall();
+            } else {
+                const modal = document.getElementById('pwa-guide-modal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                }
             }
-        });
+        }
+
+        async function executeNativeInstall() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                closePwaModal();
+            } else {
+                const modal = document.getElementById('pwa-guide-modal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                }
+            }
+        }
+
+        function closePwaModal() {
+            const modal = document.getElementById('pwa-guide-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

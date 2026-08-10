@@ -24,7 +24,7 @@ class Profile extends Component
 
     // General & Printing Settings (System-Wide)
     public string $company_name = 'سرور كوفي';
-    public string $company_subtitle = 'لتوزيع خامات مطاحن البن';
+    public string $company_subtitle = 'لتوريدات خامات مطاحن البن';
     public bool $show_print_subtitle = true;
 
     // Security
@@ -41,7 +41,7 @@ class Profile extends Component
 
         // Load General Settings
         $this->company_name = Setting::get('company_name', 'سرور كوفي');
-        $this->company_subtitle = Setting::get('company_subtitle', 'لتوزيع خامات مطاحن البن');
+        $this->company_subtitle = Setting::get('company_subtitle', 'لتوريدات خامات مطاحن البن');
         $this->show_print_subtitle = Setting::getBool('show_print_subtitle', true);
     }
 

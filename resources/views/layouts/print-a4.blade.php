@@ -140,13 +140,20 @@
             padding-top: 15px;
             border-top: 2px dashed #000000;
         }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
-    <div class="no-print" style="max-width: 210mm; margin: 0 auto 15px auto; display: flex; gap: 10px;">
-        <button onclick="window.print()" style="padding: 10px 24px; background: #059669; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 900; font-family: 'Cairo'; font-size: 15px;">🖨️ طباعة الفاتورة (A4)</button>
-        <button onclick="window.history.back()" style="padding: 10px 20px; background: #475569; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: 700; font-size: 14px;">رجوع</button>
+    <div class="no-print" style="max-width: 210mm; margin: 0 auto 15px auto; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <button onclick="window.print()" style="padding: 10px 22px; background: #059669; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 900; font-family: 'Cairo'; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;">
+            <span>🖨️ طباعة / حفظ PDF</span>
+        </button>
+        <button onclick="downloadAsImage()" id="btn-download-img" style="padding: 10px 22px; background: #d97706; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 900; font-family: 'Cairo'; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;">
+            <span>📸 تحميل كصورة (PNG)</span>
+        </button>
+        <button onclick="window.history.back()" style="padding: 10px 20px; background: #475569; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: 700; font-size: 14px;">
+            رجوع
+        </button>
     </div>
 
     @php
@@ -272,5 +279,38 @@
         </div>
     </div>
 
+    <script>
+        function downloadAsImage() {
+            const btn = document.getElementById('btn-download-img');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span>جاري التجهيز... ⏳</span>';
+            btn.style.opacity = '0.7';
+
+            const element = document.querySelector('.container');
+            
+            html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'فاتورة-مبيعات-{{ $invoice->invoice_number }}.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                btn.innerHTML = '<span>تم التحميل بنجاح ✅</span>';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.opacity = '1';
+                }, 2000);
+            }).catch(err => {
+                console.error('Error generating invoice image:', err);
+                btn.innerHTML = originalText;
+                btn.style.opacity = '1';
+                alert('حدث خطأ أثناء حفظ الفاتورة كصورة.');
+            });
+        }
+    </script>
 </body>
 </html>
