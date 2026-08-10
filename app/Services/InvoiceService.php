@@ -183,6 +183,10 @@ class InvoiceService
      */
     public function cancelInvoice(Invoice $invoice, string $reason): Invoice
     {
+        if (auth()->check() && !auth()->user()->hasRole('admin')) {
+            throw new Exception("عفواً، لا يملك صلاحية إلغاء الفواتير سوى المدير العام.");
+        }
+
         return DB::transaction(function () use ($invoice, $reason) {
             $lockedInvoice = Invoice::where('id', $invoice->id)->lockForUpdate()->firstOrFail();
 
@@ -405,6 +409,10 @@ class InvoiceService
      */
     public function deleteInvoice(Invoice $invoice): bool
     {
+        if (auth()->check() && !auth()->user()->hasRole('admin')) {
+            throw new Exception("عفواً، لا يملك صلاحية حذف الفواتير سوى المدير العام.");
+        }
+
         return DB::transaction(function () use ($invoice) {
             $lockedInvoice = Invoice::where('id', $invoice->id)->lockForUpdate()->firstOrFail();
             $customerId = $lockedInvoice->customer_id;

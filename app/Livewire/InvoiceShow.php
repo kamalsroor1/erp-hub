@@ -17,6 +17,10 @@ class InvoiceShow extends Component
 
     public function deleteInvoice(InvoiceService $invoiceService)
     {
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403, 'عفواً، لا يملك صلاحية حذف الفواتير سوى المدير العام.');
+        }
+
         $num = $this->invoice->invoice_number;
         $invoiceService->deleteInvoice($this->invoice);
 

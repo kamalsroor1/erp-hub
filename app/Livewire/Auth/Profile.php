@@ -18,6 +18,7 @@ class Profile extends Component
 
     public string $name = '';
     public string $email = '';
+    public string $theme_preference = 'dark';
 
     public string $current_password = '';
     public string $new_password = '';
@@ -28,6 +29,7 @@ class Profile extends Component
         $user = Auth::user();
         $this->name = $user->name;
         $this->email = $user->email;
+        $this->theme_preference = $user->theme_preference ?? 'dark';
     }
 
     public function updateProfile()
@@ -35,8 +37,9 @@ class Profile extends Component
         $user = Auth::user();
 
         $this->validate([
-            'name'  => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$user->id],
+            'name'             => ['required', 'string', 'max:255'],
+            'email'            => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$user->id],
+            'theme_preference' => ['required', 'string', 'in:dark,light'],
         ], [
             'name.required'  => 'يرجى إدخال الاسم بالكامل.',
             'email.required' => 'يرجى إدخال البريد الإلكتروني.',
@@ -45,15 +48,17 @@ class Profile extends Component
         ]);
 
         $user->update([
-            'name'  => $this->name,
-            'email' => $this->email,
+            'name'             => $this->name,
+            'email'            => $this->email,
+            'theme_preference' => $this->theme_preference,
         ]);
 
         $this->dispatch('swal:toast', [
             'type' => 'success',
             'title' => 'تم حفظ البيانات!',
-            'text' => 'تم تحديث البيانات الشخصية بنجاح.'
+            'text' => 'تم تحديث البيانات الشخصية والمظهر بنجاح.'
         ]);
+        $this->dispatch('theme-changed', $this->theme_preference);
     }
 
     public function updatePassword()

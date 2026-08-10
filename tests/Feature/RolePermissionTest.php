@@ -85,4 +85,58 @@ class RolePermissionTest extends TestCase
         $this->get(route('daily.journal'))->assertStatus(200);
         $this->get(route('users.index'))->assertStatus(403);
     }
+
+    public function test_only_admin_can_delete_invoice_and_cashier_is_forbidden()
+    {
+        $item = \App\Models\Item::create([
+            'code'              => 'TEST-ITEM-1',
+            'name'              => 'بن تجريبي',
+            'category'          => 'بن وتوليفات',
+            'unit'              => 'كجم',
+            'current_stock'     => '50.000',
+            'cost_price'        => '100.000',
+            'weighted_avg_cost' => '100.000',
+            'selling_price'     => '150.000',
+            'min_stock_level'   => '5.000',
+            'is_active'         => true,
+        ]);
+
+        $customer = \App\Models\Customer::create([
+            'name'            => 'عميل فحص الصلاحيات',
+            'phone'           => '01099887766',
+            'current_balance' => '0.000',
+            'is_active'       => true,
+        ]);
+
+        $invoiceService = app(\App\Services\InvoiceService::class);
+        $invoice = $invoiceService->confirmInvoice([
+            'customer_id'   => $customer->id,
+            'invoice_date'  => now()->toDateString(),
+            'payment_type'  => 'cash',
+            'discount_type' => 'fixed',
+            'discount_value'=> '0.000',
+            'items'         => [
+                [
+                    'item_id'    => $item->id,
+                    'quantity'   => '2.000',
+                    'unit_price' => '150.000',
+                ]
+            ]
+        ]);
+
+        // 1. Cashier attempts to delete invoice -> BLOCKED
+        $this->actingAs($this->cashier);
+        \Livewire\Livewire::test(\App\Livewire\InvoiceIndex::class)
+            ->call('deleteInvoice', $invoice->id)
+            ->assertDispatched('swal:toast');
+
+        $this->assertDatabaseHas('invoices', ['id' => $invoice->id]);
+
+        // 2. Admin deletes invoice -> ALLOWED
+        $this->actingAs($this->admin);
+        \Livewire\Livewire::test(\App\Livewire\InvoiceIndex::class)
+            ->call('deleteInvoice', $invoice->id);
+
+        $this->assertDatabaseMissing('invoices', ['id' => $invoice->id]);
+    }
 }

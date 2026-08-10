@@ -68,6 +68,32 @@
                         @error('email') <span class="text-xs text-rose-400 mt-1 block">{{ $message }}</span> @enderror
                     </div>
 
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-2">
+                            المظهر والسمة المفضلة (Theme) <span class="text-rose-400">*</span>
+                        </label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all {{ $theme_preference === 'dark' ? 'bg-slate-950 border-amber-500 text-amber-300 shadow-md shadow-amber-500/10' : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700' }}">
+                                <input type="radio" wire:model="theme_preference" value="dark" class="hidden">
+                                <span class="text-lg">🌙</span>
+                                <div class="text-right">
+                                    <div class="text-xs font-bold text-white">الوضع الليلي (Dark)</div>
+                                    <div class="text-[10px] text-slate-400">مريح للعين ومناسب للإضاءة الخافتة</div>
+                                </div>
+                            </label>
+
+                            <label class="flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all {{ $theme_preference === 'light' ? 'bg-slate-800 border-amber-500 text-amber-300 shadow-md shadow-amber-500/10' : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700' }}">
+                                <input type="radio" wire:model="theme_preference" value="light" class="hidden">
+                                <span class="text-lg">☀️</span>
+                                <div class="text-right">
+                                    <div class="text-xs font-bold text-white">الوضع النهاري (Light)</div>
+                                    <div class="text-[10px] text-slate-400">إضاءة عالية وتباين ساطع للشاشات</div>
+                                </div>
+                            </label>
+                        </div>
+                        @error('theme_preference') <span class="text-xs text-rose-400 mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
                     <div class="pt-4">
                         <button
                             type="submit"

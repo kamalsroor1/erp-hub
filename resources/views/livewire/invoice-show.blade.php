@@ -25,13 +25,16 @@
             <a href="{{ route('invoices.print.a4', $invoice->id) }}" target="_blank" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 flex items-center gap-1.5 transition-all">
                 <span>📄 طباعة الفاتورة</span>
             </a>
+            @hasrole('admin')
             <button
                 wire:click="deleteInvoice"
                 wire:confirm="هل أنت متأكد من حذف هذه الفاتورة نهائياً؟ سيتم إرجاع البضاعة للمخزن وتحديث الرصيد وحذف السجل تماماً."
-                class="px-3.5 py-2 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white text-xs font-bold rounded-xl border border-rose-500/30 flex items-center gap-1.5 transition-all"
+                class="px-3.5 py-2 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white text-xs font-bold rounded-xl border border-rose-500/30 flex items-center gap-1.5 transition-all cursor-pointer"
+                title="حذف نهائي للفاتورة (المدير العام فقط)"
             >
                 <span>🗑️ حذف نهائي</span>
             </button>
+            @endhasrole
             <a href="{{ route('invoices.index') }}" class="px-3 py-2 bg-slate-950 text-slate-400 hover:text-white text-xs font-bold rounded-xl border border-slate-800 transition-colors">
                 ← رجوع
             </a>

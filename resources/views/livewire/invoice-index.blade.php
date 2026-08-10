@@ -84,14 +84,16 @@
                                 <span>✏️ تعديل</span>
                             </a>
                             @endif
+                            @hasrole('admin')
                             <button
                                 wire:click="deleteInvoice({{ $inv->id }})"
                                 wire:confirm="هل أنت متأكد من حذف الفاتورة رقم {{ $inv->invoice_number }} نهائياً؟ سيتم إرجاع البضاعة للمخزن وحذف الفاتورة تماماً."
-                                class="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-400 text-[11px] font-bold border border-rose-500/30 transition-all flex items-center gap-1"
-                                title="حذف نهائي للفاتورة"
+                                class="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-400 text-[11px] font-bold border border-rose-500/30 transition-all flex items-center gap-1 cursor-pointer"
+                                title="حذف نهائي للفاتورة (المدير العام فقط)"
                             >
                                 <span>🗑️ حذف</span>
                             </button>
+                            @endhasrole
                         </td>
                     </tr>
                     @empty

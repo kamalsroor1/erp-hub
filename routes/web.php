@@ -92,4 +92,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/customers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportCustomerStatement'])->name('customers.export.csv');
     Route::get('/suppliers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportSupplierStatement'])->name('suppliers.export.csv');
     Route::get('/items/export-csv', [App\Http\Controllers\ExportController::class, 'exportInventory'])->name('items.export.csv');
+
+    // Theme Toggle (Dark / Light Mode)
+    Route::post('/theme-toggle', function (\Illuminate\Http\Request $request) {
+        $theme = $request->input('theme', 'dark');
+        if (in_array($theme, ['dark', 'light']) && Auth::check()) {
+            Auth::user()->update(['theme_preference' => $theme]);
+        }
+        return response()->json(['status' => 'success', 'theme' => $theme]);
+    })->name('theme.toggle');
 });

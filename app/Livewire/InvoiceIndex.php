@@ -23,6 +23,11 @@ class InvoiceIndex extends Component
 
     public function openCancelModal($invoiceId)
     {
+        if (!auth()->user()->hasRole('admin')) {
+            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => 'عفواً، لا يملك صلاحية إلغاء الفواتير سوى المدير العام.']);
+            return;
+        }
+
         $this->cancelInvoiceId = $invoiceId;
         $this->cancelReason = '';
         $this->errorMessage = '';
@@ -31,6 +36,11 @@ class InvoiceIndex extends Component
 
     public function confirmCancel(InvoiceService $invoiceService)
     {
+        if (!auth()->user()->hasRole('admin')) {
+            $this->errorMessage = 'عفواً، لا يملك صلاحية إلغاء الفواتير سوى المدير العام.';
+            return;
+        }
+
         $this->validate([
             'cancelReason' => 'required|string|min:3',
         ]);
@@ -50,6 +60,11 @@ class InvoiceIndex extends Component
 
     public function deleteInvoice($invoiceId, InvoiceService $invoiceService)
     {
+        if (!auth()->user()->hasRole('admin')) {
+            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => 'عفواً، لا يملك صلاحية حذف الفواتير سوى المدير العام.']);
+            return;
+        }
+
         try {
             $invoice = Invoice::findOrFail($invoiceId);
             $num = $invoice->invoice_number;

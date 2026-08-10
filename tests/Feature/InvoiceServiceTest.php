@@ -27,7 +27,9 @@ class InvoiceServiceTest extends TestCase
         parent::setUp();
 
         $this->invoiceService = app(InvoiceService::class);
+        $adminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin']);
         $this->user = User::factory()->create();
+        $this->user->assignRole($adminRole);
         $this->actingAs($this->user);
     }
 
