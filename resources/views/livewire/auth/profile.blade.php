@@ -77,25 +77,69 @@
                     </div>
                 </div>
 
-                <!-- Print Subtitle Toggle Box -->
-                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div class="flex items-start gap-3">
-                        <span class="text-xl mt-0.5">👁️</span>
-                        <div>
-                            <p class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">إظهار جملة الوصف الفرعي في الطباعة</p>
-                            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                                عند التعطيل، سيتم إخفاء جملة "<span class="font-semibold text-slate-700 dark:text-slate-300">{{ $company_subtitle ?: 'لتوزيع خامات مطاحن البن' }}</span>" من فواتير A4 وإيصالات الكاشير الحرارية.
-                            </p>
+                <div class="space-y-3">
+                    <!-- 1. Print Company Name Toggle Box -->
+                    <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3">
+                            <span class="text-xl mt-0.5">🏢</span>
+                            <div>
+                                <p class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">إظهار اسم النشاط ({{ $company_name ?: 'سرور كوفي' }}) في الطباعة</p>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                    عند التعطيل، سيتم إخفاء اسم النشاط من رأس فواتير A4 وإيصالات الكاشير.
+                                </p>
+                            </div>
                         </div>
+
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0 self-end sm:self-center">
+                            <input type="checkbox" wire:model.live="show_print_company_name" class="sr-only peer">
+                            <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-amber-500"></div>
+                            <span class="ms-3 text-xs font-bold text-slate-700 dark:text-slate-300 min-w-[75px]">
+                                {{ $show_print_company_name ? 'مُفعّل (ظاهر)' : 'مُعطّل (مخفي)' }}
+                            </span>
+                        </label>
                     </div>
 
-                    <label class="relative inline-flex items-center cursor-pointer shrink-0 self-end sm:self-center">
-                        <input type="checkbox" wire:model="show_print_subtitle" class="sr-only peer">
-                        <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-amber-500"></div>
-                        <span class="ms-3 text-xs font-bold text-slate-700 dark:text-slate-300">
-                            {{ $show_print_subtitle ? 'مُفعّل (ظاهر)' : 'مُعطّل (مخفي)' }}
-                        </span>
-                    </label>
+                    <!-- 2. Print Subtitle Toggle Box -->
+                    <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3">
+                            <span class="text-xl mt-0.5">👁️</span>
+                            <div>
+                                <p class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">إظهار جملة الوصف الفرعي في الطباعة</p>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                    عند التعطيل، سيتم إخفاء جملة "<span class="font-semibold text-slate-700 dark:text-slate-300">{{ $company_subtitle ?: 'لتوريدات خامات مطاحن البن' }}</span>" من فواتير A4 وإيصالات الكاشير.
+                                </p>
+                            </div>
+                        </div>
+
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0 self-end sm:self-center">
+                            <input type="checkbox" wire:model.live="show_print_subtitle" class="sr-only peer">
+                            <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-amber-500"></div>
+                            <span class="ms-3 text-xs font-bold text-slate-700 dark:text-slate-300 min-w-[75px]">
+                                {{ $show_print_subtitle ? 'مُفعّل (ظاهر)' : 'مُعطّل (مخفي)' }}
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- 3. Print Logo Toggle Box -->
+                    <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3">
+                            <span class="text-xl mt-0.5">🖼️</span>
+                            <div>
+                                <p class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">إظهار اللوجو في الطباعة</p>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                    عند التعطيل، سيتم إخفاء صورة اللوجو من رأس فواتير A4 وإيصالات الكاشير.
+                                </p>
+                            </div>
+                        </div>
+
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0 self-end sm:self-center">
+                            <input type="checkbox" wire:model.live="show_print_logo" class="sr-only peer">
+                            <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-amber-500"></div>
+                            <span class="ms-3 text-xs font-bold text-slate-700 dark:text-slate-300 min-w-[75px]">
+                                {{ $show_print_logo ? 'مُفعّل (ظاهر)' : 'مُعطّل (مخفي)' }}
+                            </span>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="flex justify-end pt-2">

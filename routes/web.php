@@ -102,3 +102,27 @@ Route::middleware('auth')->group(function () {
         return response()->json(['status' => 'success', 'theme' => $theme]);
     })->name('theme.toggle');
 });
+
+// PWA Assets Routing with proper headers
+Route::get('/manifest.json', function () {
+    $path = public_path('manifest.json');
+    if (!file_exists($path)) {
+        return response()->json(['error' => 'Not found'], 404);
+    }
+    return response()->file($path, [
+        'Content-Type' => 'application/manifest+json; charset=utf-8',
+        'Cache-Control' => 'no-cache',
+    ]);
+});
+
+Route::get('/sw.js', function () {
+    $path = public_path('sw.js');
+    if (!file_exists($path)) {
+        return response('console.log("SW not found");', 404, ['Content-Type' => 'application/javascript']);
+    }
+    return response()->file($path, [
+        'Content-Type' => 'application/javascript; charset=utf-8',
+        'Service-Worker-Allowed' => '/',
+        'Cache-Control' => 'no-cache',
+    ]);
+});

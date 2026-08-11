@@ -63,15 +63,21 @@
     @php
         $companyName = \App\Models\Setting::get('company_name', 'سرور كوفي');
         $companySubtitle = \App\Models\Setting::get('company_subtitle', 'لتوريدات خامات مطاحن البن');
+        $showCompanyName = \App\Models\Setting::getBool('show_print_company_name', true);
         $showSubtitle = \App\Models\Setting::getBool('show_print_subtitle', true);
+        $showLogo = \App\Models\Setting::getBool('show_print_logo', true);
         $logoPath = public_path('logo.png');
         $logoSrc = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : asset('logo.png');
     @endphp
 
     <!-- Header -->
     <div class="text-center">
-        <img src="{{ $logoSrc }}" alt="{{ $companyName }}" style="max-height: 52px; max-width: 50mm; margin: 0 auto 4px auto; display: block; object-fit: contain;">
-        <h2 class="font-black" style="font-size: 17px; margin: 0; color: #000;">{{ $companyName }}</h2>
+        @if($showLogo)
+            <img src="{{ $logoSrc }}" alt="{{ $companyName }}" style="max-height: 52px; max-width: 50mm; margin: 0 auto 4px auto; display: block; object-fit: contain;">
+        @endif
+        @if($showCompanyName)
+            <h2 class="font-black" style="font-size: 17px; margin: 0; color: #000;">{{ $companyName }}</h2>
+        @endif
         @if($showSubtitle && !empty($companySubtitle))
             <p style="margin: 2px 0; font-size: 11px; font-weight: 800;">{{ $companySubtitle }}</p>
         @endif

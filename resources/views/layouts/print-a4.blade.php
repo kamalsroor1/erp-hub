@@ -160,7 +160,9 @@
     @php
         $companyName = \App\Models\Setting::get('company_name', 'سرور كوفي');
         $companySubtitle = \App\Models\Setting::get('company_subtitle', 'لتوريدات خامات مطاحن البن');
+        $showCompanyName = \App\Models\Setting::getBool('show_print_company_name', true);
         $showSubtitle = \App\Models\Setting::getBool('show_print_subtitle', true);
+        $showLogo = \App\Models\Setting::getBool('show_print_logo', true);
         $logoPath = public_path('logo.png');
         $logoSrc = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : asset('logo.png');
     @endphp
@@ -169,13 +171,19 @@
         <!-- Header -->
         <div class="header">
             <div style="display: flex; align-items: center; gap: 14px;">
-                <img src="{{ $logoSrc }}" alt="{{ $companyName }}" style="max-height: 75px; max-width: 130px; object-fit: contain;">
+                @if($showLogo)
+                    <img src="{{ $logoSrc }}" alt="{{ $companyName }}" style="max-height: 75px; max-width: 130px; object-fit: contain;">
+                @endif
+                @if($showCompanyName || ($showSubtitle && !empty($companySubtitle)))
                 <div>
-                    <h1 class="brand-title">{{ $companyName }}</h1>
+                    @if($showCompanyName)
+                        <h1 class="brand-title">{{ $companyName }}</h1>
+                    @endif
                     @if($showSubtitle && !empty($companySubtitle))
                         <p class="brand-subtitle">{{ $companySubtitle }}</p>
                     @endif
                 </div>
+                @endif
             </div>
             <div class="invoice-meta">
                 <h2 class="invoice-title">فاتورة مبيعات</h2>

@@ -13,9 +13,9 @@
     <script>
         (function() {
             try {
-                const userPref = "{{ auth()->user()->theme_preference ?? '' }}";
                 const localPref = localStorage.getItem('theme');
-                const theme = userPref || localPref || 'dark';
+                const userPref = "{{ auth()->user()->theme_preference ?? '' }}";
+                const theme = localPref || userPref || 'dark';
                 if (theme === 'dark') {
                     document.documentElement.classList.add('dark');
                 } else {
@@ -39,38 +39,40 @@
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="سرور POS">
+    <meta name="apple-mobile-web-app-title" content="سرور كوفي">
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS Config & CDN -->
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Cairo', 'Tajawal', 'sans-serif'],
-                        tajawal: ['Tajawal', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: {
-                            50: '#ecfdf5',
-                            100: '#d1fae5',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
+        window.tailwind = {
+            config: {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Cairo', 'Tajawal', 'sans-serif'],
+                            tajawal: ['Tajawal', 'sans-serif'],
                         },
-                        dark: {
-                            800: '#1e293b',
-                            850: '#172033',
-                            900: '#0f172a',
-                            950: '#020617',
+                        colors: {
+                            primary: {
+                                50: '#ecfdf5',
+                                100: '#d1fae5',
+                                500: '#10b981',
+                                600: '#059669',
+                                700: '#047857',
+                            },
+                            dark: {
+                                800: '#1e293b',
+                                850: '#172033',
+                                900: '#0f172a',
+                                950: '#020617',
+                            }
                         }
                     }
                 }
             }
-        }
+        };
     </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
         body {
@@ -487,14 +489,15 @@
         });
 
         // ☀️ / 🌙 Theme Toggle Controller (Instant + Backend Persistence)
-        function toggleAppTheme() {
-            const isDark = document.documentElement.classList.contains('dark');
+        window.toggleAppTheme = function() {
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark');
             const newTheme = isDark ? 'light' : 'dark';
 
             if (newTheme === 'dark') {
-                document.documentElement.classList.add('dark');
+                html.classList.add('dark');
             } else {
-                document.documentElement.classList.remove('dark');
+                html.classList.remove('dark');
             }
 
             try {
@@ -510,7 +513,20 @@
                 },
                 body: JSON.stringify({ theme: newTheme })
             }).catch(e => console.log('Theme sync error', e));
+        };
+
+        function applyStoredTheme() {
+            try {
+                const stored = localStorage.getItem('theme');
+                if (stored === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else if (stored === 'light') {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch(e) {}
         }
+
+        window.addEventListener('livewire:navigated', applyStoredTheme);
 
         window.addEventListener('theme-changed', event => {
             const theme = typeof event.detail === 'string' ? event.detail : (event.detail?.[0] || 'dark');
@@ -568,35 +584,40 @@
         });
 
     <!-- 📲 PWA Install Guide Modal -->
-    <div id="pwa-guide-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md p-6 space-y-5 shadow-2xl relative">
+    <div id="pwa-guide-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm" style="display: none;">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md p-6 space-y-4 shadow-2xl relative">
             <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('logo.png') }}" class="w-10 h-10 object-contain rounded-xl p-1 bg-slate-50 dark:bg-slate-800 border" alt="لوجو">
+                    <img src="{{ asset('logo.png') }}" class="w-10 h-10 object-contain rounded-xl p-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700" alt="لوجو">
                     <div>
-                        <h3 class="font-black text-slate-900 dark:text-white text-base">تثبيت تطبيق سرور كوفي</h3>
+                        <h3 class="font-black text-slate-900 dark:text-white text-base font-tajawal">تثبيت تطبيق سرور كوفي</h3>
                         <p class="text-xs text-slate-500">على الشاشة الرئيسية للهاتف أو الكمبيوتر</p>
                     </div>
                 </div>
-                <button onclick="closePwaModal()" class="text-slate-400 hover:text-slate-700 dark:hover:text-white text-lg">✕</button>
+                <button onclick="closePwaModal()" class="text-slate-400 hover:text-slate-700 dark:hover:text-white text-xl font-bold p-1">✕</button>
             </div>
 
             <div class="space-y-3 text-xs text-slate-700 dark:text-slate-300">
-                <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-1.5">
+                <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-1">
                     <p class="font-bold text-amber-800 dark:text-amber-300 text-sm">📱 لهواتف الأندرويد (Chrome):</p>
                     <p>انقر على زر <strong>"تثبيت التطبيق الآن"</strong> بالأسفل، أو اضغط على قائمة المتصفح (⋮) ثم اختر <strong>"تثبيت التطبيق"</strong> أو <strong>"إضافة إلى الشاشة الرئيسية"</strong>.</p>
                 </div>
 
-                <div class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1.5">
+                <div class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
                     <p class="font-bold text-slate-900 dark:text-white text-sm">🍏 لهواتف الآيفون (Safari):</p>
-                    <p>1. اضغط على زر المشاركة بالأسفل <strong>(⎋ Share)</strong>.</p>
+                    <p>1. اضغط على زر المشاركة بالأسفل <strong>(⎋ Share)</strong> في شريط متصفح سفاري.</p>
                     <p>2. مرر للأسفل واختر <strong>"إضافة إلى الشاشة الرئيسية ➕ (Add to Home Screen)"</strong>.</p>
+                </div>
+
+                <div class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
+                    <p class="font-bold text-slate-900 dark:text-white text-sm">💻 لأجهزة الكمبيوتر (Chrome / Edge):</p>
+                    <p>اضغط على أيقونة التثبيت <strong>(⊕ أو 🖥️)</strong> الموجودة في نهاية شريط العنوان بالمتصفح لتثبيته كتطبيق مستقل.</p>
                 </div>
             </div>
 
-            <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
-                <button onclick="closePwaModal()" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs">إغلاق</button>
-                <button id="pwa-prompt-btn" onclick="executeNativeInstall()" class="px-5 py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-xl text-xs shadow-lg shadow-amber-500/20">📲 تثبيت التطبيق الآن</button>
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <button onclick="closePwaModal()" class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">إغلاق</button>
+                <button id="pwa-prompt-btn" onclick="executeNativeInstall()" class="px-5 py-2.5 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-xl text-xs shadow-lg shadow-amber-500/20 cursor-pointer">📲 تثبيت التطبيق الآن</button>
             </div>
         </div>
     </div>

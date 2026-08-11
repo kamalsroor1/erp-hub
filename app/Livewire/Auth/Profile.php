@@ -25,7 +25,9 @@ class Profile extends Component
     // General & Printing Settings (System-Wide)
     public string $company_name = 'سرور كوفي';
     public string $company_subtitle = 'لتوريدات خامات مطاحن البن';
+    public bool $show_print_company_name = true;
     public bool $show_print_subtitle = true;
+    public bool $show_print_logo = true;
 
     // Security
     public string $current_password = '';
@@ -42,7 +44,9 @@ class Profile extends Component
         // Load General Settings
         $this->company_name = Setting::get('company_name', 'سرور كوفي');
         $this->company_subtitle = Setting::get('company_subtitle', 'لتوريدات خامات مطاحن البن');
+        $this->show_print_company_name = Setting::getBool('show_print_company_name', true);
         $this->show_print_subtitle = Setting::getBool('show_print_subtitle', true);
+        $this->show_print_logo = Setting::getBool('show_print_logo', true);
     }
 
     public function updateProfile()
@@ -77,16 +81,20 @@ class Profile extends Component
     public function updateGeneralSettings()
     {
         $this->validate([
-            'company_name'        => ['required', 'string', 'max:255'],
-            'company_subtitle'    => ['nullable', 'string', 'max:255'],
-            'show_print_subtitle' => ['boolean'],
+            'company_name'            => ['required', 'string', 'max:255'],
+            'company_subtitle'        => ['nullable', 'string', 'max:255'],
+            'show_print_company_name' => ['boolean'],
+            'show_print_subtitle'     => ['boolean'],
+            'show_print_logo'         => ['boolean'],
         ], [
             'company_name.required' => 'يرجى إدخال اسم المؤسسة أو النشاط.',
         ]);
 
         Setting::set('company_name', $this->company_name);
         Setting::set('company_subtitle', $this->company_subtitle ?? '');
+        Setting::set('show_print_company_name', $this->show_print_company_name ? '1' : '0');
         Setting::set('show_print_subtitle', $this->show_print_subtitle ? '1' : '0');
+        Setting::set('show_print_logo', $this->show_print_logo ? '1' : '0');
 
         $this->dispatch('swal:toast', [
             'type' => 'success',

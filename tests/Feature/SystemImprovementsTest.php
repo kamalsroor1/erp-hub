@@ -217,13 +217,17 @@ class SystemImprovementsTest extends TestCase
         Livewire::test(\App\Livewire\Auth\Profile::class)
             ->set('company_name', 'سرور كوفي والمطاحن الحديثة')
             ->set('company_subtitle', 'أجود أنواع البن والشاي')
+            ->set('show_print_company_name', false)
             ->set('show_print_subtitle', false)
+            ->set('show_print_logo', false)
             ->call('updateGeneralSettings')
             ->assertHasNoErrors()
             ->assertDispatched('swal:toast');
 
         $this->assertEquals('سرور كوفي والمطاحن الحديثة', \App\Models\Setting::get('company_name'));
         $this->assertEquals('أجود أنواع البن والشاي', \App\Models\Setting::get('company_subtitle'));
+        $this->assertFalse(\App\Models\Setting::getBool('show_print_company_name'));
         $this->assertFalse(\App\Models\Setting::getBool('show_print_subtitle'));
+        $this->assertFalse(\App\Models\Setting::getBool('show_print_logo'));
     }
 }
