@@ -5,7 +5,9 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Item;
 use App\Models\Customer;
+use App\Models\Store;
 use App\Services\InvoiceService;
+use App\Services\CustomerPricingHelper;
 use App\Livewire\Traits\RequiresAuth;
 use Exception;
 
@@ -14,6 +16,7 @@ class InvoiceCreate extends Component
     use RequiresAuth;
 
     public $customer_id;
+    public $store_id;
     public $invoice_date;
     public $payment_type = 'cash'; // cash, credit, partial
     public $discount_type = 'fixed'; // fixed, percentage
@@ -36,6 +39,7 @@ class InvoiceCreate extends Component
 
     protected $rules = [
         'customer_id'    => 'required|exists:customers,id',
+        'store_id'       => 'required|exists:stores,id',
         'invoice_date'   => 'required|date',
         'payment_type'   => 'required|in:cash,credit,partial',
         'items'          => 'required|array|min:1',
@@ -48,10 +52,36 @@ class InvoiceCreate extends Component
     {
         $this->invoice_date = now()->toDateString();
         
+        $this->store_id = session('current_store_id') 
+            ?? auth()->user()?->getCurrentStore()?->id 
+            ?? Store::getMainStore()?->id;
+
         $firstCustomer = Customer::active()->first();
         if ($firstCustomer) {
             $this->customer_id = $firstCustomer->id;
         }
+    }
+
+    public function updatedCustomerId()
+    {
+        $pricingHelper = app(CustomerPricingHelper::class);
+        foreach ($this->items as $idx => $line) {
+            $this->items[$idx]['last_customer_price'] = $this->customer_id
+                ? $pricingHelper->getLastSoldPrice($this->customer_id, $line['item_id'], $this->store_id)
+                : null;
+        }
+    }
+
+    public function updatedStoreId()
+    {
+        // Re-evaluate stock and custom prices for the selected store
+        foreach ($this->items as $idx => $line) {
+            $item = Item::find($line['item_id']);
+            if ($item) {
+                $this->items[$idx]['current_stock'] = $item->getStockInStore($this->store_id);
+            }
+        }
+        $this->updatedCustomerId();
     }
 
     public function addItem($itemId, $quantity = '1.000')
@@ -60,6 +90,7 @@ class InvoiceCreate extends Component
         if (!$item) return;
 
         $qtyToAdd = (string) $quantity;
+        $pricingHelper = app(CustomerPricingHelper::class);
 
         // Check if item already in lines
         foreach ($this->items as $index => $line) {
@@ -72,21 +103,35 @@ class InvoiceCreate extends Component
             }
         }
 
+        $effectivePrice = $item->getEffectivePriceForStore($this->store_id);
+        $lastCustomerPrice = $this->customer_id 
+            ? $pricingHelper->getLastSoldPrice($this->customer_id, $item->id, $this->store_id)
+            : null;
+
         $this->items[] = [
-            'item_id'         => $item->id,
-            'code'            => $item->code,
-            'name'            => $item->name,
-            'category'        => $item->category,
-            'unit'            => $item->unit ?: 'كجم',
-            'current_stock'   => $item->current_stock,
-            'quantity'        => $qtyToAdd,
-            'unit_price'      => $item->selling_price,
-            'discount_amount' => '0.000',
-            'total_price'     => bcmul($qtyToAdd, $item->selling_price, 3),
+            'item_id'             => $item->id,
+            'code'                => $item->code,
+            'name'                => $item->name,
+            'category'            => $item->category,
+            'unit'                => $item->unit ?: 'كجم',
+            'current_stock'       => $item->getStockInStore($this->store_id),
+            'quantity'            => $qtyToAdd,
+            'unit_price'          => $effectivePrice,
+            'discount_amount'     => '0.000',
+            'total_price'         => bcmul($qtyToAdd, $effectivePrice, 3),
+            'last_customer_price' => $lastCustomerPrice,
         ];
 
         $this->calculateTotals();
         $this->searchQuery = '';
+    }
+
+    public function applyCustomerLastPrice($index)
+    {
+        if (isset($this->items[$index]) && !empty($this->items[$index]['last_customer_price'])) {
+            $this->items[$index]['unit_price'] = $this->items[$index]['last_customer_price']['unit_price'];
+            $this->calculateTotals();
+        }
     }
 
     public function setLineWeightPreset($index, $weight)
@@ -209,6 +254,7 @@ class InvoiceCreate extends Component
         try {
             $invoice = $invoiceService->confirmInvoice([
                 'customer_id'    => $this->customer_id,
+                'store_id'       => $this->store_id,
                 'invoice_date'   => $this->invoice_date,
                 'payment_type'   => $this->payment_type,
                 'discount_type'  => $this->discount_type,
@@ -232,6 +278,7 @@ class InvoiceCreate extends Component
     public function render()
     {
         $customers = Customer::active()->orderBy('name')->get();
+        $stores = Store::active()->orderBy('is_main', 'desc')->get();
 
         $quickCatalog = Item::active()
             ->when($this->selectedCategory !== 'all', fn($q) => $q->where('category', $this->selectedCategory))
@@ -246,7 +293,9 @@ class InvoiceCreate extends Component
 
         return view('livewire.invoice-create', [
             'customers'    => $customers,
+            'stores'       => $stores,
             'quickCatalog' => $quickCatalog,
+            'currentStore' => Store::find($this->store_id),
         ])->layout('components.layouts.app', ['title' => 'نقطة البيع ومطحنة البن والشاي (POS)']);
     }
 }

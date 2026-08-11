@@ -57,6 +57,12 @@ Route::middleware('auth')->group(function () {
     // Items & Inventory
     Route::get('/items', ItemIndex::class)->name('items.index');
 
+    // Multi-Store, Vans & Warehouse Management
+    Route::get('/stores', App\Livewire\StoreIndex::class)->name('stores');
+    Route::get('/store-stocks', App\Livewire\StoreStockIndex::class)->name('store-stocks');
+    Route::get('/stock-transfers', App\Livewire\StockTransferIndex::class)->name('stock-transfers');
+    Route::get('/stock-transfers/create', App\Livewire\StockTransferCreate::class)->name('stock-transfers.create');
+
     // Customers & Statements
     Route::get('/customers', CustomerIndex::class)->name('customers.index');
     Route::get('/customers/{id}/statement', CustomerStatement::class)->name('customers.statement');

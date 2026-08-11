@@ -202,13 +202,30 @@
                 </a>
                 @endhasanyrole
 
-                <!-- المشتريات والمخزون (Admin, Storekeeper, Accountant, Cashier) -->
-                <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">المشتريات والمخزون</div>
+                <!-- المشتريات والمخزون والفروع (Admin, Storekeeper, Accountant, Cashier) -->
+                <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">المخزون والفروع والتوزيع</div>
 
                 <a href="{{ route('items.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('items.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                    <span>الأصناف والمخزون</span>
+                    <span>الأصناف والأسعار العامة</span>
                 </a>
+
+                <a href="{{ route('store-stocks') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('store-stocks') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    <span>📦 جرد وأسعار الفروع</span>
+                </a>
+
+                <a href="{{ route('stock-transfers') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('stock-transfers*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                    <span>🚚 أذونات التحويل والشحن</span>
+                </a>
+
+                @hasrole('admin')
+                <a href="{{ route('stores') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('stores') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    <span>🏬 الفروع وعربات التوزيع</span>
+                </a>
+                @endhasrole
 
                 @hasanyrole('admin|storekeeper|accountant')
                 <a href="{{ route('purchases.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('purchases.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
@@ -317,6 +334,66 @@
                 <!-- Header Actions -->
                 <div class="flex items-center gap-2 sm:gap-3" x-data="{ userMenuOpen: false }">
                     
+                    @php
+                        $currentStore = auth()->user()?->getCurrentStore();
+                        $availableStores = auth()->user()?->hasRole('admin') 
+                            ? \App\Models\Store::where('is_active', true)->orderBy('is_main', 'desc')->get()
+                            : auth()->user()?->stores()->where('is_active', true)->get();
+                        if ($availableStores && $availableStores->isEmpty() && $currentStore) {
+                            $availableStores = collect([$currentStore]);
+                        }
+                    @endphp
+
+                    <!-- 🏬 Store / Van Switcher in Header -->
+                    @if($currentStore)
+                    <div class="relative" x-data="{ storeMenuOpen: false }">
+                        <button
+                            @click="storeMenuOpen = !storeMenuOpen"
+                            type="button"
+                            class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-bold text-xs transition-all cursor-pointer shrink-0 max-w-[130px] sm:max-w-none"
+                            title="تبديل الفرع أو عربية التوزيع النشطة"
+                        >
+                            <span>
+                                @if($currentStore->type === 'wholesale_van') 🚚 @elseif($currentStore->type === 'main_warehouse') 🏢 @else 🏬 @endif
+                            </span>
+                            <span class="truncate max-w-[100px] sm:max-w-[140px]">{{ $currentStore->name }}</span>
+                            @if($availableStores && $availableStores->count() > 1)
+                            <span class="text-[10px] text-emerald-500">▼</span>
+                            @endif
+                        </button>
+
+                        @if($availableStores && $availableStores->count() > 1)
+                        <div
+                            x-show="storeMenuOpen"
+                            @click.away="storeMenuOpen = false"
+                            x-cloak
+                            class="absolute left-0 mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl py-2 z-50 divide-y divide-slate-100 dark:divide-slate-800/80 font-sans"
+                        >
+                            <div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                الفرع / عربية التوزيع النشطة:
+                            </div>
+                            <div class="py-1 max-h-60 overflow-y-auto">
+                                @foreach($availableStores as $stOption)
+                                <button
+                                    type="button"
+                                    onclick="switchGlobalStore({{ $stOption->id }})"
+                                    class="w-full text-right flex items-center justify-between px-3 py-2 text-xs transition-colors cursor-pointer {{ (int)$currentStore->id === (int)$stOption->id ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-black' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}"
+                                >
+                                    <div class="flex items-center gap-2 truncate">
+                                        <span>@if($stOption->type === 'wholesale_van') 🚚 @elseif($stOption->type === 'main_warehouse') 🏢 @else 🏬 @endif</span>
+                                        <span class="truncate">{{ $stOption->name }}</span>
+                                    </div>
+                                    @if((int)$currentStore->id === (int)$stOption->id)
+                                    <span class="text-xs text-emerald-600 font-black">✓</span>
+                                    @endif
+                                </button>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                    @endif
+
                     <!-- 📲 PWA Install Button (Permanent in Top Bar) -->
                     <button
                         type="button"
@@ -424,6 +501,26 @@
                 toast.onmouseleave = Swal.resumeTimer;
             }
         });
+
+        // 🏬 Global Fast Store Switcher
+        window.switchGlobalStore = function(storeId) {
+            fetch('{{ route('store.switch') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ store_id: storeId })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.reload();
+                }
+            })
+            .catch(err => console.error('Store switch error:', err));
+        };
 
         // Flash session messages on load
         @if (session()->has('success'))
