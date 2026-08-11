@@ -72,7 +72,10 @@ class Item extends Model
             return (string)$this->current_stock;
         }
 
-        $stock = $this->storeStocks->firstWhere('store_id', $storeId);
+        $stock = $this->relationLoaded('storeStocks')
+            ? $this->storeStocks->firstWhere('store_id', $storeId)
+            : $this->storeStocks()->where('store_id', $storeId)->first();
+
         return $stock ? (string)$stock->quantity : '0.000';
     }
 
@@ -82,7 +85,10 @@ class Item extends Model
             return (string)$this->selling_price;
         }
 
-        $stock = $this->storeStocks->firstWhere('store_id', $storeId);
+        $stock = $this->relationLoaded('storeStocks')
+            ? $this->storeStocks->firstWhere('store_id', $storeId)
+            : $this->storeStocks()->where('store_id', $storeId)->first();
+
         if ($stock && $stock->custom_selling_price !== null && bccomp((string)$stock->custom_selling_price, '0.000', 3) > 0) {
             return (string)$stock->custom_selling_price;
         }

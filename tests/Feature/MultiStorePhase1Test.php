@@ -103,6 +103,7 @@ class MultiStorePhase1Test extends TestCase
             'custom_selling_price' => '360.000',
         ]);
 
+        $this->item->refresh();
         $this->assertEquals('360.000', $vanStock->effective_selling_price);
         $this->assertEquals('360.000', $this->item->getEffectivePriceForStore($this->vanStore->id));
         $this->assertEquals('20.000', $this->item->getStockInStore($this->vanStore->id));
