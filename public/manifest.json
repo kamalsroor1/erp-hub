@@ -2,8 +2,8 @@
   "name": "سرور كوفي | نظام إدارة الفواتير والمخزون",
   "short_name": "سرور POS",
   "description": "تطبيق سرور لإدارة مبيعات وفواتير ومخزون مطاحن البن",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#020617",
   "theme_color": "#0f172a",
@@ -12,13 +12,13 @@
   "lang": "ar",
   "icons": [
     {
-      "src": "/logo.png",
+      "src": "logo.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/logo.png",
+      "src": "logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

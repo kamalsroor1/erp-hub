@@ -1,14 +1,16 @@
-const CACHE_NAME = 'sroor-pos-v2';
+const CACHE_NAME = 'sroor-pos-v3';
 const STATIC_ASSETS = [
-    '/',
-    '/manifest.json',
-    '/logo.png'
+    './',
+    './manifest.json',
+    './logo.png'
 ];
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(STATIC_ASSETS);
+            return cache.addAll(STATIC_ASSETS).catch((err) => {
+                console.log('SW cache addAll warning:', err);
+            });
         })
     );
     self.skipWaiting();
@@ -30,7 +32,6 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-    // Network first, fallback to cache for smooth POS offline resilience
     if (event.request.method !== 'GET') return;
 
     event.respondWith(

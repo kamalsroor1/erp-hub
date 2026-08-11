@@ -35,7 +35,7 @@
     <!-- Favicon & PWA Icons -->
     <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -607,46 +607,49 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
+            console.log('PWA beforeinstallprompt ready');
         });
 
-        function triggerPwaInstall() {
+        window.triggerPwaInstall = function() {
             if (deferredPrompt) {
-                executeNativeInstall();
+                window.executeNativeInstall();
             } else {
                 const modal = document.getElementById('pwa-guide-modal');
                 if (modal) {
+                    modal.style.display = 'flex';
                     modal.classList.remove('hidden');
-                    modal.classList.add('flex');
                 }
             }
-        }
+        };
 
-        async function executeNativeInstall() {
+        window.executeNativeInstall = async function() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 deferredPrompt = null;
-                closePwaModal();
+                window.closePwaModal();
             } else {
                 const modal = document.getElementById('pwa-guide-modal');
                 if (modal) {
+                    modal.style.display = 'flex';
                     modal.classList.remove('hidden');
-                    modal.classList.add('flex');
                 }
             }
-        }
+        };
 
-        function closePwaModal() {
+        window.closePwaModal = function() {
             const modal = document.getElementById('pwa-guide-modal');
             if (modal) {
+                modal.style.display = 'none';
                 modal.classList.add('hidden');
-                modal.classList.remove('flex');
             }
-        }
+        };
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(err => {
+                navigator.serviceWorker.register('{{ asset("sw.js") }}').then(reg => {
+                    console.log('SW Registered successfully:', reg.scope);
+                }).catch(err => {
                     console.log('SW Registration error:', err);
                 });
             });

@@ -140,6 +140,7 @@
             padding-top: 15px;
             border-top: 2px dashed #000000;
         }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
@@ -158,15 +159,17 @@
 
     @php
         $companyName = \App\Models\Setting::get('company_name', 'سرور كوفي');
-        $companySubtitle = \App\Models\Setting::get('company_subtitle', 'لتوزيع خامات مطاحن البن');
+        $companySubtitle = \App\Models\Setting::get('company_subtitle', 'لتوريدات خامات مطاحن البن');
         $showSubtitle = \App\Models\Setting::getBool('show_print_subtitle', true);
+        $logoPath = public_path('logo.png');
+        $logoSrc = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : asset('logo.png');
     @endphp
 
     <div class="container">
         <!-- Header -->
         <div class="header">
             <div style="display: flex; align-items: center; gap: 14px;">
-                <img src="{{ asset('logo.png') }}" alt="{{ $companyName }}" style="max-height: 75px; max-width: 130px; object-fit: contain;">
+                <img src="{{ $logoSrc }}" alt="{{ $companyName }}" style="max-height: 75px; max-width: 130px; object-fit: contain;">
                 <div>
                     <h1 class="brand-title">{{ $companyName }}</h1>
                     @if($showSubtitle && !empty($companySubtitle))

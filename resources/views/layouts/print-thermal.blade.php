@@ -47,9 +47,10 @@
         .my-2 { margin-top: 6px; margin-bottom: 6px; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 4px 1px; font-size: 11px; font-weight: 700; }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
-<body onload="window.print()">
+<body>
 
     <div class="no-print" style="margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center;">
         <button onclick="window.print()" style="padding: 7px 14px; font-family: 'Cairo'; background: #10b981; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 900; font-size: 12px;">🖨️ طباعة الإيصال</button>
@@ -61,13 +62,15 @@
 
     @php
         $companyName = \App\Models\Setting::get('company_name', 'سرور كوفي');
-        $companySubtitle = \App\Models\Setting::get('company_subtitle', 'لتوزيع خامات مطاحن البن');
+        $companySubtitle = \App\Models\Setting::get('company_subtitle', 'لتوريدات خامات مطاحن البن');
         $showSubtitle = \App\Models\Setting::getBool('show_print_subtitle', true);
+        $logoPath = public_path('logo.png');
+        $logoSrc = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : asset('logo.png');
     @endphp
 
     <!-- Header -->
     <div class="text-center">
-        <img src="{{ asset('logo.png') }}" alt="{{ $companyName }}" style="max-height: 52px; max-width: 50mm; margin: 0 auto 4px auto; display: block; object-fit: contain;">
+        <img src="{{ $logoSrc }}" alt="{{ $companyName }}" style="max-height: 52px; max-width: 50mm; margin: 0 auto 4px auto; display: block; object-fit: contain;">
         <h2 class="font-black" style="font-size: 17px; margin: 0; color: #000;">{{ $companyName }}</h2>
         @if($showSubtitle && !empty($companySubtitle))
             <p style="margin: 2px 0; font-size: 11px; font-weight: 800;">{{ $companySubtitle }}</p>

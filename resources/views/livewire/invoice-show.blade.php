@@ -45,7 +45,7 @@
     </div>
 
     <!-- Invoice Details Card -->
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-6 shadow-sm">
+    <div id="invoice-card-container" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-6 shadow-sm">
         <!-- Customer & Info Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-xs">
             <div>
@@ -134,7 +134,13 @@
             btn.innerHTML = '<span>جاري التجهيز... ⏳</span>';
             btn.style.opacity = '0.7';
 
-            const card = document.querySelector('.bg-white.dark\\:bg-slate-900.border.rounded-2xl') || document.querySelector('.space-y-6');
+            const card = document.getElementById('invoice-card-container');
+            if (!card) {
+                alert('تعذر العثور على الفاتورة');
+                btn.innerHTML = originalText;
+                btn.style.opacity = '1';
+                return;
+            }
 
             html2canvas(card, {
                 scale: 2,
