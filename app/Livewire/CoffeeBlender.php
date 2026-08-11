@@ -223,8 +223,13 @@ class CoffeeBlender extends Component
                 }
             }
 
+            $storeId = session('current_store_id') 
+                ?? auth()->user()?->getCurrentStore()?->id 
+                ?? \App\Models\Store::getMainStore()?->id;
+
             $invoice = $invoiceService->confirmInvoice([
                 'customer_id'    => $this->customer_id,
+                'store_id'       => $storeId,
                 'invoice_date'   => now()->toDateString(),
                 'payment_type'   => 'cash',
                 'discount_type'  => 'fixed',

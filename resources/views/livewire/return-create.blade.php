@@ -128,6 +128,16 @@
                     >
                         مرتجع مشتريات (لمورد)
                     </button>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">الفرع / المخزن المعني بالمرتجع:</label>
+                    <select wire:model.live="store_id" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 dark:text-white">
+                        @foreach($stores as $st)
+                        <option value="{{ $st->id }}">
+                            @if($st->type === 'wholesale_van') 🚚 @elseif($st->type === 'main_warehouse') 🏢 @else 🏬 @endif
+                            {{ $st->name }}
+                        </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 @if($return_type === 'sales_return')

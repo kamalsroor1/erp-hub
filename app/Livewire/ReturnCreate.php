@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Supplier;
 use App\Models\Invoice;
 use App\Models\Item;
+use App\Models\Store;
 use App\Services\ReturnService;
 use Exception;
 
@@ -15,6 +16,7 @@ class ReturnCreate extends Component
     public $return_type = 'sales_return'; // sales_return, purchase_return
     public $customer_id;
     public $supplier_id;
+    public $store_id;
     public $return_date;
     public $reason = '';
     public $searchQuery = '';
@@ -23,8 +25,9 @@ class ReturnCreate extends Component
     public $errorMessage = '';
 
     protected $rules = [
-        'return_date' => 'required|date',
-        'items'       => 'required|array|min:1',
+        'store_id'         => 'required|exists:stores,id',
+        'return_date'      => 'required|date',
+        'items'            => 'required|array|min:1',
         'items.*.item_id'  => 'required|exists:items,id',
         'items.*.quantity' => 'required|numeric|min:0.001',
         'items.*.unit_price' => 'required|numeric|min:0',
@@ -33,6 +36,11 @@ class ReturnCreate extends Component
     public function mount()
     {
         $this->return_date = now()->toDateString();
+        
+        $this->store_id = session('current_store_id') 
+            ?? auth()->user()?->getCurrentStore()?->id 
+            ?? Store::getMainStore()?->id;
+
         $firstCust = Customer::active()->first();
         if ($firstCust) $this->customer_id = $firstCust->id;
 
@@ -94,6 +102,7 @@ class ReturnCreate extends Component
             if ($this->return_type === 'sales_return') {
                 $returnDoc = $returnService->createSalesReturn([
                     'customer_id' => $this->customer_id,
+                    'store_id'    => $this->store_id,
                     'return_date' => $this->return_date,
                     'reason'      => $this->reason ?: 'مرتجع مبيعات من العميل',
                     'items'       => $this->items,
@@ -101,6 +110,7 @@ class ReturnCreate extends Component
             } else {
                 $returnDoc = $returnService->createPurchaseReturn([
                     'supplier_id' => $this->supplier_id,
+                    'store_id'    => $this->store_id,
                     'return_date' => $this->return_date,
                     'reason'      => $this->reason ?: 'مرتجع مشتريات للمورد',
                     'items'       => $this->items,
@@ -120,6 +130,7 @@ class ReturnCreate extends Component
     {
         $customers = Customer::active()->orderBy('name')->get();
         $suppliers = Supplier::active()->orderBy('name')->get();
+        $stores = Store::active()->get();
 
         $searchResults = [];
         if (strlen($this->searchQuery) >= 1) {
@@ -135,6 +146,7 @@ class ReturnCreate extends Component
         return view('livewire.return-create', [
             'customers'     => $customers,
             'suppliers'     => $suppliers,
+            'stores'        => $stores,
             'searchResults' => $searchResults,
         ])->layout('components.layouts.app', ['title' => 'تسجيل مرتجع مبيعات / مشتريات']);
     }

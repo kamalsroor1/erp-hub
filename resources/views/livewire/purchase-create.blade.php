@@ -132,6 +132,18 @@
         <div class="space-y-4">
             <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm">
                 <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">المخزن / الفرع المستلم:</label>
+                    <select wire:model.live="store_id" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 dark:text-white">
+                        @foreach($stores as $st)
+                        <option value="{{ $st->id }}">
+                            @if($st->type === 'wholesale_van') 🚚 @elseif($st->type === 'main_warehouse') 🏢 @else 🏬 @endif
+                            {{ $st->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">المورد:</label>
                     <select wire:model.live="supplier_id" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white">
                         @foreach($suppliers as $s)

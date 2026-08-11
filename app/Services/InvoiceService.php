@@ -211,7 +211,8 @@ class InvoiceService
                     source: $lockedInvoice,
                     documentNumber: $lockedInvoice->invoice_number,
                     movementType: 'cancellation_in',
-                    notes: "إلغاء فاتورة مبيعات رقم {$lockedInvoice->invoice_number} - سبب: {$reason}"
+                    notes: "إلغاء فاتورة مبيعات رقم {$lockedInvoice->invoice_number} - سبب: {$reason}",
+                    storeId: $lockedInvoice->store_id
                 );
             }
 
