@@ -15,6 +15,20 @@
     </div>
     @endif
 
+    @if($errors->any())
+    <div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs space-y-1">
+        <div class="font-bold flex items-center gap-1.5">
+            <span>⚠️</span>
+            <span>يرجى تصحيح الأخطاء التالية لحفظ التوريد:</span>
+        </div>
+        <ul class="list-disc list-inside pr-4 space-y-0.5 font-medium">
+            @foreach($errors->all() as $err)
+                <li>{{ $err }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Left 2 Cols: Item Search and Items Table -->
         <div class="lg:col-span-2 space-y-4">
