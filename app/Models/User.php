@@ -17,6 +17,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_active',
+        'default_store_id',
         'theme_preference',
         'show_print_subtitle',
     ];
@@ -56,8 +57,29 @@ class User extends Authenticatable
         return $this->hasMany(StockMovement::class);
     }
 
-    public function auditLogs()
+    public function stores()
     {
-        return $this->hasMany(AuditLog::class);
+        return $this->belongsToMany(Store::class, 'store_user')->withTimestamps();
+    }
+
+    public function defaultStore()
+    {
+        return $this->belongsTo(Store::class, 'default_store_id');
+    }
+
+    public function getCurrentStore(): ?Store
+    {
+        if (session()->has('current_store_id')) {
+            $sessionStore = Store::find(session('current_store_id'));
+            if ($sessionStore && $sessionStore->is_active) {
+                return $sessionStore;
+            }
+        }
+
+        if ($this->defaultStore && $this->defaultStore->is_active) {
+            return $this->defaultStore;
+        }
+
+        return $this->stores()->where('is_active', true)->first() ?? Store::getMainStore();
     }
 }

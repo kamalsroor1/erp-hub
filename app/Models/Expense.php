@@ -15,6 +15,7 @@ class Expense extends Model
         'expense_date',
         'payment_method',
         'user_id',
+        'store_id',
         'notes',
     ];
 
@@ -26,5 +27,10 @@ class Expense extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Store::class);
     }
 }

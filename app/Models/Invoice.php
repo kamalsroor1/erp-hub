@@ -14,6 +14,7 @@ class Invoice extends Model
         'invoice_number',
         'customer_id',
         'user_id',
+        'store_id',
         'invoice_date',
         'payment_type',
         'status',
@@ -51,6 +52,11 @@ class Invoice extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
     }
 
     public function items()

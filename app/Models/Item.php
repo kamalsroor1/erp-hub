@@ -61,6 +61,35 @@ class Item extends Model
         return $this->hasMany(ReturnItem::class);
     }
 
+    public function storeStocks()
+    {
+        return $this->hasMany(StoreStock::class);
+    }
+
+    public function getStockInStore(?int $storeId): string
+    {
+        if (!$storeId) {
+            return (string)$this->current_stock;
+        }
+
+        $stock = $this->storeStocks->firstWhere('store_id', $storeId);
+        return $stock ? (string)$stock->quantity : '0.000';
+    }
+
+    public function getEffectivePriceForStore(?int $storeId): string
+    {
+        if (!$storeId) {
+            return (string)$this->selling_price;
+        }
+
+        $stock = $this->storeStocks->firstWhere('store_id', $storeId);
+        if ($stock && $stock->custom_selling_price !== null && bccomp((string)$stock->custom_selling_price, '0.000', 3) > 0) {
+            return (string)$stock->custom_selling_price;
+        }
+
+        return (string)$this->selling_price;
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);

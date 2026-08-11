@@ -19,6 +19,7 @@ class ReturnDocument extends Model
         'customer_id',
         'supplier_id',
         'user_id',
+        'store_id',
         'total_amount',
         'return_date',
         'reason',
@@ -55,6 +56,11 @@ class ReturnDocument extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
     }
 
     public function items()

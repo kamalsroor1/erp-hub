@@ -20,6 +20,7 @@ class StockMovement extends Model
         'source_id',
         'document_number',
         'user_id',
+        'store_id',
         'notes',
     ];
 
@@ -41,6 +42,11 @@ class StockMovement extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
     }
 
     public function source()

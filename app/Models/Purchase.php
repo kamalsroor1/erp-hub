@@ -13,6 +13,7 @@ class Purchase extends Model
         'purchase_number',
         'supplier_id',
         'user_id',
+        'store_id',
         'purchase_date',
         'status',
         'payment_status',
@@ -45,6 +46,11 @@ class Purchase extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
     }
 
     public function items()
