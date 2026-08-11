@@ -22,6 +22,18 @@
         >
 
         <div class="flex flex-wrap items-center gap-1.5 text-xs">
+            <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">الحالة:</span>
+            <button wire:click="$set('filterStatus', 'active')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStatus === 'active' ? 'bg-emerald-600 text-white border-emerald-500' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400' }}">النشطة</button>
+            <button wire:click="$set('filterStatus', 'trashed')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs flex items-center gap-1 {{ $filterStatus === 'trashed' ? 'bg-rose-600 text-white border-rose-500' : 'border-slate-200 dark:border-slate-800 text-rose-600 dark:text-rose-400' }}">
+                <span>سلة المحذوفات</span>
+                @if($trashedCount > 0)
+                <span class="px-1.5 py-0.2 rounded-full text-[10px] {{ $filterStatus === 'trashed' ? 'bg-white text-rose-600' : 'bg-rose-500/20 text-rose-600' }} font-mono font-bold">{{ $trashedCount }}</span>
+                @endif
+            </button>
+            <button wire:click="$set('filterStatus', 'all')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStatus === 'all' ? 'bg-slate-700 text-white border-slate-600' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400' }}">الكل</button>
+
+            <span class="text-slate-300 dark:text-slate-700 mx-1">|</span>
+
             <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">حالة السداد:</span>
             <button wire:click="$set('paymentStatus', 'all')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'all' ? 'bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white' : 'border-transparent text-slate-500 dark:text-slate-400' }}">الكل</button>
             <button wire:click="$set('paymentStatus', 'unpaid')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'unpaid' ? 'bg-rose-500/20 border-rose-500/40 text-rose-700 dark:text-rose-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">آجل</button>
@@ -149,24 +161,34 @@
                             @endif
                         </td>
                         <td class="p-3.5 text-center flex items-center justify-center gap-1.5">
-                            <a href="{{ route('invoices.show', $inv->id) }}" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold text-[11px] transition-colors border border-slate-300 dark:border-slate-700">
-                                تفاصيل / طباعة
-                            </a>
-                            @if($inv->status !== 'cancelled')
-                            <a href="{{ route('invoices.edit', $inv->id) }}" class="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-600 hover:text-slate-950 text-amber-600 dark:text-amber-400 text-[11px] font-bold border border-amber-500/30 transition-all flex items-center gap-1 cursor-pointer" title="تعديل الفاتورة">
-                                <span>✏️ تعديل</span>
-                            </a>
+                            @if($inv->trashed())
+                                <button
+                                    wire:click="restoreInvoice({{ $inv->id }})"
+                                    class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-600 hover:text-white text-emerald-700 dark:text-emerald-400 font-bold text-[11px] border border-emerald-500/30 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                                    title="استعادة الفاتورة"
+                                >
+                                    <span>♻️ استعادة</span>
+                                </button>
+                            @else
+                                <a href="{{ route('invoices.show', $inv->id) }}" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold text-[11px] transition-colors border border-slate-300 dark:border-slate-700">
+                                    تفاصيل / طباعة
+                                </a>
+                                @if($inv->status !== 'cancelled')
+                                <a href="{{ route('invoices.edit', $inv->id) }}" class="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-600 hover:text-slate-950 text-amber-600 dark:text-amber-400 text-[11px] font-bold border border-amber-500/30 transition-all flex items-center gap-1 cursor-pointer" title="تعديل الفاتورة">
+                                    <span>✏️ تعديل</span>
+                                </a>
+                                @endif
+                                @hasrole('admin')
+                                <button
+                                    wire:click="deleteInvoice({{ $inv->id }})"
+                                    wire:confirm="هل أنت متأكد من أرشفة الفاتورة رقم {{ $inv->invoice_number }} ونقلها لسلة المحذوفات؟"
+                                    class="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-600 dark:text-rose-400 text-[11px] font-bold border border-rose-500/30 transition-all flex items-center gap-1 cursor-pointer"
+                                    title="نقل لسلة المحذوفات (المدير العام فقط)"
+                                >
+                                    <span>🗑️</span>
+                                </button>
+                                @endhasrole
                             @endif
-                            @hasrole('admin')
-                            <button
-                                wire:click="deleteInvoice({{ $inv->id }})"
-                                wire:confirm="هل أنت متأكد من حذف الفاتورة رقم {{ $inv->invoice_number }} نهائياً؟ سيتم إرجاع البضاعة للمخزن وحذف الفاتورة تماماً."
-                                class="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-600 dark:text-rose-400 text-[11px] font-bold border border-rose-500/30 transition-all flex items-center gap-1 cursor-pointer"
-                                title="حذف نهائي للفاتورة (المدير العام فقط)"
-                            >
-                                <span>🗑️ حذف</span>
-                            </button>
-                            @endhasrole
                         </td>
                     </tr>
                     @empty

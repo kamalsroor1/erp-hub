@@ -66,7 +66,7 @@
 
     <!-- Filters & Search Bar -->
     <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-sm space-y-4">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
             <div class="lg:col-span-2">
                 <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">بحث في المصروفات:</label>
                 <input
@@ -75,6 +75,19 @@
                     placeholder="ابحث باسم البند، رقم السند، أو الملاحظات..."
                     class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white text-xs placeholder-slate-400 focus:ring-2 focus:ring-amber-500 focus:outline-none"
                 >
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">الحالة والأرشيف:</label>
+                <div class="flex items-center gap-1">
+                    <button wire:click="$set('filterStatus', 'active')" class="flex-1 py-2 rounded-xl font-bold transition-colors cursor-pointer text-xs {{ $filterStatus === 'active' ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">النشطة</button>
+                    <button wire:click="$set('filterStatus', 'trashed')" class="flex-1 py-2 rounded-xl font-bold transition-colors cursor-pointer text-xs flex items-center justify-center gap-1 {{ $filterStatus === 'trashed' ? 'bg-rose-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-rose-600 dark:text-rose-400' }}">
+                        <span>المحذوفات</span>
+                        @if($trashedCount > 0)
+                        <span class="px-1.5 py-0.2 rounded-full text-[10px] {{ $filterStatus === 'trashed' ? 'bg-white text-rose-600' : 'bg-rose-500/20 text-rose-600' }} font-mono font-bold">{{ $trashedCount }}</span>
+                        @endif
+                    </button>
+                </div>
             </div>
 
             <div>
@@ -154,6 +167,15 @@
                         </td>
                         <td class="px-5 py-4 text-center">
                             <div class="flex items-center justify-center gap-1.5">
+                                @if($exp->trashed())
+                                <button
+                                    wire:click="restoreExpense({{ $exp->id }})"
+                                    class="px-2.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white rounded-xl text-xs font-bold border border-emerald-500/30 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                                    title="استعادة المصروف"
+                                >
+                                    <span>♻️ استعادة</span>
+                                </button>
+                                @else
                                 <button
                                     wire:click="openEditModal({{ $exp->id }})"
                                     class="px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
@@ -163,12 +185,13 @@
                                 </button>
                                 <button
                                     wire:click="deleteExpense({{ $exp->id }})"
-                                    wire:confirm="هل أنت متأكد من حذف بيان المصروف [{{ $exp->title }}] نهائياً؟"
+                                    wire:confirm="هل أنت متأكد من أرشفة بيان المصروف [{{ $exp->title }}] ونقله لسلة المحذوفات؟"
                                     class="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-600 text-rose-600 hover:text-white rounded-xl text-xs font-bold border border-rose-500/30 transition-all cursor-pointer"
-                                    title="حذف المصروف"
+                                    title="أرشفة المصروف"
                                 >
-                                    🗑️ حذف
+                                    🗑️
                                 </button>
+                                @endif
                             </div>
                         </td>
                     </tr>

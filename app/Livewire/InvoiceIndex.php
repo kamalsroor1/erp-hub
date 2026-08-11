@@ -15,6 +15,7 @@ class InvoiceIndex extends Component
     public $search = '';
     public $status = 'all'; // all, confirmed, cancelled
     public $paymentStatus = 'all'; // all, paid, unpaid, partially_paid
+    public $filterStatus = 'active'; // active, trashed, all
 
     public $showCancelModal = false;
     public $cancelInvoiceId;
@@ -70,10 +71,31 @@ class InvoiceIndex extends Component
             $num = $invoice->invoice_number;
             $invoiceService->deleteInvoice($invoice);
 
-            session()->flash('success', "تم حذف الفاتورة رقم {$num} نهائياً وإرجاع المخزون بنجاح.");
+            session()->flash('success', "تم نقل الفاتورة رقم {$num} إلى سلة المحذوفات وإرجاع المخزون بنجاح.");
             $this->dispatch('swal:toast', [
                 'icon'  => 'success',
-                'title' => "تم حذف الفاتورة {$num} نهائياً وإرجاع المخزون!"
+                'title' => "تم أرشفة الفاتورة {$num} ونقلها لسلة المحذوفات!"
+            ]);
+        } catch (Exception $e) {
+            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => $e->getMessage()]);
+        }
+    }
+
+    public function restoreInvoice($invoiceId)
+    {
+        if (!auth()->user()->hasRole('admin')) {
+            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => 'عفواً، لا يملك صلاحية استعادة الفواتير سوى المدير العام.']);
+            return;
+        }
+
+        try {
+            $invoice = Invoice::onlyTrashed()->findOrFail($invoiceId);
+            $invoice->restore();
+
+            session()->flash('success', "تم استعادة الفاتورة رقم {$invoice->invoice_number} بنجاح.");
+            $this->dispatch('swal:toast', [
+                'icon'  => 'success',
+                'title' => "تم استعادة الفاتورة {$invoice->invoice_number} بنجاح!"
             ]);
         } catch (Exception $e) {
             $this->dispatch('swal:toast', ['icon' => 'error', 'title' => $e->getMessage()]);
@@ -82,7 +104,13 @@ class InvoiceIndex extends Component
 
     public function render()
     {
-        $query = Invoice::with(['customer', 'user'])
+        $baseQuery = match ($this->filterStatus) {
+            'trashed' => Invoice::onlyTrashed(),
+            'all'     => Invoice::withTrashed(),
+            default   => Invoice::query(),
+        };
+
+        $query = $baseQuery->with(['customer', 'user', 'store'])
             ->when($this->search, function ($q) {
                 $q->where(function ($sub) {
                     $sub->where('invoice_number', 'like', "%{$this->search}%")
@@ -94,7 +122,8 @@ class InvoiceIndex extends Component
             ->latest('invoice_date');
 
         return view('livewire.invoice-index', [
-            'invoices' => $query->paginate(15),
+            'invoices'     => $query->paginate(15),
+            'trashedCount' => Invoice::onlyTrashed()->count(),
         ])->layout('components.layouts.app', ['title' => 'سجل فواتير المبيعات']);
     }
 }

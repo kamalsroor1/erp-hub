@@ -18,6 +18,7 @@ class ExpenseIndex extends Component
 
     public string $search = '';
     public string $filterCategory = 'all';
+    public string $filterStatus = 'active'; // active, trashed, all
     public ?string $fromDate = null;
     public ?string $toDate = null;
 
@@ -160,18 +161,36 @@ class ExpenseIndex extends Component
     {
         $expense = Expense::findOrFail($id);
         $title = $expense->title;
-        $expense->delete();
+        $expense->delete(); // Soft delete
 
         $this->dispatch('swal:toast', [
             'type'  => 'success',
-            'title' => 'تم حذف المصروف!',
-            'text'  => "تم إزالة بيان المصروف [{$title}] بنجاح."
+            'title' => 'تم أرشفة المصروف!',
+            'text'  => "تم نقل بيان المصروف [{$title}] إلى سلة المحذوفات بنجاح."
+        ]);
+    }
+
+    public function restoreExpense(int $id)
+    {
+        $expense = Expense::onlyTrashed()->findOrFail($id);
+        $expense->restore();
+
+        $this->dispatch('swal:toast', [
+            'type'  => 'success',
+            'title' => 'تم استعادة المصروف!',
+            'text'  => "تم استعادة بيان المصروف [{$expense->title}] بنجاح."
         ]);
     }
 
     public function render()
     {
-        $query = Expense::with('user')
+        $baseQuery = match ($this->filterStatus) {
+            'trashed' => Expense::onlyTrashed(),
+            'all'     => Expense::withTrashed(),
+            default   => Expense::query(),
+        };
+
+        $query = $baseQuery->with(['user', 'store'])
             ->when($this->search, function ($q) {
                 $q->where(function ($sub) {
                     $sub->where('title', 'like', "%{$this->search}%")
@@ -191,6 +210,7 @@ class ExpenseIndex extends Component
             'expenses'      => $query->latest('expense_date')->paginate(15),
             'totalExpenses' => $totalExpenses,
             'expensesCount' => $expensesCount,
+            'trashedCount'  => Expense::onlyTrashed()->count(),
         ]);
     }
 }

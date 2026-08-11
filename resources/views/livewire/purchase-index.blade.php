@@ -12,14 +12,33 @@
         </a>
     </div>
 
-    <!-- Search Bar -->
-    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <input 
-            type="text" 
-            wire:model.live.debounce.300ms="search" 
-            placeholder="بحث برقم الفاتورة أو اسم المورد أو الصنف..." 
-            class="w-full sm:w-80 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
-        >
+    @if (session()->has('success'))
+    <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs flex items-center gap-2">
+        <span>✅ {{ session('success') }}</span>
+    </div>
+    @endif
+
+    <!-- Search & Filter Bar -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="w-full sm:w-80">
+            <input 
+                type="text" 
+                wire:model.live.debounce.300ms="search" 
+                placeholder="بحث برقم الفاتورة أو اسم المورد أو الصنف..." 
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+            >
+        </div>
+        <div class="flex flex-wrap items-center gap-1.5 text-xs">
+            <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">الحالة:</span>
+            <button wire:click="$set('filterStatus', 'active')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStatus === 'active' ? 'bg-emerald-600 text-white border-emerald-500' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400' }}">النشطة</button>
+            <button wire:click="$set('filterStatus', 'trashed')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs flex items-center gap-1 {{ $filterStatus === 'trashed' ? 'bg-rose-600 text-white border-rose-500' : 'border-slate-200 dark:border-slate-800 text-rose-600 dark:text-rose-400' }}">
+                <span>سلة المحذوفات</span>
+                @if($trashedCount > 0)
+                <span class="px-1.5 py-0.2 rounded-full text-[10px] {{ $filterStatus === 'trashed' ? 'bg-white text-rose-600' : 'bg-rose-500/20 text-rose-600' }} font-mono font-bold">{{ $trashedCount }}</span>
+                @endif
+            </button>
+            <button wire:click="$set('filterStatus', 'all')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStatus === 'all' ? 'bg-slate-700 text-white border-slate-600' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400' }}">الكل</button>
+        </div>
     </div>
 
     <!-- Purchases Table -->
@@ -36,6 +55,7 @@
                         <th class="p-3.5">المدفوع</th>
                         <th class="p-3.5">المتبقي للمورد</th>
                         <th class="p-3.5">حالة السداد</th>
+                        <th class="p-3.5 text-center">إجراءات</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60">
@@ -63,7 +83,9 @@
                             {{ number_format($p->remaining_amount, 2) }}
                         </td>
                         <td class="p-3.5">
-                            @if($p->payment_status === 'paid')
+                            @if($p->trashed())
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">محذوفة</span>
+                            @elseif($p->payment_status === 'paid')
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">مسددة</span>
                             @elseif($p->payment_status === 'partially_paid')
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">مسدد جزئي</span>
@@ -71,10 +93,34 @@
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">آجل</span>
                             @endif
                         </td>
+                        <td class="p-3.5 text-center">
+                            <div class="flex items-center justify-center gap-1.5">
+                                @if($p->trashed())
+                                <button 
+                                    wire:click="restorePurchase({{ $p->id }})" 
+                                    class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-600 hover:text-white text-emerald-700 dark:text-emerald-400 font-bold text-[11px] border border-emerald-500/30 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                                    title="استعادة الفاتورة"
+                                >
+                                    <span>♻️ استعادة</span>
+                                </button>
+                                @else
+                                @hasrole('admin')
+                                <button 
+                                    wire:click="deletePurchase({{ $p->id }})" 
+                                    wire:confirm="هل أنت متأكد من أرشفة فاتورة المشتريات رقم {{ $p->purchase_number }} ونقلها لسلة المحذوفات؟"
+                                    class="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-600 dark:text-rose-400 text-[11px] font-bold border border-rose-500/30 transition-all flex items-center gap-1 cursor-pointer"
+                                    title="أرشفة الفاتورة"
+                                >
+                                    <span>🗑️</span>
+                                </button>
+                                @endhasrole
+                                @endif
+                            </div>
+                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="p-12 text-center text-slate-400">لا توجد فواتير مشتريات مسجلة</td>
+                        <td colspan="9" class="p-12 text-center text-slate-400">لا توجد فواتير مشتريات مسجلة</td>
                     </tr>
                     @endforelse
                 </tbody>

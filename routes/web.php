@@ -90,7 +90,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/daily-journal', App\Livewire\DailyJournalIndex::class)->name('daily.journal');
     Route::get('/shifts', App\Livewire\DailyJournalIndex::class)->name('shifts.index');
 
-    // Auth, Profile & User Management (Admin only)
+    // Auth, Profile, Trash & User Management (Admin only)
+    Route::get('/trash', App\Livewire\TrashIndex::class)->name('trash.index')->middleware('role:admin');
     Route::get('/profile', App\Livewire\Auth\Profile::class)->name('profile');
     Route::get('/users', App\Livewire\Auth\UserManager::class)->name('users.index')->middleware('role:admin');
 

@@ -5,16 +5,67 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Purchase;
+use Exception;
 
 class PurchaseIndex extends Component
 {
     use WithPagination;
 
     public $search = '';
+    public $filterStatus = 'active'; // active, trashed, all
+
+    public function deletePurchase($purchaseId)
+    {
+        if (!auth()->user()->hasRole('admin')) {
+            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => 'عفواً، لا يملك صلاحية أرشفة فواتير المشتريات سوى المدير العام.']);
+            return;
+        }
+
+        try {
+            $purchase = Purchase::findOrFail($purchaseId);
+            $num = $purchase->purchase_number;
+            $purchase->delete(); // Soft delete
+
+            session()->flash('success', "تم نقل فاتورة المشتريات رقم {$num} إلى سلة المحذوفات بنجاح.");
+            $this->dispatch('swal:toast', [
+                'icon'  => 'success',
+                'title' => "تم أرشفة فاتورة المشتريات {$num} بنجاح!"
+            ]);
+        } catch (Exception $e) {
+            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => $e->getMessage()]);
+        }
+    }
+
+    public function restorePurchase($purchaseId)
+    {
+        if (!auth()->user()->hasRole('admin')) {
+            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => 'عفواً، لا يملك صلاحية استعادة فواتير المشتريات سوى المدير العام.']);
+            return;
+        }
+
+        try {
+            $purchase = Purchase::onlyTrashed()->findOrFail($purchaseId);
+            $purchase->restore();
+
+            session()->flash('success', "تم استعادة فاتورة المشتريات رقم {$purchase->purchase_number} بنجاح.");
+            $this->dispatch('swal:toast', [
+                'icon'  => 'success',
+                'title' => "تم استعادة فاتورة المشتريات {$purchase->purchase_number} بنجاح!"
+            ]);
+        } catch (Exception $e) {
+            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => $e->getMessage()]);
+        }
+    }
 
     public function render()
     {
-        $query = Purchase::with(['supplier', 'items.item', 'user'])
+        $baseQuery = match ($this->filterStatus) {
+            'trashed' => Purchase::onlyTrashed(),
+            'all'     => Purchase::withTrashed(),
+            default   => Purchase::query(),
+        };
+
+        $query = $baseQuery->with(['supplier', 'items.item', 'user', 'store'])
             ->when($this->search, function ($q) {
                 $q->where('purchase_number', 'like', "%{$this->search}%")
                   ->orWhereHas('supplier', fn($s) => $s->where('name', 'like', "%{$this->search}%"))
@@ -23,7 +74,8 @@ class PurchaseIndex extends Component
             ->latest('purchase_date');
 
         return view('livewire.purchase-index', [
-            'purchases' => $query->paginate(15),
+            'purchases'    => $query->paginate(15),
+            'trashedCount' => Purchase::onlyTrashed()->count(),
         ])->layout('components.layouts.app', ['title' => 'سجل فواتير المشتريات والتوريد']);
     }
 }
