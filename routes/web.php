@@ -103,16 +103,55 @@ Route::middleware('auth')->group(function () {
     })->name('theme.toggle');
 });
 
-// PWA Assets Routing with proper headers
+// PWA Assets Routing with dynamic canonical URLs and proper headers
 Route::get('/manifest.json', function () {
-    $path = public_path('manifest.json');
-    if (!file_exists($path)) {
-        return response()->json(['error' => 'Not found'], 404);
-    }
-    return response()->file($path, [
+    $baseUrl = url('/');
+    $manifest = [
+        'id' => 'sroor-coffee-pos-app',
+        'name' => 'سرور كوفي | نظام إدارة الفواتير والمخزون',
+        'short_name' => 'سرور POS',
+        'description' => 'تطبيق سرور لإدارة مبيعات وفواتير ومخزون مطاحن البن',
+        'start_url' => $baseUrl . '/',
+        'scope' => $baseUrl . '/',
+        'display' => 'standalone',
+        'background_color' => '#020617',
+        'theme_color' => '#0f172a',
+        'orientation' => 'portrait-primary',
+        'dir' => 'rtl',
+        'lang' => 'ar',
+        'prefer_related_applications' => false,
+        'icons' => [
+            [
+                'src' => asset('logo.png'),
+                'sizes' => '192x192',
+                'type' => 'image/png',
+                'purpose' => 'any',
+            ],
+            [
+                'src' => asset('logo.png'),
+                'sizes' => '192x192',
+                'type' => 'image/png',
+                'purpose' => 'maskable',
+            ],
+            [
+                'src' => asset('logo.png'),
+                'sizes' => '512x512',
+                'type' => 'image/png',
+                'purpose' => 'any',
+            ],
+            [
+                'src' => asset('logo.png'),
+                'sizes' => '512x512',
+                'type' => 'image/png',
+                'purpose' => 'maskable',
+            ],
+        ],
+    ];
+
+    return response()->json($manifest, 200, [
         'Content-Type' => 'application/manifest+json; charset=utf-8',
         'Cache-Control' => 'no-cache',
-    ]);
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 });
 
 Route::get('/sw.js', function () {

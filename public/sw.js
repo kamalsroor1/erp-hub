@@ -1,18 +1,6 @@
-const CACHE_NAME = 'sroor-pos-v3';
-const STATIC_ASSETS = [
-    './',
-    './manifest.json',
-    './logo.png'
-];
+const CACHE_NAME = 'sroor-pos-v4';
 
 self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(STATIC_ASSETS).catch((err) => {
-                console.log('SW cache addAll warning:', err);
-            });
-        })
-    );
     self.skipWaiting();
 });
 
@@ -26,21 +14,35 @@ self.addEventListener('activate', (event) => {
                     }
                 })
             );
-        })
+        }).then(() => self.clients.claim())
     );
-    self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
-    if (event.request.method !== 'GET') return;
+    if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) {
+        return;
+    }
+
+    // Skip caching for Livewire internal updates and POST requests
+    if (event.request.url.includes('/livewire/') || event.request.url.includes('/theme-toggle')) {
+        return;
+    }
 
     event.respondWith(
         fetch(event.request)
             .then((response) => {
                 return response;
             })
-            .catch(() => {
-                return caches.match(event.request);
+            .catch(async () => {
+                const cachedResponse = await caches.match(event.request);
+                if (cachedResponse) {
+                    return cachedResponse;
+                }
+                return new Response('Offline', {
+                    status: 503,
+                    statusText: 'Service Unavailable',
+                    headers: new Headers({ 'Content-Type': 'text/plain; charset=utf-8' })
+                });
             })
     );
 });

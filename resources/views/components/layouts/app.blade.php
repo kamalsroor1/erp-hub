@@ -41,38 +41,36 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="سرور كوفي">
 
-    <!-- Tailwind CSS Config & CDN -->
+    <!-- Tailwind CSS CDN & Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        window.tailwind = {
-            config: {
-                darkMode: 'class',
-                theme: {
-                    extend: {
-                        fontFamily: {
-                            sans: ['Cairo', 'Tajawal', 'sans-serif'],
-                            tajawal: ['Tajawal', 'sans-serif'],
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'Tajawal', 'sans-serif'],
+                        tajawal: ['Tajawal', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
                         },
-                        colors: {
-                            primary: {
-                                50: '#ecfdf5',
-                                100: '#d1fae5',
-                                500: '#10b981',
-                                600: '#059669',
-                                700: '#047857',
-                            },
-                            dark: {
-                                800: '#1e293b',
-                                850: '#172033',
-                                900: '#0f172a',
-                                950: '#020617',
-                            }
+                        dark: {
+                            800: '#1e293b',
+                            850: '#172033',
+                            900: '#0f172a',
+                            950: '#020617',
                         }
                     }
                 }
             }
         };
     </script>
-    <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
         body {

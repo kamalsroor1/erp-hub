@@ -167,9 +167,14 @@
         $logoSrc = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : asset('logo.png');
     @endphp
 
+    @php
+        $hasBrandHeader = $showLogo || $showCompanyName || ($showSubtitle && !empty($companySubtitle));
+    @endphp
+
     <div class="container">
         <!-- Header -->
-        <div class="header">
+        <div class="header" style="{{ !$hasBrandHeader ? 'display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 15px;' : '' }}">
+            @if($hasBrandHeader)
             <div style="display: flex; align-items: center; gap: 14px;">
                 @if($showLogo)
                     <img src="{{ $logoSrc }}" alt="{{ $companyName }}" style="max-height: 75px; max-width: 130px; object-fit: contain;">
@@ -185,10 +190,12 @@
                 </div>
                 @endif
             </div>
-            <div class="invoice-meta">
-                <h2 class="invoice-title">فاتورة مبيعات</h2>
-                <p class="invoice-num">{{ $invoice->invoice_number }}</p>
-                <p class="invoice-date">التاريخ: {{ $invoice->invoice_date->format('Y-m-d') }}</p>
+            @endif
+
+            <div class="invoice-meta" style="{{ !$hasBrandHeader ? 'text-align: center; width: 100%; margin: 0 auto;' : '' }}">
+                <h2 class="invoice-title" style="{{ !$hasBrandHeader ? 'font-size: 24px; text-decoration: underline; margin-bottom: 4px;' : '' }}">فاتورة مبيعات</h2>
+                <p class="invoice-num" style="{{ !$hasBrandHeader ? 'font-size: 16px; margin: 4px 0;' : '' }}">{{ $invoice->invoice_number }}</p>
+                <p class="invoice-date" style="{{ !$hasBrandHeader ? 'font-size: 13px;' : '' }}">التاريخ: {{ $invoice->invoice_date->format('Y-m-d') }}</p>
             </div>
         </div>
 
