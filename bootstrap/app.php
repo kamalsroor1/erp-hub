@@ -15,10 +15,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(fn () => route('dashboard'));
 
+        $middleware->web(append: [
+            \App\Http\Middleware\StoreScope::class,
+        ]);
+
         $middleware->alias([
             'role'               => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission'         => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'store.scope'        => \App\Http\Middleware\StoreScope::class,
+            'store.access'       => \App\Http\Middleware\StoreAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

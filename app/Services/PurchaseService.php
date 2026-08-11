@@ -24,11 +24,13 @@ class PurchaseService
     {
         return DB::transaction(function () use ($data) {
             $subtotal = '0.000';
+            $storeId = $data['store_id'] ?? Auth::user()?->getCurrentStore()?->id ?? \App\Models\Store::getMainStore()?->id;
 
             $purchase = Purchase::create([
                 'purchase_number'      => $data['purchase_number'] ?? $this->generateUniqueNumber(),
                 'supplier_id'          => $data['supplier_id'],
                 'user_id'              => Auth::id() ?? 1,
+                'store_id'             => $storeId,
                 'purchase_date'        => $data['purchase_date'] ?? now()->toDateString(),
                 'status'               => 'confirmed',
                 'payment_status'       => 'unpaid',
@@ -70,12 +72,13 @@ class PurchaseService
                 // Add to inventory
                 $this->stockService->addStock(
                     item: $item,
-                    quantity: $quantity,
-                    unitCost: $costPrice,
+                    quantity: (string)$quantity,
+                    unitCost: (string)$costPrice,
                     source: $purchase,
                     documentNumber: $purchase->purchase_number,
                     movementType: 'purchase_in',
-                    notes: "توريد بضاعة بفاتورة شراء رقم {$purchase->purchase_number}"
+                    notes: "توريد بضاعة بفاتورة شراء رقم {$purchase->purchase_number}",
+                    storeId: $storeId
                 );
 
                 $subtotal = bcadd($subtotal, $lineTotal, 3);

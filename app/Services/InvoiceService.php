@@ -31,10 +31,13 @@ class InvoiceService
 
             $invoiceNumber = $data['invoice_number'] ?? $this->generateUniqueNumber();
 
+            $storeId = $data['store_id'] ?? Auth::user()?->getCurrentStore()?->id ?? \App\Models\Store::getMainStore()?->id;
+
             $invoice = Invoice::create([
                 'invoice_number'   => $invoiceNumber,
                 'customer_id'      => $customer->id,
                 'user_id'          => Auth::id() ?? 1,
+                'store_id'         => $storeId,
                 'invoice_date'     => $data['invoice_date'] ?? now()->toDateString(),
                 'payment_type'     => $data['payment_type'] ?? 'cash',
                 'status'           => 'confirmed',
@@ -54,9 +57,9 @@ class InvoiceService
                 // S1: Lock item row and verify stock
                 $item = Item::where('id', $line['item_id'])->lockForUpdate()->firstOrFail();
 
-                $qty = $line['quantity'];
-                $unitPrice = $line['unit_price'];
-                $itemDiscount = $line['discount_amount'] ?? '0.000';
+                $qty = (string)$line['quantity'];
+                $unitPrice = (string)$line['unit_price'];
+                $itemDiscount = (string)($line['discount_amount'] ?? '0.000');
 
                 // Line Total = (Quantity * Unit Price) - Item Discount
                 $grossLineTotal = bcmul($qty, $unitPrice, 3);
@@ -89,7 +92,8 @@ class InvoiceService
                     source: $invoice,
                     documentNumber: $invoice->invoice_number,
                     movementType: 'sales_out',
-                    notes: "صرف مبيعات بالفاتورة رقم {$invoice->invoice_number}"
+                    notes: "صرف مبيعات بالفاتورة رقم {$invoice->invoice_number}",
+                    storeId: $storeId
                 );
 
                 $subtotal = bcadd($subtotal, $netLineTotal, 3);
@@ -254,7 +258,8 @@ class InvoiceService
                             source: $lockedInvoice,
                             documentNumber: $lockedInvoice->invoice_number,
                             movementType: 'cancellation_in',
-                            notes: "إرجاع مخزون لتعديل الفاتورة رقم {$lockedInvoice->invoice_number}"
+                            notes: "إرجاع مخزون لتعديل الفاتورة رقم {$lockedInvoice->invoice_number}",
+                            storeId: $lockedInvoice->store_id
                         );
                     }
                 }
@@ -304,7 +309,8 @@ class InvoiceService
                     source: $lockedInvoice,
                     documentNumber: $lockedInvoice->invoice_number,
                     movementType: 'sales_out',
-                    notes: "صرف مبيعات بتعديل الفاتورة رقم {$lockedInvoice->invoice_number}"
+                    notes: "صرف مبيعات بتعديل الفاتورة رقم {$lockedInvoice->invoice_number}",
+                    storeId: $lockedInvoice->store_id
                 );
 
                 $subtotal = bcadd($subtotal, $netLineTotal, 3);
@@ -430,7 +436,8 @@ class InvoiceService
                             source: $lockedInvoice,
                             documentNumber: $invoiceNumber,
                             movementType: 'cancellation_in',
-                            notes: "إرجاع مخزون بسبب حذف الفاتورة رقم {$invoiceNumber}"
+                            notes: "إرجاع مخزون بسبب حذف الفاتورة رقم {$invoiceNumber}",
+                            storeId: $lockedInvoice->store_id
                         );
                     }
                 }

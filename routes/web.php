@@ -101,6 +101,22 @@ Route::middleware('auth')->group(function () {
         }
         return response()->json(['status' => 'success', 'theme' => $theme]);
     })->name('theme.toggle');
+
+    // Store Switcher (Fast active branch/van switch for authorized users)
+    Route::post('/store/switch', function (\Illuminate\Http\Request $request) {
+        $storeId = (int)$request->input('store_id');
+        $store = \App\Models\Store::where('id', $storeId)->where('is_active', true)->first();
+
+        if ($store) {
+            $user = Auth::user();
+            if ($user->hasRole('admin') || $user->stores()->where('stores.id', $storeId)->exists() || (int)$user->default_store_id === $storeId) {
+                session(['current_store_id' => $storeId]);
+                return response()->json(['status' => 'success', 'store' => $store]);
+            }
+        }
+
+        return response()->json(['status' => 'error', 'message' => 'غير مصرح'], 403);
+    })->name('store.switch');
 });
 
 // PWA Assets Routing with dynamic canonical URLs and proper headers

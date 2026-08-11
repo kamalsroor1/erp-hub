@@ -33,6 +33,7 @@ class ReturnService
 
             $totalAmount = '0.000';
             $returnNumber = $data['return_number'] ?? $this->generateUniqueNumber('RET-SALES');
+            $storeId = $data['store_id'] ?? ($invoice?->store_id ?? Auth::user()?->getCurrentStore()?->id ?? \App\Models\Store::getMainStore()?->id);
 
             $returnDoc = ReturnDocument::create([
                 'return_number' => $returnNumber,
@@ -42,6 +43,7 @@ class ReturnService
                 'customer_id'   => $customer->id,
                 'supplier_id'   => null,
                 'user_id'       => Auth::id() ?? 1,
+                'store_id'      => $storeId,
                 'total_amount'  => '0.000',
                 'return_date'   => $data['return_date'] ?? now()->toDateString(),
                 'reason'        => $data['reason'] ?? 'مرتجع مبيعات',
@@ -49,8 +51,8 @@ class ReturnService
 
             foreach ($data['items'] as $line) {
                 $item = Item::where('id', $line['item_id'])->lockForUpdate()->firstOrFail();
-                $qty = $line['quantity'];
-                $unitPrice = $line['unit_price'];
+                $qty = (string)$line['quantity'];
+                $unitPrice = (string)$line['unit_price'];
                 $lineTotal = bcmul($qty, $unitPrice, 3);
 
                 $returnDoc->items()->create([
@@ -60,7 +62,7 @@ class ReturnService
                     'total_price' => $lineTotal,
                 ]);
 
-                // Return stock to warehouse
+                // Return stock to warehouse/store
                 $this->stockService->addStock(
                     item: $item,
                     quantity: $qty,
@@ -68,7 +70,8 @@ class ReturnService
                     source: $returnDoc,
                     documentNumber: $returnDoc->return_number,
                     movementType: 'sales_return_in',
-                    notes: "مرتجع مبيعات للعميل {$customer->name} بمستند رقم {$returnDoc->return_number}"
+                    notes: "مرتجع مبيعات للعميل {$customer->name} بمستند رقم {$returnDoc->return_number}",
+                    storeId: $storeId
                 );
 
                 $totalAmount = bcadd($totalAmount, $lineTotal, 3);
@@ -101,6 +104,7 @@ class ReturnService
 
             $totalAmount = '0.000';
             $returnNumber = $data['return_number'] ?? $this->generateUniqueNumber('RET-PURCH');
+            $storeId = $data['store_id'] ?? ($purchase?->store_id ?? Auth::user()?->getCurrentStore()?->id ?? \App\Models\Store::getMainStore()?->id);
 
             $returnDoc = ReturnDocument::create([
                 'return_number' => $returnNumber,
@@ -110,6 +114,7 @@ class ReturnService
                 'customer_id'   => null,
                 'supplier_id'   => $supplier->id,
                 'user_id'       => Auth::id() ?? 1,
+                'store_id'      => $storeId,
                 'total_amount'  => '0.000',
                 'return_date'   => $data['return_date'] ?? now()->toDateString(),
                 'reason'        => $data['reason'] ?? 'مرتجع مشتريات للمورد',
@@ -117,8 +122,8 @@ class ReturnService
 
             foreach ($data['items'] as $line) {
                 $item = Item::where('id', $line['item_id'])->lockForUpdate()->firstOrFail();
-                $qty = $line['quantity'];
-                $unitPrice = $line['unit_price'] ?? $item->cost_price;
+                $qty = (string)$line['quantity'];
+                $unitPrice = (string)($line['unit_price'] ?? $item->cost_price);
                 $lineTotal = bcmul($qty, $unitPrice, 3);
 
                 $returnDoc->items()->create([
@@ -135,7 +140,8 @@ class ReturnService
                     source: $returnDoc,
                     documentNumber: $returnDoc->return_number,
                     movementType: 'purchase_return_out',
-                    notes: "مرتجع مشتريات للمورد {$supplier->name} بمستند رقم {$returnDoc->return_number}"
+                    notes: "مرتجع مشتريات للمورد {$supplier->name} بمستند رقم {$returnDoc->return_number}",
+                    storeId: $storeId
                 );
 
                 $totalAmount = bcadd($totalAmount, $lineTotal, 3);
