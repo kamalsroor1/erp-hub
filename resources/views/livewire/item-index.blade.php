@@ -34,7 +34,19 @@
             >
         </div>
         <div class="flex flex-wrap items-center gap-1.5 text-xs">
-            <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">تصفية:</span>
+            <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">الحالة:</span>
+            <button wire:click="$set('filterStatus', 'active')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStatus === 'active' ? 'bg-emerald-600 text-white border-emerald-500' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400' }}">النشطة</button>
+            <button wire:click="$set('filterStatus', 'trashed')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs flex items-center gap-1 {{ $filterStatus === 'trashed' ? 'bg-rose-600 text-white border-rose-500' : 'border-slate-200 dark:border-slate-800 text-rose-600 dark:text-rose-400' }}">
+                <span>سلة المحذوفات</span>
+                @if($trashedCount > 0)
+                <span class="px-1.5 py-0.2 rounded-full text-[10px] {{ $filterStatus === 'trashed' ? 'bg-white text-rose-600' : 'bg-rose-500/20 text-rose-600' }} font-mono font-bold">{{ $trashedCount }}</span>
+                @endif
+            </button>
+            <button wire:click="$set('filterStatus', 'all')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStatus === 'all' ? 'bg-slate-700 text-white border-slate-600' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400' }}">الكل</button>
+
+            <span class="text-slate-300 dark:text-slate-700 mx-1">|</span>
+
+            <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">المخزون:</span>
             <button wire:click="$set('filterStock', 'all')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStock === 'all' ? 'bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white' : 'border-transparent text-slate-500 dark:text-slate-400' }}">الكل</button>
             <button wire:click="$set('filterStock', 'low')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStock === 'low' ? 'bg-rose-500/20 border-rose-500/40 text-rose-700 dark:text-rose-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">نواقص</button>
             <button wire:click="$set('filterStock', 'out')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStock === 'out' ? 'bg-rose-100 dark:bg-rose-950 border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-300' : 'border-transparent text-slate-500 dark:text-slate-400' }}">نفد (0)</button>
@@ -125,20 +137,42 @@
                         <td class="p-3.5 font-mono font-bold text-emerald-600 dark:text-emerald-400">{{ number_format($item->selling_price, 2) }} ج.م</td>
                         <td class="p-3.5 font-mono text-slate-500 dark:text-slate-400">{{ number_format($item->min_stock_level, 2) }}</td>
                         <td class="p-3.5 text-center">
-                            @if($item->isLowStock())
+                            @if($item->trashed())
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">محذوف</span>
+                            @elseif($item->isLowStock())
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">ناقص بالمخزن</span>
                             @else
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">متوفر</span>
                             @endif
                         </td>
                         <td class="p-3.5 text-center">
-                            <button 
-                                wire:click="openEditModal({{ $item->id }})" 
-                                title="تعديل بيانات الصنف"
-                                class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-emerald-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-lg text-xs font-bold border border-slate-300 dark:border-slate-700 transition-colors inline-flex items-center gap-1 cursor-pointer"
-                            >
-                                <span>✏️ تعديل</span>
-                            </button>
+                            <div class="flex items-center justify-center gap-1.5">
+                                @if($item->trashed())
+                                    <button 
+                                        wire:click="restoreItem({{ $item->id }})" 
+                                        title="استعادة الصنف"
+                                        class="px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white rounded-lg text-xs font-bold border border-emerald-500/30 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                                    >
+                                        <span>♻️ استعادة</span>
+                                    </button>
+                                @else
+                                    <button 
+                                        wire:click="openEditModal({{ $item->id }})" 
+                                        title="تعديل بيانات الصنف"
+                                        class="px-2 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-emerald-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-lg text-xs font-bold border border-slate-300 dark:border-slate-700 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                                    >
+                                        <span>✏️</span>
+                                    </button>
+                                    <button 
+                                        wire:click="deleteItem({{ $item->id }})" 
+                                        wire:confirm="هل أنت متأكد من نقل هذا الصنف لسلة المحذوفات والأرشيف؟"
+                                        title="أرشفة الصنف"
+                                        class="px-2 py-1 bg-rose-500/10 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white rounded-lg text-xs font-bold border border-rose-500/20 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                                    >
+                                        <span>🗑️</span>
+                                    </button>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @empty

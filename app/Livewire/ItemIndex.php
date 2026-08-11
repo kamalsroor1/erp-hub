@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Models\Item;
 use App\Services\StockService;
 use App\Livewire\Traits\RequiresAuth;
+use Illuminate\Validation\Rule;
 
 class ItemIndex extends Component
 {
@@ -15,6 +16,7 @@ class ItemIndex extends Component
     public $search = '';
     public $filterStock = 'all'; // all, low, out
     public $filterCategory = 'all';
+    public $filterStatus = 'active'; // active, trashed, all
 
     // Modal Properties (Create & Edit)
     public $showModal = false;
@@ -34,7 +36,11 @@ class ItemIndex extends Component
     protected function rules()
     {
         return [
-            'code'            => 'required|max:50|unique:items,code,' . $this->editItemId,
+            'code'            => [
+                'required',
+                'max:50',
+                Rule::unique('items', 'code')->whereNull('deleted_at')->ignore($this->editItemId),
+            ],
             'name'            => 'required|string|max:255',
             'category'        => 'nullable|string|max:100',
             'unit'            => 'nullable|string|max:50',
@@ -61,7 +67,7 @@ class ItemIndex extends Component
 
     public function openEditModal($id)
     {
-        $item = Item::findOrFail($id);
+        $item = Item::withTrashed()->findOrFail($id);
         $this->isEditMode = true;
         $this->editItemId = $item->id;
         $this->code = $item->code;
@@ -81,7 +87,7 @@ class ItemIndex extends Component
         $this->validate();
 
         if ($this->isEditMode && $this->editItemId) {
-            $item = Item::findOrFail($this->editItemId);
+            $item = Item::withTrashed()->findOrFail($this->editItemId);
             $item->update([
                 'code'            => $this->code,
                 'name'            => $this->name,
@@ -129,9 +135,34 @@ class ItemIndex extends Component
         $this->showModal = false;
     }
 
+    public function deleteItem($id)
+    {
+        $item = Item::findOrFail($id);
+        $name = $item->name;
+        $item->delete(); // Soft delete
+
+        session()->flash('success', "تم نقل الصنف [{$name}] إلى سلة المحذوفات بنجاح.");
+        $this->dispatch('swal:toast', ['icon' => 'success', 'title' => "تم أرشفة الصنف [{$name}] بنجاح."]);
+    }
+
+    public function restoreItem($id)
+    {
+        $item = Item::onlyTrashed()->findOrFail($id);
+        $item->restore();
+
+        session()->flash('success', "تم استعادة الصنف [{$item->name}] بنجاح.");
+        $this->dispatch('swal:toast', ['icon' => 'success', 'title' => "تم استعادة الصنف [{$item->name}] بنجاح!"]);
+    }
+
     public function render()
     {
-        $query = Item::active()
+        $baseQuery = match ($this->filterStatus) {
+            'trashed' => Item::onlyTrashed(),
+            'all'     => Item::withTrashed(),
+            default   => Item::active(),
+        };
+
+        $query = $baseQuery
             ->when($this->search, function ($q) {
                 $q->where(function ($sub) {
                     $sub->where('name', 'like', "%{$this->search}%")
@@ -145,7 +176,8 @@ class ItemIndex extends Component
             ->orderBy('name');
 
         return view('livewire.item-index', [
-            'items' => $query->paginate(15),
+            'items'        => $query->paginate(15),
+            'trashedCount' => Item::onlyTrashed()->count(),
         ])->layout('components.layouts.app', ['title' => 'دليل الأصناف والمخزون']);
     }
 }

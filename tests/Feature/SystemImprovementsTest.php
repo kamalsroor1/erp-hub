@@ -128,7 +128,7 @@ class SystemImprovementsTest extends TestCase
         $this->customer->refresh();
         $this->assertEquals('100.000', $this->item->current_stock);
         $this->assertEquals('0.000', $this->customer->current_balance);
-        $this->assertDatabaseMissing('invoices', ['id' => $invoice->id]);
+        $this->assertSoftDeleted('invoices', ['id' => $invoice->id]);
     }
 
     public function test_supplier_payment_deducts_debt_balance_accurately()
@@ -193,7 +193,7 @@ class SystemImprovementsTest extends TestCase
         Livewire::test(ExpenseIndex::class)
             ->call('deleteExpense', $expense->id);
 
-        $this->assertDatabaseMissing('expenses', ['id' => $expense->id]);
+        $this->assertSoftDeleted('expenses', ['id' => $expense->id]);
     }
 
     public function test_setting_model_and_caching()

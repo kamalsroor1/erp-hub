@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StoreStock extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'store_id',
@@ -26,12 +27,12 @@ class StoreStock extends Model
 
     public function store(): BelongsTo
     {
-        return $this->belongsTo(Store::class);
+        return $this->belongsTo(Store::class)->withTrashed();
     }
 
     public function item(): BelongsTo
     {
-        return $this->belongsTo(Item::class);
+        return $this->belongsTo(Item::class)->withTrashed();
     }
 
     /**

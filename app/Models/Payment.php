@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Payment extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'payment_number',
@@ -32,26 +33,26 @@ class Payment extends Model
 
     public function customer()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class)->withTrashed();
     }
 
     public function supplier()
     {
-        return $this->belongsTo(Supplier::class);
+        return $this->belongsTo(Supplier::class)->withTrashed();
     }
 
     public function invoice()
     {
-        return $this->belongsTo(Invoice::class);
+        return $this->belongsTo(Invoice::class)->withTrashed();
     }
 
     public function purchase()
     {
-        return $this->belongsTo(Purchase::class);
+        return $this->belongsTo(Purchase::class)->withTrashed();
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withTrashed();
     }
 }

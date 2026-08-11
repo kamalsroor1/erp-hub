@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class StockTransfer extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'transfer_number',
@@ -27,17 +28,17 @@ class StockTransfer extends Model
 
     public function fromStore(): BelongsTo
     {
-        return $this->belongsTo(Store::class, 'from_store_id');
+        return $this->belongsTo(Store::class, 'from_store_id')->withTrashed();
     }
 
     public function toStore(): BelongsTo
     {
-        return $this->belongsTo(Store::class, 'to_store_id');
+        return $this->belongsTo(Store::class, 'to_store_id')->withTrashed();
     }
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withTrashed();
     }
 
     public function items(): HasMany

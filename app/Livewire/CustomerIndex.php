@@ -13,6 +13,7 @@ class CustomerIndex extends Component
     use WithPagination;
 
     public $search = '';
+    public $filterStatus = 'active'; // active, trashed, all
 
     // Quick Add / Edit Customer Modal
     public $showCustomerModal = false;
@@ -63,7 +64,7 @@ class CustomerIndex extends Component
     public function openEditModal($id)
     {
         $this->reset(['errorMessage', 'successMessage']);
-        $customer = Customer::findOrFail($id);
+        $customer = Customer::withTrashed()->findOrFail($id);
         $this->isEditMode = true;
         $this->editCustomerId = $customer->id;
         $this->name = $customer->name;
@@ -82,7 +83,7 @@ class CustomerIndex extends Component
 
         try {
             if ($this->isEditMode && $this->editCustomerId) {
-                $customer = Customer::findOrFail($this->editCustomerId);
+                $customer = Customer::withTrashed()->findOrFail($this->editCustomerId);
                 $customer->update([
                     'name'       => $this->name,
                     'phone'      => $this->phone ?: null,
@@ -120,9 +121,30 @@ class CustomerIndex extends Component
         }
     }
 
+    public function deleteCustomer($id)
+    {
+        $customer = Customer::findOrFail($id);
+        $name = $customer->name;
+        $customer->delete(); // Soft delete
+
+        $this->successMessage = "تم نقل العميل [{$name}] إلى سلة المحذوفات بنجاح.";
+        session()->flash('success', $this->successMessage);
+        $this->dispatch('swal:toast', ['icon' => 'success', 'title' => $this->successMessage]);
+    }
+
+    public function restoreCustomer($id)
+    {
+        $customer = Customer::onlyTrashed()->findOrFail($id);
+        $customer->restore();
+
+        $this->successMessage = "تم استعادة العميل [{$customer->name}] بنجاح.";
+        session()->flash('success', $this->successMessage);
+        $this->dispatch('swal:toast', ['icon' => 'success', 'title' => $this->successMessage]);
+    }
+
     public function openPaymentModal($customerId)
     {
-        $customer = Customer::findOrFail($customerId);
+        $customer = Customer::withTrashed()->findOrFail($customerId);
         $this->selectedCustomerId = $customer->id;
         $this->selectedCustomerName = $customer->name;
         $this->paymentAmount = (string)$customer->current_balance;
@@ -164,7 +186,13 @@ class CustomerIndex extends Component
 
     public function render()
     {
-        $query = Customer::active()
+        $baseQuery = match ($this->filterStatus) {
+            'trashed' => Customer::onlyTrashed(),
+            'all'     => Customer::withTrashed(),
+            default   => Customer::active(),
+        };
+
+        $query = $baseQuery
             ->when($this->search, function ($q) {
                 $q->where('name', 'like', "%{$this->search}%")
                   ->orWhere('phone', 'like', "%{$this->search}%")
@@ -173,7 +201,8 @@ class CustomerIndex extends Component
             ->orderBy('name');
 
         return view('livewire.customer-index', [
-            'customers' => $query->paginate(15),
+            'customers'    => $query->paginate(15),
+            'trashedCount' => Customer::onlyTrashed()->count(),
         ])->layout('components.layouts.app', ['title' => 'دليل العملاء والحسابات']);
     }
 }

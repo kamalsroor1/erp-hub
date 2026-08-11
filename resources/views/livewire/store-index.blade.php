@@ -36,11 +36,23 @@
             >
         </div>
 
-        <div class="flex items-center gap-2 w-full sm:w-auto text-xs">
-            <button wire:click="$set('typeFilter', 'all')" class="px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer {{ $typeFilter === 'all' ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' }}">الكل</button>
-            <button wire:click="$set('typeFilter', 'retail_shop')" class="px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer {{ $typeFilter === 'retail_shop' ? 'bg-amber-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' }}">🏬 محلات</button>
-            <button wire:click="$set('typeFilter', 'wholesale_van')" class="px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer {{ $typeFilter === 'wholesale_van' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' }}">🚚 عربيات توزيع</button>
-            <button wire:click="$set('typeFilter', 'main_warehouse')" class="px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer {{ $typeFilter === 'main_warehouse' ? 'bg-teal-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' }}">🏢 مخازن رئيسية</button>
+        <div class="flex flex-wrap items-center gap-1.5 w-full sm:w-auto text-xs">
+            <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">الحالة:</span>
+            <button wire:click="$set('statusFilter', 'active')" class="px-2.5 py-1.5 rounded-xl font-bold transition-colors cursor-pointer {{ $statusFilter === 'active' ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' }}">النشطة</button>
+            <button wire:click="$set('statusFilter', 'trashed')" class="px-2.5 py-1.5 rounded-xl font-bold transition-colors cursor-pointer flex items-center gap-1 {{ $statusFilter === 'trashed' ? 'bg-rose-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-rose-600 dark:text-rose-400' }}">
+                <span>سلة المحذوفات</span>
+                @if($trashedCount > 0)
+                <span class="px-1.5 py-0.2 rounded-full text-[10px] {{ $statusFilter === 'trashed' ? 'bg-white text-rose-600' : 'bg-rose-500/20 text-rose-600' }} font-mono font-bold">{{ $trashedCount }}</span>
+                @endif
+            </button>
+            <button wire:click="$set('statusFilter', 'all')" class="px-2.5 py-1.5 rounded-xl font-bold transition-colors cursor-pointer {{ $statusFilter === 'all' ? 'bg-slate-700 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' }}">الكل</button>
+
+            <span class="text-slate-300 dark:text-slate-700 mx-1">|</span>
+
+            <button wire:click="$set('typeFilter', 'all')" class="px-2.5 py-1.5 rounded-xl font-bold transition-colors cursor-pointer {{ $typeFilter === 'all' ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' }}">الكل</button>
+            <button wire:click="$set('typeFilter', 'retail_shop')" class="px-2.5 py-1.5 rounded-xl font-bold transition-colors cursor-pointer {{ $typeFilter === 'retail_shop' ? 'bg-amber-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' }}">🏬 محلات</button>
+            <button wire:click="$set('typeFilter', 'wholesale_van')" class="px-2.5 py-1.5 rounded-xl font-bold transition-colors cursor-pointer {{ $typeFilter === 'wholesale_van' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' }}">🚚 عربيات</button>
+            <button wire:click="$set('typeFilter', 'main_warehouse')" class="px-2.5 py-1.5 rounded-xl font-bold transition-colors cursor-pointer {{ $typeFilter === 'main_warehouse' ? 'bg-teal-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' }}">🏢 مخازن</button>
         </div>
     </div>
 
@@ -115,6 +127,16 @@
                 </button>
 
                 <div class="flex items-center gap-1">
+                    @if($st->trashed())
+                    <button 
+                        type="button" 
+                        wire:click="restoreStore({{ $st->id }})" 
+                        class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white text-xs font-bold border border-emerald-500/30 transition-colors cursor-pointer"
+                        title="استعادة الفرع"
+                    >
+                        ♻️ استعادة
+                    </button>
+                    @else
                     <a 
                         href="{{ route('store-stocks') }}?store_id={{ $st->id }}" 
                         class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-amber-600 hover:text-white text-slate-600 dark:text-slate-400 transition-colors cursor-pointer"
@@ -130,6 +152,18 @@
                     >
                         ✏️
                     </button>
+                    @if(!$st->is_main)
+                    <button 
+                        type="button" 
+                        wire:click="deleteStore({{ $st->id }})" 
+                        wire:confirm="هل أنت متأكد من نقل هذا الفرع لسلة المحذوفات؟"
+                        class="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white transition-colors cursor-pointer"
+                        title="أرشفة الفرع"
+                    >
+                        🗑️
+                    </button>
+                    @endif
+                    @endif
                 </div>
             </div>
         </div>

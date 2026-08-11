@@ -137,6 +137,6 @@ class RolePermissionTest extends TestCase
         \Livewire\Livewire::test(\App\Livewire\InvoiceIndex::class)
             ->call('deleteInvoice', $invoice->id);
 
-        $this->assertDatabaseMissing('invoices', ['id' => $invoice->id]);
+        $this->assertSoftDeleted('invoices', ['id' => $invoice->id]);
     }
 }

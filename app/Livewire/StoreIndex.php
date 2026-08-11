@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Store;
 use App\Models\User;
 use App\Livewire\Traits\RequiresAuth;
+use Illuminate\Validation\Rule;
 
 class StoreIndex extends Component
 {
@@ -13,6 +14,7 @@ class StoreIndex extends Component
 
     public $searchQuery = '';
     public $typeFilter = 'all';
+    public $statusFilter = 'active'; // active, trashed, all
 
     // Create / Edit Modal State
     public $showModal = false;
@@ -39,7 +41,12 @@ class StoreIndex extends Component
     {
         return [
             'name'      => 'required|string|max:255',
-            'code'      => 'required|string|max:50|unique:stores,code,' . $this->editingStoreId,
+            'code'      => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('stores', 'code')->whereNull('deleted_at')->ignore($this->editingStoreId),
+            ],
             'type'      => 'required|in:retail_shop,wholesale_van,main_warehouse',
             'phone'     => 'nullable|string|max:50',
             'address'   => 'nullable|string',
@@ -60,7 +67,7 @@ class StoreIndex extends Component
 
     public function openEditModal($id)
     {
-        $store = Store::findOrFail($id);
+        $store = Store::withTrashed()->findOrFail($id);
         $this->editingStoreId = $store->id;
         $this->name           = $store->name;
         $this->code           = $store->code;
@@ -83,7 +90,7 @@ class StoreIndex extends Component
         }
 
         if ($this->isEditing) {
-            $store = Store::findOrFail($this->editingStoreId);
+            $store = Store::withTrashed()->findOrFail($this->editingStoreId);
             $store->update([
                 'name'      => $this->name,
                 'code'      => $this->code,
@@ -116,9 +123,35 @@ class StoreIndex extends Component
         $this->showModal = false;
     }
 
+    public function deleteStore($id)
+    {
+        $store = Store::findOrFail($id);
+        if ($store->is_main) {
+            $this->errorMessage = 'لا يمكن حذف أو أرشفة الفرع / المخزن الرئيسي للمؤسسة.';
+            return;
+        }
+
+        $name = $store->name;
+        $store->delete(); // Soft delete
+
+        $this->successMessage = "تم نقل الفرع [{$name}] إلى سلة المحذوفات بنجاح.";
+        session()->flash('success', $this->successMessage);
+        $this->dispatch('swal:toast', ['icon' => 'success', 'title' => $this->successMessage]);
+    }
+
+    public function restoreStore($id)
+    {
+        $store = Store::onlyTrashed()->findOrFail($id);
+        $store->restore();
+
+        $this->successMessage = "تم استعادة الفرع [{$store->name}] بنجاح.";
+        session()->flash('success', $this->successMessage);
+        $this->dispatch('swal:toast', ['icon' => 'success', 'title' => $this->successMessage]);
+    }
+
     public function openUserAssignmentModal($id)
     {
-        $this->targetStore = Store::with('users')->findOrFail($id);
+        $this->targetStore = Store::withTrashed()->with('users')->findOrFail($id);
         $this->selectedUsers = $this->targetStore->users->pluck('id')->toArray();
         $this->showUserModal = true;
     }
@@ -143,7 +176,13 @@ class StoreIndex extends Component
 
     public function render()
     {
-        $stores = Store::withCount(['stocks', 'users', 'invoices'])
+        $baseQuery = match ($this->statusFilter) {
+            'trashed' => Store::onlyTrashed(),
+            'all'     => Store::withTrashed(),
+            default   => Store::query(),
+        };
+
+        $stores = $baseQuery->withCount(['stocks', 'users', 'invoices'])
             ->when($this->typeFilter !== 'all', fn($q) => $q->where('type', $this->typeFilter))
             ->when(strlen($this->searchQuery) >= 1, function ($q) {
                 $q->where('name', 'like', "%{$this->searchQuery}%")
@@ -157,8 +196,9 @@ class StoreIndex extends Component
         $allUsers = User::where('is_active', true)->get();
 
         return view('livewire.store-index', [
-            'stores'   => $stores,
-            'allUsers' => $allUsers,
+            'stores'       => $stores,
+            'allUsers'     => $allUsers,
+            'trashedCount' => Store::onlyTrashed()->count(),
         ])->layout('components.layouts.app', ['title' => 'إدارة الفروع وعربات التوزيع']);
     }
 }

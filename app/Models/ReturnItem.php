@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ReturnItem extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'return_id',
@@ -28,11 +29,11 @@ class ReturnItem extends Model
 
     public function returnDocument()
     {
-        return $this->belongsTo(ReturnDocument::class, 'return_id');
+        return $this->belongsTo(ReturnDocument::class, 'return_id')->withTrashed();
     }
 
     public function item()
     {
-        return $this->belongsTo(Item::class);
+        return $this->belongsTo(Item::class)->withTrashed();
     }
 }

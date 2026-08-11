@@ -36,17 +36,17 @@ class StockMovement extends Model
 
     public function item()
     {
-        return $this->belongsTo(Item::class);
+        return $this->belongsTo(Item::class)->withTrashed();
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withTrashed();
     }
 
     public function store()
     {
-        return $this->belongsTo(Store::class);
+        return $this->belongsTo(Store::class)->withTrashed();
     }
 
     public function source()

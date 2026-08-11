@@ -12,6 +12,7 @@ class SupplierIndex extends Component
     use WithPagination;
 
     public $search = '';
+    public $filterStatus = 'active'; // active, trashed, all
 
     // Quick Add / Edit Supplier Modal
     public $showSupplierModal = false;
@@ -45,7 +46,7 @@ class SupplierIndex extends Component
 
     public function openEditModal($id)
     {
-        $supplier = Supplier::findOrFail($id);
+        $supplier = Supplier::withTrashed()->findOrFail($id);
         $this->isEditMode = true;
         $this->editSupplierId = $supplier->id;
         $this->name = $supplier->name;
@@ -61,7 +62,7 @@ class SupplierIndex extends Component
         $this->validate();
 
         if ($this->isEditMode && $this->editSupplierId) {
-            $supplier = Supplier::findOrFail($this->editSupplierId);
+            $supplier = Supplier::withTrashed()->findOrFail($this->editSupplierId);
             $supplier->update([
                 'name'         => $this->name,
                 'company_name' => $this->company_name,
@@ -90,9 +91,28 @@ class SupplierIndex extends Component
         $this->showSupplierModal = false;
     }
 
+    public function deleteSupplier($id)
+    {
+        $supplier = Supplier::findOrFail($id);
+        $name = $supplier->name;
+        $supplier->delete(); // Soft delete
+
+        session()->flash('success', "تم نقل المورد [{$name}] إلى سلة المحذوفات بنجاح.");
+        $this->dispatch('swal:toast', ['icon' => 'success', 'title' => "تم نقل المورد [{$name}] إلى سلة المحذوفات بنجاح."]);
+    }
+
+    public function restoreSupplier($id)
+    {
+        $supplier = Supplier::onlyTrashed()->findOrFail($id);
+        $supplier->restore();
+
+        session()->flash('success', "تم استعادة المورد [{$supplier->name}] بنجاح.");
+        $this->dispatch('swal:toast', ['icon' => 'success', 'title' => "تم استعادة المورد [{$supplier->name}] بنجاح!"]);
+    }
+
     public function openPaymentModal($supplierId)
     {
-        $supplier = Supplier::findOrFail($supplierId);
+        $supplier = Supplier::withTrashed()->findOrFail($supplierId);
         $this->selectedSupplierId = $supplier->id;
         $this->selectedSupplierName = $supplier->name;
         $this->paymentAmount = $supplier->current_balance;
@@ -121,7 +141,13 @@ class SupplierIndex extends Component
 
     public function render()
     {
-        $query = Supplier::active()
+        $baseQuery = match ($this->filterStatus) {
+            'trashed' => Supplier::onlyTrashed(),
+            'all'     => Supplier::withTrashed(),
+            default   => Supplier::active(),
+        };
+
+        $query = $baseQuery
             ->when($this->search, function ($q) {
                 $q->where('name', 'like', "%{$this->search}%")
                   ->orWhere('company_name', 'like', "%{$this->search}%")
@@ -130,7 +156,8 @@ class SupplierIndex extends Component
             ->orderBy('name');
 
         return view('livewire.supplier-index', [
-            'suppliers' => $query->paginate(15),
+            'suppliers'    => $query->paginate(15),
+            'trashedCount' => Supplier::onlyTrashed()->count(),
         ])->layout('components.layouts.app', ['title' => 'دليل الموردين']);
     }
 }
