@@ -8,13 +8,14 @@
             <p class="text-xs text-slate-500 dark:text-slate-400">إدارة بيانات العملاء، الأرصدة التراكمية، وسندات التحصيل</p>
         </div>
         <button wire:click="openCreateModal" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer">
-            <span>+ إضافة عميل جديد</span>
+            <span>➕ إضافة عميل جديد</span>
         </button>
     </div>
 
-    @if (session()->has('success'))
-    <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs flex items-center gap-2">
-        <span>✅ {{ session('success') }}</span>
+    @if (session()->has('success') || $successMessage)
+    <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs flex items-center justify-between">
+        <span>✅ {{ session('success') ?? $successMessage }}</span>
+        <button wire:click="$set('successMessage', '')" class="text-emerald-500 hover:text-emerald-700 font-bold">✕</button>
     </div>
     @endif
 
@@ -54,7 +55,7 @@
             <div class="flex items-center gap-1.5 pt-1">
                 <button 
                     wire:click="openEditModal({{ $c->id }})" 
-                    class="flex-1 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 transition-colors text-center"
+                    class="flex-1 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 transition-colors text-center cursor-pointer"
                 >
                     ✏️ تعديل
                 </button>
@@ -67,7 +68,7 @@
                 @if(bccomp($c->current_balance, '0.000', 3) > 0)
                 <button 
                     wire:click="openPaymentModal({{ $c->id }})" 
-                    class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-sm transition-colors text-center shrink-0"
+                    class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-sm transition-colors text-center shrink-0 cursor-pointer"
                 >
                     💵 تحصيل
                 </button>
@@ -146,9 +147,9 @@
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg p-5 sm:p-6 space-y-4 shadow-2xl">
             <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                 <h3 class="font-bold text-slate-900 dark:text-white text-base">
-                    {{ $isEditing ? 'تعديل بيانات العميل' : 'إضافة عميل جديد' }}
+                    {{ $isEditMode ? 'تعديل بيانات العميل' : 'إضافة عميل جديد' }}
                 </h3>
-                <button wire:click="closeCustomerModal" class="text-slate-400 hover:text-slate-700 dark:hover:text-white">✕</button>
+                <button wire:click="closeCustomerModal" class="text-slate-400 hover:text-slate-700 dark:hover:text-white font-bold cursor-pointer">✕</button>
             </div>
 
             @if($errorMessage)
@@ -160,39 +161,39 @@
             <form wire:submit.prevent="saveCustomer" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">اسم العميل <span class="text-rose-500">*</span></label>
-                    <input type="text" wire:model.defer="name" placeholder="اسم العميل أو المحل..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                    <input type="text" wire:model="name" placeholder="اسم العميل أو المحل..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
                     @error('name') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">رقم الهاتف</label>
-                        <input type="text" wire:model.defer="phone" dir="ltr" placeholder="01xxxxxxxxx" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                        <input type="text" wire:model="phone" dir="ltr" placeholder="01xxxxxxxxx" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
                         @error('phone') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">الرصيد الافتتاحي</label>
-                        <input type="number" step="0.001" wire:model.defer="opening_balance" {{ $isEditing ? 'disabled' : '' }} placeholder="0.000" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 disabled:opacity-50">
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">الرصيد الافتتاحي (ج.م)</label>
+                        <input type="number" step="0.001" wire:model="opening_balance" {{ $isEditMode ? 'disabled' : '' }} placeholder="0.000" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 disabled:opacity-50">
                         @error('opening_balance') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">العنوان / المنطقة</label>
-                    <input type="text" wire:model.defer="address" placeholder="عنوان العميل أو اسم المنطقة..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                    <input type="text" wire:model="address" placeholder="عنوان العميل أو اسم المنطقة..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
                     @error('address') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">ملاحظات إضافية</label>
-                    <textarea wire:model.defer="notes" rows="2" placeholder="أي ملاحظات تخص التعامل مع العميل..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"></textarea>
+                    <textarea wire:model="notes" rows="2" placeholder="أي ملاحظات تخص التعامل مع العميل..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"></textarea>
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
                     <button type="button" wire:click="closeCustomerModal" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold cursor-pointer">إلغاء</button>
                     <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/30 cursor-pointer">
-                        {{ $isEditing ? 'حفظ التعديلات' : 'إضافة العميل' }}
+                        {{ $isEditMode ? 'حفظ التعديلات' : 'إضافة العميل' }}
                     </button>
                 </div>
             </form>
@@ -209,7 +210,7 @@
                     <h3 class="font-bold text-slate-900 dark:text-white text-base">سند تحصيل وقبض نقدية</h3>
                     <p class="text-xs text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">العميل: {{ $selectedCustomerName }}</p>
                 </div>
-                <button wire:click="closePaymentModal" class="text-slate-400 hover:text-slate-700 dark:hover:text-white">✕</button>
+                <button wire:click="closePaymentModal" class="text-slate-400 hover:text-slate-700 dark:hover:text-white font-bold cursor-pointer">✕</button>
             </div>
 
             @if($errorMessage)
@@ -221,29 +222,24 @@
             <form wire:submit.prevent="savePayment" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">المبلغ المحصل (ج.م) <span class="text-rose-500">*</span></label>
-                    <input type="number" step="0.001" wire:model.defer="payment_amount" placeholder="0.000" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
-                    @error('payment_amount') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
+                    <input type="number" step="0.001" wire:model="paymentAmount" placeholder="0.000" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                    @error('paymentAmount') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">تاريخ التحصيل</label>
-                        <input type="date" wire:model.defer="payment_date" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
-                    </div>
-
-                    <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">طريقة القبض</label>
-                        <select wire:model.defer="payment_method" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                        <select wire:model="paymentMethod" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
                             <option value="cash">نقداً (في الدرج)</option>
                             <option value="bank_transfer">تحويل بنكي / فودافون كاش</option>
                             <option value="cheque">شيك</option>
                         </select>
                     </div>
-                </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">البيان / ملاحظات السند</label>
-                    <input type="text" wire:model.defer="payment_notes" placeholder="دفعة تحت الحساب / سداد فاتورة..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">البيان / ملاحظات السند</label>
+                        <input type="text" wire:model="paymentNotes" placeholder="دفعة تحت الحساب / سداد فاتورة..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                    </div>
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">

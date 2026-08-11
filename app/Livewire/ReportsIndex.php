@@ -7,12 +7,14 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Item;
 use App\Models\Expense;
+use App\Models\Store;
 use App\Services\ProfitService;
 use Illuminate\Support\Facades\DB;
 
 class ReportsIndex extends Component
 {
     public $dateFilter = 'this_month'; // today, this_week, this_month, custom
+    public $selectedStoreId = 'all';
     public $fromDate;
     public $toDate;
 
@@ -42,22 +44,30 @@ class ReportsIndex extends Component
 
     public function render(ProfitService $profitService)
     {
+        $storeFilter = ($this->selectedStoreId && $this->selectedStoreId !== 'all') 
+            ? (int)$this->selectedStoreId 
+            : null;
+
+        $stores = Store::active()->get();
+
         // 1. Overall Periodic Profit
-        $periodic = $profitService->getPeriodicProfits($this->fromDate, $this->toDate);
+        $periodic = $profitService->getPeriodicProfits($this->fromDate, $this->toDate, $storeFilter);
 
         // 2. Operational Expenses
         $totalExpenses = Expense::when($this->fromDate, fn($q) => $q->whereDate('expense_date', '>=', $this->fromDate))
             ->when($this->toDate, fn($q) => $q->whereDate('expense_date', '<=', $this->toDate))
+            ->when($storeFilter, fn($q) => $q->where('store_id', $storeFilter))
             ->sum('amount') ?: '0.000';
 
         $grossProfit = $periodic['gross_profit'] ?? '0.000';
         $netProfitAfterExpenses = bcsub((string)$grossProfit, (string)$totalExpenses, 3);
 
         // 3. Item-level Profitability
-        $itemProfits = InvoiceItem::whereHas('invoice', function ($q) {
+        $itemProfits = InvoiceItem::whereHas('invoice', function ($q) use ($storeFilter) {
                 $q->where('status', 'confirmed')
                   ->when($this->fromDate, fn($sub) => $sub->whereDate('invoice_date', '>=', $this->fromDate))
-                  ->when($this->toDate, fn($sub) => $sub->whereDate('invoice_date', '<=', $this->toDate));
+                  ->when($this->toDate, fn($sub) => $sub->whereDate('invoice_date', '<=', $this->toDate))
+                  ->when($storeFilter, fn($sub) => $sub->where('store_id', $storeFilter));
             })
             ->select(
                 'item_id',
@@ -84,7 +94,23 @@ class ReportsIndex extends Component
                 ];
             });
 
-        // 4. Stock Inventory Valuation
+        // 4. Store-by-Store Comparative Breakdown
+        $storeBreakdown = [];
+        if (!$storeFilter) {
+            foreach ($stores as $st) {
+                $stReport = $profitService->getPeriodicProfits($this->fromDate, $this->toDate, $st->id);
+                $storeBreakdown[] = [
+                    'store'         => $st,
+                    'invoice_count' => $stReport['invoice_count'],
+                    'total_sales'   => $stReport['total_sales'],
+                    'total_cost'    => $stReport['total_cost'],
+                    'gross_profit'  => $stReport['gross_profit'],
+                    'margin'        => $stReport['margin_percentage'],
+                ];
+            }
+        }
+
+        // 5. Stock Inventory Valuation
         $allItems = Item::active()->get();
         $stockCostValuation = '0.000';
         $stockSellingValuation = '0.000';
@@ -99,10 +125,12 @@ class ReportsIndex extends Component
         $expectedStockProfit = bcsub($stockSellingValuation, $stockCostValuation, 3);
 
         return view('livewire.reports-index', [
+            'stores'                 => $stores,
             'periodic'               => $periodic,
             'totalExpenses'          => $totalExpenses,
             'netProfitAfterExpenses' => $netProfitAfterExpenses,
             'itemProfits'            => $itemProfits,
+            'storeBreakdown'         => $storeBreakdown,
             'stockCostValuation'     => $stockCostValuation,
             'stockSellingValuation'  => $stockSellingValuation,
             'expectedStockProfit'    => $expectedStockProfit,

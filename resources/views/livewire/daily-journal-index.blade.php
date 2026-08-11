@@ -9,6 +9,28 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
+            <!-- Store Selector -->
+            @hasrole('admin')
+            <div class="flex items-center gap-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-1 text-xs">
+                <span class="text-slate-500">الفرع:</span>
+                <select wire:model.live="selectedStoreId" class="bg-transparent text-slate-900 dark:text-white font-bold focus:outline-none cursor-pointer">
+                    <option value="all">كل الفروع والعربيات</option>
+                    @foreach($stores as $st)
+                    <option value="{{ $st->id }}">
+                        @if($st->type === 'wholesale_van') 🚚 @elseif($st->type === 'main_warehouse') 🏢 @else 🏬 @endif
+                        {{ $st->name }}
+                    </option>
+                    @endforeach
+                </select>
+            </div>
+            @else
+                @if($currentStore)
+                <div class="px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-bold text-xs rounded-xl">
+                    <span>@if($currentStore->type === 'wholesale_van') 🚚 @elseif($currentStore->type === 'main_warehouse') 🏢 @else 🏬 @endif {{ $currentStore->name }}</span>
+                </div>
+                @endif
+            @endhasrole
+
             <!-- Date Filter Presets -->
             <button wire:click="setDate('today')" class="px-3 py-1.5 rounded-xl font-bold text-xs border transition-colors cursor-pointer {{ $selectedDate === now()->toDateString() ? 'bg-amber-600 text-white border-amber-500' : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800' }}">
                 اليوم

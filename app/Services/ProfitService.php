@@ -33,13 +33,14 @@ class ProfitService
     }
 
     /**
-     * Calculate aggregate profit report for a date range
+     * Calculate aggregate profit report for a date range and optional store
      */
-    public function getPeriodicProfits(?string $fromDate = null, ?string $toDate = null): array
+    public function getPeriodicProfits(?string $fromDate = null, ?string $toDate = null, ?int $storeId = null): array
     {
         $query = Invoice::where('status', 'confirmed')
             ->when($fromDate, fn($q) => $q->whereDate('invoice_date', '>=', $fromDate))
-            ->when($toDate, fn($q) => $q->whereDate('invoice_date', '<=', $toDate));
+            ->when($toDate, fn($q) => $q->whereDate('invoice_date', '<=', $toDate))
+            ->when($storeId, fn($q) => $q->where('store_id', $storeId));
 
         $invoices = $query->get();
 

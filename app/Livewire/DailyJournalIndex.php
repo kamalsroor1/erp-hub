@@ -7,8 +7,9 @@ use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Expense;
 use App\Models\Purchase;
-use App\Models\ReturnModel;
+use App\Models\ReturnDocument;
 use App\Models\CashShift;
+use App\Models\Store;
 use App\Services\ShiftService;
 use Illuminate\Support\Facades\Auth;
 use Exception;
@@ -16,6 +17,7 @@ use Exception;
 class DailyJournalIndex extends Component
 {
     public $selectedDate;
+    public $selectedStoreId = 'all';
     
     // Shift Management
     public ?CashShift $activeShift = null;
@@ -32,6 +34,21 @@ class DailyJournalIndex extends Component
     public function mount(ShiftService $shiftService)
     {
         $this->selectedDate = now()->toDateString();
+        
+        $currentStore = session('current_store_id') 
+            ?? auth()->user()?->getCurrentStore()?->id;
+
+        if (!auth()->user()?->hasRole('admin') && $currentStore) {
+            $this->selectedStoreId = (string)$currentStore;
+        } else {
+            $this->selectedStoreId = $currentStore ? (string)$currentStore : 'all';
+        }
+
+        $this->loadActiveShift($shiftService);
+    }
+
+    public function updatedSelectedStoreId(ShiftService $shiftService)
+    {
         $this->loadActiveShift($shiftService);
     }
 
@@ -46,7 +63,11 @@ class DailyJournalIndex extends Component
 
     public function loadActiveShift(ShiftService $shiftService)
     {
-        $this->activeShift = $shiftService->getActiveShift();
+        $storeId = ($this->selectedStoreId && $this->selectedStoreId !== 'all') 
+            ? (int)$this->selectedStoreId 
+            : (session('current_store_id') ?? auth()->user()?->getCurrentStore()?->id);
+
+        $this->activeShift = $shiftService->getActiveShift(storeId: $storeId);
     }
 
     public function openShiftModal()
@@ -62,9 +83,14 @@ class DailyJournalIndex extends Component
         $this->successMessage = '';
 
         try {
+            $storeId = ($this->selectedStoreId && $this->selectedStoreId !== 'all') 
+                ? (int)$this->selectedStoreId 
+                : null;
+
             $this->activeShift = $shiftService->openShift(
                 openingCash: $this->opening_cash_balance ?: '0.000',
-                notes: $this->open_notes
+                notes: $this->open_notes,
+                storeId: $storeId
             );
             $this->showOpenModal = false;
             $this->successMessage = "تم فتح يومية العمل رقم {$this->activeShift->shift_number} بنجاح.";
@@ -106,11 +132,17 @@ class DailyJournalIndex extends Component
     public function render(ShiftService $shiftService)
     {
         $date = $this->selectedDate ?: now()->toDateString();
+        $storeFilter = ($this->selectedStoreId && $this->selectedStoreId !== 'all') 
+            ? (int)$this->selectedStoreId 
+            : null;
+
+        $stores = Store::active()->get();
 
         // 1. Invoices on this day
-        $invoices = Invoice::with('customer')
+        $invoices = Invoice::with(['customer', 'store'])
             ->whereDate('invoice_date', $date)
             ->where('status', 'confirmed')
+            ->when($storeFilter, fn($q) => $q->where('store_id', $storeFilter))
             ->latest('id')
             ->get();
 
@@ -120,7 +152,7 @@ class DailyJournalIndex extends Component
         $creditSales = $invoices->where('payment_type', 'credit')->sum('net_total');
         $partialSales = $invoices->where('payment_type', 'partial')->sum('paid_amount');
 
-        // 2. Total Cash Inflows (Collected payments from customers & sales)
+        // 2. Total Cash Inflows
         $customerPayments = Payment::with('customer')
             ->whereDate('payment_date', $date)
             ->whereNotNull('customer_id')
@@ -128,13 +160,17 @@ class DailyJournalIndex extends Component
         $totalCashCollected = (string)($customerPayments->sum('amount') ?: ($cashSales + $partialSales));
 
         // 3. Operational Expenses on this day
-        $expenses = Expense::whereDate('expense_date', $date)->latest('id')->get();
+        $expenses = Expense::whereDate('expense_date', $date)
+            ->when($storeFilter, fn($q) => $q->where('store_id', $storeFilter))
+            ->latest('id')
+            ->get();
         $totalExpenses = (string)($expenses->sum('amount') ?: '0.000');
 
         // 4. Purchases on this day
         $purchases = Purchase::with('supplier')
             ->whereDate('purchase_date', $date)
             ->where('status', 'confirmed')
+            ->when($storeFilter, fn($q) => $q->where('store_id', $storeFilter))
             ->latest('id')
             ->get();
         $totalPurchases = (string)($purchases->sum('net_total') ?: '0.000');
@@ -146,13 +182,14 @@ class DailyJournalIndex extends Component
             ->get();
         $totalSupplierPaid = (string)($supplierPayments->sum('amount') ?: '0.000');
 
-        // 6. Net Movement for this day = Cash In - (Expenses + Supplier Payments)
+        // 6. Net Movement for this day
         $totalOutflows = bcadd($totalExpenses, $totalSupplierPaid, 3);
         $netCashToday = bcsub((string)$totalCashCollected, $totalOutflows, 3);
 
         // 7. Shifts on this day & Opening Balance
-        $shiftsOnDate = CashShift::with('user')
+        $shiftsOnDate = CashShift::with(['user', 'store'])
             ->whereDate('opened_at', $date)
+            ->when($storeFilter, fn($q) => $q->where('store_id', $storeFilter))
             ->latest('id')
             ->get();
 
@@ -163,7 +200,7 @@ class DailyJournalIndex extends Component
             $openingCashBalance = (string)$shiftsOnDate->first()->opening_cash_balance;
         }
 
-        // 8. Expected Total Cash Physically in Drawer Right Now = Opening Balance + Net Cash Today
+        // 8. Expected Total Cash Physically in Drawer Right Now
         $expectedCashInDrawer = bcadd($openingCashBalance, $netCashToday, 3);
 
         // Calculate live shift stats if active
@@ -173,6 +210,8 @@ class DailyJournalIndex extends Component
         }
 
         return view('livewire.daily-journal-index', [
+            'stores'               => $stores,
+            'currentStore'         => $storeFilter ? Store::find($storeFilter) : null,
             'invoices'             => $invoices,
             'invoicesCount'        => $invoicesCount,
             'totalSales'           => $totalSales,

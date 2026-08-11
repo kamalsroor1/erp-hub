@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Customer;
 use App\Services\PaymentService;
+use Exception;
 
 class CustomerIndex extends Component
 {
@@ -22,6 +23,7 @@ class CustomerIndex extends Component
     public $phone = '';
     public $address = '';
     public $tax_number = '';
+    public $opening_balance = '0.000';
     public $notes = '';
 
     // Quick Payment Voucher Modal
@@ -32,20 +34,35 @@ class CustomerIndex extends Component
     public $paymentMethod = 'cash';
     public $paymentNotes = '';
 
+    public $errorMessage = '';
+    public $successMessage = '';
+
     protected $rules = [
-        'name'  => 'required|string|max:255',
-        'phone' => 'nullable|string|max:50',
+        'name'            => 'required|string|max:255',
+        'phone'           => 'nullable|string|max:50',
+        'address'         => 'nullable|string|max:500',
+        'tax_number'      => 'nullable|string|max:50',
+        'opening_balance' => 'nullable|numeric|min:0',
+        'notes'           => 'nullable|string',
     ];
 
     public function openCreateModal()
     {
-        $this->reset(['name', 'phone', 'address', 'tax_number', 'notes', 'editCustomerId']);
+        $this->reset(['name', 'phone', 'address', 'tax_number', 'opening_balance', 'notes', 'editCustomerId', 'errorMessage', 'successMessage']);
+        $this->opening_balance = '0.000';
         $this->isEditMode = false;
         $this->showCustomerModal = true;
     }
 
+    public function closeCustomerModal()
+    {
+        $this->showCustomerModal = false;
+        $this->errorMessage = '';
+    }
+
     public function openEditModal($id)
     {
+        $this->reset(['errorMessage', 'successMessage']);
         $customer = Customer::findOrFail($id);
         $this->isEditMode = true;
         $this->editCustomerId = $customer->id;
@@ -53,42 +70,54 @@ class CustomerIndex extends Component
         $this->phone = $customer->phone ?? '';
         $this->address = $customer->address ?? '';
         $this->tax_number = $customer->tax_number ?? '';
+        $this->opening_balance = (string)$customer->current_balance;
         $this->notes = $customer->notes ?? '';
         $this->showCustomerModal = true;
     }
 
     public function saveCustomer()
     {
+        $this->errorMessage = '';
         $this->validate();
 
-        if ($this->isEditMode && $this->editCustomerId) {
-            $customer = Customer::findOrFail($this->editCustomerId);
-            $customer->update([
-                'name'       => $this->name,
-                'phone'      => $this->phone,
-                'address'    => $this->address,
-                'tax_number' => $this->tax_number,
-                'notes'      => $this->notes,
-            ]);
+        try {
+            if ($this->isEditMode && $this->editCustomerId) {
+                $customer = Customer::findOrFail($this->editCustomerId);
+                $customer->update([
+                    'name'       => $this->name,
+                    'phone'      => $this->phone ?: null,
+                    'address'    => $this->address ?: null,
+                    'tax_number' => $this->tax_number ?: null,
+                    'notes'      => $this->notes ?: null,
+                ]);
 
-            session()->flash('success', "تم تعديل بيانات العميل [{$customer->name}] بنجاح.");
-            $this->dispatch('swal:toast', ['icon' => 'success', 'title' => "تم تعديل بيانات العميل [{$customer->name}] بنجاح!"]);
-        } else {
-            $customer = Customer::create([
-                'name'            => $this->name,
-                'phone'           => $this->phone,
-                'address'         => $this->address,
-                'tax_number'      => $this->tax_number,
-                'current_balance' => '0.000',
-                'is_active'       => true,
-                'notes'           => $this->notes,
-            ]);
+                $this->successMessage = "تم تعديل بيانات العميل [{$customer->name}] بنجاح.";
+                session()->flash('success', $this->successMessage);
+                $this->dispatch('swal:toast', ['icon' => 'success', 'title' => $this->successMessage]);
+            } else {
+                $initialBalance = ($this->opening_balance && is_numeric($this->opening_balance)) 
+                    ? (string)$this->opening_balance 
+                    : '0.000';
 
-            session()->flash('success', "تم إضافة العميل [{$customer->name}] بنجاح.");
-            $this->dispatch('swal:toast', ['icon' => 'success', 'title' => "تم إضافة العميل [{$customer->name}] بنجاح!"]);
+                $customer = Customer::create([
+                    'name'            => $this->name,
+                    'phone'           => $this->phone ?: null,
+                    'address'         => $this->address ?: null,
+                    'tax_number'      => $this->tax_number ?: null,
+                    'current_balance' => $initialBalance,
+                    'is_active'       => true,
+                    'notes'           => $this->notes ?: null,
+                ]);
+
+                $this->successMessage = "تم إضافة العميل [{$customer->name}] بنجاح.";
+                session()->flash('success', $this->successMessage);
+                $this->dispatch('swal:toast', ['icon' => 'success', 'title' => $this->successMessage]);
+            }
+
+            $this->showCustomerModal = false;
+        } catch (Exception $e) {
+            $this->errorMessage = $e->getMessage();
         }
-
-        $this->showCustomerModal = false;
     }
 
     public function openPaymentModal($customerId)
@@ -96,28 +125,41 @@ class CustomerIndex extends Component
         $customer = Customer::findOrFail($customerId);
         $this->selectedCustomerId = $customer->id;
         $this->selectedCustomerName = $customer->name;
-        $this->paymentAmount = $customer->current_balance;
+        $this->paymentAmount = (string)$customer->current_balance;
         $this->paymentMethod = 'cash';
         $this->paymentNotes = 'سداد دفعة من الحساب';
+        $this->errorMessage = '';
         $this->showPaymentModal = true;
+    }
+
+    public function closePaymentModal()
+    {
+        $this->showPaymentModal = false;
+        $this->errorMessage = '';
     }
 
     public function savePayment(PaymentService $paymentService)
     {
+        $this->errorMessage = '';
         $this->validate([
             'paymentAmount' => 'required|numeric|min:0.01',
         ]);
 
-        $paymentService->recordCustomerPayment([
-            'customer_id'    => $this->selectedCustomerId,
-            'amount'         => $this->paymentAmount,
-            'payment_method' => $this->paymentMethod,
-            'notes'          => $this->paymentNotes,
-        ]);
+        try {
+            $paymentService->recordCustomerPayment([
+                'customer_id'    => $this->selectedCustomerId,
+                'amount'         => $this->paymentAmount,
+                'payment_method' => $this->paymentMethod,
+                'notes'          => $this->paymentNotes,
+            ]);
 
-        $this->showPaymentModal = false;
-        session()->flash('success', "تم تسجيل سند القبض بنجاح وتحديث رصيد العميل.");
-        $this->dispatch('swal:toast', ['icon' => 'success', 'title' => "تم تسجيل سند القبض بنجاح!"]);
+            $this->showPaymentModal = false;
+            $this->successMessage = "تم تسجيل سند القبض بنجاح وتحديث رصيد العميل.";
+            session()->flash('success', $this->successMessage);
+            $this->dispatch('swal:toast', ['icon' => 'success', 'title' => $this->successMessage]);
+        } catch (Exception $e) {
+            $this->errorMessage = $e->getMessage();
+        }
     }
 
     public function render()

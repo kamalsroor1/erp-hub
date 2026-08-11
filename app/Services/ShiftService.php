@@ -6,6 +6,7 @@ use App\Models\CashShift;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\ReturnDocument;
+use App\Models\Store;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Exception;
@@ -13,21 +14,30 @@ use Exception;
 class ShiftService
 {
     /**
-     * Get or open active shift for user
+     * Get active shift for a specific store or user
      */
-    public function getActiveShift(): ?CashShift
+    public function getActiveShift(?int $storeId = null, ?int $userId = null): ?CashShift
     {
-        return CashShift::where('status', 'open')->latest()->first();
+        return CashShift::where('status', 'open')
+            ->when($storeId, fn($q) => $q->where('store_id', $storeId))
+            ->when($userId, fn($q) => $q->where('user_id', $userId))
+            ->latest()
+            ->first();
     }
 
     /**
-     * Open a new shift
+     * Open a new shift for a store/van
      */
-    public function openShift(string $openingCash = '0.000', ?string $notes = null): CashShift
+    public function openShift(string $openingCash = '0.000', ?string $notes = null, ?int $storeId = null): CashShift
     {
-        $existing = $this->getActiveShift();
+        $targetStoreId = $storeId 
+            ?? session('current_store_id') 
+            ?? Auth::user()?->getCurrentStore()?->id 
+            ?? Store::getMainStore()?->id;
+
+        $existing = $this->getActiveShift(storeId: $targetStoreId);
         if ($existing) {
-            throw new Exception("يوجد وردية عمل مفتوحة بالفعل برقم {$existing->shift_number}. يجب إغلاقها أولاً.");
+            throw new Exception("يوجد وردية عمل مفتوحة بالفعل لهذا الفرع برقم {$existing->shift_number}. يجب إغلاقها أولاً.");
         }
 
         $shiftCount = CashShift::whereDate('opened_at', now()->toDateString())->count() + 1;
@@ -35,6 +45,7 @@ class ShiftService
 
         return CashShift::create([
             'user_id'              => Auth::id() ?? 1,
+            'store_id'             => $targetStoreId,
             'shift_number'         => $shiftNumber,
             'status'               => 'open',
             'opened_at'            => now(),
@@ -44,38 +55,50 @@ class ShiftService
     }
 
     /**
-     * Calculate current live metrics for open shift
+     * Calculate current live metrics for open shift (scoped by store)
      */
     public function calculateShiftTotals(CashShift $shift): array
     {
         $openedAt = $shift->opened_at;
+        $storeId  = $shift->store_id;
 
-        // Total cash sales (invoices paid in cash)
+        // Total cash sales (invoices paid in cash in this store)
         $cashSales = Invoice::where('status', 'confirmed')
             ->where('payment_type', 'cash')
             ->where('created_at', '>=', $openedAt)
+            ->when($storeId, fn($q) => $q->where('store_id', $storeId))
             ->sum('paid_amount') ?: '0.000';
 
         // Credit sales on account
         $creditSales = Invoice::where('status', 'confirmed')
             ->whereIn('payment_type', ['credit', 'partial'])
             ->where('created_at', '>=', $openedAt)
+            ->when($storeId, fn($q) => $q->where('store_id', $storeId))
             ->sum('remaining_amount') ?: '0.000';
 
-        // Total cash inflows from customers (all cash payments)
+        // Partial cash collected from partial invoices
+        $partialCashSales = Invoice::where('status', 'confirmed')
+            ->where('payment_type', 'partial')
+            ->where('created_at', '>=', $openedAt)
+            ->when($storeId, fn($q) => $q->where('store_id', $storeId))
+            ->sum('paid_amount') ?: '0.000';
+
+        // Total cash inflows from customer payment vouchers
         $paymentsCollected = Payment::where('created_at', '>=', $openedAt)
             ->whereNotNull('customer_id')
             ->where('payment_method', 'cash')
             ->sum('amount') ?: '0.000';
 
-        // If no payment records found, fallback to cash sales
+        $totalCashSalesInflow = bcadd((string)$cashSales, (string)$partialCashSales, 3);
+
         $totalCashIn = bccomp((string)$paymentsCollected, '0.000', 3) > 0
-            ? (string)$paymentsCollected
-            : (string)$cashSales;
+            ? bcadd((string)$paymentsCollected, (string)$totalCashSalesInflow, 3)
+            : (string)$totalCashSalesInflow;
 
         // Cash outflows: Operational expenses paid in cash
         $expenses = \App\Models\Expense::where('created_at', '>=', $openedAt)
             ->where('payment_method', 'cash')
+            ->when($storeId, fn($q) => $q->where('store_id', $storeId))
             ->sum('amount') ?: '0.000';
 
         // Cash outflows: Supplier payments paid in cash
@@ -87,14 +110,21 @@ class ShiftService
         // Sales Returns refunded in cash
         $refunds = ReturnDocument::where('created_at', '>=', $openedAt)
             ->where('return_type', 'sales_return')
+            ->when($storeId, fn($q) => $q->where('store_id', $storeId))
             ->sum('total_amount') ?: '0.000';
 
-        $totalCashOut = bcadd((string)$expenses, (string)$supplierPaid, 3);
-        $totalCashOut = bcadd($totalCashOut, (string)$refunds, 3);
+        $cashSales = bcadd((string)$cashSales, '0.000', 3);
+        $creditSales = bcadd((string)$creditSales, '0.000', 3);
+        $expenses = bcadd((string)$expenses, '0.000', 3);
+        $supplierPaid = bcadd((string)$supplierPaid, '0.000', 3);
+        $refunds = bcadd((string)$refunds, '0.000', 3);
+
+        $totalOutflows = bcadd((string)$expenses, (string)$supplierPaid, 3);
+        $totalOutflows = bcadd($totalOutflows, (string)$refunds, 3);
 
         // Expected in drawer = Opening Cash + Total Cash In - Total Cash Out
         $expectedCash = bcadd((string)$shift->opening_cash_balance, $totalCashIn, 3);
-        $expectedCash = bcsub($expectedCash, $totalCashOut, 3);
+        $expectedCash = bcsub($expectedCash, $totalOutflows, 3);
 
         return [
             'opening_cash_balance'      => (string) $shift->opening_cash_balance,

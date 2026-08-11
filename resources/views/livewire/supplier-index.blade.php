@@ -168,13 +168,13 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">اسم المورد / المسؤول <span class="text-rose-500">*</span></label>
-                        <input type="text" wire:model.defer="name" placeholder="اسم الشخص المسؤول..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                        <input type="text" wire:model="name" placeholder="اسم الشخص المسؤول..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
                         @error('name') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">اسم الشركة / المصنع</label>
-                        <input type="text" wire:model.defer="company_name" placeholder="مثال: مطاحن البن الحديثة..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                        <input type="text" wire:model="company_name" placeholder="مثال: مطاحن البن الحديثة..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
                         @error('company_name') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                     </div>
                 </div>
@@ -182,20 +182,20 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">رقم الهاتف</label>
-                        <input type="text" wire:model.defer="phone" dir="ltr" placeholder="01xxxxxxxxx" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                        <input type="text" wire:model="phone" dir="ltr" placeholder="01xxxxxxxxx" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
                         @error('phone') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">العنوان / المقر</label>
-                        <input type="text" wire:model.defer="address" placeholder="عنوان الشركة أو المصنع..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                        <input type="text" wire:model="address" placeholder="عنوان الشركة أو المصنع..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
                         @error('address') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">ملاحظات</label>
-                    <textarea wire:model.defer="notes" rows="2" placeholder="أي ملاحظات حول شروط التوريد أو الدفع..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"></textarea>
+                    <textarea wire:model="notes" rows="2" placeholder="أي ملاحظات حول شروط التوريد أو الدفع..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"></textarea>
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
@@ -224,14 +224,14 @@
             <form wire:submit.prevent="savePayment" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">المبلغ المسدد (ج.م) <span class="text-rose-500">*</span></label>
-                    <input type="number" step="0.001" wire:model.defer="paymentAmount" placeholder="0.000" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                    <input type="number" step="0.001" wire:model="paymentAmount" placeholder="0.000" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
                     @error('paymentAmount') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">طريقة الصرف</label>
-                        <select wire:model.defer="paymentMethod" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                        <select wire:model="paymentMethod" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
                             <option value="cash">نقداً (من الدرج/الخزينة)</option>
                             <option value="bank_transfer">تحويل بنكي / فودافون كاش</option>
                             <option value="cheque">شيك</option>
@@ -240,7 +240,7 @@
 
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">البيان / ملاحظات</label>
-                        <input type="text" wire:model.defer="paymentNotes" placeholder="سداد دفعة توريد..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                        <input type="text" wire:model="paymentNotes" placeholder="سداد دفعة توريد..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
                     </div>
                 </div>
 
