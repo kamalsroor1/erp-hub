@@ -582,6 +582,7 @@
                 });
             }
         });
+    </script>
 
     <!-- 📲 PWA Install Guide Modal -->
     <div id="pwa-guide-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm" style="display: none;">
