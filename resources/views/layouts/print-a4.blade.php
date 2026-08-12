@@ -196,25 +196,59 @@
                 <h2 class="invoice-title" style="{{ !$hasBrandHeader ? 'font-size: 24px; text-decoration: underline; margin-bottom: 4px;' : '' }}">فاتورة مبيعات</h2>
                 <p class="invoice-num" style="{{ !$hasBrandHeader ? 'font-size: 16px; margin: 4px 0;' : '' }}">{{ $invoice->invoice_number }}</p>
                 <p class="invoice-date" style="{{ !$hasBrandHeader ? 'font-size: 13px;' : '' }}">التاريخ: {{ $invoice->invoice_date->format('Y-m-d') }}</p>
+                @if($invoice->store)
+                <p style="margin: 2px 0; font-size: 12px; font-weight: 800; color: #000;">
+                    الفرع: {{ $invoice->store->name }} <span style="font-family: monospace;">({{ $invoice->store->code ?: 'B'.$invoice->store->id }})</span>
+                </p>
+                @endif
+                <p style="margin: 2px 0; font-size: 11px; font-weight: 700; color: #333;">الكاشير: {{ $invoice->user?->name ?? 'المدير' }}</p>
             </div>
         </div>
 
-        <!-- Customer Info Box (Without payment details on the left) -->
-        <div class="customer-card">
-            <div>
-                <span style="font-size: 13px; font-weight: 900; color: #000;">العميل:</span>
-                <span style="font-size: 16px; font-weight: 900; color: #000; margin-right: 6px;">{{ $invoice->customer->name }}</span>
+        <!-- Customer & Branch Info Row -->
+        <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+            <!-- Customer Card -->
+            <div class="customer-card" style="flex: 1; min-width: 240px; margin-bottom: 0;">
+                <div>
+                    <span style="font-size: 13px; font-weight: 900; color: #000;">العميل:</span>
+                    <span style="font-size: 15px; font-weight: 900; color: #000; margin-right: 6px;">{{ $invoice->customer->name }}</span>
+                </div>
+                @if($invoice->customer->phone)
+                <div>
+                    <span style="font-size: 12px; font-weight: 900;">الهاتف:</span>
+                    <span style="font-size: 13px; font-weight: 800; font-family: monospace;" dir="ltr">{{ $invoice->customer->phone }}</span>
+                </div>
+                @endif
+                @if($invoice->customer->address)
+                <div>
+                    <span style="font-size: 12px; font-weight: 900;">العنوان:</span>
+                    <span style="font-size: 13px; font-weight: 700;">{{ $invoice->customer->address }}</span>
+                </div>
+                @endif
             </div>
-            @if($invoice->customer->phone)
-            <div>
-                <span style="font-size: 13px; font-weight: 900;">الهاتف:</span>
-                <span style="font-size: 14px; font-weight: 800; font-family: monospace;" dir="ltr">{{ $invoice->customer->phone }}</span>
-            </div>
-            @endif
-            @if($invoice->customer->address)
-            <div>
-                <span style="font-size: 13px; font-weight: 900;">العنوان:</span>
-                <span style="font-size: 14px; font-weight: 700;">{{ $invoice->customer->address }}</span>
+
+            <!-- Branch / Store Card -->
+            @if($invoice->store)
+            <div class="customer-card" style="flex: 1; min-width: 240px; margin-bottom: 0; background: #fafafa; border-style: dashed;">
+                <div>
+                    <span style="font-size: 13px; font-weight: 900; color: #000;">
+                        {{ $invoice->store->type === 'wholesale_van' ? '🚚 سيارة التوزيع:' : ($invoice->store->is_main ? '🏢 المخزن الرئيسي:' : '🏬 الفرع:') }}
+                    </span>
+                    <span style="font-size: 15px; font-weight: 900; color: #000; margin-right: 6px;">{{ $invoice->store->name }}</span>
+                    <span style="font-size: 11px; font-weight: 800; font-family: monospace; color: #444;">({{ $invoice->store->code ?: 'B'.$invoice->store->id }})</span>
+                </div>
+                @if($invoice->store->phone)
+                <div>
+                    <span style="font-size: 12px; font-weight: 900;">هاتف الفرع:</span>
+                    <span style="font-size: 13px; font-weight: 800; font-family: monospace;" dir="ltr">{{ $invoice->store->phone }}</span>
+                </div>
+                @endif
+                @if($invoice->store->address)
+                <div>
+                    <span style="font-size: 12px; font-weight: 900;">العنوان:</span>
+                    <span style="font-size: 13px; font-weight: 700;">{{ $invoice->store->address }}</span>
+                </div>
+                @endif
             </div>
             @endif
         </div>

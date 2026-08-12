@@ -46,12 +46,29 @@
 
     <!-- Invoice Details Card -->
     <div id="invoice-card-container" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-6 shadow-sm">
-        <!-- Customer & Info Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-xs">
+        <!-- Customer & Store & Info Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-xs">
             <div>
                 <span class="text-slate-500">بيانات العميل:</span>
                 <div class="font-bold text-slate-900 dark:text-white text-sm mt-1">{{ $invoice->customer->name }}</div>
                 <div class="text-slate-500 dark:text-slate-400 mt-0.5">الهاتف: {{ $invoice->customer->phone ?? '—' }}</div>
+            </div>
+            <div>
+                <span class="text-slate-500">الفرع / نقطة البيع المصدرة:</span>
+                @if($invoice->store)
+                <div class="font-bold text-slate-900 dark:text-white text-sm mt-1 flex items-center gap-1.5">
+                    <span>{{ $invoice->store->type === 'wholesale_van' ? '🚚' : ($invoice->store->is_main ? '🏢' : '🏬') }}</span>
+                    <span>{{ $invoice->store->name }}</span>
+                    <span class="text-xs text-emerald-600 dark:text-emerald-400 font-mono">({{ $invoice->store->code ?: 'B'.$invoice->store->id }})</span>
+                </div>
+                <div class="text-slate-500 dark:text-slate-400 mt-0.5">
+                    {{ $invoice->store->address ?: ($invoice->store->type === 'wholesale_van' ? 'عربية توزيع متنقلة' : 'المقر الرئيسي') }}
+                    @if($invoice->store->phone) | هاتف: {{ $invoice->store->phone }} @endif
+                </div>
+                @else
+                <div class="font-bold text-slate-900 dark:text-white text-sm mt-1">المخزن الرئيسي</div>
+                @endif
+                <div class="text-[11px] text-slate-400 mt-0.5">مسؤول البيع: {{ $invoice->user?->name ?? 'المدير' }}</div>
             </div>
             <div>
                 <span class="text-slate-500">حالة السداد:</span>

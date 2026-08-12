@@ -15,6 +15,7 @@ class InvoiceIndex extends Component
     public $search = '';
     public $status = 'all'; // all, confirmed, cancelled
     public $paymentStatus = 'all'; // all, paid, unpaid, partially_paid
+    public $selectedStore = ''; // all or store_id
     public $filterStatus = 'active'; // active, trashed, all
 
     public $showCancelModal = false;
@@ -119,10 +120,12 @@ class InvoiceIndex extends Component
             })
             ->when($this->status !== 'all', fn($q) => $q->where('status', $this->status))
             ->when($this->paymentStatus !== 'all', fn($q) => $q->where('payment_status', $this->paymentStatus))
+            ->when($this->selectedStore !== '', fn($q) => $q->where('store_id', $this->selectedStore))
             ->latest('invoice_date');
 
         return view('livewire.invoice-index', [
             'invoices'     => $query->paginate(15),
+            'stores'       => \App\Models\Store::orderBy('is_main', 'desc')->get(),
             'trashedCount' => Invoice::onlyTrashed()->count(),
         ])->layout('components.layouts.app', ['title' => 'سجل فواتير المبيعات']);
     }

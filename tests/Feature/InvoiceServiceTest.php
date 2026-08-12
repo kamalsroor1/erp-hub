@@ -192,7 +192,9 @@ class InvoiceServiceTest extends TestCase
             ],
         ]);
 
-        $todayPrefix = 'INV-' . date('Ymd');
+        $mainStore = \App\Models\Store::getMainStore();
+        $storeCode = $mainStore?->code ? preg_replace('/[^A-Za-z0-9]/', '', strtoupper($mainStore->code)) : 'MAIN';
+        $todayPrefix = "INV-{$storeCode}-" . date('Ymd');
         $this->assertEquals($todayPrefix . '-0001', $inv1->invoice_number);
 
         // 2. Soft-delete the first invoice
@@ -229,7 +231,9 @@ class InvoiceServiceTest extends TestCase
         ]);
 
         $customer = Customer::create(['name' => 'عميل اختبار تسلسل الأرقام', 'is_active' => true]);
-        $todayPrefix = 'INV-' . date('Ymd');
+        $mainStore = \App\Models\Store::getMainStore();
+        $storeCode = $mainStore?->code ? preg_replace('/[^A-Za-z0-9]/', '', strtoupper($mainStore->code)) : 'MAIN';
+        $todayPrefix = "INV-{$storeCode}-" . date('Ymd');
 
         // Create 3 invoices
         $inv1 = $this->invoiceService->confirmInvoice([
@@ -259,5 +263,62 @@ class InvoiceServiceTest extends TestCase
         ]);
 
         $this->assertEquals($todayPrefix . '-0004', $inv4->invoice_number);
+    }
+
+    public function test_multi_store_independent_invoice_numbering(): void
+    {
+        $storeMaadi = \App\Models\Store::create([
+            'name'      => 'فرع المعادي',
+            'code'      => 'SHOP-MAADI',
+            'type'      => 'retail_shop',
+            'is_active' => true,
+        ]);
+
+        $storeVan = \App\Models\Store::create([
+            'name'      => 'عربية توزيع جملة 1',
+            'code'      => 'VAN-01',
+            'type'      => 'wholesale_van',
+            'is_active' => true,
+        ]);
+
+        $item = Item::create([
+            'code'          => 'ITM-BRANCH-TEST',
+            'name'          => 'صنف اختبار الفروع',
+            'current_stock' => '100.000',
+            'cost_price'    => '50.000',
+            'selling_price' => '80.000',
+            'is_active'     => true,
+        ]);
+
+        $customer = Customer::create(['name' => 'عميل فروع متعددة', 'is_active' => true]);
+
+        // Invoice 1 for Maadi Branch
+        $invMaadi1 = $this->invoiceService->confirmInvoice([
+            'customer_id' => $customer->id,
+            'store_id'    => $storeMaadi->id,
+            'payment_type'=> 'cash',
+            'items'       => [['item_id' => $item->id, 'quantity' => '1.000', 'unit_price' => '80.000']],
+        ]);
+
+        // Invoice 1 for Van Branch
+        $invVan1 = $this->invoiceService->confirmInvoice([
+            'customer_id' => $customer->id,
+            'store_id'    => $storeVan->id,
+            'payment_type'=> 'cash',
+            'items'       => [['item_id' => $item->id, 'quantity' => '1.000', 'unit_price' => '80.000']],
+        ]);
+
+        // Invoice 2 for Maadi Branch
+        $invMaadi2 = $this->invoiceService->confirmInvoice([
+            'customer_id' => $customer->id,
+            'store_id'    => $storeMaadi->id,
+            'payment_type'=> 'cash',
+            'items'       => [['item_id' => $item->id, 'quantity' => '1.000', 'unit_price' => '80.000']],
+        ]);
+
+        $today = date('Ymd');
+        $this->assertEquals("INV-SHOPMAADI-{$today}-0001", $invMaadi1->invoice_number);
+        $this->assertEquals("INV-VAN01-{$today}-0001", $invVan1->invoice_number);
+        $this->assertEquals("INV-SHOPMAADI-{$today}-0002", $invMaadi2->invoice_number);
     }
 }

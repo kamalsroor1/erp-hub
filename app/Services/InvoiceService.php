@@ -29,9 +29,9 @@ class InvoiceService
             $subtotal  = '0.000';
             $totalCost = '0.000';
 
-            $invoiceNumber = $data['invoice_number'] ?? $this->generateUniqueNumber();
-
             $storeId = $data['store_id'] ?? Auth::user()?->getCurrentStore()?->id ?? \App\Models\Store::getMainStore()?->id;
+
+            $invoiceNumber = $data['invoice_number'] ?? $this->generateUniqueNumber($storeId);
 
             $invoice = Invoice::create([
                 'invoice_number'   => $invoiceNumber,
@@ -475,9 +475,26 @@ class InvoiceService
         });
     }
 
-    public function generateUniqueNumber(): string
+    public function generateUniqueNumber(?int $storeId = null): string
     {
-        $prefix = 'INV-' . date('Ymd');
+        $storeCode = null;
+        if ($storeId) {
+            $store = \App\Models\Store::find($storeId);
+            if ($store && !empty($store->code)) {
+                $storeCode = preg_replace('/[^A-Za-z0-9]/', '', strtoupper($store->code));
+            } elseif ($store) {
+                $storeCode = 'B' . str_pad($store->id, 2, '0', STR_PAD_LEFT);
+            }
+        }
+
+        if (!$storeCode) {
+            $mainStore = \App\Models\Store::getMainStore();
+            $storeCode = ($mainStore && !empty($mainStore->code))
+                ? preg_replace('/[^A-Za-z0-9]/', '', strtoupper($mainStore->code))
+                : 'MAIN';
+        }
+
+        $prefix = "INV-{$storeCode}-" . date('Ymd');
         
         $lastInvoice = Invoice::withTrashed()
             ->where('invoice_number', 'LIKE', $prefix . '-%')

@@ -14,12 +14,23 @@
 
     <!-- Filters Bar -->
     <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <input 
-            type="text" 
-            wire:model.live.debounce.300ms="search" 
-            placeholder="بحث برقم الفاتورة أو اسم العميل..." 
-            class="w-full sm:w-80 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
-        >
+        <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+            <input 
+                type="text" 
+                wire:model.live.debounce.300ms="search" 
+                placeholder="بحث برقم الفاتورة أو اسم العميل..." 
+                class="w-full sm:w-72 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+            >
+            <select 
+                wire:model.live="selectedStore" 
+                class="w-full sm:w-56 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-bold"
+            >
+                <option value="">🏢 كل الفروع ونقاط البيع</option>
+                @foreach($stores as $st)
+                    <option value="{{ $st->id }}">{{ $st->type === 'wholesale_van' ? '🚚 ' : ($st->is_main ? '🏢 ' : '🏬 ') }}{{ $st->name }} ({{ $st->code ?: 'B'.$st->id }})</option>
+                @endforeach
+            </select>
+        </div>
 
         <div class="flex flex-wrap items-center gap-1.5 text-xs">
             <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">الحالة:</span>
@@ -49,7 +60,15 @@
             <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-2.5">
                 <div>
                     <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">{{ $inv->invoice_number }}</span>
-                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{{ $inv->invoice_date->format('Y-m-d') }}</p>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="text-[11px] text-slate-500 dark:text-slate-400">{{ $inv->invoice_date->format('Y-m-d') }}</span>
+                        @if($inv->store)
+                        <span class="text-slate-300 dark:text-slate-700">•</span>
+                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                            {{ $inv->store->type === 'wholesale_van' ? '🚚 ' : ($inv->store->is_main ? '🏢 ' : '🏬 ') }}{{ $inv->store->name }}
+                        </span>
+                        @endif
+                    </div>
                 </div>
                 <div>
                     @if($inv->status === 'cancelled')
@@ -123,6 +142,7 @@
                     <tr>
                         <th class="p-3.5">رقم الفاتورة</th>
                         <th class="p-3.5">العميل</th>
+                        <th class="p-3.5">الفرع / نقطة البيع</th>
                         <th class="p-3.5">التاريخ</th>
                         <th class="p-3.5">نوع الدفع</th>
                         <th class="p-3.5">الصافي المطلوب</th>
@@ -137,6 +157,17 @@
                     <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                         <td class="p-3.5 font-mono font-bold text-emerald-600 dark:text-emerald-400">{{ $inv->invoice_number }}</td>
                         <td class="p-3.5 font-bold text-slate-800 dark:text-slate-100">{{ $inv->customer->name }}</td>
+                        <td class="p-3.5">
+                            @if($inv->store)
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold {{ $inv->store->type === 'wholesale_van' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20' : ($inv->store->is_main ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20') }}">
+                                    <span>{{ $inv->store->type === 'wholesale_van' ? '🚚' : ($inv->store->is_main ? '🏢' : '🏬') }}</span>
+                                    <span>{{ $inv->store->name }}</span>
+                                    <span class="text-[10px] opacity-75 font-mono">({{ $inv->store->code ?: 'B'.$inv->store->id }})</span>
+                                </span>
+                            @else
+                                <span class="text-slate-400 text-xs">—</span>
+                            @endif
+                        </td>
                         <td class="p-3.5 font-mono text-slate-500 dark:text-slate-400">{{ $inv->invoice_date->format('Y-m-d') }}</td>
                         <td class="p-3.5 text-slate-700 dark:text-slate-300">
                             @if($inv->payment_type === 'cash') نقدي
