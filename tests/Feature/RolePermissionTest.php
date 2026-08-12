@@ -20,10 +20,12 @@ class RolePermissionTest extends TestCase
     {
         parent::setUp();
 
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $cashierRole = Role::firstOrCreate(['name' => 'cashier']);
-        $accountantRole = Role::firstOrCreate(['name' => 'accountant']);
-        $storekeeperRole = Role::firstOrCreate(['name' => 'storekeeper']);
+        $this->seed(\Database\Seeders\PermissionsSeeder::class);
+
+        $adminRole = Role::findByName('admin');
+        $cashierRole = Role::findByName('cashier');
+        $accountantRole = Role::findByName('accountant');
+        $storekeeperRole = Role::findByName('storekeeper');
 
         $this->admin = User::factory()->create([
             'phone' => '01012316954',
@@ -124,18 +126,19 @@ class RolePermissionTest extends TestCase
             ]
         ]);
 
-        // 1. Cashier attempts to delete invoice -> BLOCKED
+        // 1. Cashier attempts to delete invoice -> BLOCKED (403)
         $this->actingAs($this->cashier);
         \Livewire\Livewire::test(\App\Livewire\InvoiceIndex::class)
             ->call('deleteInvoice', $invoice->id)
-            ->assertDispatched('swal:toast');
+            ->assertStatus(403);
 
         $this->assertDatabaseHas('invoices', ['id' => $invoice->id]);
 
         // 2. Admin deletes invoice -> ALLOWED
         $this->actingAs($this->admin);
         \Livewire\Livewire::test(\App\Livewire\InvoiceIndex::class)
-            ->call('deleteInvoice', $invoice->id);
+            ->call('deleteInvoice', $invoice->id)
+            ->assertStatus(200);
 
         $this->assertSoftDeleted('invoices', ['id' => $invoice->id]);
     }

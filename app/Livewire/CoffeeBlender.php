@@ -31,6 +31,7 @@ class CoffeeBlender extends Component
 
     public function mount()
     {
+        abort_if(!auth()->user()?->can('pos.access'), 403, 'غير مصرح لك بدخول أداة خلط وتوليفات البن');
         $firstCust = Customer::active()->first();
         if ($firstCust) $this->customer_id = $firstCust->id;
 
@@ -173,6 +174,7 @@ class CoffeeBlender extends Component
 
     public function createBlendInvoice(InvoiceService $invoiceService)
     {
+        abort_if(!auth()->user()?->can('invoices.create'), 403, 'غير مصرح لك بإنشاء فواتير مبيعات من خلطات وتوليفات البن');
         $this->errorMessage = '';
         $this->successMessage = '';
 

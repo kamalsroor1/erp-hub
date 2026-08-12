@@ -34,71 +34,72 @@ Route::post('/logout', function () {
 
 // 3. Protected POS, ERP & Inventory Routes
 Route::middleware('auth')->group(function () {
-    // Dashboard
+    // Dashboard (All authenticated users can see dashboard)
     Route::get('/', Dashboard::class)->name('dashboard');
 
     // Invoices & POS
-    Route::get('/invoices', InvoiceIndex::class)->name('invoices.index');
-    Route::get('/invoices/create', InvoiceCreate::class)->name('invoices.create');
-    Route::get('/invoices/{id}', InvoiceShow::class)->name('invoices.show');
-    Route::get('/invoices/{id}/edit', App\Livewire\InvoiceEdit::class)->name('invoices.edit');
+    Route::get('/invoices', InvoiceIndex::class)->name('invoices.index')->middleware('can:invoices.view');
+    Route::get('/invoices/create', InvoiceCreate::class)->name('invoices.create')->middleware('can:pos.access');
+    Route::get('/invoices/{id}', InvoiceShow::class)->name('invoices.show')->middleware('can:invoices.view');
+    Route::get('/invoices/{id}/edit', App\Livewire\InvoiceEdit::class)->name('invoices.edit')->middleware('can:invoices.edit');
 
     // Printing Routes
     Route::get('/invoices/{id}/print/thermal', function ($id) {
         $invoice = Invoice::with(['customer', 'items.item'])->findOrFail($id);
         return view('layouts.print-thermal', compact('invoice'));
-    })->name('invoices.print.thermal');
+    })->name('invoices.print.thermal')->middleware('can:invoices.view');
 
     Route::get('/invoices/{id}/print/a4', function ($id) {
         $invoice = Invoice::with(['customer', 'items.item'])->findOrFail($id);
         return view('layouts.print-a4', compact('invoice'));
-    })->name('invoices.print.a4');
+    })->name('invoices.print.a4')->middleware('can:invoices.view');
 
     // Items & Inventory
-    Route::get('/items', ItemIndex::class)->name('items.index');
+    Route::get('/items', ItemIndex::class)->name('items.index')->middleware('can:items.view');
 
     // Multi-Store, Vans & Warehouse Management
-    Route::get('/stores', App\Livewire\StoreIndex::class)->name('stores');
-    Route::get('/store-stocks', App\Livewire\StoreStockIndex::class)->name('store-stocks');
-    Route::get('/stock-transfers', App\Livewire\StockTransferIndex::class)->name('stock-transfers');
-    Route::get('/stock-transfers/create', App\Livewire\StockTransferCreate::class)->name('stock-transfers.create');
+    Route::get('/stores', App\Livewire\StoreIndex::class)->name('stores')->middleware('can:stores.manage');
+    Route::get('/store-stocks', App\Livewire\StoreStockIndex::class)->name('store-stocks')->middleware('can:items.view');
+    Route::get('/stock-transfers', App\Livewire\StockTransferIndex::class)->name('stock-transfers')->middleware('can:transfers.view');
+    Route::get('/stock-transfers/create', App\Livewire\StockTransferCreate::class)->name('stock-transfers.create')->middleware('can:transfers.create');
 
     // Customers & Statements
-    Route::get('/customers', CustomerIndex::class)->name('customers.index');
-    Route::get('/customers/{id}/statement', CustomerStatement::class)->name('customers.statement');
+    Route::get('/customers', CustomerIndex::class)->name('customers.index')->middleware('can:customers.manage');
+    Route::get('/customers/{id}/statement', CustomerStatement::class)->name('customers.statement')->middleware('can:customers.statement');
 
     // Suppliers & Purchases & Statements
-    Route::get('/suppliers', SupplierIndex::class)->name('suppliers.index');
-    Route::get('/suppliers/{id}/statement', SupplierStatement::class)->name('suppliers.statement');
-    Route::get('/purchases', PurchaseIndex::class)->name('purchases.index');
-    Route::get('/purchases/create', PurchaseCreate::class)->name('purchases.create');
+    Route::get('/suppliers', SupplierIndex::class)->name('suppliers.index')->middleware('can:suppliers.manage');
+    Route::get('/suppliers/{id}/statement', SupplierStatement::class)->name('suppliers.statement')->middleware('can:suppliers.manage');
+    Route::get('/purchases', PurchaseIndex::class)->name('purchases.index')->middleware('can:purchases.view');
+    Route::get('/purchases/create', PurchaseCreate::class)->name('purchases.create')->middleware('can:purchases.create');
 
     // Returns & Reversals
-    Route::get('/returns', ReturnIndex::class)->name('returns.index');
-    Route::get('/returns/create', ReturnCreate::class)->name('returns.create');
+    Route::get('/returns', ReturnIndex::class)->name('returns.index')->middleware('can:returns.manage');
+    Route::get('/returns/create', ReturnCreate::class)->name('returns.create')->middleware('can:returns.manage');
 
-    // Financial & Profit Reports (Admin & Accountant only)
-    Route::get('/reports', ReportsIndex::class)->name('reports.index')->middleware('role:admin|accountant');
+    // Financial & Profit Reports (Admin & Accountant / reports.view)
+    Route::get('/reports', ReportsIndex::class)->name('reports.index')->middleware('can:reports.view');
 
     // Operational Expenses & Supplies
-    Route::get('/expenses', App\Livewire\ExpenseIndex::class)->name('expenses.index');
+    Route::get('/expenses', App\Livewire\ExpenseIndex::class)->name('expenses.index')->middleware('can:expenses.manage');
 
     // Coffee Blending Master & Roastery Recipe
-    Route::get('/coffee-blender', App\Livewire\CoffeeBlender::class)->name('coffee.blender');
+    Route::get('/coffee-blender', App\Livewire\CoffeeBlender::class)->name('coffee.blender')->middleware('can:items.create');
 
     // Daily Journal & Cashier Shifts (يوم بيوم)
-    Route::get('/daily-journal', App\Livewire\DailyJournalIndex::class)->name('daily.journal');
-    Route::get('/shifts', App\Livewire\DailyJournalIndex::class)->name('shifts.index');
+    Route::get('/daily-journal', App\Livewire\DailyJournalIndex::class)->name('daily.journal')->middleware('can:daily_journal.view');
+    Route::get('/shifts', App\Livewire\DailyJournalIndex::class)->name('shifts.index')->middleware('can:daily_journal.view');
 
-    // Auth, Profile, Trash & User Management (Admin only)
-    Route::get('/trash', App\Livewire\TrashIndex::class)->name('trash.index')->middleware('role:admin');
+    // Auth, Profile, Trash & User Management
+    Route::get('/trash', App\Livewire\TrashIndex::class)->name('trash.index')->middleware('can:trash.access');
     Route::get('/profile', App\Livewire\Auth\Profile::class)->name('profile');
-    Route::get('/users', App\Livewire\Auth\UserManager::class)->name('users.index')->middleware('role:admin');
+    Route::get('/users', App\Livewire\Auth\UserManager::class)->name('users.index')->middleware('can:roles.manage');
+    Route::get('/roles', App\Livewire\Auth\RolePermissionManager::class)->name('roles.index')->middleware('can:roles.manage');
 
     // Excel & CSV Exports
-    Route::get('/customers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportCustomerStatement'])->name('customers.export.csv');
-    Route::get('/suppliers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportSupplierStatement'])->name('suppliers.export.csv');
-    Route::get('/items/export-csv', [App\Http\Controllers\ExportController::class, 'exportInventory'])->name('items.export.csv');
+    Route::get('/customers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportCustomerStatement'])->name('customers.export.csv')->middleware('can:customers.statement');
+    Route::get('/suppliers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportSupplierStatement'])->name('suppliers.export.csv')->middleware('can:suppliers.manage');
+    Route::get('/items/export-csv', [App\Http\Controllers\ExportController::class, 'exportInventory'])->name('items.export.csv')->middleware('can:items.view');
 
     // Theme Toggle (Dark / Light Mode)
     Route::post('/theme-toggle', function (\Illuminate\Http\Request $request) {

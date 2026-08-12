@@ -35,6 +35,7 @@ class ReturnCreate extends Component
 
     public function mount()
     {
+        abort_if(!auth()->user()?->can('returns.manage'), 403, 'غير مصرح لك بتسجيل مرتجعات');
         $this->return_date = now()->toDateString();
         
         $this->store_id = session('current_store_id') 
@@ -95,6 +96,7 @@ class ReturnCreate extends Component
 
     public function saveReturn(ReturnService $returnService)
     {
+        abort_if(!auth()->user()?->can('returns.manage'), 403, 'غير مصرح لك بتسجيل المرتجعات');
         $this->errorMessage = '';
         $this->validate();
 

@@ -55,8 +55,14 @@ class StoreIndex extends Component
         ];
     }
 
+    public function mount()
+    {
+        abort_if(!auth()->user()?->can('stores.manage'), 403, 'غير مصرح لك بإدارة الفروع والمخازن');
+    }
+
     public function openCreateModal()
     {
+        abort_if(!auth()->user()?->can('stores.manage'), 403, 'غير مصرح لك بإضافة فروع جديدة');
         $this->reset(['name', 'code', 'phone', 'address', 'is_main', 'editingStoreId', 'errorMessage', 'successMessage']);
         $this->type = 'retail_shop';
         $this->is_active = true;
@@ -67,6 +73,7 @@ class StoreIndex extends Component
 
     public function openEditModal($id)
     {
+        abort_if(!auth()->user()?->can('stores.manage'), 403, 'غير مصرح لك بتعديل بيانات الفروع');
         $store = Store::withTrashed()->findOrFail($id);
         $this->editingStoreId = $store->id;
         $this->name           = $store->name;
@@ -82,6 +89,7 @@ class StoreIndex extends Component
 
     public function saveStore()
     {
+        abort_if(!auth()->user()?->can('stores.manage'), 403, 'غير مصرح لك بحفظ بيانات الفروع');
         $this->validate();
 
         if ($this->is_main) {
@@ -125,6 +133,7 @@ class StoreIndex extends Component
 
     public function deleteStore($id)
     {
+        abort_if(!auth()->user()?->can('stores.manage'), 403, 'غير مصرح لك بحذف الفروع');
         $store = Store::findOrFail($id);
         if ($store->is_main) {
             $this->errorMessage = 'لا يمكن حذف أو أرشفة الفرع / المخزن الرئيسي للمؤسسة.';
@@ -141,6 +150,7 @@ class StoreIndex extends Component
 
     public function restoreStore($id)
     {
+        abort_if(!auth()->user()?->can('trash.access'), 403, 'غير مصرح لك باسترجاع الفروع المحذوفة');
         $store = Store::onlyTrashed()->findOrFail($id);
         $store->restore();
 
@@ -151,6 +161,7 @@ class StoreIndex extends Component
 
     public function openUserAssignmentModal($id)
     {
+        abort_if(!auth()->user()?->can('stores.manage'), 403, 'غير مصرح لك بتعيين موظفي الفروع');
         $this->targetStore = Store::withTrashed()->with('users')->findOrFail($id);
         $this->selectedUsers = $this->targetStore->users->pluck('id')->toArray();
         $this->showUserModal = true;
@@ -158,6 +169,7 @@ class StoreIndex extends Component
 
     public function saveUserAssignment()
     {
+        abort_if(!auth()->user()?->can('stores.manage'), 403, 'غير مصرح لك بتعيين موظفي الفروع');
         if ($this->targetStore) {
             $this->targetStore->users()->sync($this->selectedUsers);
             $this->successMessage = 'تم تحديث تعيينات الموظفين للفرع بنجاح.';

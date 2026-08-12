@@ -33,6 +33,8 @@ class DailyJournalIndex extends Component
 
     public function mount(ShiftService $shiftService)
     {
+        abort_if(!auth()->user()?->can('daily_journal.view'), 403, 'غير مصرح لك بعرض دفتر اليومية');
+
         $this->selectedDate = now()->toDateString();
         
         $currentStore = session('current_store_id') 
@@ -72,6 +74,7 @@ class DailyJournalIndex extends Component
 
     public function openShiftModal()
     {
+        abort_if(!auth()->user()?->can('daily_journal.close_shift'), 403, 'غير مصرح لك بإدارة ورديات اليومية');
         $this->opening_cash_balance = '0.000';
         $this->open_notes = '';
         $this->showOpenModal = true;
@@ -79,6 +82,7 @@ class DailyJournalIndex extends Component
 
     public function startShift(ShiftService $shiftService)
     {
+        abort_if(!auth()->user()?->can('daily_journal.close_shift'), 403, 'غير مصرح لك بفتح يومية العمل');
         $this->errorMessage = '';
         $this->successMessage = '';
 
@@ -101,6 +105,7 @@ class DailyJournalIndex extends Component
 
     public function openCloseModal(ShiftService $shiftService)
     {
+        abort_if(!auth()->user()?->can('daily_journal.close_shift'), 403, 'غير مصرح لك بإغلاق يومية العمل');
         if (!$this->activeShift) return;
         $totals = $shiftService->calculateShiftTotals($this->activeShift);
         $this->actual_cash_balance = $totals['expected_cash_balance'];
@@ -109,6 +114,7 @@ class DailyJournalIndex extends Component
 
     public function submitCloseShift(ShiftService $shiftService)
     {
+        abort_if(!auth()->user()?->can('daily_journal.close_shift'), 403, 'غير مصرح لك بإغلاق وتقفيل يومية العمل');
         $this->errorMessage = '';
         $this->successMessage = '';
 

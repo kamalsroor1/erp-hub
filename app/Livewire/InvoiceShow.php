@@ -12,14 +12,13 @@ class InvoiceShow extends Component
 
     public function mount($id)
     {
+        abort_if(!auth()->user()?->can('invoices.view'), 403, 'غير مصرح لك بعرض تفاصيل الفاتورة');
         $this->invoice = Invoice::with(['customer', 'items.item', 'payments', 'user'])->findOrFail($id);
     }
 
     public function deleteInvoice(InvoiceService $invoiceService)
     {
-        if (!auth()->user()->hasRole('admin')) {
-            abort(403, 'عفواً، لا يملك صلاحية حذف الفواتير سوى المدير العام.');
-        }
+        abort_if(!auth()->user()?->can('invoices.delete'), 403, 'عفواً، ليس لديك صلاحية حذف أو أرشفة الفواتير.');
 
         $num = $this->invoice->invoice_number;
         $invoiceService->deleteInvoice($this->invoice);

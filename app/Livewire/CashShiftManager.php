@@ -35,6 +35,7 @@ class CashShiftManager extends Component
 
     public function startShift(ShiftService $shiftService)
     {
+        abort_if(!auth()->user()?->can('daily_journal.close_shift'), 403, 'غير مصرح لك بفتح وردية العمل');
         $this->errorMessage = '';
         $this->successMessage = '';
 
@@ -51,6 +52,7 @@ class CashShiftManager extends Component
 
     public function openCloseModal(ShiftService $shiftService)
     {
+        abort_if(!auth()->user()?->can('daily_journal.close_shift'), 403, 'غير مصرح لك بإغلاق وردية العمل');
         if (!$this->activeShift) return;
         $totals = $shiftService->calculateShiftTotals($this->activeShift);
         $this->actual_cash_balance = $totals['expected_cash_balance'];
@@ -59,6 +61,7 @@ class CashShiftManager extends Component
 
     public function submitCloseShift(ShiftService $shiftService)
     {
+        abort_if(!auth()->user()?->can('daily_journal.close_shift'), 403, 'غير مصرح لك بإغلاق وتقفيل وردية العمل');
         $this->errorMessage = '';
         $this->successMessage = '';
 

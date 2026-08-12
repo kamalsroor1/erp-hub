@@ -4,17 +4,16 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use App\Models\Store;
 use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Setup Roles safely (never delete existing data)
+        // 1. Setup Roles & Permissions Matrix
+        $this->call(PermissionsSeeder::class);
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $cashierRole = Role::firstOrCreate(['name' => 'cashier']);
-        $storeRole = Role::firstOrCreate(['name' => 'storekeeper']);
-        $accountantRole = Role::firstOrCreate(['name' => 'accountant']);
 
         // 2. Super Admin 1: كمال سرور (01012316954 / password)
         $admin1 = User::firstOrCreate(
@@ -33,12 +32,23 @@ class DatabaseSeeder extends Seeder
             ['phone' => '01558088841'],
             [
                 'name'      => 'المدير العام 2',
-                'phone'     => '01558088841',
                 'email'     => '01558088841@sroor.com',
                 'password'  => bcrypt('123456789'),
                 'is_active' => true,
             ]
         );
         $admin2->syncRoles([$adminRole]);
+
+        // 4. Base Main Warehouse (المخزن الرئيسي الأساسي)
+        Store::firstOrCreate(
+            ['code' => 'MAIN-01'],
+            [
+                'name'      => 'المخزن والفرع الرئيسي',
+                'type'      => 'main_warehouse',
+                'is_main'   => true,
+                'is_active' => true,
+                'address'   => 'المركز الرئيسي - سرور كوفي',
+            ]
+        );
     }
 }

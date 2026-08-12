@@ -50,6 +50,8 @@ class InvoiceEdit extends Component
 
     public function mount($id)
     {
+        abort_if(!auth()->user()?->can('invoices.edit'), 403, 'غير مصرح لك بتعديل فواتير المبيعات المعتمدة');
+
         $this->invoice = Invoice::with(['items.item', 'customer'])->findOrFail($id);
         $this->invoice_id = $this->invoice->id;
         $this->invoice_number = $this->invoice->invoice_number;
@@ -229,6 +231,12 @@ class InvoiceEdit extends Component
 
     public function updateInvoice(InvoiceService $invoiceService, $printMode = null)
     {
+        abort_if(!auth()->user()?->can('invoices.edit'), 403, 'غير مصرح لك بتعديل فواتير المبيعات المعتمدة');
+
+        if (bccomp((string)($this->discount_value ?: '0.000'), '0.000', 3) > 0) {
+            abort_if(!auth()->user()?->can('invoices.discount'), 403, 'غير مصرح لك بمنح خصومات على الفواتير');
+        }
+
         $this->errorMessage = '';
         $this->validate();
 

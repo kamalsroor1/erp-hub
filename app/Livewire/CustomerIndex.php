@@ -47,8 +47,14 @@ class CustomerIndex extends Component
         'notes'           => 'nullable|string',
     ];
 
+    public function mount()
+    {
+        abort_if(!auth()->user()?->can('customers.manage'), 403, 'غير مصرح لك بإدارة العملاء والحسابات');
+    }
+
     public function openCreateModal()
     {
+        abort_if(!auth()->user()?->can('customers.manage'), 403, 'غير مصرح لك بإضافة عملاء جدد');
         $this->reset(['name', 'phone', 'address', 'tax_number', 'opening_balance', 'notes', 'editCustomerId', 'errorMessage', 'successMessage']);
         $this->opening_balance = '0.000';
         $this->isEditMode = false;
@@ -123,6 +129,7 @@ class CustomerIndex extends Component
 
     public function deleteCustomer($id)
     {
+        abort_if(!auth()->user()?->can('customers.manage'), 403, 'غير مصرح لك بحذف العملاء');
         $customer = Customer::findOrFail($id);
         $name = $customer->name;
         $customer->delete(); // Soft delete
@@ -134,6 +141,7 @@ class CustomerIndex extends Component
 
     public function restoreCustomer($id)
     {
+        abort_if(!auth()->user()?->can('trash.access'), 403, 'غير مصرح لك باسترجاع العملاء المحذوفين');
         $customer = Customer::onlyTrashed()->findOrFail($id);
         $customer->restore();
 

@@ -37,8 +37,14 @@ class SupplierIndex extends Component
         'name' => 'required|string|max:255',
     ];
 
+    public function mount()
+    {
+        abort_if(!auth()->user()?->can('suppliers.manage'), 403, 'غير مصرح لك بإدارة الموردين');
+    }
+
     public function openCreateModal()
     {
+        abort_if(!auth()->user()?->can('suppliers.manage'), 403, 'غير مصرح لك بإضافة موردين جدد');
         $this->reset(['name', 'company_name', 'phone', 'address', 'notes', 'editSupplierId']);
         $this->isEditMode = false;
         $this->showSupplierModal = true;
@@ -93,6 +99,7 @@ class SupplierIndex extends Component
 
     public function deleteSupplier($id)
     {
+        abort_if(!auth()->user()?->can('suppliers.manage'), 403, 'غير مصرح لك بحذف الموردين');
         $supplier = Supplier::findOrFail($id);
         $name = $supplier->name;
         $supplier->delete(); // Soft delete
@@ -103,6 +110,7 @@ class SupplierIndex extends Component
 
     public function restoreSupplier($id)
     {
+        abort_if(!auth()->user()?->can('trash.access'), 403, 'غير مصرح لك باسترجاع الموردين المحذوفين');
         $supplier = Supplier::onlyTrashed()->findOrFail($id);
         $supplier->restore();
 
@@ -112,6 +120,7 @@ class SupplierIndex extends Component
 
     public function openPaymentModal($supplierId)
     {
+        abort_if(!auth()->user()?->can('suppliers.manage'), 403, 'غير مصرح لك بتسجيل سندات صرف للموردين');
         $supplier = Supplier::withTrashed()->findOrFail($supplierId);
         $this->selectedSupplierId = $supplier->id;
         $this->selectedSupplierName = $supplier->name;
@@ -123,6 +132,7 @@ class SupplierIndex extends Component
 
     public function savePayment(PaymentService $paymentService)
     {
+        abort_if(!auth()->user()?->can('suppliers.manage'), 403, 'غير مصرح لك بتسجيل سندات صرف للموردين');
         $this->validate([
             'paymentAmount' => 'required|numeric|min:0.01',
         ]);

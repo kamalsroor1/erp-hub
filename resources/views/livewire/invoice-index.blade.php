@@ -112,11 +112,13 @@
                     🖨️
                 </a>
                 @if($inv->status !== 'cancelled')
+                @can('invoices.edit')
                 <a href="{{ route('invoices.edit', $inv->id) }}" class="px-3 py-1.5 text-center rounded-xl bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-slate-950 dark:text-amber-400 font-bold text-xs border border-amber-500/30">
                     ✏️
                 </a>
+                @endcan
                 @endif
-                @hasrole('admin')
+                @can('invoices.delete')
                 <button
                     wire:click="deleteInvoice({{ $inv->id }})"
                     wire:confirm="هل أنت متأكد من حذف الفاتورة رقم {{ $inv->invoice_number }} نهائياً؟"
@@ -124,7 +126,7 @@
                 >
                     🗑️
                 </button>
-                @endhasrole
+                @endcan
             </div>
         </div>
         @empty
@@ -193,6 +195,7 @@
                         </td>
                         <td class="p-3.5 text-center flex items-center justify-center gap-1.5">
                             @if($inv->trashed())
+                                @can('trash.access')
                                 <button
                                     wire:click="restoreInvoice({{ $inv->id }})"
                                     class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-600 hover:text-white text-emerald-700 dark:text-emerald-400 font-bold text-[11px] border border-emerald-500/30 transition-colors inline-flex items-center gap-1 cursor-pointer"
@@ -200,25 +203,28 @@
                                 >
                                     <span>♻️ استعادة</span>
                                 </button>
+                                @endcan
                             @else
                                 <a href="{{ route('invoices.show', $inv->id) }}" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold text-[11px] transition-colors border border-slate-300 dark:border-slate-700">
                                     تفاصيل / طباعة
                                 </a>
                                 @if($inv->status !== 'cancelled')
+                                @can('invoices.edit')
                                 <a href="{{ route('invoices.edit', $inv->id) }}" class="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-600 hover:text-slate-950 text-amber-600 dark:text-amber-400 text-[11px] font-bold border border-amber-500/30 transition-all flex items-center gap-1 cursor-pointer" title="تعديل الفاتورة">
                                     <span>✏️ تعديل</span>
                                 </a>
+                                @endcan
                                 @endif
-                                @hasrole('admin')
+                                @can('invoices.delete')
                                 <button
                                     wire:click="deleteInvoice({{ $inv->id }})"
                                     wire:confirm="هل أنت متأكد من أرشفة الفاتورة رقم {{ $inv->invoice_number }} ونقلها لسلة المحذوفات؟"
                                     class="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-600 dark:text-rose-400 text-[11px] font-bold border border-rose-500/30 transition-all flex items-center gap-1 cursor-pointer"
-                                    title="نقل لسلة المحذوفات (المدير العام فقط)"
+                                    title="نقل لسلة المحذوفات"
                                 >
                                     <span>🗑️</span>
                                 </button>
-                                @endhasrole
+                                @endcan
                             @endif
                         </td>
                     </tr>

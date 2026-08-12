@@ -50,6 +50,8 @@ class InvoiceCreate extends Component
 
     public function mount()
     {
+        abort_if(!auth()->user()?->can('pos.access'), 403, 'غير مصرح لك بدخول شاشة نقطة البيع (POS)');
+
         $this->invoice_date = now()->toDateString();
         
         $this->store_id = session('current_store_id') 
@@ -347,6 +349,12 @@ class InvoiceCreate extends Component
 
     public function saveInvoice(InvoiceService $invoiceService, $printMode = null)
     {
+        abort_if(!auth()->user()?->can('invoices.create'), 403, 'غير مصرح لك بإنشاء واعتماد فواتير المبيعات');
+
+        if (bccomp((string)($this->discount_value ?: '0.000'), '0.000', 3) > 0) {
+            abort_if(!auth()->user()?->can('invoices.discount'), 403, 'غير مصرح لك بمنح خصومات على الفواتير');
+        }
+
         $this->errorMessage = '';
         $this->validate();
 

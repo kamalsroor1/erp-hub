@@ -81,7 +81,7 @@ class Login extends Component
             'text'  => 'تم تسجيل الدخول بنجاح إلى منظومة سرور POS.'
         ]);
 
-        return redirect()->intended(route('dashboard'));
+        return $this->redirectIntended(default: route('dashboard'));
     }
 
     public function render()

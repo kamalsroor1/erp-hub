@@ -53,6 +53,7 @@ class ItemIndex extends Component
 
     public function openCreateModal()
     {
+        abort_if(!auth()->user()?->can('items.create'), 403, 'غير مصرح لك بإضافة أصناف جديدة');
         $this->reset(['code', 'name', 'notes', 'editItemId']);
         $this->isEditMode = false;
         $this->code = 'ITM-' . rand(1000, 9999);
@@ -67,6 +68,7 @@ class ItemIndex extends Component
 
     public function openEditModal($id)
     {
+        abort_if(!auth()->user()?->can('items.edit'), 403, 'غير مصرح لك بتعديل بيانات الأصناف');
         $item = Item::withTrashed()->findOrFail($id);
         $this->isEditMode = true;
         $this->editItemId = $item->id;
@@ -84,6 +86,12 @@ class ItemIndex extends Component
 
     public function saveItem(StockService $stockService)
     {
+        if ($this->isEditMode && $this->editItemId) {
+            abort_if(!auth()->user()?->can('items.edit'), 403, 'غير مصرح لك بتعديل بيانات الأصناف');
+        } else {
+            abort_if(!auth()->user()?->can('items.create'), 403, 'غير مصرح لك بإضافة أصناف جديدة');
+        }
+
         $this->validate();
 
         if ($this->isEditMode && $this->editItemId) {
@@ -137,6 +145,7 @@ class ItemIndex extends Component
 
     public function deleteItem($id)
     {
+        abort_if(!auth()->user()?->can('items.delete'), 403, 'غير مصرح لك بحذف أو أرشفة الأصناف');
         $item = Item::findOrFail($id);
         $name = $item->name;
         $item->delete(); // Soft delete
@@ -147,6 +156,7 @@ class ItemIndex extends Component
 
     public function restoreItem($id)
     {
+        abort_if(!auth()->user()?->can('trash.access'), 403, 'غير مصرح لك باسترجاع الأصناف');
         $item = Item::onlyTrashed()->findOrFail($id);
         $item->restore();
 

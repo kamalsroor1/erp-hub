@@ -46,12 +46,14 @@
                 <span>⚠️ النواقص وقرب النفاد فقط</span>
             </label>
 
+            @can('transfers.create')
             <a 
                 href="{{ route('stock-transfers.create') }}?to_store_id={{ $selectedStoreId }}" 
                 class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black transition-all cursor-pointer flex items-center gap-1"
             >
                 <span>➕ شحن بضاعة لهذا الفرع</span>
             </a>
+            @endcan
         </div>
     </div>
 
@@ -104,6 +106,7 @@
                             {{ number_format($stk->effective_selling_price, 2) }} ج.م
                         </td>
                         <td class="p-3 text-center">
+                            @can('items.edit')
                             <button 
                                 type="button" 
                                 wire:click="openEditModal({{ $stk->id }})" 
@@ -111,6 +114,7 @@
                             >
                                 ⚙️ ضبط
                             </button>
+                            @endcan
                         </td>
                     </tr>
                     @empty

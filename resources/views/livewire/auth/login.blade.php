@@ -26,7 +26,7 @@
                 </label>
                 <div class="relative">
                     <input
-                        wire:model.defer="phone"
+                        wire:model="phone"
                         type="text"
                         id="phone"
                         required
@@ -51,7 +51,7 @@
                 </label>
                 <div class="relative">
                     <input
-                        wire:model.defer="password"
+                        wire:model="password"
                         :type="showPass ? 'text' : 'password'"
                         id="password"
                         required

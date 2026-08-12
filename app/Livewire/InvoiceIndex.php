@@ -23,10 +23,15 @@ class InvoiceIndex extends Component
     public $cancelReason = '';
     public $errorMessage = '';
 
+    public function mount()
+    {
+        abort_if(!auth()->user()?->can('invoices.view'), 403, 'غير مصرح لك بعرض سجل الفواتير');
+    }
+
     public function openCancelModal($invoiceId)
     {
-        if (!auth()->user()->hasRole('admin')) {
-            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => 'عفواً، لا يملك صلاحية إلغاء الفواتير سوى المدير العام.']);
+        if (!auth()->user()?->can('invoices.cancel')) {
+            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => 'عفواً، ليس لديك صلاحية إلغاء الفواتير.']);
             return;
         }
 
@@ -38,10 +43,7 @@ class InvoiceIndex extends Component
 
     public function confirmCancel(InvoiceService $invoiceService)
     {
-        if (!auth()->user()->hasRole('admin')) {
-            $this->errorMessage = 'عفواً، لا يملك صلاحية إلغاء الفواتير سوى المدير العام.';
-            return;
-        }
+        abort_if(!auth()->user()?->can('invoices.cancel'), 403, 'غير مصرح لك بإلغاء الفواتير وعكس الأثر المخزني والمالي');
 
         $this->validate([
             'cancelReason' => 'required|string|min:3',
@@ -62,10 +64,7 @@ class InvoiceIndex extends Component
 
     public function deleteInvoice($invoiceId, InvoiceService $invoiceService)
     {
-        if (!auth()->user()->hasRole('admin')) {
-            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => 'عفواً، لا يملك صلاحية حذف الفواتير سوى المدير العام.']);
-            return;
-        }
+        abort_if(!auth()->user()?->can('invoices.delete'), 403, 'غير مصرح لك بحذف أو أرشفة الفواتير');
 
         try {
             $invoice = Invoice::findOrFail($invoiceId);
@@ -84,10 +83,7 @@ class InvoiceIndex extends Component
 
     public function restoreInvoice($invoiceId)
     {
-        if (!auth()->user()->hasRole('admin')) {
-            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => 'عفواً، لا يملك صلاحية استعادة الفواتير سوى المدير العام.']);
-            return;
-        }
+        abort_if(!auth()->user()?->can('trash.access'), 403, 'غير مصرح لك باسترجاع الفواتير المحذوفة');
 
         try {
             $invoice = Invoice::onlyTrashed()->findOrFail($invoiceId);

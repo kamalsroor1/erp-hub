@@ -23,6 +23,7 @@ class SupplierStatement extends Component
 
     public function mount($id)
     {
+        abort_if(!auth()->user()?->can('suppliers.statement'), 403, 'غير مصرح لك بعرض كشف حساب المورد');
         $this->supplier = Supplier::findOrFail($id);
         $this->fromDate = now()->startOfYear()->toDateString();
         $this->toDate = now()->toDateString();
@@ -30,6 +31,7 @@ class SupplierStatement extends Component
 
     public function openPaymentModal()
     {
+        abort_if(!auth()->user()?->can('suppliers.manage'), 403, 'غير مصرح لك بتسجيل سند صرف للمورد');
         $this->supplier->refresh();
         $this->paymentAmount = $this->supplier->current_balance;
         $this->paymentMethod = 'cash';
@@ -39,6 +41,7 @@ class SupplierStatement extends Component
 
     public function savePayment(PaymentService $paymentService)
     {
+        abort_if(!auth()->user()?->can('suppliers.manage'), 403, 'غير مصرح لك بتسجيل سند صرف للمورد');
         $this->validate([
             'paymentAmount' => 'required|numeric|min:0.01',
         ]);

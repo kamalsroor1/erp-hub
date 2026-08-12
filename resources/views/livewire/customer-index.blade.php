@@ -7,9 +7,11 @@
             </h2>
             <p class="text-xs text-slate-500 dark:text-slate-400">إدارة بيانات العملاء، الأرصدة التراكمية، وسندات التحصيل</p>
         </div>
+        @can('customers.manage')
         <button wire:click="openCreateModal" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer">
             <span>➕ إضافة عميل جديد</span>
         </button>
+        @endcan
     </div>
 
     @if (session()->has('success') || $successMessage)
@@ -66,25 +68,31 @@
             @endif
 
             <div class="flex items-center gap-1.5 pt-1">
+                @can('customers.manage')
                 <button 
                     wire:click="openEditModal({{ $c->id }})" 
                     class="flex-1 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 transition-colors text-center cursor-pointer"
                 >
                     ✏️ تعديل
                 </button>
+                @endcan
+                @can('customers.statement')
                 <a 
                     href="{{ route('customers.statement', $c->id) }}" 
                     class="flex-1 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 transition-colors text-center"
                 >
                     📑 كشف حساب
                 </a>
+                @endcan
                 @if(bccomp($c->current_balance, '0.000', 3) > 0)
+                @can('customers.manage')
                 <button 
                     wire:click="openPaymentModal({{ $c->id }})" 
                     class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-sm transition-colors text-center shrink-0 cursor-pointer"
                 >
                     💵 تحصيل
                 </button>
+                @endcan
                 @endif
             </div>
         </div>
@@ -120,6 +128,7 @@
                         <td class="p-3.5 text-center">
                             <div class="flex items-center justify-center gap-1.5">
                                 @if($c->trashed())
+                                    @can('trash.access')
                                     <button 
                                         wire:click="restoreCustomer({{ $c->id }})" 
                                         title="استعادة العميل"
@@ -127,7 +136,9 @@
                                     >
                                         <span>♻️ استعادة</span>
                                     </button>
+                                    @endcan
                                 @else
+                                    @can('customers.manage')
                                     <button 
                                         wire:click="openEditModal({{ $c->id }})" 
                                         title="تعديل بيانات العميل"
@@ -135,14 +146,23 @@
                                     >
                                         <span>✏️</span>
                                     </button>
+                                    @endcan
+
+                                    @can('customers.statement')
                                     <a href="{{ route('customers.statement', $c->id) }}" title="كشف حساب" class="px-2 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold border border-slate-300 dark:border-slate-700 transition-colors">
                                         📑
                                     </a>
+                                    @endcan
+
                                     @if(bccomp($c->current_balance, '0.000', 3) > 0)
+                                    @can('customers.manage')
                                     <button wire:click="openPaymentModal({{ $c->id }})" title="تحصيل دفعة" class="px-2 py-1 bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white rounded-lg text-xs font-bold border border-emerald-500/30 transition-colors cursor-pointer">
                                         💵
                                     </button>
+                                    @endcan
                                     @endif
+
+                                    @can('customers.manage')
                                     <button 
                                         wire:click="deleteCustomer({{ $c->id }})" 
                                         wire:confirm="هل أنت متأكد من نقل هذا العميل لسلة المحذوفات؟"
@@ -151,6 +171,7 @@
                                     >
                                         <span>🗑️</span>
                                     </button>
+                                    @endcan
                                 @endif
                             </div>
                         </td>

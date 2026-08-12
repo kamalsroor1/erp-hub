@@ -14,6 +14,7 @@ class CustomerStatement extends Component
 
     public function mount($id)
     {
+        abort_if(!auth()->user()?->can('customers.statement'), 403, 'غير مصرح لك بعرض كشف حساب العميل');
         $this->customer = Customer::findOrFail($id);
         $this->fromDate = now()->startOfYear()->toDateString();
         $this->toDate = now()->toDateString();

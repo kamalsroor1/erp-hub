@@ -15,12 +15,14 @@ class ReturnIndex extends Component
     public $type = 'all'; // all, sales_return, purchase_return
     public $filterStatus = 'active'; // active, trashed, all
 
+    public function mount()
+    {
+        abort_if(!auth()->user()?->can('returns.manage'), 403, 'غير مصرح لك بإدارة المرتجعات');
+    }
+
     public function deleteReturn($returnId)
     {
-        if (!auth()->user()->hasRole('admin')) {
-            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => 'عفواً، لا يملك صلاحية أرشفة المرتجعات سوى المدير العام.']);
-            return;
-        }
+        abort_if(!auth()->user()?->can('returns.manage'), 403, 'غير مصرح لك بحذف أو أرشفة المرتجعات');
 
         try {
             $returnDoc = ReturnDocument::findOrFail($returnId);
@@ -39,10 +41,7 @@ class ReturnIndex extends Component
 
     public function restoreReturn($returnId)
     {
-        if (!auth()->user()->hasRole('admin')) {
-            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => 'عفواً، لا يملك صلاحية استعادة المرتجعات سوى المدير العام.']);
-            return;
-        }
+        abort_if(!auth()->user()?->can('trash.access'), 403, 'غير مصرح لك باسترجاع المرتجعات المحذوفة');
 
         try {
             $returnDoc = ReturnDocument::onlyTrashed()->findOrFail($returnId);

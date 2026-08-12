@@ -33,6 +33,7 @@ class StockTransferCreate extends Component
 
     public function mount()
     {
+        abort_if(!auth()->user()?->can('transfers.create'), 403, 'غير مصرح لك بإنشاء أذونات تحويل وشحن البضاعة');
         $this->transfer_date = now()->toDateString();
 
         $mainStore = Store::getMainStore();
@@ -96,6 +97,7 @@ class StockTransferCreate extends Component
 
     public function saveTransfer(StockTransferService $transferService)
     {
+        abort_if(!auth()->user()?->can('transfers.create'), 403, 'غير مصرح لك بإنشاء أذونات تحويل وشحن البضاعة');
         $this->errorMessage = '';
         $this->validate();
 

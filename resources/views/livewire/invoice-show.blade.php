@@ -15,9 +15,11 @@
 
         <div class="flex flex-wrap items-center gap-2">
             @if($invoice->status !== 'cancelled')
+            @can('invoices.edit')
             <a href="{{ route('invoices.edit', $invoice->id) }}" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-500/20 flex items-center gap-1.5 transition-all cursor-pointer">
                 <span>✏️ تعديل</span>
             </a>
+            @endcan
             @endif
             <a href="{{ route('invoices.print.thermal', $invoice->id) }}" target="_blank" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all">
                 <span>🖨️ إيصال كاشير</span>
@@ -28,16 +30,16 @@
             <button onclick="downloadCardAsImage()" id="btn-show-img" class="px-3 py-2 bg-amber-500/10 hover:bg-amber-500 text-amber-700 dark:text-amber-300 hover:text-slate-950 text-xs font-bold rounded-xl border border-amber-500/30 flex items-center gap-1.5 transition-all cursor-pointer">
                 <span>📸 تحميل صورة (PNG)</span>
             </button>
-            @hasrole('admin')
+            @can('invoices.delete')
             <button
                 wire:click="deleteInvoice"
                 wire:confirm="هل أنت متأكد من حذف هذه الفاتورة نهائياً؟ سيتم إرجاع البضاعة للمخزن وتحديث الرصيد وحذف السجل تماماً."
                 class="px-3 py-2 bg-rose-500/10 hover:bg-rose-600 text-rose-600 hover:text-white dark:text-rose-400 text-xs font-bold rounded-xl border border-rose-500/30 flex items-center gap-1.5 transition-all cursor-pointer"
-                title="حذف نهائي للفاتورة (المدير العام فقط)"
+                title="حذف نهائي للفاتورة"
             >
                 <span>🗑️ حذف</span>
             </button>
-            @endhasrole
+            @endcan
             <a href="{{ route('invoices.index') }}" class="px-3 py-2 bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-800 transition-colors">
                 ← رجوع
             </a>

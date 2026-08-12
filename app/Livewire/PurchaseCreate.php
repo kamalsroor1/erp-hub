@@ -40,6 +40,7 @@ class PurchaseCreate extends Component
 
     public function mount()
     {
+        abort_if(!auth()->user()?->can('purchases.create'), 403, 'غير مصرح لك بإنشاء فواتير مشتريات وتوريدات');
         $this->purchase_date = now()->toDateString();
         
         $this->store_id = session('current_store_id') 
@@ -150,6 +151,7 @@ class PurchaseCreate extends Component
 
     public function savePurchase(PurchaseService $purchaseService)
     {
+        abort_if(!auth()->user()?->can('purchases.create'), 403, 'غير مصرح لك بإنشاء فواتير مشتريات وتوريدات');
         $this->errorMessage = '';
         $this->validate();
 

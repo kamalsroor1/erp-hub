@@ -34,9 +34,7 @@ class UserManager extends Component
 
     public function mount()
     {
-        if (!auth()->check() || !auth()->user()->hasRole('admin')) {
-            abort(403, 'غير مصرح لك بالوصول لإدارة المستخدمين والصلاحيات.');
-        }
+        abort_if(!auth()->user()?->can('roles.manage'), 403, 'غير مصرح لك بالوصول لإدارة المستخدمين والصلاحيات.');
     }
 
     protected function rules(): array
@@ -48,7 +46,7 @@ class UserManager extends Component
             'phone'     => ['required', 'string', 'max:20', 'unique:users,phone,'.$userId],
             'email'     => ['nullable', 'string', 'email', 'max:255', 'unique:users,email,'.$userId],
             'password'  => [$userId ? 'nullable' : 'required', 'string', 'min:6'],
-            'role'      => ['required', 'string', 'in:admin,cashier,storekeeper,accountant'],
+            'role'      => ['required', 'string', 'exists:roles,name'],
             'is_active' => ['boolean'],
         ];
     }
@@ -130,7 +128,7 @@ class UserManager extends Component
             $this->dispatch('swal:toast', [
                 'type'  => 'success',
                 'title' => 'تم إنشاء المستخدم!',
-                'text'  => "تم إضافة المستخدم والكاشير الجديد {$user->name} بنجاح."
+                'text'  => "تم إضافة المستخدم الجديد {$user->name} بنجاح."
             ]);
         }
 
@@ -169,14 +167,17 @@ class UserManager extends Component
             ->when($this->search, function ($q) {
                 $q->where(function ($sub) {
                     $sub->where('name', 'like', "%{$this->search}%")
-                        ->orWhere('email', 'like', "%{$this->search}%");
+                        ->orWhere('email', 'like', "%{$this->search}%")
+                        ->orWhere('phone', 'like', "%{$this->search}%");
                 });
             });
 
         $users = $query->latest()->paginate(10);
+        $availableRoles = \Spatie\Permission\Models\Role::all();
 
         return view('livewire.auth.user-manager', [
-            'users' => $users,
+            'users'          => $users,
+            'availableRoles' => $availableRoles,
         ]);
     }
 }

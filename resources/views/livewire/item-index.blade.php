@@ -11,9 +11,11 @@
             <a href="{{ route('items.export.csv') }}" class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-2 transition-colors">
                 📊 تصدير CSV
             </a>
+            @can('items.create')
             <button wire:click="openCreateModal" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer">
                 <span>+ إضافة صنف جديد</span>
             </button>
+            @endcan
         </div>
     </div>
 
@@ -74,21 +76,24 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800 text-center text-xs">
+            <div class="grid grid-cols-{{ auth()->user()?->can('items.view_cost') ? '3' : '2' }} gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800 text-center text-xs">
                 <div>
                     <span class="text-[10px] text-slate-400 block">الرصيد:</span>
                     <span class="font-mono font-bold text-slate-900 dark:text-white">{{ number_format($item->current_stock, 2) }} {{ $item->unit }}</span>
                 </div>
+                @can('items.view_cost')
                 <div>
                     <span class="text-[10px] text-slate-400 block">التكلفة:</span>
                     <span class="font-mono text-slate-600 dark:text-slate-400">{{ number_format($item->cost_price, 2) }}</span>
                 </div>
+                @endcan
                 <div>
                     <span class="text-[10px] text-slate-400 block">البيع:</span>
                     <span class="font-mono font-black text-emerald-600 dark:text-emerald-400">{{ number_format($item->selling_price, 2) }}</span>
                 </div>
             </div>
 
+            @can('items.edit')
             <div class="flex justify-end pt-1">
                 <button 
                     wire:click="openEditModal({{ $item->id }})" 
@@ -97,6 +102,7 @@
                     ✏️ تعديل بيانات الصنف
                 </button>
             </div>
+            @endcan
         </div>
         @empty
         <div class="p-8 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-400 text-xs">
@@ -116,7 +122,9 @@
                         <th class="p-3.5">القسم</th>
                         <th class="p-3.5">الوحدة</th>
                         <th class="p-3.5">الرصيد الحالي</th>
+                        @can('items.view_cost')
                         <th class="p-3.5">سعر التكلفة</th>
+                        @endcan
                         <th class="p-3.5">سعر البيع</th>
                         <th class="p-3.5">الحد الأدنى</th>
                         <th class="p-3.5 text-center">الحالة</th>
@@ -133,7 +141,9 @@
                         <td class="p-3.5 font-mono font-bold {{ $item->isLowStock() ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-slate-100' }}">
                             {{ number_format($item->current_stock, 3) }}
                         </td>
+                        @can('items.view_cost')
                         <td class="p-3.5 font-mono text-slate-700 dark:text-slate-300">{{ number_format($item->cost_price, 2) }} ج.م</td>
+                        @endcan
                         <td class="p-3.5 font-mono font-bold text-emerald-600 dark:text-emerald-400">{{ number_format($item->selling_price, 2) }} ج.م</td>
                         <td class="p-3.5 font-mono text-slate-500 dark:text-slate-400">{{ number_format($item->min_stock_level, 2) }}</td>
                         <td class="p-3.5 text-center">
@@ -148,6 +158,7 @@
                         <td class="p-3.5 text-center">
                             <div class="flex items-center justify-center gap-1.5">
                                 @if($item->trashed())
+                                    @can('trash.access')
                                     <button 
                                         wire:click="restoreItem({{ $item->id }})" 
                                         title="استعادة الصنف"
@@ -155,7 +166,9 @@
                                     >
                                         <span>♻️ استعادة</span>
                                     </button>
+                                    @endcan
                                 @else
+                                    @can('items.edit')
                                     <button 
                                         wire:click="openEditModal({{ $item->id }})" 
                                         title="تعديل بيانات الصنف"
@@ -163,6 +176,9 @@
                                     >
                                         <span>✏️</span>
                                     </button>
+                                    @endcan
+
+                                    @can('items.delete')
                                     <button 
                                         wire:click="deleteItem({{ $item->id }})" 
                                         wire:confirm="هل أنت متأكد من نقل هذا الصنف لسلة المحذوفات والأرشيف؟"
@@ -171,6 +187,7 @@
                                     >
                                         <span>🗑️</span>
                                     </button>
+                                    @endcan
                                 @endif
                             </div>
                         </td>

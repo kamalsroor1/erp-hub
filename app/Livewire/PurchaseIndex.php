@@ -14,12 +14,14 @@ class PurchaseIndex extends Component
     public $search = '';
     public $filterStatus = 'active'; // active, trashed, all
 
+    public function mount()
+    {
+        abort_if(!auth()->user()?->can('purchases.view'), 403, 'غير مصرح لك بعرض فواتير المشتريات');
+    }
+
     public function deletePurchase($purchaseId)
     {
-        if (!auth()->user()->hasRole('admin')) {
-            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => 'عفواً، لا يملك صلاحية أرشفة فواتير المشتريات سوى المدير العام.']);
-            return;
-        }
+        abort_if(!auth()->user()?->can('purchases.delete'), 403, 'غير مصرح لك بأرشفة فواتير المشتريات');
 
         try {
             $purchase = Purchase::findOrFail($purchaseId);
@@ -38,10 +40,7 @@ class PurchaseIndex extends Component
 
     public function restorePurchase($purchaseId)
     {
-        if (!auth()->user()->hasRole('admin')) {
-            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => 'عفواً، لا يملك صلاحية استعادة فواتير المشتريات سوى المدير العام.']);
-            return;
-        }
+        abort_if(!auth()->user()?->can('trash.access'), 403, 'غير مصرح لك باسترجاع فواتير المشتريات');
 
         try {
             $purchase = Purchase::onlyTrashed()->findOrFail($purchaseId);

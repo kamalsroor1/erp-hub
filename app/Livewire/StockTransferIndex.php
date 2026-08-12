@@ -29,6 +29,11 @@ class StockTransferIndex extends Component
     public $successMessage = '';
     public $errorMessage = '';
 
+    public function mount()
+    {
+        abort_if(!auth()->user()?->can('transfers.view'), 403, 'غير مصرح لك بعرض أذونات تحويل وشحن البضاعة');
+    }
+
     public function viewDetails($id)
     {
         $this->selectedTransfer = StockTransfer::with(['fromStore', 'toStore', 'user', 'items.item'])->findOrFail($id);
@@ -37,6 +42,7 @@ class StockTransferIndex extends Component
 
     public function confirmCancel($id)
     {
+        abort_if(!auth()->user()?->can('transfers.create'), 403, 'غير مصرح لك بإلغاء أذونات التحويل');
         $this->transferToCancel = StockTransfer::findOrFail($id);
         $this->cancelReason = '';
         $this->showCancelModal = true;
@@ -44,6 +50,7 @@ class StockTransferIndex extends Component
 
     public function executeCancel(StockTransferService $transferService)
     {
+        abort_if(!auth()->user()?->can('transfers.create'), 403, 'غير مصرح لك بإلغاء أذونات التحويل');
         $this->errorMessage = '';
         try {
             if ($this->transferToCancel) {

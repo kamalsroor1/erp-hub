@@ -28,6 +28,8 @@ class StoreStockIndex extends Component
 
     public function mount()
     {
+        abort_if(!auth()->user()?->can('items.view'), 403, 'غير مصرح لك بعرض أرصدة المخزون');
+
         $this->selectedStoreId = request()->query('store_id') 
             ?? session('current_store_id') 
             ?? auth()->user()?->getCurrentStore()?->id 
@@ -36,6 +38,7 @@ class StoreStockIndex extends Component
 
     public function openEditModal($stockId)
     {
+        abort_if(!auth()->user()?->can('items.edit'), 403, 'غير مصرح لك بتعديل إعدادات وأسعار الصنف بالفرع');
         $stock = StoreStock::with('item')->findOrFail($stockId);
         $this->editingStockId     = $stock->id;
         $this->editingItemName    = $stock->item->name;
@@ -47,6 +50,7 @@ class StoreStockIndex extends Component
 
     public function saveStockSettings()
     {
+        abort_if(!auth()->user()?->can('items.edit'), 403, 'غير مصرح لك بتعديل إعدادات وأسعار الصنف بالفرع');
         $this->validate([
             'editingMinStock'    => 'required|numeric|min:0',
             'editingCustomPrice' => 'nullable|numeric|min:0',

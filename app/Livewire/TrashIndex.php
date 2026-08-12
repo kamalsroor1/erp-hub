@@ -21,6 +21,11 @@ class TrashIndex extends Component
     public string $activeTab = 'items'; // items, customers, suppliers, stores, invoices, purchases, expenses, returns
     public string $search = '';
 
+    public function mount()
+    {
+        abort_if(!auth()->user()?->can('trash.access'), 403, 'غير مصرح لك بالوصول لسلة المحذوفات المركزية');
+    }
+
     public function setTab(string $tab)
     {
         $this->activeTab = $tab;

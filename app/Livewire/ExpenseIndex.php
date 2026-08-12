@@ -47,6 +47,7 @@ class ExpenseIndex extends Component
 
     public function mount()
     {
+        abort_if(!auth()->user()?->can('expenses.manage'), 403, 'غير مصرح لك بإدارة المصروفات');
         $this->fromDate = now()->startOfMonth()->toDateString();
         $this->toDate = now()->toDateString();
         $this->expense_date = now()->toDateString();
@@ -77,6 +78,7 @@ class ExpenseIndex extends Component
 
     public function openCreateModal()
     {
+        abort_if(!auth()->user()?->can('expenses.manage'), 403, 'غير مصرح لك بتسجيل مصروفات جديدة');
         $this->resetValidation();
         $this->reset(['title', 'notes', 'editExpenseId']);
         $this->isEditMode = false;
@@ -97,6 +99,7 @@ class ExpenseIndex extends Component
 
     public function openEditModal(int $id)
     {
+        abort_if(!auth()->user()?->can('expenses.manage'), 403, 'غير مصرح لك بتعديل المصروفات');
         $this->resetValidation();
         $expense = Expense::findOrFail($id);
         $this->isEditMode = true;
@@ -112,6 +115,7 @@ class ExpenseIndex extends Component
 
     public function saveExpense()
     {
+        abort_if(!auth()->user()?->can('expenses.manage'), 403, 'غير مصرح لك بحفظ المصروفات');
         $this->validate();
 
         if ($this->isEditMode && $this->editExpenseId) {
@@ -159,6 +163,7 @@ class ExpenseIndex extends Component
 
     public function deleteExpense(int $id)
     {
+        abort_if(!auth()->user()?->can('expenses.manage'), 403, 'غير مصرح لك بحذف المصروفات');
         $expense = Expense::findOrFail($id);
         $title = $expense->title;
         $expense->delete(); // Soft delete
@@ -172,6 +177,7 @@ class ExpenseIndex extends Component
 
     public function restoreExpense(int $id)
     {
+        abort_if(!auth()->user()?->can('trash.access'), 403, 'غير مصرح لك باسترجاع المصروفات المحذوفة');
         $expense = Expense::onlyTrashed()->findOrFail($id);
         $expense->restore();
 

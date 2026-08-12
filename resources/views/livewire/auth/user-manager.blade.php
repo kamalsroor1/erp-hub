@@ -11,13 +11,19 @@
             </p>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
+            <span class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-black shadow-lg shadow-emerald-600/30 flex items-center gap-1.5">
+                <span>👥 إدارة المستخدمين</span>
+            </span>
+            <a href="{{ route('roles.index') }}" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-all flex items-center gap-1.5">
+                <span>🛡️ مصفوفة الصلاحيات</span>
+            </a>
             <button
                 wire:click="openCreateModal"
-                class="px-5 py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-2xl shadow-lg shadow-amber-600/30 transition-all font-tajawal flex items-center gap-2 text-sm cursor-pointer"
+                class="px-4 py-2.5 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-black rounded-xl shadow-lg shadow-amber-600/30 transition-all flex items-center gap-1.5 text-xs cursor-pointer"
             >
                 <span>➕</span>
-                <span>إضافة كاشير / مستخدم جديد</span>
+                <span>إضافة مستخدم جديد</span>
             </button>
         </div>
     </div>
@@ -67,26 +73,10 @@
                                 📱 {{ $user->phone ?? $user->email }}
                             </td>
                             <td class="px-6 py-4">
-                                @php
-                                    $roleName = $user->roles->first()?->name ?? 'cashier';
-                                @endphp
-                                @if ($roleName === 'admin')
-                                    <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">
-                                        👑 مدير عام
-                                    </span>
-                                @elseif ($roleName === 'cashier')
-                                    <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                                        ☕ كاشير مبيعات
-                                    </span>
-                                @elseif ($roleName === 'storekeeper')
-                                    <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30">
-                                        📦 أمين مخزن
-                                    </span>
-                                @else
-                                    <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/30">
-                                        📊 محاسب مالي
-                                    </span>
-                                @endif
+                                @php $roleName = $user->roles->first()?->name ?? 'cashier'; @endphp
+                                <span class="px-2.5 py-1 rounded-full text-xs font-bold border {{ \App\Enums\UserRole::getBadgeClass($roleName) }}">
+                                    {{ \App\Enums\UserRole::getFormatted($roleName) }}
+                                </span>
                             </td>
                             <td class="px-6 py-4">
                                 @if ($user->is_active)
@@ -164,7 +154,7 @@
                             اسم المستخدم الكامل <span class="text-rose-500">*</span>
                         </label>
                         <input
-                            wire:model.defer="name"
+                            wire:model="name"
                             type="text"
                             required
                             placeholder="مثال: أحمد محمود (كاشير)"
@@ -178,7 +168,7 @@
                             رقم الهاتف للدخول <span class="text-rose-500">*</span>
                         </label>
                         <input
-                            wire:model.defer="phone"
+                            wire:model="phone"
                             type="text"
                             required
                             dir="ltr"
@@ -193,7 +183,7 @@
                             البريد الإلكتروني (اختياري)
                         </label>
                         <input
-                            wire:model.defer="email"
+                            wire:model="email"
                             type="email"
                             dir="ltr"
                             placeholder="cashier@sroor.com"
@@ -207,13 +197,14 @@
                             الصلاحية والدور <span class="text-rose-500">*</span>
                         </label>
                         <select
-                            wire:model.defer="role"
+                            wire:model="role"
                             class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
                         >
-                            <option value="cashier">☕ كاشير مبيعات (POS وفواتير فقط)</option>
-                            <option value="storekeeper">📦 أمين مخزن (أصناف ومشتريات وشكاير)</option>
-                            <option value="accountant">📊 محاسب مالي (تقارير وكشوفات حساب)</option>
-                            <option value="admin">👑 مدير عام (كامل الصلاحيات)</option>
+                            @foreach($availableRoles as $ar)
+                                <option value="{{ $ar->name }}">
+                                    {{ \App\Enums\UserRole::getFormatted($ar->name) }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -224,7 +215,7 @@
                         </label>
                         <div class="relative">
                             <input
-                                wire:model.defer="password"
+                                wire:model="password"
                                 :type="showPass ? 'text' : 'password'"
                                 {{ $editingUserId ? '' : 'required' }}
                                 dir="ltr"
@@ -246,7 +237,7 @@
                     <div class="pt-2">
                         <label class="flex items-center gap-2.5 cursor-pointer">
                             <input
-                                wire:model.defer="is_active"
+                                wire:model="is_active"
                                 type="checkbox"
                                 class="w-4 h-4 rounded bg-slate-50 dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-amber-500 focus:ring-amber-500"
                             >
