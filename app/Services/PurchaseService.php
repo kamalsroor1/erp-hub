@@ -156,7 +156,28 @@ class PurchaseService
     public function generateUniqueNumber(): string
     {
         $prefix = 'PUR-' . date('Ymd');
-        $count = Purchase::whereDate('created_at', now()->toDateString())->count() + 1;
-        return $prefix . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+        
+        $lastPurchase = Purchase::withTrashed()
+            ->where('purchase_number', 'LIKE', $prefix . '-%')
+            ->orderBy('purchase_number', 'desc')
+            ->first();
+
+        if ($lastPurchase) {
+            $parts = explode('-', $lastPurchase->purchase_number);
+            $lastSequence = (int) end($parts);
+            $nextSequence = $lastSequence + 1;
+        } else {
+            $nextSequence = 1;
+        }
+
+        do {
+            $candidate = $prefix . '-' . str_pad($nextSequence, 4, '0', STR_PAD_LEFT);
+            $exists = Purchase::withTrashed()->where('purchase_number', $candidate)->exists();
+            if ($exists) {
+                $nextSequence++;
+            }
+        } while ($exists);
+
+        return $candidate;
     }
 }

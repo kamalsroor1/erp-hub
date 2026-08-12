@@ -69,4 +69,37 @@ class PurchaseServiceTest extends TestCase
         $this->assertEquals('1000.000', $purchase->remaining_amount);
         $this->assertEquals('partially_paid', $purchase->payment_status);
     }
+
+    public function test_generate_unique_number_prevents_duplicate_after_soft_delete(): void
+    {
+        $item = Item::create([
+            'code'          => 'ITM-PUR-UNIQ',
+            'name'          => 'صنف اختبار توريد فريد',
+            'current_stock' => '0.000',
+            'cost_price'    => '100.000',
+            'selling_price' => '150.000',
+            'is_active'     => true,
+        ]);
+
+        $supplier = Supplier::create(['name' => 'مورد اختبار فريد', 'is_active' => true]);
+        $todayPrefix = 'PUR-' . date('Ymd');
+
+        // 1. Create first purchase
+        $pur1 = $this->purchaseService->createPurchase([
+            'supplier_id' => $supplier->id,
+            'items'       => [['item_id' => $item->id, 'quantity' => '5.000', 'cost_price' => '100.000']],
+        ]);
+        $this->assertEquals($todayPrefix . '-0001', $pur1->purchase_number);
+
+        // 2. Soft-delete purchase
+        $pur1->delete();
+        $this->assertSoftDeleted('purchases', ['id' => $pur1->id]);
+
+        // 3. Create second purchase - must be PUR-YYYYMMDD-0002 without collision
+        $pur2 = $this->purchaseService->createPurchase([
+            'supplier_id' => $supplier->id,
+            'items'       => [['item_id' => $item->id, 'quantity' => '5.000', 'cost_price' => '100.000']],
+        ]);
+        $this->assertEquals($todayPrefix . '-0002', $pur2->purchase_number);
+    }
 }

@@ -478,7 +478,28 @@ class InvoiceService
     public function generateUniqueNumber(): string
     {
         $prefix = 'INV-' . date('Ymd');
-        $count = Invoice::whereDate('created_at', now()->toDateString())->count() + 1;
-        return $prefix . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+        
+        $lastInvoice = Invoice::withTrashed()
+            ->where('invoice_number', 'LIKE', $prefix . '-%')
+            ->orderBy('invoice_number', 'desc')
+            ->first();
+
+        if ($lastInvoice) {
+            $parts = explode('-', $lastInvoice->invoice_number);
+            $lastSequence = (int) end($parts);
+            $nextSequence = $lastSequence + 1;
+        } else {
+            $nextSequence = 1;
+        }
+
+        do {
+            $candidate = $prefix . '-' . str_pad($nextSequence, 4, '0', STR_PAD_LEFT);
+            $exists = Invoice::withTrashed()->where('invoice_number', $candidate)->exists();
+            if ($exists) {
+                $nextSequence++;
+            }
+        } while ($exists);
+
+        return $candidate;
     }
 }

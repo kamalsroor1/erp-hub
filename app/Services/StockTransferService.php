@@ -243,7 +243,28 @@ class StockTransferService
     public function generateUniqueNumber(): string
     {
         $prefix = 'TRF-' . date('Ymd');
-        $count = StockTransfer::whereDate('created_at', now()->toDateString())->count() + 1;
-        return $prefix . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+        
+        $lastTransfer = StockTransfer::withTrashed()
+            ->where('transfer_number', 'LIKE', $prefix . '-%')
+            ->orderBy('transfer_number', 'desc')
+            ->first();
+
+        if ($lastTransfer) {
+            $parts = explode('-', $lastTransfer->transfer_number);
+            $lastSequence = (int) end($parts);
+            $nextSequence = $lastSequence + 1;
+        } else {
+            $nextSequence = 1;
+        }
+
+        do {
+            $candidate = $prefix . '-' . str_pad($nextSequence, 4, '0', STR_PAD_LEFT);
+            $exists = StockTransfer::withTrashed()->where('transfer_number', $candidate)->exists();
+            if ($exists) {
+                $nextSequence++;
+            }
+        } while ($exists);
+
+        return $candidate;
     }
 }

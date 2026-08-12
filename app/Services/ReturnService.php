@@ -171,7 +171,29 @@ class ReturnService
 
     public function generateUniqueNumber(string $prefix): string
     {
-        $count = ReturnDocument::whereDate('created_at', now()->toDateString())->count() + 1;
-        return $prefix . '-' . date('Ymd') . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+        $datePrefix = $prefix . '-' . date('Ymd');
+        
+        $lastReturn = ReturnDocument::withTrashed()
+            ->where('return_number', 'LIKE', $datePrefix . '-%')
+            ->orderBy('return_number', 'desc')
+            ->first();
+
+        if ($lastReturn) {
+            $parts = explode('-', $lastReturn->return_number);
+            $lastSequence = (int) end($parts);
+            $nextSequence = $lastSequence + 1;
+        } else {
+            $nextSequence = 1;
+        }
+
+        do {
+            $candidate = $datePrefix . '-' . str_pad($nextSequence, 4, '0', STR_PAD_LEFT);
+            $exists = ReturnDocument::withTrashed()->where('return_number', $candidate)->exists();
+            if ($exists) {
+                $nextSequence++;
+            }
+        } while ($exists);
+
+        return $candidate;
     }
 }

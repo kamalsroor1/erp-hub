@@ -169,4 +169,95 @@ class InvoiceServiceTest extends TestCase
         $this->assertNotNull($cancellationMovement);
         $this->assertEquals('3.000', $cancellationMovement->quantity);
     }
+
+    public function test_generate_unique_number_prevents_duplicate_after_soft_delete(): void
+    {
+        $item = Item::create([
+            'code'          => 'ITM-UNIQ-1',
+            'name'          => 'صنف اختبار فريد 1',
+            'current_stock' => '50.000',
+            'cost_price'    => '100.000',
+            'selling_price' => '150.000',
+            'is_active'     => true,
+        ]);
+
+        $customer = Customer::create(['name' => 'عميل اختبار الأرقام الفريدة', 'is_active' => true]);
+
+        // 1. Create first invoice (INV-YYYYMMDD-0001)
+        $inv1 = $this->invoiceService->confirmInvoice([
+            'customer_id'  => $customer->id,
+            'payment_type' => 'cash',
+            'items'        => [
+                ['item_id' => $item->id, 'quantity' => '1.000', 'unit_price' => '150.000']
+            ],
+        ]);
+
+        $todayPrefix = 'INV-' . date('Ymd');
+        $this->assertEquals($todayPrefix . '-0001', $inv1->invoice_number);
+
+        // 2. Soft-delete the first invoice
+        $this->invoiceService->deleteInvoice($inv1);
+        $this->assertSoftDeleted('invoices', ['id' => $inv1->id]);
+
+        // 3. Generate number for next invoice - must NOT be 0001 again
+        $nextNumber = $this->invoiceService->generateUniqueNumber();
+        $this->assertEquals($todayPrefix . '-0002', $nextNumber);
+
+        // 4. Create second invoice - must succeed without unique constraint error
+        $inv2 = $this->invoiceService->confirmInvoice([
+            'customer_id'  => $customer->id,
+            'payment_type' => 'cash',
+            'items'        => [
+                ['item_id' => $item->id, 'quantity' => '1.000', 'unit_price' => '150.000']
+            ],
+        ]);
+
+        $this->assertEquals($todayPrefix . '-0002', $inv2->invoice_number);
+        $this->assertEquals(1, Invoice::count()); // 1 active
+        $this->assertEquals(2, Invoice::withTrashed()->count()); // 2 total in DB
+    }
+
+    public function test_generate_unique_number_sequential_increment_with_deleted_records(): void
+    {
+        $item = Item::create([
+            'code'          => 'ITM-UNIQ-2',
+            'name'          => 'صنف اختبار فريد 2',
+            'current_stock' => '50.000',
+            'cost_price'    => '100.000',
+            'selling_price' => '150.000',
+            'is_active'     => true,
+        ]);
+
+        $customer = Customer::create(['name' => 'عميل اختبار تسلسل الأرقام', 'is_active' => true]);
+        $todayPrefix = 'INV-' . date('Ymd');
+
+        // Create 3 invoices
+        $inv1 = $this->invoiceService->confirmInvoice([
+            'customer_id' => $customer->id, 'payment_type' => 'cash',
+            'items' => [['item_id' => $item->id, 'quantity' => '1.000', 'unit_price' => '150.000']],
+        ]);
+        $inv2 = $this->invoiceService->confirmInvoice([
+            'customer_id' => $customer->id, 'payment_type' => 'cash',
+            'items' => [['item_id' => $item->id, 'quantity' => '1.000', 'unit_price' => '150.000']],
+        ]);
+        $inv3 = $this->invoiceService->confirmInvoice([
+            'customer_id' => $customer->id, 'payment_type' => 'cash',
+            'items' => [['item_id' => $item->id, 'quantity' => '1.000', 'unit_price' => '150.000']],
+        ]);
+
+        $this->assertEquals($todayPrefix . '-0001', $inv1->invoice_number);
+        $this->assertEquals($todayPrefix . '-0002', $inv2->invoice_number);
+        $this->assertEquals($todayPrefix . '-0003', $inv3->invoice_number);
+
+        // Delete invoice #2
+        $this->invoiceService->deleteInvoice($inv2);
+
+        // Create 4th invoice - must get sequence 0004 (not 0003 or 0002)
+        $inv4 = $this->invoiceService->confirmInvoice([
+            'customer_id' => $customer->id, 'payment_type' => 'cash',
+            'items' => [['item_id' => $item->id, 'quantity' => '1.000', 'unit_price' => '150.000']],
+        ]);
+
+        $this->assertEquals($todayPrefix . '-0004', $inv4->invoice_number);
+    }
 }
