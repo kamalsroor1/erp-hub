@@ -257,6 +257,81 @@ class InvoiceCreate extends Component
         $this->calculateTotals();
     }
 
+    public function incrementLineQty($index, $step = '1.000')
+    {
+        if (isset($this->items[$index])) {
+            $line = $this->items[$index];
+            $item = Item::find($line['item_id']);
+            $currentStock = $item ? (string)$item->getStockInStore($this->store_id) : '0.000';
+            $newQty = bcadd($line['quantity'], (string)$step, 3);
+
+            if (bccomp($newQty, $currentStock, 3) > 0) {
+                $msg = "عفواً، الكمية المطلوبة ({$newQty}) تتجاوز الرصيد المتاح بالمخزن ({$currentStock}) للصنف: {$line['name']}";
+                $this->errorMessage = $msg;
+                $this->dispatch('swal:toast', ['icon' => 'error', 'title' => $msg]);
+                return;
+            }
+
+            $this->items[$index]['quantity'] = $newQty;
+            $this->items[$index]['total_price'] = bcmul($newQty, $this->items[$index]['unit_price'], 3);
+            $this->calculateTotals();
+        }
+    }
+
+    public function decrementLineQty($index, $step = '1.000')
+    {
+        if (isset($this->items[$index])) {
+            $line = $this->items[$index];
+            $minQty = ($line['unit'] === 'كجم') ? '0.125' : '1.000';
+            $newQty = bcsub($line['quantity'], (string)$step, 3);
+
+            if (bccomp($newQty, $minQty, 3) < 0) {
+                $this->removeItem($index);
+                return;
+            }
+
+            $this->items[$index]['quantity'] = $newQty;
+            $this->items[$index]['total_price'] = bcmul($newQty, $this->items[$index]['unit_price'], 3);
+            $this->calculateTotals();
+        }
+    }
+
+    public function quickSetPaidExact()
+    {
+        $this->payment_type = 'cash';
+        $this->paid_amount = $this->net_total;
+        $this->calculateTotals();
+    }
+
+    public function quickSetPaidAmount($amount)
+    {
+        $amt = (string) $amount;
+        $this->paid_amount = $amt;
+        if (bccomp($amt, $this->net_total, 3) >= 0) {
+            $this->payment_type = 'cash';
+        } else {
+            $this->payment_type = 'partial';
+        }
+        $this->calculateTotals();
+    }
+
+    public function quickSetDiscountPercent($percent)
+    {
+        if (!auth()->user()?->can('invoices.discount')) {
+            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => 'غير مصرح لك بمنح خصومات']);
+            return;
+        }
+        $this->discount_type = 'percentage';
+        $this->discount_value = (string) $percent;
+        $this->calculateTotals();
+    }
+
+    public function quickSetPaymentType($type)
+    {
+        $this->payment_type = $type;
+        $this->updatedPaymentType();
+    }
+
     public function updatedItems($value, $key)
     {
         if (str_contains($key, 'quantity')) {

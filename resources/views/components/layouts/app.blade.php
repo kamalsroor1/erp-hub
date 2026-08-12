@@ -126,7 +126,15 @@
     </style>
     @livewireStyles
 </head>
-<body class="h-full bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex overflow-hidden selection:bg-amber-500 selection:text-white" x-data="{ sidebarOpen: false }">
+<body class="h-full bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex overflow-hidden selection:bg-amber-500 selection:text-white" 
+      x-data="{ 
+          sidebarOpen: false, 
+          sidebarCollapsed: {{ request()->routeIs('invoices.create') ? 'true' : "(localStorage.getItem('sidebar_collapsed') === 'true')" }},
+          toggleSidebar() {
+              this.sidebarCollapsed = !this.sidebarCollapsed;
+              localStorage.setItem('sidebar_collapsed', this.sidebarCollapsed);
+          }
+      }">
 
     <!-- 🌟 Top Page Loading Progress Bar -->
     <div id="top-loading-bar"></div>
@@ -144,212 +152,425 @@
         <!-- Mobile sidebar backdrop -->
         <div x-show="sidebarOpen" @click="sidebarOpen = false" x-cloak class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"></div>
 
-        <!-- Sidebar Navigation -->
-        <aside :class="sidebarOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'" class="fixed lg:static inset-y-0 right-0 z-50 w-72 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none">
+        <!-- Sidebar Navigation (Collapsible) -->
+        <aside 
+            :class="{
+                'translate-x-0': sidebarOpen,
+                'translate-x-full lg:translate-x-0': !sidebarOpen,
+                'w-72': !sidebarCollapsed,
+                'w-20': sidebarCollapsed
+            }"
+            class="fixed lg:static inset-y-0 right-0 z-50 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-300 ease-in-out shadow-xl lg:shadow-none select-none"
+        >
             <!-- Brand Header -->
-            <div class="h-16 px-6 flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/50 backdrop-blur-md">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 p-1 flex items-center justify-center shadow-md shadow-amber-500/10 border border-slate-200 dark:border-slate-700 shrink-0">
+            <div class="h-16 px-3.5 flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/50 backdrop-blur-md overflow-hidden">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <a href="{{ route('dashboard') }}" class="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 p-1 flex items-center justify-center shadow-md shadow-amber-500/10 border border-slate-200 dark:border-slate-700 shrink-0">
                         <img src="{{ asset('logo.png') }}" alt="سرور POS" class="w-full h-full object-contain">
-                    </div>
-                    <div>
-                        <h1 class="font-extrabold text-base tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5 font-tajawal">
+                    </a>
+                    <div x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate min-w-0">
+                        <h1 class="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white font-tajawal truncate">
                             {{ $siteCompanyName }}
-                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">V1.0</span>
                         </h1>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[150px]">{{ $siteSubtitle }}</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">{{ $siteSubtitle }}</p>
                     </div>
                 </div>
-                <button @click="sidebarOpen = false" class="lg:hidden text-slate-400 hover:text-slate-700 dark:hover:text-white">
-                    ✕
-                </button>
+
+                <div class="flex items-center">
+                    <!-- Desktop Collapse/Expand Toggle Button -->
+                    <button 
+                        @click="toggleSidebar()" 
+                        type="button"
+                        class="hidden lg:flex p-2 rounded-xl text-slate-400 hover:text-amber-600 hover:bg-amber-500/10 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                        :title="sidebarCollapsed ? 'توسيع القائمة الجانبية' : 'تصغير القائمة الجانبية'"
+                    >
+                        <svg class="w-5 h-5 transition-transform duration-300" :class="sidebarCollapsed ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+
+                    <!-- Mobile Close Button -->
+                    <button @click="sidebarOpen = false" class="lg:hidden p-2 text-slate-400 hover:text-slate-700 dark:hover:text-white">
+                        ✕
+                    </button>
+                </div>
             </div>
 
             <!-- Quick POS Button (pos.access) -->
             @can('pos.access')
-            <div class="p-4 border-b border-slate-200 dark:border-slate-800/60">
-                <a href="{{ route('invoices.create') }}" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-500 text-white font-bold rounded-xl shadow-lg shadow-amber-600/30 transition-all duration-200 active:scale-95 group font-tajawal">
-                    <svg class="w-5 h-5 transition-transform group-hover:rotate-90 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                    <span>فاتورة بيع جديدة (F2)</span>
+            <div class="p-3 border-b border-slate-200 dark:border-slate-800/60 relative group">
+                <a href="{{ route('invoices.create') }}" 
+                   :class="sidebarCollapsed ? 'px-2 py-3 justify-center' : 'px-4 py-3 justify-center gap-2'"
+                   class="w-full flex items-center bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-500 text-white font-bold rounded-xl shadow-lg shadow-amber-600/30 transition-all duration-200 active:scale-95 group font-tajawal cursor-pointer"
+                >
+                    <svg class="w-5 h-5 shrink-0 transition-transform group-hover:rotate-90 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                    <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">فاتورة بيع جديدة (F2)</span>
                 </a>
+                <!-- Tooltip Flyout when collapsed -->
+                <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                    <div class="px-3.5 py-2 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap flex items-center gap-2">
+                        <span>⚡ فاتورة بيع جديدة (F2)</span>
+                    </div>
+                </div>
             </div>
             @endcan
 
             <!-- Nav Links -->
-            <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('dashboard') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                    <span>لوحة التحكم (Dashboard)</span>
-                </a>
+            <nav class="flex-1 px-2.5 py-3 space-y-1 overflow-y-auto overflow-x-hidden">
+                <!-- لوحة التحكم -->
+                <div class="relative group">
+                    <a href="{{ route('dashboard') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('dashboard') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">لوحة التحكم (Dashboard)</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            📊 لوحة التحكم
+                        </div>
+                    </div>
+                </div>
 
                 <!-- المبيعات والفواتير -->
                 @if(auth()->user()?->can('invoices.view') || auth()->user()?->can('daily_journal.view') || auth()->user()?->can('customers.manage'))
-                <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">المبيعات والفواتير</div>
+                <div x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 truncate">المبيعات والفواتير</div>
+                <div x-show="sidebarCollapsed" class="my-2 border-t border-slate-200 dark:border-slate-800/80 mx-2"></div>
 
                 @can('invoices.view')
-                <a href="{{ route('invoices.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('invoices.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    <span>فواتير المبيعات</span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('invoices.index') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('invoices.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">فواتير المبيعات</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            🧾 فواتير المبيعات
+                        </div>
+                    </div>
+                </div>
                 @endcan
 
                 @can('daily_journal.view')
-                <a href="{{ route('daily.journal') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('daily.journal') || request()->routeIs('shifts.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <span>📅 اليومية وحركة الدرج</span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('daily.journal') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('daily.journal') || request()->routeIs('shifts.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">📅 اليومية وحركة الدرج</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            📅 اليومية وحركة الدرج
+                        </div>
+                    </div>
+                </div>
                 @endcan
 
                 @can('customers.manage')
-                <a href="{{ route('customers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('customers.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    <span>العملاء والحسابات</span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('customers.index') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('customers.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">العملاء والحسابات</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            👥 العملاء والحسابات
+                        </div>
+                    </div>
+                </div>
                 @endcan
                 @endif
 
                 <!-- المخزون والفروع والتوزيع -->
                 @if(auth()->user()?->can('items.view') || auth()->user()?->can('transfers.view') || auth()->user()?->can('stores.manage') || auth()->user()?->can('purchases.view') || auth()->user()?->can('suppliers.manage'))
-                <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">المخزون والفروع والتوزيع</div>
+                <div x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 truncate">المخزون والفروع والتوزيع</div>
+                <div x-show="sidebarCollapsed" class="my-2 border-t border-slate-200 dark:border-slate-800/80 mx-2"></div>
 
                 @can('items.view')
-                <a href="{{ route('items.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('items.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                    <span>الأصناف والأسعار العامة</span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('items.index') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('items.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">الأصناف والأسعار العامة</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            📦 الأصناف والأسعار العامة
+                        </div>
+                    </div>
+                </div>
 
-                <a href="{{ route('store-stocks') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('store-stocks') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                    <span>📦 جرد وأسعار الفروع</span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('store-stocks') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('store-stocks') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">📦 جرد وأسعار الفروع</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            📦 جرد وأسعار الفروع
+                        </div>
+                    </div>
+                </div>
                 @endcan
 
                 @can('transfers.view')
-                <a href="{{ route('stock-transfers') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('stock-transfers*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                    <span>🚚 أذونات التحويل والشحن</span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('stock-transfers') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('stock-transfers*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">🚚 أذونات التحويل والشحن</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            🚚 أذونات التحويل والشحن
+                        </div>
+                    </div>
+                </div>
                 @endcan
 
                 @can('stores.manage')
-                <a href="{{ route('stores') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('stores') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                    <span>🏬 الفروع وعربات التوزيع</span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('stores') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('stores') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">🏬 الفروع وعربات التوزيع</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            🏬 الفروع وعربات التوزيع
+                        </div>
+                    </div>
+                </div>
                 @endcan
 
                 @can('purchases.view')
-                <a href="{{ route('purchases.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('purchases.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    <span>فواتير المشتريات</span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('purchases.index') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('purchases.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">فواتير المشتريات</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            🛒 فواتير المشتريات
+                        </div>
+                    </div>
+                </div>
                 @endcan
 
                 @can('suppliers.manage')
-                <a href="{{ route('suppliers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('suppliers.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                    <span>الموردون</span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('suppliers.index') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('suppliers.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">الموردون</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            🏢 الموردون
+                        </div>
+                    </div>
+                </div>
                 @endcan
                 @endif
 
                 <!-- المرتجعات والمصروفات والتقارير -->
                 @if(auth()->user()?->can('expenses.manage') || auth()->user()?->can('returns.manage') || auth()->user()?->can('reports.view'))
-                <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">المرتجعات والمصروفات والتقارير</div>
+                <div x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 truncate">المرتجعات والمصروفات والتقارير</div>
+                <div x-show="sidebarCollapsed" class="my-2 border-t border-slate-200 dark:border-slate-800/80 mx-2"></div>
 
                 @can('expenses.manage')
-                <a href="{{ route('expenses.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('expenses.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    <span>المصروفات والنثريات</span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('expenses.index') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('expenses.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">المصروفات والنثريات</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            💵 المصروفات والنثريات
+                        </div>
+                    </div>
+                </div>
                 @endcan
 
                 @can('returns.manage')
-                <a href="{{ route('returns.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('returns.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    <span>سجل المرتجعات</span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('returns.index') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('returns.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">سجل المرتجعات</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            🔄 سجل المرتجعات
+                        </div>
+                    </div>
+                </div>
                 @endcan
 
                 @can('reports.view')
-                <a href="{{ route('reports.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('reports.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    <span>التقارير المالية والأرباح</span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('reports.index') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('reports.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">التقارير المالية والأرباح</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            📈 التقارير المالية والأرباح
+                        </div>
+                    </div>
+                </div>
                 @endcan
                 @endif
 
                 <!-- إدارة النظام والمستخدمين -->
                 @if(auth()->user()?->can('roles.manage') || auth()->user()?->can('trash.access') || auth()->user()?->can('logs.view'))
-                <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">إدارة النظام والمستخدمين</div>
+                <div x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 truncate">إدارة النظام والمستخدمين</div>
+                <div x-show="sidebarCollapsed" class="my-2 border-t border-slate-200 dark:border-slate-800/80 mx-2"></div>
 
                 @can('roles.manage')
-                <a href="{{ route('users.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('users.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    <span>المستخدمون والكاشير</span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('users.index') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('users.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">المستخدمون والكاشير</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            👥 المستخدمون والكاشير
+                        </div>
+                    </div>
+                </div>
 
-                <a href="{{ route('roles.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('roles.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                    <span>🛡️ الأدوار ومجموعات الصلاحيات</span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('roles.index') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('roles.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">🛡️ الأدوار ومجموعات الصلاحيات</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            🛡️ الأدوار ومجموعات الصلاحيات
+                        </div>
+                    </div>
+                </div>
                 @endcan
 
                 @can('logs.view')
-                <a href="{{ route('activity-logs.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('activity-logs.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                    <span>📜 سجل العمليات والرقابة</span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('activity-logs.index') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('activity-logs.*') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">📜 سجل العمليات والرقابة</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            📜 سجل العمليات والرقابة
+                        </div>
+                    </div>
+                </div>
                 @endcan
 
                 @can('trash.access')
-                <a href="{{ route('trash.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('trash.index') ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/40' : 'text-slate-600 dark:text-slate-300 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400' }}">
-                    <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    <span class="flex items-center justify-between w-full">
-                        <span>🗑️ سلة المحذوفات المركزية</span>
-                    </span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('trash.index') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('trash.index') ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/40' : 'text-slate-600 dark:text-slate-300 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400' }}"
+                    >
+                        <svg class="w-5 h-5 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">🗑️ سلة المحذوفات المركزية</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-rose-900 text-rose-100 text-xs font-bold rounded-xl shadow-2xl border border-rose-700 whitespace-nowrap">
+                            🗑️ سلة المحذوفات المركزية
+                        </div>
+                    </div>
+                </div>
                 @endcan
                 @endif
 
-                <a href="{{ route('profile') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('profile') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    <span>الملف الشخصي والأمان</span>
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('profile') }}" 
+                       :class="sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5 gap-3'"
+                       class="flex items-center rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('profile') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">الملف الشخصي والأمان</span>
+                    </a>
+                    <div x-show="sidebarCollapsed" class="hidden lg:group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 z-50 items-center pointer-events-none">
+                        <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-2xl border border-slate-700 whitespace-nowrap">
+                            👤 الملف الشخصي والأمان
+                        </div>
+                    </div>
+                </div>
 
-                <!-- 📲 PWA Mobile Install Button (Permanent) -->
-                <div class="pt-2 px-1">
-                    <button onclick="triggerPwaInstall()" type="button" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-amber-600/15 via-amber-500/20 to-amber-600/15 hover:from-amber-600/30 hover:to-amber-500/30 text-amber-600 dark:text-amber-400 font-bold rounded-xl text-xs border border-amber-500/30 shadow-sm transition-all cursor-pointer">
-                        <span>📲 تثبيت التطبيق (PWA)</span>
+                <!-- 📲 PWA Mobile Install Button -->
+                <div class="pt-2">
+                    <button onclick="triggerPwaInstall()" type="button" 
+                            :class="sidebarCollapsed ? 'px-2 py-3 justify-center' : 'px-3 py-2.5 justify-center gap-2'"
+                            class="w-full flex items-center bg-gradient-to-r from-amber-600/15 via-amber-500/20 to-amber-600/15 hover:from-amber-600/30 hover:to-amber-500/30 text-amber-600 dark:text-amber-400 font-bold rounded-xl text-xs border border-amber-500/30 shadow-sm transition-all cursor-pointer"
+                    >
+                        <span class="text-base">📲</span>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">تثبيت التطبيق (PWA)</span>
                     </button>
                 </div>
             </nav>
 
             <!-- User Info & Logout -->
-            <div class="p-4 border-t border-slate-200 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/60 flex items-center justify-between">
-                <a href="{{ route('profile') }}" class="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition-opacity">
-                    <div class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-600 dark:text-amber-300 flex items-center justify-center font-bold text-xs shrink-0">
+            <div class="p-3 border-t border-slate-200 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/60 flex items-center justify-between overflow-hidden">
+                <a href="{{ route('profile') }}" :class="sidebarCollapsed ? 'justify-center w-full' : 'gap-2.5'" class="flex items-center min-w-0 hover:opacity-80 transition-opacity">
+                    <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-600 dark:text-amber-300 flex items-center justify-center font-bold text-xs shrink-0 shadow-inner">
                         {{ mb_substr(auth()->user()->name ?? 'م', 0, 1) }}
                     </div>
-                    <div class="min-w-0">
+                    <div x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="min-w-0 truncate">
                         <p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{{ auth()->user()->name ?? 'مستخدم' }}</p>
-                        <p class="text-[10px] text-amber-600 dark:text-amber-400/80 truncate">
-                            @if(auth()->user()->hasRole('admin'))
-                                👑 المدير العام (Admin)
-                            @elseif(auth()->user()->hasRole('cashier'))
-                                💼 كاشير (Cashier)
-                            @elseif(auth()->user()->hasRole('storekeeper'))
-                                📦 أمين مخزن (Store)
-                            @elseif(auth()->user()->hasRole('accountant'))
-                                📊 محاسب (Accountant)
-                            @else
-                                مستخدم
-                            @endif
+                        <p class="text-[10px] text-amber-600 dark:text-amber-400/80 truncate font-semibold">
+                            @if(auth()->user()->hasRole('admin')) 👑 المدير العام
+                            @elseif(auth()->user()->hasRole('cashier')) 💼 كاشير
+                            @elseif(auth()->user()->hasRole('storekeeper')) 📦 أمين مخزن
+                            @elseif(auth()->user()->hasRole('accountant')) 📊 محاسب
+                            @else مستخدم @endif
                         </p>
                     </div>
                 </a>
 
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms>
                     @csrf
                     <button type="submit" class="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer" title="تسجيل الخروج">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
@@ -363,9 +584,23 @@
             <!-- Top App Bar -->
             <header class="h-16 bg-white/90 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 lg:px-8 shrink-0 z-30 shadow-sm">
                 <div class="flex items-center gap-3">
+                    <!-- Mobile Hamburger -->
                     <button @click="sidebarOpen = true" class="lg:hidden p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
+
+                    <!-- Desktop Collapse Switcher in Header -->
+                    <button 
+                        @click="toggleSidebar()" 
+                        type="button" 
+                        class="hidden lg:flex p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-amber-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        :title="sidebarCollapsed ? 'توسيع القائمة' : 'تصغير القائمة'"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+                        </svg>
+                    </button>
+
                     <div class="text-sm font-semibold text-slate-600 dark:text-slate-300 hidden sm:flex items-center gap-2">
                         <span>📅 {{ now()->translatedFormat('l, d F Y') }}</span>
                         <span class="text-slate-300 dark:text-slate-600">|</span>
