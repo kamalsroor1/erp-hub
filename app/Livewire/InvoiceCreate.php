@@ -90,22 +90,70 @@ class InvoiceCreate extends Component
         if (!$item) return;
 
         $qtyToAdd = (string) $quantity;
-        $pricingHelper = app(CustomerPricingHelper::class);
+        $currentStock = (string) $item->getStockInStore($this->store_id);
+
+        // 🛑 Check 1: Stock is zero or negative
+        if (bccomp($currentStock, '0.000', 3) <= 0) {
+            $msg = "عفواً، الصنف ({$item->name}) غير متوفر حالياً بالمخزن/الفرع المحدد (الرصيد المتاح: 0).";
+            $this->errorMessage = $msg;
+            $this->dispatch('swal:toast', [
+                'icon'  => 'error',
+                'title' => $msg,
+            ]);
+            $this->dispatch('swal:alert', [
+                'icon'    => 'error',
+                'title'   => 'نفاد الكمية بالمخزن!',
+                'message' => $msg,
+            ]);
+            return;
+        }
 
         // Check if item already in lines
         foreach ($this->items as $index => $line) {
             if ($line['item_id'] == $item->id) {
                 $newQty = bcadd($line['quantity'], $qtyToAdd, 3);
+                // 🛑 Check 2: Total requested quantity exceeds available stock
+                if (bccomp($newQty, $currentStock, 3) > 0) {
+                    $msg = "عفواً، الكمية الإجمالية المطلوب بيعها ({$newQty}) تتجاوز الرصيد المتاح بالمخزن ({$currentStock}) للصنف: {$item->name}";
+                    $this->errorMessage = $msg;
+                    $this->dispatch('swal:toast', [
+                        'icon'  => 'error',
+                        'title' => $msg,
+                    ]);
+                    $this->dispatch('swal:alert', [
+                        'icon'    => 'error',
+                        'title'   => 'تجاوز رصيد المخزن!',
+                        'message' => $msg,
+                    ]);
+                    return;
+                }
                 $this->items[$index]['quantity'] = $newQty;
+                $this->items[$index]['total_price'] = bcmul($newQty, $this->items[$index]['unit_price'], 3);
                 $this->calculateTotals();
                 $this->searchQuery = '';
                 return;
             }
         }
 
+        // 🛑 Check 3: Initial requested quantity exceeds current stock
+        if (bccomp($qtyToAdd, $currentStock, 3) > 0) {
+            $msg = "عفواً، الكمية المطلوبة ({$qtyToAdd}) تتجاوز الرصيد المتاح بالمخزن ({$currentStock}) للصنف: {$item->name}";
+            $this->errorMessage = $msg;
+            $this->dispatch('swal:toast', [
+                'icon'  => 'error',
+                'title' => $msg,
+            ]);
+            $this->dispatch('swal:alert', [
+                'icon'    => 'error',
+                'title'   => 'تجاوز رصيد المخزن!',
+                'message' => $msg,
+            ]);
+            return;
+        }
+
         $effectivePrice = $item->getEffectivePriceForStore($this->store_id);
         $lastCustomerPrice = $this->customer_id 
-            ? $pricingHelper->getLastSoldPrice($this->customer_id, $item->id, $this->store_id)
+            ? app(CustomerPricingHelper::class)->getLastSoldPrice($this->customer_id, $item->id, $this->store_id)
             : null;
 
         $this->items[] = [
@@ -114,7 +162,7 @@ class InvoiceCreate extends Component
             'name'                => $item->name,
             'category'            => $item->category,
             'unit'                => $item->unit ?: 'كجم',
-            'current_stock'       => $item->getStockInStore($this->store_id),
+            'current_stock'       => $currentStock,
             'quantity'            => $qtyToAdd,
             'unit_price'          => $effectivePrice,
             'discount_amount'     => '0.000',
@@ -137,7 +185,21 @@ class InvoiceCreate extends Component
     public function setLineWeightPreset($index, $weight)
     {
         if (isset($this->items[$index])) {
-            $this->items[$index]['quantity'] = (string) $weight;
+            $line = $this->items[$index];
+            $item = Item::find($line['item_id']);
+            $currentStock = $item ? (string)$item->getStockInStore($this->store_id) : '0.000';
+            $reqWeight = (string) $weight;
+
+            if (bccomp($reqWeight, $currentStock, 3) > 0) {
+                $msg = "عفواً، الوزن المطلوب ({$reqWeight}) يتجاوز الرصيد المتاح بالمخزن ({$currentStock}) للصنف: {$line['name']}";
+                $this->errorMessage = $msg;
+                $this->dispatch('swal:toast', ['icon' => 'error', 'title' => $msg]);
+                $this->dispatch('swal:alert', ['icon' => 'error', 'title' => 'تجاوز رصيد المخزن!', 'message' => $msg]);
+                return;
+            }
+
+            $this->items[$index]['quantity'] = $reqWeight;
+            $this->items[$index]['total_price'] = bcmul($reqWeight, $this->items[$index]['unit_price'], 3);
             $this->calculateTotals();
         }
     }
@@ -145,8 +207,21 @@ class InvoiceCreate extends Component
     public function setLineGrams($index, $grams)
     {
         if (isset($this->items[$index])) {
+            $line = $this->items[$index];
+            $item = Item::find($line['item_id']);
+            $currentStock = $item ? (string)$item->getStockInStore($this->store_id) : '0.000';
             $kg = bcdiv((string)$grams, '1000', 4);
+
+            if (bccomp($kg, $currentStock, 3) > 0) {
+                $msg = "عفواً، الوزن المطلوب ({$kg} كجم) يتجاوز الرصيد المتاح بالمخزن ({$currentStock}) للصنف: {$line['name']}";
+                $this->errorMessage = $msg;
+                $this->dispatch('swal:toast', ['icon' => 'error', 'title' => $msg]);
+                $this->dispatch('swal:alert', ['icon' => 'error', 'title' => 'تجاوز رصيد المخزن!', 'message' => $msg]);
+                return;
+            }
+
             $this->items[$index]['quantity'] = $kg;
+            $this->items[$index]['total_price'] = bcmul($kg, $this->items[$index]['unit_price'], 3);
             $this->calculateTotals();
         }
     }
@@ -154,7 +229,21 @@ class InvoiceCreate extends Component
     public function addLineWeightPreset($index, $weightToAdd)
     {
         if (isset($this->items[$index])) {
-            $this->items[$index]['quantity'] = bcadd($this->items[$index]['quantity'], (string)$weightToAdd, 3);
+            $line = $this->items[$index];
+            $item = Item::find($line['item_id']);
+            $currentStock = $item ? (string)$item->getStockInStore($this->store_id) : '0.000';
+            $newQty = bcadd($line['quantity'], (string)$weightToAdd, 3);
+
+            if (bccomp($newQty, $currentStock, 3) > 0) {
+                $msg = "عفواً، الوزن المطلوب ({$newQty}) يتجاوز الرصيد المتاح بالمخزن ({$currentStock}) للصنف: {$line['name']}";
+                $this->errorMessage = $msg;
+                $this->dispatch('swal:toast', ['icon' => 'error', 'title' => $msg]);
+                $this->dispatch('swal:alert', ['icon' => 'error', 'title' => 'تجاوز رصيد المخزن!', 'message' => $msg]);
+                return;
+            }
+
+            $this->items[$index]['quantity'] = $newQty;
+            $this->items[$index]['total_price'] = bcmul($newQty, $this->items[$index]['unit_price'], 3);
             $this->calculateTotals();
         }
     }
@@ -166,8 +255,26 @@ class InvoiceCreate extends Component
         $this->calculateTotals();
     }
 
-    public function updatedItems()
+    public function updatedItems($value, $key)
     {
+        if (str_contains($key, 'quantity')) {
+            $parts = explode('.', $key);
+            $idx = $parts[0] ?? null;
+            if ($idx !== null && isset($this->items[$idx])) {
+                $line = $this->items[$idx];
+                $item = Item::find($line['item_id']);
+                $currentStock = $item ? (string)$item->getStockInStore($this->store_id) : '0.000';
+                $requestedQty = (string)($line['quantity'] ?: '0');
+
+                if (bccomp($requestedQty, $currentStock, 3) > 0) {
+                    $msg = "عفواً، الكمية المطلوبة ({$requestedQty}) تتجاوز الرصيد المتاح بالمخزن ({$currentStock}) للصنف: {$line['name']}";
+                    $this->errorMessage = $msg;
+                    $this->dispatch('swal:toast', ['icon' => 'error', 'title' => $msg]);
+                    $this->dispatch('swal:alert', ['icon' => 'error', 'title' => 'تجاوز رصيد المخزن!', 'message' => $msg]);
+                    $this->items[$idx]['quantity'] = $currentStock;
+                }
+            }
+        }
         $this->calculateTotals();
     }
 
@@ -198,40 +305,32 @@ class InvoiceCreate extends Component
 
     public function calculateTotals()
     {
-        $sub = '0.000';
+        $subtotal = '0.000';
+        foreach ($this->items as $index => $line) {
+            $qty = (string)($line['quantity'] ?: '0');
+            $unitPrice = (string)($line['unit_price'] ?: '0');
+            $lineDiscount = (string)($line['discount_amount'] ?? '0.000');
 
-        foreach ($this->items as $idx => $line) {
-            $qty = $line['quantity'] ?? '1.000';
-            $price = $line['unit_price'] ?? '0.000';
-            $disc = $line['discount_amount'] ?? '0.000';
+            $lineGross = bcmul($qty, $unitPrice, 3);
+            $lineTotal = bcsub($lineGross, $lineDiscount, 3);
+            $lineTotal = bccomp($lineTotal, '0.000', 3) > 0 ? $lineTotal : '0.000';
 
-            $lineTotal = bcsub(bcmul($qty, $price, 3), $disc, 3);
-            if (bccomp($lineTotal, '0.000', 3) < 0) {
-                $lineTotal = '0.000';
-            }
-
-            $this->items[$idx]['total_price'] = $lineTotal;
-            $sub = bcadd($sub, $lineTotal, 3);
+            $this->items[$index]['total_price'] = $lineTotal;
+            $subtotal = bcadd($subtotal, $lineTotal, 3);
         }
 
-        $this->subtotal = $sub;
+        $this->subtotal = $subtotal;
 
-        // Invoice Discount
-        $discVal = $this->discount_value ?: '0.000';
-        $invDisc = '0.000';
-
+        $discountVal = (string)($this->discount_value ?: '0.000');
         if ($this->discount_type === 'percentage') {
-            $invDisc = bcdiv(bcmul($this->subtotal, $discVal, 4), '100', 3);
+            $percAmount = bcmul($subtotal, bcdiv($discountVal, '100', 6), 3);
+            $this->discount_amount = bccomp($percAmount, $subtotal, 3) > 0 ? $subtotal : $percAmount;
         } else {
-            $invDisc = $discVal;
+            $this->discount_amount = bccomp($discountVal, $subtotal, 3) > 0 ? $subtotal : $discountVal;
         }
 
-        if (bccomp($invDisc, $this->subtotal, 3) > 0) {
-            $invDisc = $this->subtotal;
-        }
-
-        $this->discount_amount = $invDisc;
-        $this->net_total = bcsub($this->subtotal, $invDisc, 3);
+        $net = bcsub($subtotal, $this->discount_amount, 3);
+        $this->net_total = bccomp($net, '0.000', 3) > 0 ? $net : '0.000';
 
         if ($this->payment_type === 'cash') {
             $this->paid_amount = $this->net_total;
@@ -250,6 +349,21 @@ class InvoiceCreate extends Component
     {
         $this->errorMessage = '';
         $this->validate();
+
+        // 🛑 Strict validation before saving
+        foreach ($this->items as $line) {
+            $item = Item::find($line['item_id']);
+            if ($item) {
+                $avail = (string)$item->getStockInStore($this->store_id);
+                if (bccomp($line['quantity'], $avail, 3) > 0) {
+                    $msg = "عفواً، رصيد الصنف ({$item->name}) غير كافٍ لإنهاء الفاتورة (المطلوب: {$line['quantity']} - المتاح: {$avail}).";
+                    $this->errorMessage = $msg;
+                    $this->dispatch('swal:toast', ['icon' => 'error', 'title' => $msg]);
+                    $this->dispatch('swal:alert', ['icon' => 'error', 'title' => 'فشل حفظ الفاتورة!', 'message' => $msg]);
+                    return;
+                }
+            }
+        }
 
         try {
             $invoice = $invoiceService->confirmInvoice([
@@ -272,6 +386,7 @@ class InvoiceCreate extends Component
             return redirect()->route('invoices.show', $invoice->id);
         } catch (Exception $e) {
             $this->errorMessage = $e->getMessage();
+            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => $e->getMessage()]);
         }
     }
 

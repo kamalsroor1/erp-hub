@@ -176,4 +176,40 @@ class LivewirePagesTest extends TestCase
             ->assertStatus(200)
             ->assertSee('يومية المبيعات');
     }
+
+    public function test_pos_blocks_adding_item_when_stock_is_zero_and_dispatches_red_toast(): void
+    {
+        $zeroStockItem = Item::create([
+            'code'          => 'ZERO-001',
+            'name'          => 'بن حبهان محوج (منتهي)',
+            'unit'          => 'كجم',
+            'current_stock' => '0.000',
+            'cost_price'    => '100.000',
+            'selling_price' => '150.000',
+            'is_active'     => true,
+        ]);
+
+        \Livewire\Livewire::test(\App\Livewire\InvoiceCreate::class)
+            ->call('addItem', $zeroStockItem->id, '1.000')
+            ->assertDispatched('swal:toast', fn($eventName, $params) => $params[0]['icon'] === 'error')
+            ->assertSet('items', []);
+    }
+
+    public function test_pos_blocks_adding_item_when_requested_quantity_exceeds_stock(): void
+    {
+        $lowStockItem = Item::create([
+            'code'          => 'LOW-001',
+            'name'          => 'شاي أسام ملكي',
+            'unit'          => 'كجم',
+            'current_stock' => '2.000',
+            'cost_price'    => '60.000',
+            'selling_price' => '90.000',
+            'is_active'     => true,
+        ]);
+
+        \Livewire\Livewire::test(\App\Livewire\InvoiceCreate::class)
+            ->call('addItem', $lowStockItem->id, '5.000')
+            ->assertDispatched('swal:toast', fn($eventName, $params) => $params[0]['icon'] === 'error')
+            ->assertSet('items', []);
+    }
 }
