@@ -90,7 +90,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/daily-journal', App\Livewire\DailyJournalIndex::class)->name('daily.journal')->middleware('can:daily_journal.view');
     Route::get('/shifts', App\Livewire\DailyJournalIndex::class)->name('shifts.index')->middleware('can:daily_journal.view');
 
-    // Auth, Profile, Trash & User Management
+    // Auth, Profile, Trash, Activity Logs & User Management
+    Route::get('/activity-logs', App\Livewire\ActivityLogIndex::class)->name('activity-logs.index')->middleware('can:logs.view');
     Route::get('/trash', App\Livewire\TrashIndex::class)->name('trash.index')->middleware('can:trash.access');
     Route::get('/profile', App\Livewire\Auth\Profile::class)->name('profile');
     Route::get('/users', App\Livewire\Auth\UserManager::class)->name('users.index')->middleware('can:roles.manage');

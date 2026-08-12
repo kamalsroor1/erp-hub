@@ -63,6 +63,13 @@ class Login extends Component
         if (!$attemptPhone && !$attemptEmail) {
             RateLimiter::hit($throttleKey, 60);
 
+            app(\App\Services\ActivityLogService::class)->log(
+                module: 'auth',
+                action: 'login_failed',
+                description: "محاولة تسجيل دخول غير ناجحة برقم الهاتف [{$cleanPhone}]",
+                properties: ['attempted_phone' => $cleanPhone]
+            );
+
             $this->addError('phone', 'رقم الهاتف أو كلمة المرور غير صحيحة أو الحساب معطل.');
             $this->dispatch('swal:toast', [
                 'type'  => 'error',
@@ -74,6 +81,15 @@ class Login extends Component
 
         RateLimiter::clear($throttleKey);
         session()->regenerate();
+
+        $user = Auth::user();
+        app(\App\Services\ActivityLogService::class)->log(
+            module: 'auth',
+            action: 'login',
+            description: "تسجيل دخول ناجح للمستخدم [{$user->name}] برقم ({$user->phone})",
+            subject: $user,
+            userId: $user->id
+        );
 
         session()->flash('swal:toast', [
             'type'  => 'success',

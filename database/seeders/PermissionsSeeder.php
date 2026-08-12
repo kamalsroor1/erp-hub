@@ -56,6 +56,7 @@ class PermissionsSeeder extends Seeder
             'reports.view'        => 'عرض التقارير المالية والأرباح ومقارنة الفروع',
             'trash.access'        => 'الوصول لسلة المحذوفات المركزية واسترجاع البيانات',
             'roles.manage'        => 'إدارة المستخدمين والأدوار والصلاحيات',
+            'logs.view'           => 'عرض وفحص سجل العمليات والرقابة الذاتية',
         ];
 
         foreach ($permissions as $name => $description) {

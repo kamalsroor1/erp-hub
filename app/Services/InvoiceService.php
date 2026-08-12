@@ -15,7 +15,8 @@ class InvoiceService
     public function __construct(
         protected StockService $stockService,
         protected CustomerBalanceService $customerBalanceService,
-        protected AuditLogService $auditLogService
+        protected AuditLogService $auditLogService,
+        protected ActivityLogService $activityLogService
     ) {}
 
     /**
@@ -170,12 +171,18 @@ class InvoiceService
             // S6: Update Customer balance
             $this->customerBalanceService->updateBalance($customer->id);
 
-            // S7: Audit Log
+            // S7: Audit & Activity Log
             $this->auditLogService->log(
                 action: 'invoice_confirmed',
                 auditable: $invoice,
                 oldValues: null,
                 newValues: $invoice->toArray()
+            );
+
+            $this->activityLogService->logSales(
+                action: 'created',
+                invoice: $invoice,
+                description: "تم إنشاء واعتماد فاتورة مبيعات جديدة رقم [{$invoice->invoice_number}] للعميل ({$customer->name}) بقيمة " . number_format((float)$invoice->net_total, 2) . " ج.م"
             );
 
             return $invoice;
@@ -225,12 +232,19 @@ class InvoiceService
             // Recalculate customer balance
             $this->customerBalanceService->updateBalance($lockedInvoice->customer_id);
 
-            // Audit log
+            // Audit & Activity log
             $this->auditLogService->log(
                 action: 'invoice_cancelled',
                 auditable: $lockedInvoice,
                 oldValues: $oldState,
                 newValues: $lockedInvoice->toArray()
+            );
+
+            $this->activityLogService->logSales(
+                action: 'cancelled',
+                invoice: $lockedInvoice,
+                description: "تم إلغاء فاتورة المبيعات رقم [{$lockedInvoice->invoice_number}] وإرجاع بضاعتها للمخزن. سبب الإلغاء: {$reason}",
+                properties: ['reason' => $reason]
             );
 
             return $lockedInvoice;
@@ -399,12 +413,19 @@ class InvoiceService
                 $this->customerBalanceService->updateBalance($newCustomerId);
             }
 
-            // 8. Audit log
+            // 8. Audit & Activity log
             $this->auditLogService->log(
                 action: 'invoice_updated',
                 auditable: $lockedInvoice,
                 oldValues: null,
                 newValues: $lockedInvoice->toArray()
+            );
+
+            $this->activityLogService->logSales(
+                action: 'updated',
+                invoice: $lockedInvoice,
+                description: "تم تعديل بيانات وأصناف فاتورة المبيعات رقم [{$lockedInvoice->invoice_number}] وإعادة احتساب الرصيد",
+                properties: ['net_total' => (string)$lockedInvoice->net_total, 'paid_amount' => (string)$lockedInvoice->paid_amount]
             );
 
             return $lockedInvoice;
@@ -463,12 +484,20 @@ class InvoiceService
                 $this->customerBalanceService->updateBalance($customerId);
             }
 
-            // 7. Audit log
+            // 7. Audit & Activity log
             $this->auditLogService->log(
                 action: 'invoice_deleted',
                 auditable: $lockedInvoice,
                 oldValues: ['invoice_number' => $invoiceNumber],
                 newValues: null
+            );
+
+            $this->activityLogService->log(
+                module: 'sales',
+                action: 'deleted',
+                description: "تم حذف فاتورة المبيعات رقم [{$invoiceNumber}] وعكس أثرها المخزني والمالي",
+                properties: ['invoice_number' => $invoiceNumber],
+                storeId: $lockedInvoice->store_id
             );
 
             return true;

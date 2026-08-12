@@ -14,6 +14,12 @@ use Exception;
 
 class StockTransferService
 {
+    public function __construct(
+        protected ?ActivityLogService $activityLogService = null
+    ) {
+        $this->activityLogService = $this->activityLogService ?: app(ActivityLogService::class);
+    }
+
     /**
      * Create and execute a stock transfer between two stores/warehouses atomically
      */
@@ -134,6 +140,20 @@ class StockTransferService
                 ]);
             }
 
+            $this->activityLogService->log(
+                module: 'inventory',
+                action: 'created',
+                description: "تم إنشاء إذن تحويل مخزني جديد رقم [{$transfer->transfer_number}] من ({$fromStore->name}) إلى ({$toStore->name}) بعدد (" . count($data['items']) . ") صنف",
+                subject: $transfer,
+                properties: [
+                    'transfer_number' => $transfer->transfer_number,
+                    'from_store'      => $fromStore->name,
+                    'to_store'        => $toStore->name,
+                    'items_count'     => count($data['items']),
+                ],
+                storeId: $fromStoreId
+            );
+
             return $transfer;
         });
     }
@@ -232,6 +252,15 @@ class StockTransferService
                 $lockedTransfer->notes = ($lockedTransfer->notes ? $lockedTransfer->notes . " | " : '') . "سبب الإلغاء: " . $reason;
             }
             $lockedTransfer->save();
+
+            $this->activityLogService->log(
+                module: 'inventory',
+                action: 'cancelled',
+                description: "تم إلغاء إذن التحويل المخزني رقم [{$lockedTransfer->transfer_number}] وإعادة الأصناف للمخزن. سبب الإلغاء: " . ($reason ?: 'بدون ملاحظات'),
+                subject: $lockedTransfer,
+                properties: ['reason' => $reason],
+                storeId: $lockedTransfer->from_store_id
+            );
 
             return $lockedTransfer;
         });

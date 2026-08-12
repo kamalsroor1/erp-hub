@@ -13,6 +13,12 @@ use Exception;
 
 class ShiftService
 {
+    public function __construct(
+        protected ?ActivityLogService $activityLogService = null
+    ) {
+        $this->activityLogService = $this->activityLogService ?: app(ActivityLogService::class);
+    }
+
     /**
      * Get active shift for a specific store or user
      */
@@ -43,7 +49,7 @@ class ShiftService
         $shiftCount = CashShift::whereDate('opened_at', now()->toDateString())->count() + 1;
         $shiftNumber = 'SHIFT-' . date('Ymd') . '-' . str_pad($shiftCount, 3, '0', STR_PAD_LEFT);
 
-        return CashShift::create([
+        $shift = CashShift::create([
             'user_id'              => Auth::id() ?? 1,
             'store_id'             => $targetStoreId,
             'shift_number'         => $shiftNumber,
@@ -52,6 +58,15 @@ class ShiftService
             'opening_cash_balance' => $openingCash,
             'notes'                => $notes,
         ]);
+
+        $storeName = Store::find($targetStoreId)?->name ?? 'الفرع الرئيسي';
+        $this->activityLogService->logShift(
+            action: 'shift_opened',
+            shift: $shift,
+            description: "تم فتح وردية عمل جديدة رقم [{$shiftNumber}] في فرع ({$storeName}) برصيد افتتاحي " . number_format((float)$openingCash, 2) . " ج.م"
+        );
+
+        return $shift;
     }
 
     /**
@@ -160,6 +175,23 @@ class ShiftService
                 'cash_difference'           => $diff,
                 'notes'                     => $notes ?: $shift->notes,
             ]);
+
+            $diffMsg = bccomp($diff, '0.000', 3) === 0
+                ? "متطابقة تماماً بدون عجز أو زيادة"
+                : (bccomp($diff, '0.000', 3) > 0
+                    ? "بزيادة قدرها " . number_format((float)$diff, 2) . " ج.م"
+                    : "بعجز قدره " . number_format((float)abs((float)$diff), 2) . " ج.م");
+
+            $this->activityLogService->logShift(
+                action: 'shift_closed',
+                shift: $shift,
+                description: "تم تقفيل وإغلاق وردية العمل رقم [{$shift->shift_number}] بنقدية فعلية " . number_format((float)$actualCash, 2) . " ج.م ({$diffMsg})",
+                properties: [
+                    'expected_cash' => $totals['expected_cash_balance'],
+                    'actual_cash'   => $actualCash,
+                    'difference'    => $diff,
+                ]
+            );
 
             return $shift;
         });

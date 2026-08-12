@@ -14,8 +14,11 @@ class PurchaseService
     public function __construct(
         protected StockService $stockService,
         protected SupplierBalanceService $supplierBalanceService,
-        protected AuditLogService $auditLogService
-    ) {}
+        protected AuditLogService $auditLogService,
+        protected ?ActivityLogService $activityLogService = null
+    ) {
+        $this->activityLogService = $this->activityLogService ?: app(ActivityLogService::class);
+    }
 
     /**
      * Create and confirm purchase invoice
@@ -125,6 +128,12 @@ class PurchaseService
                 auditable: $purchase,
                 oldValues: null,
                 newValues: $purchase->toArray()
+            );
+
+            $this->activityLogService->logPurchase(
+                action: 'created',
+                purchase: $purchase,
+                description: "تم إنشاء فاتورة مشتريات وتوريد بضاعة رقم [{$purchase->purchase_number}] من المورد ({$purchase->supplier?->name}) بإجمالي " . number_format((float)$purchase->net_total, 2) . " ج.م"
             );
 
             return $purchase;
