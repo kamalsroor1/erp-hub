@@ -124,12 +124,13 @@
 
 ---
 
-## المرحلة السادسة: نظام الصلاحيات والأدوار المتقدم (Phase 6: Dynamic RBAC & Permissions)
-- [x] تهيئة Seeder الصلاحيات `PermissionsSeeder` بـ 27 صلاحية دقيقة موزعة على 7 أقسام ونظام Spatie Permission.
-- [x] تفعيل Gate Super-Admin Bypass في `AppServiceProvider.php` لدور المدير العام.
-- [x] استبدال كافة التوجيهات الثابتة في الـ Layout والـ Sidebar بتوجيهات `@can(...)` الديناميكية.
-- [x] حماية كافة المسارات (Routes) بـ `middleware('can:...')`.
-- [x] حماية كافة المكونات التفاعلية (Livewire 4 Components) عبر `abort_if(!auth()->user()->can(...), 403)` في الباك إند و `@can` في واجهات Blade (أصناف، مبيعات، مشتريات، فروع، عملاء، موردين، مصروفات، مرتجعات، تقارير، سلة المحذوفات).
-- [x] بناء وتوسيع حزمة اختبارات المتصفح التفاعلية E2E Playwright لـ 11 اختباراً كاملاً مع تقارير عربية حية واجتياز 100%.
-- [x] اجتياز كافة اختبارات PHPUnit (93/93 اختباراً بنجاح 100%).
+## المرحلة السابعة: نظام سجل العمليات والرقابة الذاتية الموحد (Phase 7: Unified Audit & Activity Logs)
+- [x] إنشاء Migration جدول `activity_logs` ونموذج Eloquent `ActivityLog` بروابط مع المستخدمين والفروع والكيانات المستهدفة.
+- [x] بناء خدمة التسجيل المركزية `ActivityLogService` مع طرق مخصصة لكافة الأقسام (`sales`, `inventory`, `shifts`, `purchases`, `expenses`, `auth`, `system`).
+- [x] دمج وترقية `AuditLogService` وربطه بالخدمات الحساسة (`InvoiceService`, `ShiftService`, `StockTransferService`, `PurchaseService`, `Login`).
+- [x] إضافة صلاحية `logs.view` لمصفوفة الصلاحيات ومكون `RolePermissionManager`.
+- [x] بناء مكون وشاشة Livewire التفاعلية `ActivityLogIndex` مع فلاتر سريعة بنقرة واحدة (التاريخ، الموظف، الفرع، القسم)، وإحصائيات مباشرة، ونافذة معاينة التعديلات (Before vs After Diff Modal)، وتصدير CSV.
+- [x] ربط شاشة السجل في السايدبار والقائمة العلوية تحت إدارة النظام.
+- [x] كتابة اختبارات PHPUnit شاملة لـ `ActivityLogTest` واجتياز 100/100 اختبار في النظام بنجاح 100%.
+- [x] اختبار حقيقي عبر Playwright على السيرفر الحي بنجاح تام.
 
