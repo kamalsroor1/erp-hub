@@ -10,7 +10,7 @@
                     <h1 class="text-xl md:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                         سجل العمليات والرقابة الذاتية
                         <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-bold">
-                            Live Audit Trail
+                            تتبع فوري مباشر
                         </span>
                     </h1>
                     <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-0.5">

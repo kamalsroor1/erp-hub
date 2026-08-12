@@ -4,7 +4,6 @@
         <div>
             <h2 class="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                 <span>مرحباً بك في نظام سرور لإدارة الفواتير</span>
-                <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">Phase 1 Live</span>
             </h2>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">نظرة عامة على المبيعات، رصيد الخزينة، المخزون، وحسابات العملاء</p>
         </div>
