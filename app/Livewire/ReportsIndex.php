@@ -17,6 +17,7 @@ class ReportsIndex extends Component
     public $activeTab = 'sales'; // sales, items, stores, customers, expenses, inventory
     public $dateFilter = 'today'; // today, this_week, this_month, this_year, custom
     public $selectedStoreId = 'all';
+    public $inventoryStockFilter = 'all'; // all, in_stock, out_of_stock
     public $fromDate;
     public $toDate;
 
@@ -319,6 +320,18 @@ class ReportsIndex extends Component
             }
         }
 
+        if ($this->inventoryStockFilter === 'in_stock') {
+            $filteredInventoryItems = array_values(array_filter($inventoryItems, function ($item) {
+                return bccomp((string)$item->current_stock, '0.000', 3) > 0;
+            }));
+        } elseif ($this->inventoryStockFilter === 'zero_stock') {
+            $filteredInventoryItems = array_values(array_filter($inventoryItems, function ($item) {
+                return bccomp((string)$item->current_stock, '0.000', 3) <= 0;
+            }));
+        } else {
+            $filteredInventoryItems = $inventoryItems;
+        }
+
         $expectedStockProfit = bcsub($stockSellingValuation, $stockCostValuation, 3);
 
         return view('livewire.reports-index', [
@@ -335,8 +348,11 @@ class ReportsIndex extends Component
             'stockCostValuation'     => $stockCostValuation,
             'stockSellingValuation'  => $stockSellingValuation,
             'expectedStockProfit'    => $expectedStockProfit,
-            'inventoryItems'         => $inventoryItems,
-            'allItems'               => $inventoryItems,
+            'inventoryItems'         => $filteredInventoryItems,
+            'allItems'               => $filteredInventoryItems,
+            'totalInventoryCount'    => count($inventoryItems),
+            'inStockCount'           => count(array_filter($inventoryItems, fn($i) => bccomp((string)$i->current_stock, '0.000', 3) > 0)),
+            'zeroStockCount'         => count(array_filter($inventoryItems, fn($i) => bccomp((string)$i->current_stock, '0.000', 3) <= 0)),
         ])->layout('components.layouts.app', ['title' => 'التقارير المالية والمبيعات والأرباح']);
     }
 }

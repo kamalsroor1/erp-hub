@@ -616,8 +616,8 @@
         </div>
 
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
-            <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+            <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex flex-wrap items-center gap-2">
                     <span>🏢 جرد وتقييم الأصناف:</span>
                     @if($selectedStore)
                         <span class="px-2.5 py-0.5 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 text-xs font-bold">
@@ -629,6 +629,34 @@
                         </span>
                     @endif
                 </h3>
+
+                <!-- Stock Quantity Filter Buttons -->
+                <div class="flex flex-wrap items-center gap-1.5 bg-slate-100 dark:bg-slate-950 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs">
+                    <button 
+                        type="button" 
+                        wire:click="$set('inventoryStockFilter', 'all')" 
+                        class="px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1.5 {{ $inventoryStockFilter === 'all' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white' }}"
+                    >
+                        <span>🏢 كل الأصناف</span>
+                        <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold bg-slate-200 dark:bg-slate-700">{{ $totalInventoryCount }}</span>
+                    </button>
+                    <button 
+                        type="button" 
+                        wire:click="$set('inventoryStockFilter', 'in_stock')" 
+                        class="px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1.5 {{ $inventoryStockFilter === 'in_stock' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30' : 'text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400' }}"
+                    >
+                        <span>📦 متوفر كمية فقط (> 0)</span>
+                        <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold {{ $inventoryStockFilter === 'in_stock' ? 'bg-white text-emerald-700' : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' }}">{{ $inStockCount }}</span>
+                    </button>
+                    <button 
+                        type="button" 
+                        wire:click="$set('inventoryStockFilter', 'zero_stock')" 
+                        class="px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1.5 {{ $inventoryStockFilter === 'zero_stock' ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30' : 'text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400' }}"
+                    >
+                        <span>🚫 الرصيد صفر (0)</span>
+                        <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold {{ $inventoryStockFilter === 'zero_stock' ? 'bg-white text-rose-700' : 'bg-rose-500/20 text-rose-700 dark:text-rose-300' }}">{{ $zeroStockCount }}</span>
+                    </button>
+                </div>
             </div>
 
             <div class="overflow-x-auto">

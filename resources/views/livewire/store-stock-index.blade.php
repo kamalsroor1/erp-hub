@@ -30,8 +30,8 @@
     @endif
 
     <!-- Search & Filter -->
-    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
-        <div class="w-full sm:w-80 relative">
+    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 shadow-sm">
+        <div class="w-full lg:w-80 relative">
             <input 
                 type="text" 
                 wire:model.live.debounce.200ms="searchQuery" 
@@ -40,16 +40,43 @@
             >
         </div>
 
-        <div class="flex items-center gap-3 w-full sm:w-auto">
-            <label class="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
-                <input type="checkbox" wire:model.live="lowStockOnly" class="rounded text-rose-600 focus:ring-0">
-                <span>⚠️ النواقص وقرب النفاد فقط</span>
-            </label>
+        <div class="flex flex-wrap items-center gap-2">
+            <!-- Filter Pills -->
+            <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
+                <button 
+                    type="button" 
+                    wire:click="$set('stockFilter', 'all')" 
+                    class="px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer {{ $stockFilter === 'all' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white' }}"
+                >
+                    🏢 الكل
+                </button>
+                <button 
+                    type="button" 
+                    wire:click="$set('stockFilter', 'in_stock')" 
+                    class="px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer {{ $stockFilter === 'in_stock' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400' }}"
+                >
+                    📦 متوفر فقط (>0)
+                </button>
+                <button 
+                    type="button" 
+                    wire:click="$set('stockFilter', 'low')" 
+                    class="px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer {{ $stockFilter === 'low' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400' }}"
+                >
+                    ⚠️ قرب النفاد
+                </button>
+                <button 
+                    type="button" 
+                    wire:click="$set('stockFilter', 'out')" 
+                    class="px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer {{ $stockFilter === 'out' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400' }}"
+                >
+                    🚫 الرصيد صفر
+                </button>
+            </div>
 
             @can('transfers.create')
             <a 
                 href="{{ route('stock-transfers.create') }}?to_store_id={{ $selectedStoreId }}" 
-                class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black transition-all cursor-pointer flex items-center gap-1"
+                class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black transition-all cursor-pointer flex items-center gap-1 shrink-0"
             >
                 <span>➕ شحن بضاعة لهذا الفرع</span>
             </a>

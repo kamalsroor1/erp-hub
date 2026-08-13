@@ -14,6 +14,7 @@ class StoreStockIndex extends Component
 
     public $selectedStoreId;
     public $searchQuery = '';
+    public $stockFilter = 'all'; // all, in_stock, low, out
     public $lowStockOnly = false;
 
     // Edit Modal State
@@ -97,7 +98,9 @@ class StoreStockIndex extends Component
                     });
                 }
             })
-            ->when($this->lowStockOnly, fn($q) => $q->whereColumn('quantity', '<=', 'min_stock'))
+            ->when($this->stockFilter === 'in_stock', fn($q) => $q->where('quantity', '>', '0.000'))
+            ->when($this->stockFilter === 'low' || $this->lowStockOnly, fn($q) => $q->whereColumn('quantity', '<=', 'min_stock'))
+            ->when($this->stockFilter === 'out', fn($q) => $q->where('quantity', '<=', '0.000'))
             ->get();
 
         return view('livewire.store-stock-index', [

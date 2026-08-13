@@ -50,7 +50,8 @@
 
             <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">المخزون:</span>
             <button wire:click="$set('filterStock', 'all')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStock === 'all' ? 'bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white' : 'border-transparent text-slate-500 dark:text-slate-400' }}">الكل</button>
-            <button wire:click="$set('filterStock', 'low')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStock === 'low' ? 'bg-rose-500/20 border-rose-500/40 text-rose-700 dark:text-rose-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">نواقص</button>
+            <button wire:click="$set('filterStock', 'in_stock')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStock === 'in_stock' ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">📦 متوفر كمية (>0)</button>
+            <button wire:click="$set('filterStock', 'low')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStock === 'low' ? 'bg-amber-500/20 border-amber-500/40 text-amber-700 dark:text-amber-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">⚠️ قرب النفاد</button>
             <button wire:click="$set('filterStock', 'out')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStock === 'out' ? 'bg-rose-100 dark:bg-rose-950 border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-300' : 'border-transparent text-slate-500 dark:text-slate-400' }}">نفد (0)</button>
         </div>
     </div>

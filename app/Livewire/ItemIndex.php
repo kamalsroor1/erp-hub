@@ -181,6 +181,7 @@ class ItemIndex extends Component
                 });
             })
             ->when($this->filterCategory !== 'all', fn($q) => $q->where('category', $this->filterCategory))
+            ->when($this->filterStock === 'in_stock', fn($q) => $q->where('current_stock', '>', '0.000'))
             ->when($this->filterStock === 'low', fn($q) => $q->lowStock())
             ->when($this->filterStock === 'out', fn($q) => $q->where('current_stock', '<=', '0.000'))
             ->orderBy('name');
