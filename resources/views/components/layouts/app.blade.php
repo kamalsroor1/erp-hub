@@ -87,7 +87,7 @@
         }
         [x-cloak] { display: none !important; }
         
-        /* Instant Zero-flicker Sidebar Widths (Zero Layout Shifts) */
+        /* Instant Zero-flicker Sidebar (Zero Layout Shifts & Zero Font Resizing) */
         @media (min-width: 1024px) {
             html.sidebar-collapsed aside#main-sidebar {
                 width: 6rem !important; /* w-24 */
@@ -95,7 +95,124 @@
             html:not(.sidebar-collapsed) aside#main-sidebar {
                 width: 18rem !important; /* w-72 */
             }
+            
+            /* Desktop Collapsed state rules */
+            html.sidebar-collapsed .sidebar-text-full {
+                display: none !important;
+            }
+            html.sidebar-collapsed .sidebar-text-mini {
+                display: block !important;
+            }
+            html.sidebar-collapsed .sidebar-nav-item {
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: center !important;
+                padding: 0.5rem 0.25rem !important;
+                gap: 0.25rem !important;
+                text-align: center !important;
+                border-radius: 1rem !important;
+            }
+            html.sidebar-collapsed .sidebar-pos-btn {
+                flex-direction: column !important;
+                justify-content: center !important;
+                padding: 0.5rem 0.25rem !important;
+                gap: 0.25rem !important;
+                text-align: center !important;
+            }
+            html.sidebar-collapsed .sidebar-divider-full {
+                display: none !important;
+            }
+            html.sidebar-collapsed .sidebar-divider-mini {
+                display: block !important;
+            }
+            html.sidebar-collapsed .sidebar-user-info {
+                display: none !important;
+            }
+            html.sidebar-collapsed .sidebar-user-link {
+                justify-content: center !important;
+                width: 100% !important;
+            }
+            html.sidebar-collapsed .sidebar-logout-btn {
+                display: none !important;
+            }
+
+            /* Desktop Expanded state rules */
+            html:not(.sidebar-collapsed) .sidebar-text-full {
+                display: block !important;
+            }
+            html:not(.sidebar-collapsed) .sidebar-text-mini {
+                display: none !important;
+            }
+            html:not(.sidebar-collapsed) .sidebar-nav-item {
+                flex-direction: row !important;
+                align-items: center !important;
+                padding: 0.625rem 0.75rem !important;
+                gap: 0.75rem !important;
+                text-align: right !important;
+                border-radius: 0.75rem !important;
+            }
+            html:not(.sidebar-collapsed) .sidebar-pos-btn {
+                flex-direction: row !important;
+                justify-content: center !important;
+                padding: 0.75rem 1rem !important;
+                gap: 0.5rem !important;
+            }
+            html:not(.sidebar-collapsed) .sidebar-divider-full {
+                display: block !important;
+            }
+            html:not(.sidebar-collapsed) .sidebar-divider-mini {
+                display: none !important;
+            }
+            html:not(.sidebar-collapsed) .sidebar-user-info {
+                display: block !important;
+            }
+            html:not(.sidebar-collapsed) .sidebar-user-link {
+                gap: 0.625rem !important;
+            }
+            html:not(.sidebar-collapsed) .sidebar-logout-btn {
+                display: block !important;
+            }
         }
+
+        /* Mobile drawer rules */
+        @media (max-width: 1023px) {
+            .sidebar-text-full {
+                display: block !important;
+            }
+            .sidebar-text-mini {
+                display: none !important;
+            }
+            .sidebar-nav-item {
+                flex-direction: row !important;
+                align-items: center !important;
+                padding: 0.625rem 0.75rem !important;
+                gap: 0.75rem !important;
+                text-align: right !important;
+                border-radius: 0.75rem !important;
+            }
+            .sidebar-pos-btn {
+                flex-direction: row !important;
+                justify-content: center !important;
+                padding: 0.75rem 1rem !important;
+                gap: 0.5rem !important;
+            }
+            .sidebar-divider-full {
+                display: block !important;
+            }
+            .sidebar-divider-mini {
+                display: none !important;
+            }
+            .sidebar-user-info {
+                display: block !important;
+            }
+            .sidebar-user-link {
+                gap: 0.625rem !important;
+            }
+            .sidebar-logout-btn {
+                display: block !important;
+            }
+        }
+
         aside#main-sidebar.has-transition {
             transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
@@ -207,11 +324,9 @@
             :class="{
                 'translate-x-0': sidebarOpen,
                 'translate-x-full lg:translate-x-0': !sidebarOpen,
-                'w-72': !sidebarCollapsed,
-                'w-24': sidebarCollapsed,
                 'has-transition': hasTransition
             }"
-            class="fixed lg:static inset-y-0 right-0 z-50 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 flex flex-col shadow-xl lg:shadow-none select-none shrink-0"
+            class="w-72 fixed lg:static inset-y-0 right-0 z-50 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 flex flex-col shadow-xl lg:shadow-none select-none shrink-0"
         >
             <!-- Brand Header -->
             <div class="h-16 px-2.5 flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/50 backdrop-blur-md overflow-hidden">
@@ -219,7 +334,7 @@
                     <a href="{{ route('dashboard') }}" title="{{ $siteCompanyName }}" class="w-9 h-9 rounded-xl bg-white dark:bg-slate-800 p-1 flex items-center justify-center shadow-md shadow-amber-500/10 border border-slate-200 dark:border-slate-700 shrink-0">
                         <img src="{{ asset('logo.png') }}" alt="سرور POS" class="w-full h-full object-contain">
                     </a>
-                    <div x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate min-w-0">
+                    <div class="sidebar-text-full truncate min-w-0">
                         <h1 class="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white font-tajawal truncate">
                             {{ $siteCompanyName }}
                         </h1>
@@ -252,12 +367,11 @@
             <div class="p-2 border-b border-slate-200 dark:border-slate-800/60">
                 <a href="{{ route('invoices.create') }}" 
                    title="فاتورة بيع جديدة (F2)"
-                   :class="sidebarCollapsed ? 'flex-col justify-center py-2 px-1 gap-1 text-center' : 'px-4 py-3 justify-center gap-2'"
-                   class="w-full flex items-center bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-500 text-white font-bold rounded-2xl shadow-lg shadow-amber-600/30 transition-all duration-200 active:scale-95 group font-tajawal cursor-pointer"
+                   class="w-full flex items-center sidebar-pos-btn bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-500 text-white font-bold rounded-2xl shadow-lg shadow-amber-600/30 transition-all duration-200 active:scale-95 group font-tajawal cursor-pointer"
                 >
                     <svg class="w-6 h-6 shrink-0 transition-transform group-hover:rotate-90 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                    <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-bold">فاتورة بيع جديدة (F2)</span>
-                    <span x-show="sidebarCollapsed" class="text-[10px] font-black truncate max-w-full">بيع جديد</span>
+                    <span class="sidebar-text-full truncate text-sm font-bold">فاتورة بيع جديدة (F2)</span>
+                    <span class="sidebar-text-mini text-[10px] font-black truncate max-w-full">بيع جديد</span>
                 </a>
             </div>
             @endcan
@@ -268,30 +382,28 @@
                 <div>
                     <a href="{{ route('dashboard') }}" 
                        title="لوحة التحكم (Dashboard)"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('dashboard') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('dashboard') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">لوحة التحكم (Dashboard)</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الرئيسية</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">لوحة التحكم (Dashboard)</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الرئيسية</span>
                     </a>
                 </div>
 
                 <!-- المبيعات والفواتير -->
                 @if(auth()->user()?->can('invoices.view') || auth()->user()?->can('daily_journal.view') || auth()->user()?->can('customers.manage'))
-                <div x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 truncate">المبيعات والفواتير</div>
-                <div x-show="sidebarCollapsed" class="my-1.5 border-t border-slate-200 dark:border-slate-800/80 mx-1"></div>
+                <div class="sidebar-divider-full pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 truncate">المبيعات والفواتير</div>
+                <div class="sidebar-divider-mini my-1.5 border-t border-slate-200 dark:border-slate-800/80 mx-1"></div>
 
                 @can('invoices.view')
                 <div>
                     <a href="{{ route('invoices.index') }}" 
                        title="فواتير المبيعات"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('invoices.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('invoices.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">فواتير المبيعات</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">المبيعات</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">فواتير المبيعات</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">المبيعات</span>
                     </a>
                 </div>
                 @endcan
@@ -300,8 +412,7 @@
                 <div>
                     <a href="{{ route('daily.journal') }}" 
                        title="اليومية وحركة الدرج"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('daily.journal') || request()->routeIs('shifts.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('daily.journal') || request()->routeIs('shifts.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <div class="relative shrink-0">
                             <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -309,7 +420,7 @@
                             <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full {{ $isOverdueShift ? 'bg-rose-500 animate-ping' : 'bg-emerald-500 animate-pulse' }}"></span>
                             @endif
                         </div>
-                        <div x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="flex-1 flex items-center justify-between min-w-0">
+                        <div class="sidebar-text-full flex-1 flex items-center justify-between min-w-0">
                             <span class="truncate text-sm font-semibold">اليومية وحركة الدرج</span>
                             @if($activeShift)
                             <span class="text-[10px] px-1.5 py-0.5 rounded-md font-bold {{ $isOverdueShift ? 'bg-rose-500 text-white animate-pulse' : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' }}">
@@ -317,7 +428,7 @@
                             </span>
                             @endif
                         </div>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">اليومية</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">اليومية</span>
                     </a>
                 </div>
                 @endcan
@@ -326,12 +437,11 @@
                 <div>
                     <a href="{{ route('customers.index') }}" 
                        title="العملاء والحسابات"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('customers.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('customers.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">العملاء والحسابات</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">العملاء</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">العملاء والحسابات</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">العملاء</span>
                     </a>
                 </div>
                 @endcan
@@ -339,31 +449,29 @@
 
                 <!-- المخزون والفروع والتوزيع -->
                 @if(auth()->user()?->can('items.view') || auth()->user()?->can('transfers.view') || auth()->user()?->can('stores.manage') || auth()->user()?->can('purchases.view') || auth()->user()?->can('suppliers.manage'))
-                <div x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 truncate">المخزون والفروع والتوزيع</div>
-                <div x-show="sidebarCollapsed" class="my-1.5 border-t border-slate-200 dark:border-slate-800/80 mx-1"></div>
+                <div class="sidebar-divider-full pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 truncate">المخزون والفروع والتوزيع</div>
+                <div class="sidebar-divider-mini my-1.5 border-t border-slate-200 dark:border-slate-800/80 mx-1"></div>
 
                 @can('items.view')
                 <div>
                     <a href="{{ route('items.index') }}" 
                        title="الأصناف والأسعار العامة"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('items.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('items.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">الأصناف والأسعار</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الأصناف</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">الأصناف والأسعار</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الأصناف</span>
                     </a>
                 </div>
 
                 <div>
                     <a href="{{ route('store-stocks') }}" 
                        title="جرد وأأسعار الفروع"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('store-stocks') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('store-stocks') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">جرد وأسعار الفروع</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">جرد الفروع</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">جرد وأسعار الفروع</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">جرد الفروع</span>
                     </a>
                 </div>
                 @endcan
@@ -372,12 +480,11 @@
                 <div>
                     <a href="{{ route('stock-transfers') }}" 
                        title="أذونات التحويل والشحن"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('stock-transfers*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('stock-transfers*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">أذونات التحويل والشحن</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">التحويلات</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">أذونات التحويل والشحن</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">التحويلات</span>
                     </a>
                 </div>
                 @endcan
@@ -386,12 +493,11 @@
                 <div>
                     <a href="{{ route('stores') }}" 
                        title="الفروع وعربات التوزيع"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('stores') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('stores') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">الفروع وعربات التوزيع</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الفروع</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">الفروع وعربات التوزيع</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الفروع</span>
                     </a>
                 </div>
                 @endcan
@@ -400,12 +506,11 @@
                 <div>
                     <a href="{{ route('purchases.index') }}" 
                        title="فواتير المشتريات"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('purchases.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('purchases.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">فواتير المشتريات</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">المشتريات</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">فواتير المشتريات</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">المشتريات</span>
                     </a>
                 </div>
                 @endcan
@@ -414,12 +519,11 @@
                 <div>
                     <a href="{{ route('suppliers.index') }}" 
                        title="الموردون والشركات"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('suppliers.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('suppliers.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">الموردون والشركات</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الموردون</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">الموردون والشركات</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الموردون</span>
                     </a>
                 </div>
                 @endcan
@@ -427,19 +531,18 @@
 
                 <!-- المرتجعات والمصروفات والتقارير -->
                 @if(auth()->user()?->can('expenses.manage') || auth()->user()?->can('returns.manage') || auth()->user()?->can('reports.view'))
-                <div x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 truncate">المرتجعات والمصروفات والتقارير</div>
-                <div x-show="sidebarCollapsed" class="my-1.5 border-t border-slate-200 dark:border-slate-800/80 mx-1"></div>
+                <div class="sidebar-divider-full pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 truncate">المرتجعات والمصروفات والتقارير</div>
+                <div class="sidebar-divider-mini my-1.5 border-t border-slate-200 dark:border-slate-800/80 mx-1"></div>
 
                 @can('expenses.manage')
                 <div>
                     <a href="{{ route('expenses.index') }}" 
                        title="المصروفات والنثريات"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('expenses.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('expenses.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">المصروفات والنثريات</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">المصروفات</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">المصروفات والنثريات</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">المصروفات</span>
                     </a>
                 </div>
                 @endcan
@@ -448,12 +551,11 @@
                 <div>
                     <a href="{{ route('returns.index') }}" 
                        title="سجل المرتجعات"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('returns.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('returns.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">سجل المرتجعات</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">المرتجعات</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">سجل المرتجعات</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">المرتجعات</span>
                     </a>
                 </div>
                 @endcan
@@ -462,12 +564,11 @@
                 <div>
                     <a href="{{ route('reports.index') }}" 
                        title="التقارير المالية والأرباح"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('reports.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('reports.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">التقارير المالية والأرباح</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">التقارير</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">التقارير المالية والأرباح</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">التقارير</span>
                     </a>
                 </div>
                 @endcan
@@ -475,31 +576,29 @@
 
                 <!-- إدارة النظام والمستخدمين -->
                 @if(auth()->user()?->can('roles.manage') || auth()->user()?->can('trash.access') || auth()->user()?->can('logs.view'))
-                <div x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 truncate">إدارة النظام والمستخدمين</div>
-                <div x-show="sidebarCollapsed" class="my-1.5 border-t border-slate-200 dark:border-slate-800/80 mx-1"></div>
+                <div class="sidebar-divider-full pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 truncate">إدارة النظام والمستخدمين</div>
+                <div class="sidebar-divider-mini my-1.5 border-t border-slate-200 dark:border-slate-800/80 mx-1"></div>
 
                 @can('roles.manage')
                 <div>
                     <a href="{{ route('users.index') }}" 
                        title="المستخدمون والكاشير"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('users.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('users.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">المستخدمون والكاشير</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">المستخدمين</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">المستخدمون والكاشير</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">المستخدمين</span>
                     </a>
                 </div>
 
                 <div>
                     <a href="{{ route('roles.index') }}" 
                        title="الأدوار ومجموعات الصلاحيات"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('roles.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('roles.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">الأدوار والصلاحيات</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الصلاحيات</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">الأدوار والصلاحيات</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الصلاحيات</span>
                     </a>
                 </div>
                 @endcan
@@ -508,12 +607,11 @@
                 <div>
                     <a href="{{ route('activity-logs.index') }}" 
                        title="سجل العمليات والرقابة"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('activity-logs.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('activity-logs.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">سجل العمليات والرقابة</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الرقابة</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">سجل العمليات والرقابة</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الرقابة</span>
                     </a>
                 </div>
                 @endcan
@@ -522,12 +620,11 @@
                 <div>
                     <a href="{{ route('trash.index') }}" 
                        title="سلة المحذوفات المركزية"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('trash.index') ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/40 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('trash.index') ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/40 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400' }}"
                     >
                         <svg class="w-6 h-6 text-rose-500 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">سلة المحذوفات</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-rose-600 dark:text-rose-400">المحذوفات</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">سلة المحذوفات</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-rose-600 dark:text-rose-400">المحذوفات</span>
                     </a>
                 </div>
                 @endcan
@@ -536,12 +633,11 @@
                 <div>
                     <a href="{{ route('profile') }}" 
                        title="الملف الشخصي والأمان"
-                       :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
-                       class="flex transition-all {{ request()->routeIs('profile') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
+                       class="flex sidebar-nav-item transition-all {{ request()->routeIs('profile') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">الملف الشخصي والأمان</span>
-                        <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الحساب</span>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">الملف الشخصي والأمان</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الحساب</span>
                     </a>
                 </div>
 
@@ -549,23 +645,22 @@
                 <div class="pt-1.5">
                     <button onclick="triggerPwaInstall()" type="button" 
                             title="تثبيت التطبيق (PWA)"
-                            :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center' : 'px-3 py-2.5 justify-center gap-2'"
-                            class="w-full flex items-center bg-gradient-to-r from-amber-600/15 via-amber-500/20 to-amber-600/15 hover:from-amber-600/30 hover:to-amber-500/30 text-amber-600 dark:text-amber-400 font-bold rounded-xl text-xs border border-amber-500/30 shadow-sm transition-all cursor-pointer"
+                            class="w-full flex items-center sidebar-nav-item bg-gradient-to-r from-amber-600/15 via-amber-500/20 to-amber-600/15 hover:from-amber-600/30 hover:to-amber-500/30 text-amber-600 dark:text-amber-400 font-bold rounded-xl text-xs border border-amber-500/30 shadow-sm transition-all cursor-pointer"
                     >
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">تثبيت التطبيق (PWA)</span>
-                        <span x-show="sidebarCollapsed" class="text-[10px] font-black truncate max-w-full">تثبيت PWA</span>
+                        <span class="sidebar-text-full truncate">تثبيت التطبيق (PWA)</span>
+                        <span class="sidebar-text-mini text-[10px] font-black truncate max-w-full">تثبيت PWA</span>
                     </button>
                 </div>
             </nav>
 
             <!-- User Info & Logout -->
             <div class="p-2.5 border-t border-slate-200 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/60 flex items-center justify-between overflow-hidden">
-                <a href="{{ route('profile') }}" title="{{ auth()->user()->name ?? 'مستخدم' }}" :class="sidebarCollapsed ? 'justify-center w-full' : 'gap-2.5'" class="flex items-center min-w-0 hover:opacity-80 transition-opacity">
+                <a href="{{ route('profile') }}" title="{{ auth()->user()->name ?? 'مستخدم' }}" class="flex items-center sidebar-user-link min-w-0 hover:opacity-80 transition-opacity">
                     <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-600 dark:text-amber-300 flex items-center justify-center font-bold text-xs shrink-0 shadow-inner">
                         {{ mb_substr(auth()->user()->name ?? 'م', 0, 1) }}
                     </div>
-                    <div x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="min-w-0 truncate">
+                    <div class="sidebar-user-info min-w-0 truncate">
                         <p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{{ auth()->user()->name ?? 'مستخدم' }}</p>
                         <p class="text-[10px] text-amber-600 dark:text-amber-400/80 truncate font-semibold">
                             @if(auth()->user()->hasRole('admin')) المدير العام
@@ -577,7 +672,7 @@
                     </div>
                 </a>
 
-                <form method="POST" action="{{ route('logout') }}" x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms>
+                <form method="POST" action="{{ route('logout') }}" class="sidebar-logout-btn">
                     @csrf
                     <button type="submit" class="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer" title="تسجيل الخروج">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
