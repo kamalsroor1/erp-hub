@@ -42,15 +42,15 @@ for t in TARGET_DIRS:
     php artisan db:seed --class=PermissionsSeeder --force
     php artisan db:seed --force
     
-    # 4. Clear all caches completely
+    # 4. Clear and rebuild complete production caches
     php artisan optimize:clear
-    php artisan view:clear
-    php artisan route:clear
-    php artisan config:clear
-    php artisan cache:clear
+    php artisan config:cache
+    php artisan route:cache
+    php artisan view:cache
+    php artisan event:cache
     
     chmod -R 775 storage bootstrap/cache
-    echo "✅ تم تحديث وتنظيف {t} بنجاح!"
+    echo "✅ تم تحديث وتسريع {t} بنمط الإنتاج الكامل!"
     """
     
     stdin, stdout, stderr = ssh.exec_command(cmd, get_pty=True)
