@@ -22,6 +22,9 @@
 6. **جلسة 14 (`session-14-clean-server-database-reset.md`):**
    - تصفير وإعادة تهيئة قاعدة بيانات السيرفر بالكامل (`migrate:fresh --seed`).
    - الإبقاء حصراً على: المجموعات والأدوار، الصلاحيات (28 صلاحية)، حسابات المدراء، والمخزن الرئيسي فقط، مع تصفير كامل فواتير وحركات وأصناف وعملاء النظام.
+7. **جلسة 15 (`session-15-production-environment-optimization.md`):**
+   - تفعيل بيئة الإنتاج الكاملة (`production` و `debug=false`) وتجميع كافة الكاشات (`config:cache`, `route:cache`, `view:cache`, `event:cache`) لتوفير أقصى سرعة استجابة.
+
 
 
 
