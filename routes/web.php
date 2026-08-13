@@ -32,6 +32,11 @@ Route::post('/logout', function () {
     return redirect()->route('login');
 })->name('logout')->middleware('auth');
 
+// 📄 Public Marketing Brochure & Pricing PDF Presentation
+Route::get('/brochure', function () {
+    return view('marketing-brochure');
+})->name('marketing.brochure');
+
 // 3. Protected POS, ERP & Inventory Routes
 Route::middleware('auth')->group(function () {
     // Dashboard (All authenticated users can see dashboard)
