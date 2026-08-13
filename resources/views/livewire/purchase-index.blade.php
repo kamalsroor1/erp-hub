@@ -19,15 +19,36 @@
     @endif
 
     <!-- Search & Filter Bar -->
-    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <div class="w-full sm:w-80">
+    <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="flex flex-col sm:flex-row items-center gap-2 w-full lg:w-auto">
             <input 
                 type="text" 
                 wire:model.live.debounce.300ms="search" 
                 placeholder="بحث برقم الفاتورة أو اسم المورد أو الصنف..." 
-                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+                class="w-full sm:w-72 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
             >
+            
+            <!-- Date Filter Inputs -->
+            <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-950 p-1.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs">
+                <div class="flex items-center gap-1">
+                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">📅 من:</span>
+                    <input 
+                        type="date" 
+                        wire:model.live="fromDate" 
+                        class="h-8 px-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+                    >
+                </div>
+                <div class="flex items-center gap-1">
+                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">إلى:</span>
+                    <input 
+                        type="date" 
+                        wire:model.live="toDate" 
+                        class="h-8 px-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+                    >
+                </div>
+            </div>
         </div>
+
         <div class="flex flex-wrap items-center gap-1.5 text-xs">
             <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">الحالة:</span>
             <button wire:click="$set('filterStatus', 'active')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStatus === 'active' ? 'bg-emerald-600 text-white border-emerald-500' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400' }}">النشطة</button>

@@ -45,6 +45,16 @@ class ReportsIndex extends Component
         }
     }
 
+    public function updatedFromDate()
+    {
+        $this->dateFilter = 'custom';
+    }
+
+    public function updatedToDate()
+    {
+        $this->dateFilter = 'custom';
+    }
+
     public function setTab($tab)
     {
         $this->activeTab = $tab;

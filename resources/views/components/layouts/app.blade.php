@@ -9,7 +9,7 @@
     @endphp
     <title>{{ $title ?? $siteCompanyName }} | {{ $siteCompanyName }} - {{ $siteSubtitle }}</title>
     
-    <!-- Theme Early Initialization (Zero-lag / Anti-flicker) -->
+    <!-- Theme & Sidebar Early Initialization (Zero-lag / Anti-flicker) -->
     <script>
         (function() {
             try {
@@ -20,6 +20,14 @@
                     document.documentElement.classList.add('dark');
                 } else {
                     document.documentElement.classList.remove('dark');
+                }
+
+                const isPos = {{ request()->routeIs('invoices.create') ? 'true' : 'false' }};
+                const isCollapsed = isPos || (localStorage.getItem('sidebar_collapsed') === 'true');
+                if (isCollapsed) {
+                    document.documentElement.classList.add('sidebar-collapsed');
+                } else {
+                    document.documentElement.classList.remove('sidebar-collapsed');
                 }
             } catch (e) {
                 document.documentElement.classList.add('dark');
@@ -79,6 +87,19 @@
         }
         [x-cloak] { display: none !important; }
         
+        /* Instant Zero-flicker Sidebar Widths (Zero Layout Shifts) */
+        @media (min-width: 1024px) {
+            html.sidebar-collapsed aside#main-sidebar {
+                width: 6rem !important; /* w-24 */
+            }
+            html:not(.sidebar-collapsed) aside#main-sidebar {
+                width: 18rem !important; /* w-72 */
+            }
+        }
+        aside#main-sidebar.has-transition {
+            transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
         /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
@@ -130,9 +151,16 @@
       x-data="{ 
           sidebarOpen: false, 
           sidebarCollapsed: {{ request()->routeIs('invoices.create') ? 'true' : "(localStorage.getItem('sidebar_collapsed') === 'true')" }},
+          hasTransition: false,
           toggleSidebar() {
+              this.hasTransition = true;
               this.sidebarCollapsed = !this.sidebarCollapsed;
               localStorage.setItem('sidebar_collapsed', this.sidebarCollapsed);
+              if (this.sidebarCollapsed) {
+                  document.documentElement.classList.add('sidebar-collapsed');
+              } else {
+                  document.documentElement.classList.remove('sidebar-collapsed');
+              }
           }
       }">
 
@@ -149,18 +177,41 @@
     </div>
 
     @auth
+        @php
+            $currentStore = auth()->user()?->getCurrentStore();
+            $availableStores = auth()->user()?->hasRole('admin') 
+                ? \App\Models\Store::where('is_active', true)->orderBy('is_main', 'desc')->get()
+                : auth()->user()?->stores()->where('is_active', true)->get();
+            if ($availableStores && $availableStores->isEmpty() && $currentStore) {
+                $availableStores = collect([$currentStore]);
+            }
+
+            $shiftService = app(\App\Services\ShiftService::class);
+            $activeShift = $shiftService->getActiveShift(storeId: $currentStore?->id);
+            $isOverdueShift = false;
+            $shiftDurationHours = 0;
+            if ($activeShift && $activeShift->opened_at) {
+                $shiftDurationHours = now()->diffInHours($activeShift->opened_at);
+                if ($activeShift->opened_at->diffInDays(now()) >= 1 || $shiftDurationHours >= 24) {
+                    $isOverdueShift = true;
+                }
+            }
+        @endphp
+
         <!-- Mobile sidebar backdrop -->
         <div x-show="sidebarOpen" @click="sidebarOpen = false" x-cloak class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"></div>
 
-        <!-- Sidebar Navigation (Collapsible) -->
+        <!-- Sidebar Navigation (Collapsible - Zero Flickering) -->
         <aside 
+            id="main-sidebar"
             :class="{
                 'translate-x-0': sidebarOpen,
                 'translate-x-full lg:translate-x-0': !sidebarOpen,
                 'w-72': !sidebarCollapsed,
-                'w-24': sidebarCollapsed
+                'w-24': sidebarCollapsed,
+                'has-transition': hasTransition
             }"
-            class="fixed lg:static inset-y-0 right-0 z-50 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-300 ease-in-out shadow-xl lg:shadow-none select-none"
+            class="fixed lg:static inset-y-0 right-0 z-50 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 flex flex-col shadow-xl lg:shadow-none select-none shrink-0"
         >
             <!-- Brand Header -->
             <div class="h-16 px-2.5 flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/50 backdrop-blur-md overflow-hidden">
@@ -252,8 +303,20 @@
                        :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
                        class="flex transition-all {{ request()->routeIs('daily.journal') || request()->routeIs('shifts.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
-                        <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">📅 اليومية وحركة الدرج</span>
+                        <div class="relative shrink-0">
+                            <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            @if($activeShift)
+                            <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full {{ $isOverdueShift ? 'bg-rose-500 animate-ping' : 'bg-emerald-500 animate-pulse' }}"></span>
+                            @endif
+                        </div>
+                        <div x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="flex-1 flex items-center justify-between min-w-0">
+                            <span class="truncate text-sm font-semibold">اليومية وحركة الدرج</span>
+                            @if($activeShift)
+                            <span class="text-[10px] px-1.5 py-0.5 rounded-md font-bold {{ $isOverdueShift ? 'bg-rose-500 text-white animate-pulse' : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' }}">
+                                {{ $isOverdueShift ? 'متأخرة (+24h)' : 'مفتوحة' }}
+                            </span>
+                            @endif
+                        </div>
                         <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">اليومية</span>
                     </a>
                 </div>
@@ -267,7 +330,7 @@
                        class="flex transition-all {{ request()->routeIs('customers.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">👥 العملاء والحسابات</span>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">العملاء والحسابات</span>
                         <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">العملاء</span>
                     </a>
                 </div>
@@ -294,12 +357,12 @@
 
                 <div>
                     <a href="{{ route('store-stocks') }}" 
-                       title="جرد وأسعار الفروع"
+                       title="جرد وأأسعار الفروع"
                        :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center group' : 'items-center px-3 py-2.5 rounded-xl gap-3 text-right'"
                        class="flex transition-all {{ request()->routeIs('store-stocks') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">📦 جرد وأسعار الفروع</span>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">جرد وأسعار الفروع</span>
                         <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">جرد الفروع</span>
                     </a>
                 </div>
@@ -313,7 +376,7 @@
                        class="flex transition-all {{ request()->routeIs('stock-transfers*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">🚚 أذونات التحويل والشحن</span>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">أذونات التحويل والشحن</span>
                         <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">التحويلات</span>
                     </a>
                 </div>
@@ -327,7 +390,7 @@
                        class="flex transition-all {{ request()->routeIs('stores') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">🏬 الفروع وعربات التوزيع</span>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">الفروع وعربات التوزيع</span>
                         <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الفروع</span>
                     </a>
                 </div>
@@ -341,7 +404,7 @@
                        class="flex transition-all {{ request()->routeIs('purchases.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">🛒 فواتير المشتريات</span>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">فواتير المشتريات</span>
                         <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">المشتريات</span>
                     </a>
                 </div>
@@ -355,7 +418,7 @@
                        class="flex transition-all {{ request()->routeIs('suppliers.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">🏢 الموردون والشركات</span>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">الموردون والشركات</span>
                         <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الموردون</span>
                     </a>
                 </div>
@@ -375,7 +438,7 @@
                        class="flex transition-all {{ request()->routeIs('expenses.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">💵 المصروفات والنثريات</span>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">المصروفات والنثريات</span>
                         <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">المصروفات</span>
                     </a>
                 </div>
@@ -389,7 +452,7 @@
                        class="flex transition-all {{ request()->routeIs('returns.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">🔄 سجل المرتجعات</span>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">سجل المرتجعات</span>
                         <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">المرتجعات</span>
                     </a>
                 </div>
@@ -403,7 +466,7 @@
                        class="flex transition-all {{ request()->routeIs('reports.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">📈 التقارير المالية والأرباح</span>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">التقارير المالية والأرباح</span>
                         <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">التقارير</span>
                     </a>
                 </div>
@@ -423,7 +486,7 @@
                        class="flex transition-all {{ request()->routeIs('users.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">👥 المستخدمون والكاشير</span>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">المستخدمون والكاشير</span>
                         <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">المستخدمين</span>
                     </a>
                 </div>
@@ -435,7 +498,7 @@
                        class="flex transition-all {{ request()->routeIs('roles.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">🛡️ الأدوار والصلاحيات</span>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">الأدوار والصلاحيات</span>
                         <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الصلاحيات</span>
                     </a>
                 </div>
@@ -449,7 +512,7 @@
                        class="flex transition-all {{ request()->routeIs('activity-logs.*') ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white' }}"
                     >
                         <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">📜 سجل العمليات والرقابة</span>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">سجل العمليات والرقابة</span>
                         <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-slate-700 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">الرقابة</span>
                     </a>
                 </div>
@@ -463,7 +526,7 @@
                        class="flex transition-all {{ request()->routeIs('trash.index') ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/40 font-bold shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400' }}"
                     >
                         <svg class="w-6 h-6 text-rose-500 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">🗑️ سلة المحذوفات</span>
+                        <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate text-sm font-semibold">سلة المحذوفات</span>
                         <span x-show="sidebarCollapsed" class="text-[10.5px] font-bold truncate max-w-full text-rose-600 dark:text-rose-400">المحذوفات</span>
                     </a>
                 </div>
@@ -482,14 +545,14 @@
                     </a>
                 </div>
 
-                <!-- 📲 PWA Mobile Install Button -->
+                <!-- PWA Mobile Install Button (Clean SVG Icon) -->
                 <div class="pt-1.5">
                     <button onclick="triggerPwaInstall()" type="button" 
                             title="تثبيت التطبيق (PWA)"
                             :class="sidebarCollapsed ? 'flex-col justify-center items-center py-2 px-1 rounded-2xl gap-1 text-center' : 'px-3 py-2.5 justify-center gap-2'"
                             class="w-full flex items-center bg-gradient-to-r from-amber-600/15 via-amber-500/20 to-amber-600/15 hover:from-amber-600/30 hover:to-amber-500/30 text-amber-600 dark:text-amber-400 font-bold rounded-xl text-xs border border-amber-500/30 shadow-sm transition-all cursor-pointer"
                     >
-                        <span class="text-lg">📲</span>
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         <span x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="truncate">تثبيت التطبيق (PWA)</span>
                         <span x-show="sidebarCollapsed" class="text-[10px] font-black truncate max-w-full">تثبيت PWA</span>
                     </button>
@@ -505,10 +568,10 @@
                     <div x-show="!sidebarCollapsed" x-transition.opacity.duration.200ms class="min-w-0 truncate">
                         <p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{{ auth()->user()->name ?? 'مستخدم' }}</p>
                         <p class="text-[10px] text-amber-600 dark:text-amber-400/80 truncate font-semibold">
-                            @if(auth()->user()->hasRole('admin')) 👑 المدير العام
-                            @elseif(auth()->user()->hasRole('cashier')) 💼 كاشير
-                            @elseif(auth()->user()->hasRole('storekeeper')) 📦 أمين مخزن
-                            @elseif(auth()->user()->hasRole('accountant')) 📊 محاسب
+                            @if(auth()->user()->hasRole('admin')) المدير العام
+                            @elseif(auth()->user()->hasRole('cashier')) كاشير
+                            @elseif(auth()->user()->hasRole('storekeeper')) أمين مخزن
+                            @elseif(auth()->user()->hasRole('accountant')) محاسب
                             @else مستخدم @endif
                         </p>
                     </div>
@@ -555,15 +618,36 @@
                 <!-- Header Actions -->
                 <div class="flex items-center gap-2 sm:gap-3" x-data="{ userMenuOpen: false }">
                     
-                    @php
-                        $currentStore = auth()->user()?->getCurrentStore();
-                        $availableStores = auth()->user()?->hasRole('admin') 
-                            ? \App\Models\Store::where('is_active', true)->orderBy('is_main', 'desc')->get()
-                            : auth()->user()?->stores()->where('is_active', true)->get();
-                        if ($availableStores && $availableStores->isEmpty() && $currentStore) {
-                            $availableStores = collect([$currentStore]);
-                        }
-                    @endphp
+                    <!-- 🟢 / 🚨 Shift / Daily Journal Status Button in Header -->
+                    @if(auth()->user()?->can('daily_journal.view') || auth()->user()?->hasRole('admin') || auth()->user()?->hasRole('cashier'))
+                        @if($activeShift)
+                            @if($isOverdueShift)
+                            <a href="{{ route('daily.journal') }}" 
+                               class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/50 text-rose-700 dark:text-rose-300 font-bold text-xs shadow-md shadow-rose-500/20 animate-pulse transition-all cursor-pointer shrink-0"
+                               title="تحذير: الوردية واليومية مفتوحة منذ أكثر من 24 ساعة! اضغط لتقفيل اليومية ومطابقة الدرج">
+                                <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+                                <span class="font-mono">🚨 اليومية متأخرة (+24h)</span>
+                                <span class="hidden sm:inline text-[10px] bg-rose-600 text-white px-1.5 py-0.5 rounded-md font-black">تقفيل</span>
+                            </a>
+                            @else
+                            <a href="{{ route('daily.journal') }}" 
+                               class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-bold text-xs transition-all cursor-pointer shrink-0"
+                               title="اليومية مفتوحة وشغالة حالياً (#{{ $activeShift->shift_number }}) - اضغط لمتابعة الدرج أو التقفيل">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span class="hidden xs:inline">اليومية شغالة</span>
+                                <span class="text-[10px] bg-emerald-600/20 text-emerald-800 dark:text-emerald-300 font-mono font-black px-1.5 py-0.5 rounded">#{{ $activeShift->shift_number }}</span>
+                            </a>
+                            @endif
+                        @else
+                            <a href="{{ route('daily.journal') }}" 
+                               class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-amber-500/10 hover:border-amber-500/30 text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 font-bold text-xs border border-slate-300 dark:border-slate-700 transition-all cursor-pointer shrink-0"
+                               title="الوردية مغلقة حالياً - اضغط لفتح يومية جديدة">
+                                <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                                <span class="hidden xs:inline">الوردية مغلقة</span>
+                                <span class="text-[10px] text-amber-600 dark:text-amber-400 font-black">+ فتح</span>
+                            </a>
+                        @endif
+                    @endif
 
                     <!-- 🏬 Store / Van Switcher in Header -->
                     @if($currentStore)
@@ -614,17 +698,6 @@
                         @endif
                     </div>
                     @endif
-
-                    <!-- 📲 PWA Install Button (Permanent in Top Bar) -->
-                    <button
-                        type="button"
-                        onclick="triggerPwaInstall()"
-                        class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs shadow-md shadow-amber-500/20 transition-all cursor-pointer active:scale-95 shrink-0"
-                        title="تثبيت النظام كتطبيق على الهاتف أو الكمبيوتر"
-                    >
-                        <span class="text-sm">📲</span>
-                        <span class="hidden sm:inline font-tajawal">تثبيت التطبيق</span>
-                    </button>
 
                     <!-- ☀️ / 🌙 Theme Toggle Button -->
                     <button
@@ -700,6 +773,21 @@
                     </div>
                 </div>
             </header>
+
+            <!-- 🚨 Overdue Shift Global Alert Banner (> 24 Hours) -->
+            @if($isOverdueShift && (auth()->user()?->hasRole('admin') || auth()->user()?->hasRole('cashier') || auth()->user()?->can('daily_journal.view')))
+            <div class="bg-gradient-to-r from-rose-700 via-rose-600 to-rose-700 text-white px-4 py-2.5 shadow-md flex flex-col sm:flex-row items-center justify-between gap-2 text-xs font-bold shrink-0 z-20 border-b border-rose-800 animate-pulse">
+                <div class="flex items-center gap-2 text-center sm:text-right">
+                    <span class="text-base">🚨</span>
+                    <span>
+                        <strong>إنذار تقفيل اليومية:</strong> الوردية رقم (<span class="font-mono underline">{{ $activeShift->shift_number }}</span>) مفتوحة منذ أكثر من 24 ساعة (منذ {{ $activeShift->opened_at->translatedFormat('l d F - h:i A') }}). يرجى مراجعة الخزينة وتقفيل اليومية ومطابقة العهدة!
+                    </span>
+                </div>
+                <a href="{{ route('daily.journal') }}" class="px-3.5 py-1.5 bg-white text-rose-700 hover:bg-rose-100 rounded-xl text-xs font-black transition-all shadow shrink-0 cursor-pointer">
+                    الانتقال لتقفيل اليومية الآن ←
+                </a>
+            </div>
+            @endif
 
             <!-- Dynamic Body Page Content -->
             <main class="flex-1 overflow-y-auto bg-slate-100 dark:bg-slate-950 p-4 lg:p-6 text-slate-800 dark:text-slate-100">

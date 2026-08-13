@@ -13,6 +13,8 @@ class PurchaseIndex extends Component
 
     public $search = '';
     public $filterStatus = 'active'; // active, trashed, all
+    public ?string $fromDate = null;
+    public ?string $toDate = null;
 
     public function mount()
     {
@@ -70,6 +72,8 @@ class PurchaseIndex extends Component
                   ->orWhereHas('supplier', fn($s) => $s->where('name', 'like', "%{$this->search}%"))
                   ->orWhereHas('items.item', fn($i) => $i->where('name', 'like', "%{$this->search}%"));
             })
+            ->when($this->fromDate, fn($q) => $q->whereDate('purchase_date', '>=', $this->fromDate))
+            ->when($this->toDate, fn($q) => $q->whereDate('purchase_date', '<=', $this->toDate))
             ->latest('purchase_date');
 
         return view('livewire.purchase-index', [

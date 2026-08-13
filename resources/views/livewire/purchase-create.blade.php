@@ -146,21 +146,30 @@
             
             <!-- Supplier & Store Card -->
             <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">🏢 المورد / جهة التوريد:</label>
-                        <select wire:model.live="supplier_id" class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="sm:col-span-1">
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">📅 تاريخ الفاتورة:</label>
+                        <input 
+                            type="date" 
+                            wire:model="purchase_date" 
+                            class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+                        >
+                    </div>
+
+                    <div class="sm:col-span-1">
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">🏢 المورد:</label>
+                        <select wire:model.live="supplier_id" class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-slate-900 dark:[&>option]:text-slate-100">
                             @foreach($suppliers as $sup)
-                            <option value="{{ $sup->id }}">{{ $sup->name }} (له: {{ number_format($sup->current_balance, 2) }} ج.م)</option>
+                            <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="{{ $sup->id }}">{{ $sup->name }}</option>
                             @endforeach
                         </select>
                     </div>
 
-                    <div>
+                    <div class="sm:col-span-1">
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">🏬 المخزن المستلم:</label>
-                        <select wire:model.live="store_id" class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <select wire:model.live="store_id" class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-slate-900 dark:[&>option]:text-slate-100">
                             @foreach($stores as $st)
-                            <option value="{{ $st->id }}">
+                            <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="{{ $st->id }}">
                                 @if($st->type === 'wholesale_van') 🚚 @elseif($st->type === 'main_warehouse') 🏢 @else 🏬 @endif
                                 {{ $st->name }}
                             </option>

@@ -12,12 +12,13 @@
             </div>
 
             <!-- Store Selector -->
+            <!-- Store Selector -->
             <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-2xl px-3 py-2 shrink-0">
-                <span class="text-xs font-bold text-slate-500">🏬 نطاق الفرع:</span>
-                <select wire:model.live="selectedStoreId" class="bg-transparent text-xs font-black text-slate-900 dark:text-white focus:outline-none cursor-pointer">
-                    <option value="all">🏢 إجمالي كافة الفروع والمخازن وعربات التوزيع</option>
+                <span class="text-xs font-bold text-slate-500 dark:text-slate-400">🏬 نطاق الفرع:</span>
+                <select wire:model.live="selectedStoreId" class="bg-transparent text-xs font-black text-slate-900 dark:text-white focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-slate-900 dark:[&>option]:text-slate-100">
+                    <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="all">🏢 إجمالي كافة الفروع والمخازن وعربات التوزيع</option>
                     @foreach($stores as $st)
-                    <option value="{{ $st->id }}">
+                    <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="{{ $st->id }}">
                         @if($st->type === 'wholesale_van') 🚚 @elseif($st->type === 'main_warehouse') 🏢 @else 🏬 @endif
                         {{ $st->name }}
                     </option>
@@ -68,19 +69,23 @@
             </div>
 
             <!-- Custom Date Inputs -->
-            <div class="flex items-center gap-2 text-xs">
-                <span class="text-slate-400 font-bold">من:</span>
-                <input 
-                    type="date" 
-                    wire:model.live="fromDate" 
-                    class="h-9 px-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
-                >
-                <span class="text-slate-400 font-bold">إلى:</span>
-                <input 
-                    type="date" 
-                    wire:model.live="toDate" 
-                    class="h-9 px-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
-                >
+            <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-950 p-1.5 rounded-2xl border border-slate-300 dark:border-slate-700 text-xs">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">📅 من:</span>
+                    <input 
+                        type="date" 
+                        wire:model.live="fromDate" 
+                        class="h-8 px-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+                    >
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">إلى:</span>
+                    <input 
+                        type="date" 
+                        wire:model.live="toDate" 
+                        class="h-8 px-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+                    >
+                </div>
             </div>
         </div>
     </div>

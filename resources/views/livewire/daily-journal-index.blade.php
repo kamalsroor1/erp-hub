@@ -12,11 +12,11 @@
             <!-- Store Selector -->
             @hasrole('admin')
             <div class="flex items-center gap-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-1 text-xs">
-                <span class="text-slate-500">الفرع:</span>
-                <select wire:model.live="selectedStoreId" class="bg-transparent text-slate-900 dark:text-white font-bold focus:outline-none cursor-pointer">
-                    <option value="all">كل الفروع والعربيات</option>
+                <span class="text-slate-500 dark:text-slate-400 font-bold">الفرع:</span>
+                <select wire:model.live="selectedStoreId" class="bg-transparent text-slate-900 dark:text-white font-bold focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-slate-900 dark:[&>option]:text-slate-100">
+                    <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="all">كل الفروع والعربيات</option>
                     @foreach($stores as $st)
-                    <option value="{{ $st->id }}">
+                    <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="{{ $st->id }}">
                         @if($st->type === 'wholesale_van') 🚚 @elseif($st->type === 'main_warehouse') 🏢 @else 🏬 @endif
                         {{ $st->name }}
                     </option>
@@ -40,9 +40,9 @@
             </button>
 
             <!-- Date Picker -->
-            <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1 text-xs">
-                <span class="text-slate-500 dark:text-slate-400">التاريخ:</span>
-                <input type="date" wire:model.live="selectedDate" class="bg-transparent text-slate-900 dark:text-white font-mono font-bold focus:outline-none">
+            <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-1 text-xs">
+                <span class="text-slate-500 dark:text-slate-400 font-bold">📅 التاريخ:</span>
+                <input type="date" wire:model.live="selectedDate" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-0.5 text-slate-900 dark:text-white font-mono font-bold focus:outline-none cursor-pointer">
             </div>
 
             <!-- Print Daily Summary Button -->
@@ -72,10 +72,20 @@
                 <div class="text-xs font-bold text-slate-900 dark:text-white flex flex-wrap items-center gap-2">
                     <span>حالة الوردية / اليومية:</span>
                     @if($activeShift)
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-bold">
-                            🟢 مفتوحة (#{{ $activeShift->shift_number }})
+                        @php
+                            $isOverdue = $activeShift->opened_at && (now()->diffInHours($activeShift->opened_at) >= 24 || $activeShift->opened_at->diffInDays(now()) >= 1);
+                        @endphp
+                        @if($isOverdue)
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/40 font-bold animate-pulse">
+                            🚨 مفتوحة ومتأخرة (+24h) (#{{ $activeShift->shift_number }})
                         </span>
+                        @else
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-bold">
+                            🟢 مفتوحة وشغالة (#{{ $activeShift->shift_number }})
+                        </span>
+                        @endif
                         <span class="text-slate-500 dark:text-slate-400 font-normal">| الكاشير: <strong class="text-slate-900 dark:text-white">{{ $activeShift->user->name ?? 'الكاشير' }}</strong></span>
+                        <span class="text-slate-500 dark:text-slate-400 font-normal">| تم الفتح: <strong class="text-slate-900 dark:text-white font-mono">{{ $activeShift->opened_at ? $activeShift->opened_at->translatedFormat('d F - h:i A') : '—' }}</strong></span>
                     @else
                         <span class="px-2.5 py-0.5 rounded-full text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700">
                             مغلقة / غير مفتوحة

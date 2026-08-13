@@ -13,43 +13,67 @@
     </div>
 
     <!-- Filters Bar -->
-    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
-            <input 
-                type="text" 
-                wire:model.live.debounce.300ms="search" 
-                placeholder="بحث برقم الفاتورة أو اسم العميل..." 
-                class="w-full sm:w-72 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
-            >
-            <select 
-                wire:model.live="selectedStore" 
-                class="w-full sm:w-56 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-bold"
-            >
-                <option value="">🏢 كل الفروع ونقاط البيع</option>
-                @foreach($stores as $st)
-                    <option value="{{ $st->id }}">{{ $st->type === 'wholesale_van' ? '🚚 ' : ($st->is_main ? '🏢 ' : '🏬 ') }}{{ $st->name }} ({{ $st->code ?: 'B'.$st->id }})</option>
-                @endforeach
-            </select>
+    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+        <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+            <div class="flex flex-col sm:flex-row items-center gap-2 w-full lg:w-auto">
+                <input 
+                    type="text" 
+                    wire:model.live.debounce.300ms="search" 
+                    placeholder="بحث برقم الفاتورة أو اسم العميل..." 
+                    class="w-full sm:w-64 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+                >
+                <select 
+                    wire:model.live="selectedStore" 
+                    class="w-full sm:w-56 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-bold [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-slate-900 dark:[&>option]:text-slate-100"
+                >
+                    <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="">🏢 كل الفروع ونقاط البيع</option>
+                    @foreach($stores as $st)
+                        <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="{{ $st->id }}">{{ $st->type === 'wholesale_van' ? '🚚 ' : ($st->is_main ? '🏢 ' : '🏬 ') }}{{ $st->name }} ({{ $st->code ?: 'B'.$st->id }})</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- Date Filter Inputs -->
+            <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-950 p-1.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs">
+                <div class="flex items-center gap-1">
+                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">📅 من:</span>
+                    <input 
+                        type="date" 
+                        wire:model.live="fromDate" 
+                        class="h-8 px-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+                    >
+                </div>
+                <div class="flex items-center gap-1">
+                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">إلى:</span>
+                    <input 
+                        type="date" 
+                        wire:model.live="toDate" 
+                        class="h-8 px-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+                    >
+                </div>
+            </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-1.5 text-xs">
-            <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">الحالة:</span>
-            <button wire:click="$set('filterStatus', 'active')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStatus === 'active' ? 'bg-emerald-600 text-white border-emerald-500' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400' }}">النشطة</button>
-            <button wire:click="$set('filterStatus', 'trashed')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs flex items-center gap-1 {{ $filterStatus === 'trashed' ? 'bg-rose-600 text-white border-rose-500' : 'border-slate-200 dark:border-slate-800 text-rose-600 dark:text-rose-400' }}">
-                <span>سلة المحذوفات</span>
-                @if($trashedCount > 0)
-                <span class="px-1.5 py-0.2 rounded-full text-[10px] {{ $filterStatus === 'trashed' ? 'bg-white text-rose-600' : 'bg-rose-500/20 text-rose-600' }} font-mono font-bold">{{ $trashedCount }}</span>
-                @endif
-            </button>
-            <button wire:click="$set('filterStatus', 'all')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStatus === 'all' ? 'bg-slate-700 text-white border-slate-600' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400' }}">الكل</button>
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+            <div class="flex flex-wrap items-center gap-1.5">
+                <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">الحالة:</span>
+                <button wire:click="$set('filterStatus', 'active')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStatus === 'active' ? 'bg-emerald-600 text-white border-emerald-500' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400' }}">النشطة</button>
+                <button wire:click="$set('filterStatus', 'trashed')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs flex items-center gap-1 {{ $filterStatus === 'trashed' ? 'bg-rose-600 text-white border-rose-500' : 'border-slate-200 dark:border-slate-800 text-rose-600 dark:text-rose-400' }}">
+                    <span>سلة المحذوفات</span>
+                    @if($trashedCount > 0)
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] {{ $filterStatus === 'trashed' ? 'bg-white text-rose-600' : 'bg-rose-500/20 text-rose-600' }} font-mono font-bold">{{ $trashedCount }}</span>
+                    @endif
+                </button>
+                <button wire:click="$set('filterStatus', 'all')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStatus === 'all' ? 'bg-slate-700 text-white border-slate-600' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400' }}">الكل</button>
+            </div>
 
-            <span class="text-slate-300 dark:text-slate-700 mx-1">|</span>
-
-            <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">حالة السداد:</span>
-            <button wire:click="$set('paymentStatus', 'all')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'all' ? 'bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white' : 'border-transparent text-slate-500 dark:text-slate-400' }}">الكل</button>
-            <button wire:click="$set('paymentStatus', 'unpaid')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'unpaid' ? 'bg-rose-500/20 border-rose-500/40 text-rose-700 dark:text-rose-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">آجل</button>
-            <button wire:click="$set('paymentStatus', 'partially_paid')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'partially_paid' ? 'bg-amber-500/20 border-amber-500/40 text-amber-700 dark:text-amber-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">جزئي</button>
-            <button wire:click="$set('paymentStatus', 'paid')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'paid' ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-700 dark:text-emerald-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">مدفوع</button>
+            <div class="flex flex-wrap items-center gap-1.5">
+                <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">حالة السداد:</span>
+                <button wire:click="$set('paymentStatus', 'all')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'all' ? 'bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white' : 'border-transparent text-slate-500 dark:text-slate-400' }}">الكل</button>
+                <button wire:click="$set('paymentStatus', 'unpaid')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'unpaid' ? 'bg-rose-500/20 border-rose-500/40 text-rose-700 dark:text-rose-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">آجل</button>
+                <button wire:click="$set('paymentStatus', 'partially_paid')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'partially_paid' ? 'bg-amber-500/20 border-amber-500/40 text-amber-700 dark:text-amber-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">جزئي</button>
+                <button wire:click="$set('paymentStatus', 'paid')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'paid' ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-700 dark:text-emerald-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">مدفوع</button>
+            </div>
         </div>
     </div>
 

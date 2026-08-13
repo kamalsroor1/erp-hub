@@ -31,8 +31,8 @@
     </div>
     @endif
 
-    <!-- Overview Card -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs shadow-sm">
+    <!-- Overview Card & Date Filters -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs shadow-sm items-center">
         <div>
             <span class="text-slate-500">اسم الشركة / المصنع:</span>
             <div class="font-bold text-slate-900 dark:text-white mt-0.5">{{ $supplier->company_name ?? '—' }}</div>
@@ -45,6 +45,16 @@
             <span class="text-slate-500">الرصيد المستحق للمورد حالياً:</span>
             <div class="font-black text-base font-mono mt-0.5 {{ bccomp($current_balance, '0.000', 3) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400' }}">
                 {{ number_format($current_balance, 2) }} ج.م
+            </div>
+        </div>
+        <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-slate-300 dark:border-slate-700">
+            <div class="flex items-center gap-1">
+                <span class="text-[10px] font-bold text-slate-500">من:</span>
+                <input type="date" wire:model.live="fromDate" class="h-7 px-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none cursor-pointer">
+            </div>
+            <div class="flex items-center gap-1">
+                <span class="text-[10px] font-bold text-slate-500">إلى:</span>
+                <input type="date" wire:model.live="toDate" class="h-7 px-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none cursor-pointer">
             </div>
         </div>
     </div>

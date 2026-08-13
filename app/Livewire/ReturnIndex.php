@@ -14,6 +14,8 @@ class ReturnIndex extends Component
     public $search = '';
     public $type = 'all'; // all, sales_return, purchase_return
     public $filterStatus = 'active'; // active, trashed, all
+    public ?string $fromDate = null;
+    public ?string $toDate = null;
 
     public function mount()
     {
@@ -72,6 +74,8 @@ class ReturnIndex extends Component
                   ->orWhereHas('supplier', fn($s) => $s->where('name', 'like', "%{$this->search}%"));
             })
             ->when($this->type !== 'all', fn($q) => $q->where('return_type', $this->type))
+            ->when($this->fromDate, fn($q) => $q->whereDate('return_date', '>=', $this->fromDate))
+            ->when($this->toDate, fn($q) => $q->whereDate('return_date', '<=', $this->toDate))
             ->latest('return_date');
 
         return view('livewire.return-index', [
