@@ -616,6 +616,19 @@
                 </div>
                 @endcan
 
+                @if(auth()->user()?->hasRole('admin'))
+                <div>
+                    <a href="/pulse" target="_blank"
+                       title="مراقبة أداء وسرعة السيرفر (Pulse)"
+                       class="flex sidebar-nav-item transition-all text-purple-600 dark:text-purple-400 hover:bg-purple-500/10 hover:text-purple-700 dark:hover:text-purple-300"
+                    >
+                        <svg class="w-6 h-6 shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <span class="sidebar-text-full truncate text-sm font-semibold">مراقبة السيرفر Pulse</span>
+                        <span class="sidebar-text-mini text-[10.5px] font-bold truncate max-w-full text-purple-600 dark:text-purple-400">Pulse</span>
+                    </a>
+                </div>
+                @endif
+
                 @can('trash.access')
                 <div>
                     <a href="{{ route('trash.index') }}" 

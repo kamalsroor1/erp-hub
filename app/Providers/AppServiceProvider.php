@@ -24,5 +24,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(function ($user, $ability) {
             return $user->hasRole('admin') ? true : null;
         });
+
+        // Restrict Laravel Pulse dashboard strictly to Admin users
+        Gate::define('viewPulse', function ($user) {
+            return $user->hasRole('admin');
+        });
     }
 }
