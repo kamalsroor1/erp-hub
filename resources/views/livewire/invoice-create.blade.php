@@ -272,16 +272,98 @@
                         </select>
                     </div>
 
-                    <!-- Customer Selector -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">👤 العميل والحساب:</label>
-                        <select wire:model.live="customer_id" class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
-                            @foreach($customers as $c)
-                            <option value="{{ $c->id }}">
-                                {{ $c->name }} ({{ number_format($c->current_balance, 2) }} ج.م)
-                            </option>
-                            @endforeach
-                        </select>
+                    <!-- Customer Selector & Quick Search -->
+                    <div class="relative" x-data="{ open: false }">
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">👤 العميل والحساب:</label>
+                            @if(auth()->user()?->can('customers.manage') || auth()->user()?->can('pos.access') || auth()->user()?->can('invoices.create'))
+                            <button 
+                                type="button" 
+                                wire:click="openNewCustomerModal" 
+                                class="text-[11px] font-black text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 flex items-center gap-1 cursor-pointer transition-colors"
+                            >
+                                <span>➕ عميل جديد</span>
+                            </button>
+                            @endif
+                        </div>
+
+                        <!-- Customer Search Input with Dropdown -->
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                wire:model.live.debounce.150ms="customerSearch" 
+                                @focus="open = true" 
+                                @click="open = true"
+                                placeholder="🔍 ابحث بالاسم أو رقم الهاتف..." 
+                                class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 pl-8 text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            >
+                            @if($customerSearch)
+                            <button 
+                                type="button" 
+                                @click="open = true"
+                                wire:click="$set('customerSearch', '')" 
+                                class="absolute left-2.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs font-bold hover:bg-slate-300 cursor-pointer"
+                            >
+                                ✕
+                            </button>
+                            @endif
+                        </div>
+
+                        <!-- Dropdown List of Filtered Customers -->
+                        <div 
+                            x-show="open" 
+                            @click.away="open = false" 
+                            x-transition.duration.150ms 
+                            class="absolute z-50 right-0 left-0 mt-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800"
+                            style="display: none;"
+                        >
+                            @forelse($filteredCustomers as $fc)
+                            <button 
+                                type="button" 
+                                wire:click="selectCustomer({{ $fc->id }})" 
+                                @click="open = false"
+                                class="w-full p-2.5 text-right hover:bg-amber-500/10 transition-colors flex items-center justify-between gap-2 cursor-pointer {{ $customer_id == $fc->id ? 'bg-amber-500/15' : '' }}"
+                            >
+                                <div>
+                                    <div class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                        <span>👤 {{ $fc->name }}</span>
+                                        @if($customer_id == $fc->id)
+                                            <span class="text-[10px] bg-emerald-500/20 text-emerald-600 px-1.5 py-0.5 rounded font-black">✓ محدد</span>
+                                        @endif
+                                    </div>
+                                    @if($fc->phone)
+                                    <div class="text-[10px] text-slate-400 font-mono mt-0.5" dir="ltr">
+                                        📱 {{ $fc->phone }}
+                                    </div>
+                                    @endif
+                                </div>
+                                <div class="text-left shrink-0">
+                                    <span class="text-[10px] px-2 py-0.5 rounded-md font-mono font-bold {{ bccomp($fc->current_balance, '0.000', 3) > 0 ? 'bg-rose-500/10 text-rose-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                                        {{ number_format($fc->current_balance, 2) }} ج.م
+                                    </span>
+                                </div>
+                            </button>
+                            @empty
+                            <div class="p-3 text-center text-xs text-slate-400">
+                                لا يوجد عميل مطابق للبحث
+                                @if(auth()->user()?->can('customers.manage') || auth()->user()?->can('pos.access') || auth()->user()?->can('invoices.create'))
+                                <button type="button" wire:click="openNewCustomerModal" @click="open = false" class="block mx-auto mt-1 text-amber-600 font-bold hover:underline cursor-pointer">
+                                    ➕ تسجيل عميل جديد الآن
+                                </button>
+                                @endif
+                            </div>
+                            @endforelse
+                        </div>
+
+                        <!-- Selected Customer Info Pill -->
+                        @if($selectedCustomer)
+                        <div class="mt-1.5 flex items-center justify-between text-[11px] px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300">
+                            <span class="font-bold truncate">العميل الحالي: <b class="text-amber-600 dark:text-amber-400">{{ $selectedCustomer->name }}</b></span>
+                            <span class="font-mono font-bold {{ bccomp($selectedCustomer->current_balance, '0.000', 3) > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500' }}">
+                                الرصيد: {{ number_format($selectedCustomer->current_balance, 2) }} ج.م
+                            </span>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -545,4 +627,83 @@
             </div>
         </div>
     </div>
+
+    <!-- ➕ Quick Add Customer Modal -->
+    @if($showNewCustomerModal)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" x-data>
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md p-6 space-y-4 shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    <span>👤 تسجيل عميل جديد فوراً (POS)</span>
+                </h3>
+                <button type="button" wire:click="closeNewCustomerModal" class="text-slate-400 hover:text-slate-700 dark:hover:text-white text-xl font-bold p-1 cursor-pointer">✕</button>
+            </div>
+
+            <form wire:submit="quickCreateCustomer" class="space-y-3.5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">اسم العميل: <span class="text-rose-500">*</span></label>
+                    <input 
+                        type="text" 
+                        wire:model="newCustomerName" 
+                        placeholder="مثال: سوبر ماركت الأمانة / أحمد محمد" 
+                        class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        autofocus
+                        required
+                    >
+                    @error('newCustomerName') <span class="text-rose-500 text-[11px] font-bold">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">رقم الهاتف:</label>
+                    <input 
+                        type="tel" 
+                        wire:model="newCustomerPhone" 
+                        placeholder="مثال: 01012345678" 
+                        class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 text-sm font-mono text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        dir="ltr"
+                    >
+                    @error('newCustomerPhone') <span class="text-rose-500 text-[11px] font-bold">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">العنوان أو المنطقة (اختياري):</label>
+                    <input 
+                        type="text" 
+                        wire:model="newCustomerAddress" 
+                        placeholder="مثال: شارع التحرير - الدقي" 
+                        class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">ملاحظات (اختياري):</label>
+                    <input 
+                        type="text" 
+                        wire:model="newCustomerNotes" 
+                        placeholder="أي ملاحظات حول العميل" 
+                        class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    >
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <button 
+                        type="button" 
+                        wire:click="closeNewCustomerModal" 
+                        class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs hover:bg-slate-200 cursor-pointer"
+                    >
+                        إلغاء
+                    </button>
+                    <button 
+                        type="submit" 
+                        wire:loading.attr="disabled"
+                        class="px-5 py-2.5 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-xl text-xs shadow-lg shadow-amber-500/20 cursor-pointer flex items-center gap-1.5"
+                    >
+                        <span wire:loading.remove wire:target="quickCreateCustomer">💾 حفظ وتحديد العميل للفاتورة</span>
+                        <span wire:loading wire:target="quickCreateCustomer">جاري الحفظ...</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
 </div>

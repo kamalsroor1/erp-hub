@@ -91,20 +91,8 @@
             <span><strong>التاريخ:</strong> {{ $invoice->invoice_date->format('Y-m-d') }}</span>
             <span><strong>الوقت:</strong> {{ $invoice->created_at->format('H:i') }}</span>
         </div>
-        @if($invoice->store)
         <div>
-            <strong>الفرع:</strong> {{ $invoice->store->name }} ({{ $invoice->store->code ?: 'B'.$invoice->store->id }})
-        </div>
-        @if($invoice->store->phone)
-        <div><strong>هاتف الفرع:</strong> <span dir="ltr">{{ $invoice->store->phone }}</span></div>
-        @endif
-        @if($invoice->store->address)
-        <div style="font-size: 10px;"><strong>العنوان:</strong> {{ $invoice->store->address }}</div>
-        @endif
-        @endif
-        <div style="display: flex; justify-content: space-between;">
             <span><strong>العميل:</strong> {{ $invoice->customer->name }}</span>
-            <span><strong>الكاشير:</strong> {{ $invoice->user?->name ?? 'المدير' }}</span>
         </div>
     </div>
 

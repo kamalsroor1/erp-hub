@@ -29,6 +29,15 @@ class InvoiceCreate extends Component
     public $selectedCategory = 'all';
     public $items = [];
 
+    // Customer Search and Quick Registration
+    public $customerSearch = '';
+    public $showCustomerDropdown = false;
+    public $showNewCustomerModal = false;
+    public $newCustomerName = '';
+    public $newCustomerPhone = '';
+    public $newCustomerAddress = '';
+    public $newCustomerNotes = '';
+
     // Summary calculations
     public $subtotal = '0.000';
     public $discount_amount = '0.000';
@@ -61,7 +70,63 @@ class InvoiceCreate extends Component
         $firstCustomer = Customer::active()->first();
         if ($firstCustomer) {
             $this->customer_id = $firstCustomer->id;
+            $this->customerSearch = $firstCustomer->name . ($firstCustomer->phone ? " ({$firstCustomer->phone})" : '');
         }
+    }
+
+    public function selectCustomer($customerId)
+    {
+        $customer = Customer::find($customerId);
+        if ($customer) {
+            $this->customer_id = $customer->id;
+            $this->customerSearch = $customer->name . ($customer->phone ? " ({$customer->phone})" : '');
+            $this->showCustomerDropdown = false;
+            $this->updatedCustomerId();
+        }
+    }
+
+    public function openNewCustomerModal()
+    {
+        $this->newCustomerName = '';
+        $this->newCustomerPhone = '';
+        $this->newCustomerAddress = '';
+        $this->newCustomerNotes = '';
+        $this->showNewCustomerModal = true;
+    }
+
+    public function closeNewCustomerModal()
+    {
+        $this->showNewCustomerModal = false;
+    }
+
+    public function quickCreateCustomer()
+    {
+        $this->validate([
+            'newCustomerName' => 'required|string|max:150',
+            'newCustomerPhone' => 'nullable|string|max:30',
+        ], [
+            'newCustomerName.required' => 'يرجى إدخال اسم العميل',
+        ]);
+
+        $customer = Customer::create([
+            'name'            => trim($this->newCustomerName),
+            'phone'           => trim($this->newCustomerPhone) ?: null,
+            'address'         => trim($this->newCustomerAddress) ?: null,
+            'notes'           => trim($this->newCustomerNotes) ?: null,
+            'is_active'       => true,
+            'current_balance' => '0.000',
+        ]);
+
+        $this->customer_id = $customer->id;
+        $this->customerSearch = $customer->name . ($customer->phone ? " ({$customer->phone})" : '');
+        $this->showNewCustomerModal = false;
+        $this->showCustomerDropdown = false;
+        $this->updatedCustomerId();
+
+        $this->dispatch('swal:toast', [
+            'icon'  => 'success',
+            'title' => "تم تسجيل العميل ({$customer->name}) وتحديده للفاتورة فوراً ✅",
+        ]);
     }
 
     public function updatedCustomerId()
@@ -476,7 +541,20 @@ class InvoiceCreate extends Component
     public function render()
     {
         $customers = Customer::active()->orderBy('name')->get();
+        $selectedCustomer = Customer::find($this->customer_id);
         $stores = Store::active()->orderBy('is_main', 'desc')->get();
+
+        $filteredCustomers = Customer::active()
+            ->when(!empty($this->customerSearch), function ($q) {
+                $term = trim($this->customerSearch);
+                $q->where(function ($sub) use ($term) {
+                    $sub->where('name', 'like', "%{$term}%")
+                        ->orWhere('phone', 'like', "%{$term}%");
+                });
+            })
+            ->orderBy('name')
+            ->take(10)
+            ->get();
 
         $quickCatalog = Item::active()
             ->when($this->selectedCategory !== 'all', fn($q) => $q->where('category', $this->selectedCategory))
@@ -490,10 +568,12 @@ class InvoiceCreate extends Component
             ->get();
 
         return view('livewire.invoice-create', [
-            'customers'    => $customers,
-            'stores'       => $stores,
-            'quickCatalog' => $quickCatalog,
-            'currentStore' => Store::find($this->store_id),
+            'customers'         => $customers,
+            'filteredCustomers' => $filteredCustomers,
+            'selectedCustomer'  => $selectedCustomer,
+            'stores'            => $stores,
+            'quickCatalog'      => $quickCatalog,
+            'currentStore'      => Store::find($this->store_id),
         ])->layout('components.layouts.app', ['title' => 'نقطة البيع ومطحنة البن والشاي (POS)']);
     }
 }
