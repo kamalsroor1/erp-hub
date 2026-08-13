@@ -221,22 +221,109 @@ class ReportsIndex extends Component
 
         $totalAllCustomersDebt = Customer::active()->sum('current_balance') ?: '0.000';
 
-        // 6. Stock Inventory Valuation
-        $allItems = Item::active()->get();
-        $stockCostValuation = '0.000';
+        // 6. Stock Inventory Valuation (Fully linked to selected store or all stores)
+        $stockCostValuation    = '0.000';
         $stockSellingValuation = '0.000';
+        $inventoryItems        = [];
+        $selectedStore         = null;
 
-        foreach ($allItems as $itm) {
-            $costVal = bcmul($itm->current_stock, $itm->cost_price, 3);
-            $sellVal = bcmul($itm->current_stock, $itm->selling_price, 3);
-            $stockCostValuation = bcadd($stockCostValuation, $costVal, 3);
-            $stockSellingValuation = bcadd($stockSellingValuation, $sellVal, 3);
+        if ($storeFilter) {
+            $selectedStore = Store::find($storeFilter);
+            
+            $storeStocks = \App\Models\StoreStock::with('item')
+                ->where('store_id', $storeFilter)
+                ->whereHas('item', fn($q) => $q->where('is_active', true))
+                ->get();
+
+            $existingItemIds = $storeStocks->pluck('item_id')->toArray();
+            $missingItems = Item::active()->whereNotIn('id', $existingItemIds)->get();
+
+            foreach ($storeStocks as $stk) {
+                $item = $stk->item;
+                if (!$item) continue;
+
+                $qty          = (string)($stk->quantity ?? '0.000');
+                $costPrice    = (string)($item->cost_price ?? '0.000');
+                $sellingPrice = (string)$stk->effective_selling_price;
+
+                $costVal = bcmul($qty, $costPrice, 3);
+                $sellVal = bcmul($qty, $sellingPrice, 3);
+                $profit  = bcsub($sellVal, $costVal, 3);
+
+                $stockCostValuation    = bcadd($stockCostValuation, $costVal, 3);
+                $stockSellingValuation = bcadd($stockSellingValuation, $sellVal, 3);
+
+                $inventoryItems[] = (object)[
+                    'id'               => $item->id,
+                    'name'             => $item->name,
+                    'code'             => $item->code,
+                    'category'         => $item->category,
+                    'unit'             => $item->unit,
+                    'current_stock'    => $qty,
+                    'cost_price'       => $costPrice,
+                    'selling_price'    => $sellingPrice,
+                    'cost_val'         => $costVal,
+                    'sell_val'         => $sellVal,
+                    'profit'           => $profit,
+                    'has_custom_price' => ($stk->custom_selling_price !== null && bccomp((string)$stk->custom_selling_price, '0.000', 3) > 0),
+                ];
+            }
+
+            foreach ($missingItems as $mItm) {
+                $costPrice    = (string)($mItm->cost_price ?? '0.000');
+                $sellingPrice = (string)($mItm->selling_price ?? '0.000');
+
+                $inventoryItems[] = (object)[
+                    'id'               => $mItm->id,
+                    'name'             => $mItm->name,
+                    'code'             => $mItm->code,
+                    'category'         => $mItm->category,
+                    'unit'             => $mItm->unit,
+                    'current_stock'    => '0.000',
+                    'cost_price'       => $costPrice,
+                    'selling_price'    => $sellingPrice,
+                    'cost_val'         => '0.000',
+                    'sell_val'         => '0.000',
+                    'profit'           => '0.000',
+                    'has_custom_price' => false,
+                ];
+            }
+        } else {
+            $allItems = Item::active()->get();
+            foreach ($allItems as $itm) {
+                $qty          = (string)($itm->current_stock ?? '0.000');
+                $costPrice    = (string)($itm->cost_price ?? '0.000');
+                $sellingPrice = (string)($itm->selling_price ?? '0.000');
+
+                $costVal = bcmul($qty, $costPrice, 3);
+                $sellVal = bcmul($qty, $sellingPrice, 3);
+                $profit  = bcsub($sellVal, $costVal, 3);
+
+                $stockCostValuation    = bcadd($stockCostValuation, $costVal, 3);
+                $stockSellingValuation = bcadd($stockSellingValuation, $sellVal, 3);
+
+                $inventoryItems[] = (object)[
+                    'id'               => $itm->id,
+                    'name'             => $itm->name,
+                    'code'             => $itm->code,
+                    'category'         => $itm->category,
+                    'unit'             => $itm->unit,
+                    'current_stock'    => $qty,
+                    'cost_price'       => $costPrice,
+                    'selling_price'    => $sellingPrice,
+                    'cost_val'         => $costVal,
+                    'sell_val'         => $sellVal,
+                    'profit'           => $profit,
+                    'has_custom_price' => false,
+                ];
+            }
         }
 
         $expectedStockProfit = bcsub($stockSellingValuation, $stockCostValuation, 3);
 
         return view('livewire.reports-index', [
             'stores'                 => $stores,
+            'selectedStore'          => $selectedStore,
             'periodic'               => $periodic,
             'totalExpenses'          => $totalExpenses,
             'expensesByCategory'     => $expensesByCategory,
@@ -248,7 +335,8 @@ class ReportsIndex extends Component
             'stockCostValuation'     => $stockCostValuation,
             'stockSellingValuation'  => $stockSellingValuation,
             'expectedStockProfit'    => $expectedStockProfit,
-            'allItems'               => $allItems,
+            'inventoryItems'         => $inventoryItems,
+            'allItems'               => $inventoryItems,
         ])->layout('components.layouts.app', ['title' => 'التقارير المالية والمبيعات والأرباح']);
     }
 }

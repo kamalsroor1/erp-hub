@@ -582,7 +582,10 @@
     <div class="space-y-5">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-sm space-y-2">
-                <div class="text-xs font-bold text-slate-500">قيمة البضاعة الحالية بسعر التكلفة</div>
+                <div class="text-xs font-bold text-slate-500">
+                    قيمة البضاعة بسعر التكلفة 
+                    @if($selectedStore) ({{ $selectedStore->name }}) @endif
+                </div>
                 <div class="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 font-mono">
                     {{ number_format($stockCostValuation, 2) }} <span class="text-xs font-normal">ج.م</span>
                 </div>
@@ -590,7 +593,10 @@
             </div>
 
             <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-sm space-y-2">
-                <div class="text-xs font-bold text-slate-500">قيمة البضاعة بسعر البيع المتوقع</div>
+                <div class="text-xs font-bold text-slate-500">
+                    قيمة البضاعة بسعر البيع المتوقع
+                    @if($selectedStore) ({{ $selectedStore->name }}) @endif
+                </div>
                 <div class="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
                     {{ number_format($stockSellingValuation, 2) }} <span class="text-xs font-normal">ج.م</span>
                 </div>
@@ -598,7 +604,10 @@
             </div>
 
             <div class="bg-white dark:bg-slate-900 border border-indigo-500/40 p-5 rounded-3xl shadow-sm space-y-2 bg-gradient-to-b from-white dark:from-slate-900 to-indigo-500/5">
-                <div class="text-xs font-bold text-indigo-600 dark:text-indigo-400">الأرباح الكامنة في المخزن</div>
+                <div class="text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                    الأرباح المتوقعة في المخزن
+                    @if($selectedStore) ({{ $selectedStore->name }}) @endif
+                </div>
                 <div class="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400 font-mono">
                     {{ number_format($expectedStockProfit, 2) }} <span class="text-xs font-normal">ج.م</span>
                 </div>
@@ -607,9 +616,18 @@
         </div>
 
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
-            <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white">
-                    🏢 جرد وتقييم الأصناف المسجلة بالنظام
+            <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    <span>🏢 جرد وتقييم الأصناف:</span>
+                    @if($selectedStore)
+                        <span class="px-2.5 py-0.5 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 text-xs font-bold">
+                            @if($selectedStore->type === 'wholesale_van') 🚚 @elseif($selectedStore->type === 'main_warehouse') 🏢 @else 🏬 @endif {{ $selectedStore->name }}
+                        </span>
+                    @else
+                        <span class="px-2.5 py-0.5 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 text-xs font-bold">
+                            🏢 إجمالي كافة الفروع والمخازن
+                        </span>
+                    @endif
                 </h3>
             </div>
 
@@ -619,24 +637,26 @@
                         <tr>
                             <th class="p-3.5">#</th>
                             <th class="p-3.5">الصنف</th>
-                            <th class="p-3.5 text-center">الرصيد الكلي</th>
+                            <th class="p-3.5 text-center">{{ $selectedStore ? 'الرصيد في الفرع' : 'الرصيد الكلي' }}</th>
                             <th class="p-3.5">سعر التكلفة</th>
                             <th class="p-3.5">سعر البيع</th>
-                            <th class="p-3.5">القيمة الإجمالية بالتكلفة</th>
+                            <th class="p-3.5">القيمة بالتكلفة</th>
                             <th class="p-3.5">القيمة بسعر البيع</th>
+                            <th class="p-3.5">الربح المتوقع</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
-                        @foreach($allItems as $index => $item)
-                        @php
-                            $cVal = bcmul($item->current_stock, $item->cost_price, 2);
-                            $sVal = bcmul($item->current_stock, $item->selling_price, 2);
-                        @endphp
+                        @foreach($inventoryItems as $index => $item)
                         <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                             <td class="p-3.5 font-bold font-mono text-slate-400">{{ $index + 1 }}</td>
                             <td class="p-3.5">
                                 <span class="font-extrabold text-slate-900 dark:text-white text-xs sm:text-sm">{{ $item->name }}</span>
-                                <span class="block text-[10px] text-slate-400 font-mono">كود: {{ $item->code }}</span>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="text-[10px] text-slate-400 font-mono">كود: {{ $item->code }}</span>
+                                    @if(!empty($item->has_custom_price))
+                                    <span class="text-[9px] px-1.5 py-0.5 bg-amber-500/15 text-amber-700 dark:text-amber-400 rounded font-bold">سعر مخصص للفرع</span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="p-3.5 text-center font-black font-mono {{ bccomp($item->current_stock, '0.000', 3) <= 0 ? 'text-rose-600' : 'text-slate-900 dark:text-white' }}">
                                 {{ number_format($item->current_stock, 2) }} {{ $item->unit }}
@@ -648,10 +668,13 @@
                                 {{ number_format($item->selling_price, 2) }} ج.م
                             </td>
                             <td class="p-3.5 font-black font-mono text-amber-600 dark:text-amber-400">
-                                {{ number_format($cVal, 2) }} ج.م
+                                {{ number_format($item->cost_val, 2) }} ج.م
                             </td>
                             <td class="p-3.5 font-black font-mono text-emerald-600 dark:text-emerald-400">
-                                {{ number_format($sVal, 2) }} ج.م
+                                {{ number_format($item->sell_val, 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 font-black font-mono {{ bccomp($item->profit, '0.000', 3) >= 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600' }}">
+                                {{ number_format($item->profit, 2) }} ج.م
                             </td>
                         </tr>
                         @endforeach
