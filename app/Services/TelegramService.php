@@ -60,28 +60,48 @@ class TelegramService
             return ['success' => false, 'message' => 'لم يتم ضبط Bot Token أو Chat ID في الإعدادات.'];
         }
 
-        try {
-            $url = "https://api.telegram.org/bot{$token}/sendMessage";
-            $response = Http::timeout(10)->post($url, [
-                'chat_id'                  => $targetChatId,
-                'text'                     => $htmlText,
-                'parse_mode'               => 'HTML',
-                'disable_web_page_preview' => true,
-            ]);
-
-            if ($response->successful()) {
-                return ['success' => true, 'message' => 'تم إرسال الإشعار بنجاح عبر تيليجرام!'];
-            }
-
-            Log::error('Telegram notification error: ' . $response->body());
-            return [
-                'success' => false, 
-                'message' => 'فشل الإرسال من تيليجرام: ' . ($response->json('description') ?? $response->status())
-            ];
-        } catch (\Throwable $e) {
-            Log::error('Telegram exception: ' . $e->getMessage());
-            return ['success' => false, 'message' => 'حدث خطأ أثناء الاتصال بتيليجرام: ' . $e->getMessage()];
+        $chatIds = array_filter(array_map('trim', explode(',', $targetChatId)));
+        if (empty($chatIds)) {
+            return ['success' => false, 'message' => 'معرف المحادثة Chat ID غير صالح.'];
         }
+
+        $successCount = 0;
+        $errors = [];
+
+        foreach ($chatIds as $cid) {
+            try {
+                $url = "https://api.telegram.org/bot{$token}/sendMessage";
+                $response = Http::timeout(10)->post($url, [
+                    'chat_id'                  => $cid,
+                    'text'                     => $htmlText,
+                    'parse_mode'               => 'HTML',
+                    'disable_web_page_preview' => true,
+                ]);
+
+                if ($response->successful()) {
+                    $successCount++;
+                } else {
+                    $desc = $response->json('description') ?? $response->status();
+                    $errors[] = "Chat {$cid}: {$desc}";
+                    Log::error("Telegram notification error for {$cid}: " . $response->body());
+                }
+            } catch (\Throwable $e) {
+                $errors[] = "Chat {$cid}: " . $e->getMessage();
+                Log::error("Telegram exception for {$cid}: " . $e->getMessage());
+            }
+        }
+
+        if ($successCount > 0) {
+            $msg = ($successCount === 1) 
+                ? 'تم إرسال الإشعار بنجاح عبر تيليجرام!' 
+                : "تم إرسال الإشعار بنجاح إلى {$successCount} محادثة/جروب!";
+            return ['success' => true, 'message' => $msg];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'فشل الإرسال: ' . implode(' | ', $errors)
+        ];
     }
 
     /**
