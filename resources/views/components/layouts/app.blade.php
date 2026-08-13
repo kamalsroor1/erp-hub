@@ -49,6 +49,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="سرور كوفي">
 
+    <!-- Flatpickr (Modern Date Picker with Arabic Locale) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
+
     <!-- Tailwind CSS CDN & Config -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -260,6 +265,140 @@
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
+        }
+
+        /* 📅 Custom Flatpickr Arabic & Dark Theme Styling */
+        .flatpickr-calendar {
+            font-family: 'Cairo', 'Tajawal', sans-serif !important;
+            border-radius: 1.25rem !important;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.25), 0 8px 10px -6px rgb(0 0 0 / 0.25) !important;
+            border: 1px solid #cbd5e1 !important;
+            direction: rtl !important;
+            padding: 8px !important;
+        }
+        html.dark .flatpickr-calendar {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+        html.dark .flatpickr-month,
+        html.dark .flatpickr-weekdays,
+        html.dark span.flatpickr-weekday {
+            background: #0f172a !important;
+            color: #94a3b8 !important;
+            fill: #f8fafc !important;
+            font-weight: bold !important;
+        }
+        html.dark .flatpickr-current-month .flatpickr-monthDropdown-months,
+        html.dark .flatpickr-current-month input.cur-year {
+            color: #f8fafc !important;
+            font-weight: 800 !important;
+        }
+        html.dark .flatpickr-day {
+            color: #e2e8f0 !important;
+            border-radius: 0.6rem !important;
+        }
+        html.dark .flatpickr-day:hover,
+        html.dark .flatpickr-day:focus {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        .flatpickr-day.selected,
+        .flatpickr-day.startRange,
+        .flatpickr-day.endRange {
+            background: #d97706 !important;
+            border-color: #d97706 !important;
+            color: #ffffff !important;
+            font-weight: bold !important;
+            border-radius: 0.6rem !important;
+        }
+        .flatpickr-day.today {
+            border-color: #d97706 !important;
+        }
+
+        /* 🖨️ Universal High-End A4 Print Optimization */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 12mm 10mm 15mm 10mm;
+            }
+            html, body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                font-family: 'Cairo', 'Tajawal', sans-serif !important;
+                font-size: 11pt !important;
+                line-height: 1.3 !important;
+                overflow: visible !important;
+                height: auto !important;
+            }
+            /* Hide all non-printable UI elements */
+            aside#main-sidebar,
+            header,
+            #top-loading-bar,
+            .sidebar-nav-item,
+            button,
+            .no-print,
+            [onclick*="print"],
+            [onclick*="window.print"],
+            .pwa-install,
+            .swal2-container,
+            [wire\:loading],
+            input[type="button"],
+            input[type="submit"] {
+                display: none !important;
+            }
+            /* Reset container widths and remove background colors / dark theme overrides */
+            main, .main-content-container, .container {
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+            /* High-contrast crisp tables for paper */
+            table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                page-break-inside: auto !important;
+            }
+            tr {
+                page-break-inside: avoid !important;
+                page-break-after: auto !important;
+            }
+            th {
+                background-color: #f1f5f9 !important;
+                color: #000000 !important;
+                border: 1.5px solid #000000 !important;
+                font-weight: 900 !important;
+                padding: 6px 8px !important;
+                text-align: center !important;
+            }
+            td {
+                border: 1px solid #333333 !important;
+                color: #000000 !important;
+                padding: 5px 8px !important;
+                background: #ffffff !important;
+            }
+            tr:nth-child(even) td {
+                background: #f8fafc !important;
+            }
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                box-shadow: none !important;
+                text-shadow: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+        }
+        @media not print {
+            .print-only {
+                display: none !important;
+            }
         }
     </style>
     @livewireStyles

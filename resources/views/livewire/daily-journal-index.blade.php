@@ -39,16 +39,16 @@
                 أمس
             </button>
 
-            <!-- Date Picker -->
-            <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-1 text-xs">
-                <span class="text-slate-500 dark:text-slate-400 font-bold">📅 التاريخ:</span>
-                <input type="date" wire:model.live="selectedDate" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-0.5 text-slate-900 dark:text-white font-mono font-bold focus:outline-none cursor-pointer">
+            <!-- Modern Date Picker -->
+            <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-2 py-0.5 text-xs">
+                <span class="text-slate-500 dark:text-slate-400 font-bold">📅</span>
+                <x-datepicker wire:model.live="selectedDate" class="w-32 !py-1 !px-2 !text-xs !bg-transparent !border-none focus:!ring-0" placeholder="اختر التاريخ" />
             </div>
 
             <!-- Print Daily Summary Button -->
-            <button onclick="window.print()" class="px-3.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl border border-slate-300 dark:border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer">
-                <span>🖨️ طباعة اليومية</span>
-            </button>
+            <a href="{{ route('daily.journal.print', ['date' => $selectedDate, 'store_id' => $selectedStoreId, 'autoprint' => 1]) }}" target="_blank" class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer font-tajawal">
+                <span>🖨️ طباعة تقرير A4 رسمي</span>
+            </a>
         </div>
     </div>
 

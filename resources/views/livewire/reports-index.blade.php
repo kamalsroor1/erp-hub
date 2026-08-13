@@ -71,20 +71,12 @@
             <!-- Custom Date Inputs -->
             <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-950 p-1.5 rounded-2xl border border-slate-300 dark:border-slate-700 text-xs">
                 <div class="flex items-center gap-1.5">
-                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">📅 من:</span>
-                    <input 
-                        type="date" 
-                        wire:model.live="fromDate" 
-                        class="h-8 px-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
-                    >
+                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 shrink-0">📅 من:</span>
+                    <x-datepicker wire:model.live="fromDate" class="!h-8 !w-32 !py-1 !px-2 !text-xs" placeholder="من تاريخ" />
                 </div>
                 <div class="flex items-center gap-1.5">
-                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">إلى:</span>
-                    <input 
-                        type="date" 
-                        wire:model.live="toDate" 
-                        class="h-8 px-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
-                    >
+                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 shrink-0">إلى:</span>
+                    <x-datepicker wire:model.live="toDate" class="!h-8 !w-32 !py-1 !px-2 !text-xs" placeholder="إلى تاريخ" />
                 </div>
             </div>
         </div>

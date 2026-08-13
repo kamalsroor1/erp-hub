@@ -1,6 +1,35 @@
 <div class="space-y-6">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+    <!-- 🖨️ Formal A4 Print Header (Visible ONLY on Print) -->
+    <div class="print-only mb-6 border-b-2 border-black pb-4">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                @php
+                    $showLogo = \App\Models\Setting::getBool('show_print_logo', true);
+                    $logoPath = public_path('logo.png');
+                    $logoSrc = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : asset('logo.png');
+                    $companyName = \App\Models\Setting::get('company_name', 'سرور كوفي');
+                    $companySubtitle = \App\Models\Setting::get('company_subtitle', 'لتوريدات خامات مطاحن البن');
+                @endphp
+                @if($showLogo)
+                    <img src="{{ $logoSrc }}" alt="Logo" style="max-height: 60px; max-width: 110px; object-fit: contain;">
+                @endif
+                <div>
+                    <h1 class="text-xl font-black text-black">{{ $companyName }}</h1>
+                    @if($companySubtitle)
+                        <p class="text-xs text-gray-700 font-bold">{{ $companySubtitle }}</p>
+                    @endif
+                </div>
+            </div>
+            <div class="text-left">
+                <h2 class="text-lg font-black text-black">كشف حساب مورد تفصيلي</h2>
+                <div class="text-xs text-black font-bold">المورد: {{ $supplier->name }}</div>
+                <div class="text-[11px] text-gray-700">تاريخ الطباعة: {{ now()->format('Y-m-d h:i A') }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header (Screen Only) -->
+    <div class="no-print flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div>
             <h2 class="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                 <span>📑 كشف حساب تفصيلي للمورد: {{ $supplier->name }}</span>
@@ -48,13 +77,13 @@
             </div>
         </div>
         <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-slate-300 dark:border-slate-700">
-            <div class="flex items-center gap-1">
-                <span class="text-[10px] font-bold text-slate-500">من:</span>
-                <input type="date" wire:model.live="fromDate" class="h-7 px-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none cursor-pointer">
+            <div class="flex items-center gap-1 w-1/2">
+                <span class="text-[10px] font-bold text-slate-500 shrink-0">من:</span>
+                <x-datepicker wire:model.live="fromDate" class="!h-7 !py-0.5 !px-1.5 !text-xs" placeholder="من تاريخ" />
             </div>
-            <div class="flex items-center gap-1">
-                <span class="text-[10px] font-bold text-slate-500">إلى:</span>
-                <input type="date" wire:model.live="toDate" class="h-7 px-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none cursor-pointer">
+            <div class="flex items-center gap-1 w-1/2">
+                <span class="text-[10px] font-bold text-slate-500 shrink-0">إلى:</span>
+                <x-datepicker wire:model.live="toDate" class="!h-7 !py-0.5 !px-1.5 !text-xs" placeholder="إلى تاريخ" />
             </div>
         </div>
     </div>
@@ -100,6 +129,25 @@
             </table>
         </div>
     </div>
+
+    <!-- 🖨️ Signatures & Official Stamp (Print Only) -->
+    <div class="print-only mt-8 pt-6 border-t-2 border-dashed border-black">
+        <div class="grid grid-cols-3 gap-6 text-center text-black">
+            <div>
+                <div class="text-xs font-bold mb-10">توقيع المورد / مندوب التوريد</div>
+                <div class="w-3/4 mx-auto border-b border-black"></div>
+            </div>
+            <div>
+                <div class="text-xs font-bold mb-10">توقيع المحاسب / المراجع</div>
+                <div class="w-3/4 mx-auto border-b border-black"></div>
+            </div>
+            <div>
+                <div class="text-xs font-bold mb-10">اعتماد الإدارة والختم</div>
+                <div class="w-3/4 mx-auto border-b border-black"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Supplier Payment Voucher Modal (سند صرف سداد مديونية) -->
     @if($showPaymentModal)
