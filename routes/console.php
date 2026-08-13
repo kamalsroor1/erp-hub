@@ -32,3 +32,7 @@ Schedule::command('notify:low-stock')
 // 6. Check and alert for overdue open shifts to Telegram every 2 hours
 Schedule::command('notify:overdue-shifts')
     ->everyTwoHours();
+
+// 7. Send daily gzipped SQL database backup to Telegram at 00:05 AM
+Schedule::command('backup:telegram')
+    ->dailyAt('00:05');

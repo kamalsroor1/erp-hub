@@ -304,4 +304,130 @@ class TelegramService
 
         return $this->sendMessage($msg);
     }
+
+    /**
+     * Send a document/file attachment to Telegram (multi-chat supported).
+     */
+    public function sendDocument(string $filePath, string $caption = '', ?string $chatId = null): array
+    {
+        if (!$this->isEnabled()) {
+            return ['success' => false, 'message' => 'خدمة إشعارات تيليجرام معطلة حالياً.'];
+        }
+
+        $token = $this->getBotToken();
+        $targetChatId = $chatId ?: $this->getDefaultChatId();
+
+        if (empty($token) || empty($targetChatId)) {
+            return ['success' => false, 'message' => 'لم يتم ضبط Bot Token أو Chat ID في الإعدادات.'];
+        }
+
+        if (!file_exists($filePath)) {
+            return ['success' => false, 'message' => "الملف غير موجود: {$filePath}"];
+        }
+
+        $chatIds = array_filter(array_map('trim', explode(',', $targetChatId)));
+        $successCount = 0;
+        $errors = [];
+
+        foreach ($chatIds as $cid) {
+            try {
+                $url = "https://api.telegram.org/bot{$token}/sendDocument";
+                $fileName = basename($filePath);
+
+                $response = Http::timeout(60)
+                    ->attach('document', file_get_contents($filePath), $fileName)
+                    ->post($url, [
+                        'chat_id'    => $cid,
+                        'caption'    => $caption,
+                        'parse_mode' => 'HTML',
+                    ]);
+
+                if ($response->successful()) {
+                    $successCount++;
+                } else {
+                    $desc = $response->json('description') ?? $response->status();
+                    $errors[] = "Chat {$cid}: {$desc}";
+                    Log::error("Telegram sendDocument error for {$cid}: " . $response->body());
+                }
+            } catch (\Throwable $e) {
+                $errors[] = "Chat {$cid}: " . $e->getMessage();
+                Log::error("Telegram sendDocument exception for {$cid}: " . $e->getMessage());
+            }
+        }
+
+        if ($successCount > 0) {
+            return ['success' => true, 'message' => 'تم إرسال الملف والنسخة الاحتياطية بنجاح عبر تيليجرام!'];
+        }
+
+        return ['success' => false, 'message' => 'فشل إرسال الملف: ' . implode(' | ', $errors)];
+    }
+
+    /**
+     * Generate and send a complete SQL.GZ database backup to Telegram.
+     */
+    public function sendDatabaseBackupNotification(?string $chatId = null): array
+    {
+        try {
+            $backupService = app(DatabaseBackupService::class);
+            $gzPath = $backupService->createSqlGzBackup();
+
+            $companyName = Setting::get('company_name', 'نظام إدارة الفواتير والمخزون');
+            $fileSize = number_format(filesize($gzPath) / 1024, 1) . ' KB';
+            $now = now()->format('Y-m-d h:i A');
+
+            $caption  = "💾 <b>النسخة الاحتياطية السحابية اليومية (Database Backup)</b>\n";
+            $caption .= "🏢 <b>المنشأة:</b> {$companyName}\n";
+            $caption .= "📅 <b>التاريخ:</b> {$now}\n";
+            $caption .= "📦 <b>حجم الملف المضغوط:</b> <code>{$fileSize}</code>\n";
+            $caption .= "🔒 <i>نسخة مشفرة ومؤمنة بالكامل تشمل كافة الفواتير، الحسابات، والمخزون.</i>";
+
+            $res = $this->sendDocument($gzPath, $caption, $chatId);
+
+            // Clean up temporary backup file
+            @unlink($gzPath);
+
+            return $res;
+        } catch (\Throwable $e) {
+            Log::error('Database backup export failed: ' . $e->getMessage());
+            return ['success' => false, 'message' => 'فشل إنشاء النسخة الاحتياطية: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Send immediate alert when a shift is closed with cash deficit or surplus.
+     */
+    public function sendShiftDiscrepancyNotification(CashShift $shift): array
+    {
+        $diff = (string)$shift->cash_difference;
+        if (bccomp($diff, '0.000', 3) === 0) {
+            return ['success' => true, 'message' => 'الوردية متطابقة تماماً.'];
+        }
+
+        $isDeficit = bccomp($diff, '0.000', 3) < 0;
+        $diffAbs = number_format(abs((float)$diff), 2);
+        $expected = number_format((float)$shift->expected_cash_balance, 2);
+        $actual = number_format((float)$shift->actual_cash_balance, 2);
+        $cashierName = $shift->user?->name ?? 'غير محدد';
+        $storeName = $shift->store?->name ?? 'المركز الرئيسي';
+
+        $icon = $isDeficit ? '🚨' : '⚠️';
+        $statusWord = $isDeficit ? 'عجز نقدي (نقص بالدرج)' : 'زيادة نقدية (فائض بالدرج)';
+
+        $msg  = "{$icon} <b>تنبيه تقفيل وردية: يوجد {$statusWord}!</b>\n";
+        $msg .= "━━━━━━━━━━━━━━━━━━━━\n\n";
+        $msg .= "👤 <b>الكاشير:</b> {$cashierName}\n";
+        $msg .= "🏢 <b>الفرع/الدرج:</b> {$storeName}\n";
+        $msg .= "🧾 <b>رقم الوردية:</b> #{$shift->shift_number}\n";
+        $msg .= "💵 <b>النقدية المحسوبة (المفترضة):</b> <code>{$expected} ج.م</code>\n";
+        $msg .= "🪙 <b>النقدية الفعلية (الدرج):</b> <code>{$actual} ج.م</code>\n";
+        $msg .= ($isDeficit ? "🔻 <b>قيمة العجز:</b> " : "🔺 <b>قيمة الزيادة:</b> ") . "<code>{$diffAbs} ج.م</code>\n\n";
+
+        if (!empty($shift->notes)) {
+            $msg .= "📝 <b>ملاحظات الكاشير:</b> <i>{$shift->notes}</i>\n\n";
+        }
+
+        $msg .= "⏰ <i>وقت الإغلاق: " . now()->format('Y-m-d h:i A') . "</i>";
+
+        return $this->sendMessage($msg);
+    }
 }

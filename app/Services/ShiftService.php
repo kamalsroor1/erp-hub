@@ -193,6 +193,15 @@ class ShiftService
                 ]
             );
 
+            // Send instant Telegram alert if there is a cash discrepancy
+            if (bccomp($diff, '0.000', 3) !== 0) {
+                try {
+                    app(\App\Services\TelegramService::class)->sendShiftDiscrepancyNotification($shift);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::error('Shift discrepancy notification failed: ' . $e->getMessage());
+                }
+            }
+
             return $shift;
         });
     }

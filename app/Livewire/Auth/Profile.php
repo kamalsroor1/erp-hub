@@ -237,6 +237,20 @@ class Profile extends Component
         ]);
     }
 
+    public function sendDatabaseBackupTest(\App\Services\TelegramService $telegramService)
+    {
+        abort_if(!auth()->user()?->hasRole('admin'), 403, 'غير مصرح');
+
+        $res = $telegramService->sendDatabaseBackupNotification();
+        $this->telegramStatusMessage = ($res['success'] ? '✅ ' : '❌ ') . $res['message'];
+
+        $this->dispatch('swal:toast', [
+            'type'  => $res['success'] ? 'success' : 'error',
+            'title' => $res['success'] ? 'تم إرسال النسخة الاحتياطية!' : 'فشل الإرسال',
+            'text'  => $res['message']
+        ]);
+    }
+
     public function render()
     {
         return view('livewire.auth.profile', [

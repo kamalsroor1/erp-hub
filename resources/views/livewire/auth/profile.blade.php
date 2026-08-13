@@ -316,6 +316,16 @@
                         <span wire:loading.remove wire:target="sendOverdueShiftTest">🚨 تجربة إنذار الشفتات</span>
                         <span wire:loading wire:target="sendOverdueShiftTest">جاري الإرسال...</span>
                     </button>
+
+                    <button
+                        wire:click="sendDatabaseBackupTest"
+                        type="button"
+                        wire:loading.attr="disabled"
+                        class="w-full sm:w-auto px-4 py-2.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 font-bold text-xs rounded-xl shadow-sm transition-all font-tajawal flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                        <span wire:loading.remove wire:target="sendDatabaseBackupTest">💾 إرسال نسخة احتياطية للجروب الآن</span>
+                        <span wire:loading wire:target="sendDatabaseBackupTest">جاري ضغط وإرسال النسخة...</span>
+                    </button>
                 </div>
             </div>
         </div>
