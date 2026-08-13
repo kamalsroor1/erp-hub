@@ -271,15 +271,27 @@
         .flatpickr-calendar {
             font-family: 'Cairo', 'Tajawal', sans-serif !important;
             border-radius: 1.25rem !important;
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.25), 0 8px 10px -6px rgb(0 0 0 / 0.25) !important;
-            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
             direction: rtl !important;
-            padding: 8px !important;
+            padding: 10px !important;
+            width: 310px !important;
         }
         html.dark .flatpickr-calendar {
             background: #0f172a !important;
-            border-color: #334155 !important;
+            border: 1px solid #334155 !important;
             color: #f8fafc !important;
+        }
+        html:not(.dark) .flatpickr-calendar {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #0f172a !important;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
+        }
+        .flatpickr-months {
+            padding: 4px 0 !important;
+        }
+        .flatpickr-months .flatpickr-month {
+            height: 38px !important;
         }
         html.dark .flatpickr-month,
         html.dark .flatpickr-weekdays,
@@ -289,19 +301,55 @@
             fill: #f8fafc !important;
             font-weight: bold !important;
         }
-        html.dark .flatpickr-current-month .flatpickr-monthDropdown-months,
+        .flatpickr-current-month {
+            font-size: 110% !important;
+            padding-top: 4px !important;
+        }
+        .flatpickr-current-month .cur-month {
+            font-weight: 800 !important;
+            margin: 0 4px !important;
+        }
         html.dark .flatpickr-current-month input.cur-year {
             color: #f8fafc !important;
             font-weight: 800 !important;
         }
+        .flatpickr-monthDropdown-months {
+            background: #1e293b !important;
+            color: #f8fafc !important;
+            border-radius: 0.5rem !important;
+            padding: 2px 6px !important;
+            font-weight: bold !important;
+        }
+        .flatpickr-monthDropdown-months option {
+            background-color: #0f172a !important;
+            color: #f8fafc !important;
+        }
+        .flatpickr-prev-month, .flatpickr-next-month {
+            padding: 6px !important;
+            border-radius: 0.5rem !important;
+        }
+        html.dark .flatpickr-prev-month, html.dark .flatpickr-next-month {
+            color: #f8fafc !important;
+            fill: #f8fafc !important;
+        }
+        .flatpickr-prev-month:hover svg, .flatpickr-next-month:hover svg {
+            fill: #f59e0b !important;
+        }
+        .flatpickr-day {
+            color: inherit !important;
+            border-radius: 0.6rem !important;
+            font-weight: 600 !important;
+            height: 36px !important;
+            line-height: 36px !important;
+            margin: 2px 0 !important;
+        }
         html.dark .flatpickr-day {
             color: #e2e8f0 !important;
-            border-radius: 0.6rem !important;
         }
         html.dark .flatpickr-day:hover,
         html.dark .flatpickr-day:focus {
             background: #1e293b !important;
-            border-color: #334155 !important;
+            border-color: #475569 !important;
         }
         .flatpickr-day.selected,
         .flatpickr-day.startRange,
@@ -309,11 +357,18 @@
             background: #d97706 !important;
             border-color: #d97706 !important;
             color: #ffffff !important;
-            font-weight: bold !important;
+            font-weight: 900 !important;
             border-radius: 0.6rem !important;
         }
         .flatpickr-day.today {
-            border-color: #d97706 !important;
+            border-color: #f59e0b !important;
+            font-weight: 800 !important;
+        }
+        .flatpickr-day.flatpickr-disabled,
+        .flatpickr-day.prevMonthDay,
+        .flatpickr-day.nextMonthDay {
+            color: #475569 !important;
+            opacity: 0.4 !important;
         }
 
         /* 🖨️ Universal High-End A4 Print Optimization */

@@ -180,7 +180,7 @@
                 <!-- Date -->
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">تاريخ التحويل:</label>
-                    <input type="date" wire:model="transfer_date" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                    <x-datepicker wire:model="transfer_date" placeholder="تاريخ التحويل" />
                 </div>
 
                 <!-- Notes -->

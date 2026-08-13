@@ -149,11 +149,11 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-amber-500/5 p-3 rounded-xl border border-amber-500/20">
             <div>
                 <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">من تاريخ:</label>
-                <input type="date" wire:model.live="dateFrom" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-white">
+                <x-datepicker wire:model.live="dateFrom" placeholder="من تاريخ" />
             </div>
             <div>
                 <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">إلى تاريخ:</label>
-                <input type="date" wire:model.live="dateTo" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-white">
+                <x-datepicker wire:model.live="dateTo" placeholder="إلى تاريخ" />
             </div>
         </div>
         @endif

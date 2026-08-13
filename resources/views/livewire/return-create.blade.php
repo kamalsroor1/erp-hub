@@ -176,7 +176,7 @@
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">تاريخ المرتجع:</label>
-                    <input type="date" wire:model="return_date" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white">
+                    <x-datepicker wire:model="return_date" placeholder="تاريخ المرتجع" />
                 </div>
 
                 <div>

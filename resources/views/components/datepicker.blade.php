@@ -15,6 +15,8 @@
         init() {
             this.instance = flatpickr(this.$refs.input, {
                 locale: 'ar',
+                monthSelectorType: 'static',
+                disableMobile: true,
                 mode: '{{ $mode }}',
                 dateFormat: '{{ $dateFormat }}',
                 altInput: true,

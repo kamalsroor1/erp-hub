@@ -105,20 +105,12 @@
 
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">📅 من تاريخ:</label>
-                <input
-                    type="date"
-                    wire:model.live="fromDate"
-                    class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white text-xs font-mono focus:ring-2 focus:ring-amber-500 focus:outline-none cursor-pointer"
-                >
+                <x-datepicker wire:model.live="fromDate" placeholder="من تاريخ" />
             </div>
 
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">📅 إلى تاريخ:</label>
-                <input
-                    type="date"
-                    wire:model.live="toDate"
-                    class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white text-xs font-mono focus:ring-2 focus:ring-amber-500 focus:outline-none cursor-pointer"
-                >
+                <x-datepicker wire:model.live="toDate" placeholder="إلى تاريخ" />
             </div>
         </div>
     </div>
@@ -301,12 +293,7 @@
                         </div>
 
                         <div>
-                            <input
-                                wire:model="expense_date"
-                                type="date"
-                                required
-                                class="w-full h-11 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-2xl text-slate-900 dark:text-white text-xs font-mono font-bold focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                            >
+                            <x-datepicker wire:model="expense_date" placeholder="تاريخ المصروف" class="!h-11" />
                             @error('expense_date') <span class="text-xs text-rose-500 mt-1 block font-bold">{{ $message }}</span> @enderror
                         </div>
                     </div>
