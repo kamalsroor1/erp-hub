@@ -90,10 +90,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/daily-journal', App\Livewire\DailyJournalIndex::class)->name('daily.journal')->middleware('can:daily_journal.view');
     Route::get('/shifts', App\Livewire\DailyJournalIndex::class)->name('shifts.index')->middleware('can:daily_journal.view');
 
-    // Auth, Profile, Trash, Activity Logs & User Management
+    // Auth, Profile, Settings, Trash, Activity Logs & User Management
     Route::get('/activity-logs', App\Livewire\ActivityLogIndex::class)->name('activity-logs.index')->middleware('can:logs.view');
     Route::get('/trash', App\Livewire\TrashIndex::class)->name('trash.index')->middleware('can:trash.access');
     Route::get('/profile', App\Livewire\Auth\Profile::class)->name('profile');
+    Route::get('/settings', App\Livewire\SettingsIndex::class)->name('settings.index')->middleware('can:roles.manage');
     Route::get('/users', App\Livewire\Auth\UserManager::class)->name('users.index')->middleware('can:roles.manage');
     Route::get('/roles', App\Livewire\Auth\RolePermissionManager::class)->name('roles.index')->middleware('can:roles.manage');
 

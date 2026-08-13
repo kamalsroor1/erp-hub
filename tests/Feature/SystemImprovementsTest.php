@@ -210,17 +210,17 @@ class SystemImprovementsTest extends TestCase
         $this->assertEquals('0', $all['show_print_subtitle']);
     }
 
-    public function test_profile_general_printing_settings_update()
+    public function test_settings_index_general_printing_settings_update()
     {
         $this->actingAs($this->admin);
 
-        Livewire::test(\App\Livewire\Auth\Profile::class)
+        Livewire::test(\App\Livewire\SettingsIndex::class)
             ->set('company_name', 'سرور كوفي والمطاحن الحديثة')
             ->set('company_subtitle', 'أجود أنواع البن والشاي')
             ->set('show_print_company_name', false)
             ->set('show_print_subtitle', false)
             ->set('show_print_logo', false)
-            ->call('updateGeneralSettings')
+            ->call('updateBrandingSettings')
             ->assertHasNoErrors()
             ->assertDispatched('swal:toast');
 
