@@ -233,14 +233,14 @@
                 </div>
                 @endif
 
-                <div class="pt-2 flex flex-col sm:flex-row items-center gap-3">
+                <div class="pt-2 flex flex-wrap items-center gap-3">
                     <button
                         wire:click="updateTelegramSettings"
                         type="button"
                         wire:loading.attr="disabled"
                         class="w-full sm:w-auto px-6 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl shadow-md transition-all font-tajawal flex items-center justify-center gap-2 cursor-pointer"
                     >
-                        <span wire:loading.remove wire:target="updateTelegramSettings">💾 حفظ إعدادات تيليجرام</span>
+                        <span wire:loading.remove wire:target="updateTelegramSettings">💾 حفظ الإعدادات</span>
                         <span wire:loading wire:target="updateTelegramSettings">جاري الحفظ...</span>
                     </button>
 
@@ -248,10 +248,40 @@
                         wire:click="sendTestTelegramMessage"
                         type="button"
                         wire:loading.attr="disabled"
-                        class="w-full sm:w-auto px-5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sky-600 dark:text-sky-400 border border-sky-500/30 font-bold text-xs rounded-xl shadow-sm transition-all font-tajawal flex items-center justify-center gap-2 cursor-pointer"
+                        class="w-full sm:w-auto px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sky-600 dark:text-sky-400 border border-sky-500/30 font-bold text-xs rounded-xl shadow-sm transition-all font-tajawal flex items-center justify-center gap-2 cursor-pointer"
                     >
-                        <span wire:loading.remove wire:target="sendTestTelegramMessage">📩 إرسال رسالة تجريبية الآن</span>
-                        <span wire:loading wire:target="sendTestTelegramMessage">جاري اختبار الإرسال...</span>
+                        <span wire:loading.remove wire:target="sendTestTelegramMessage">📩 اختبار الاتصال</span>
+                        <span wire:loading wire:target="sendTestTelegramMessage">جاري الإرسال...</span>
+                    </button>
+
+                    <button
+                        wire:click="sendDailySummaryTest"
+                        type="button"
+                        wire:loading.attr="disabled"
+                        class="w-full sm:w-auto px-4 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-bold text-xs rounded-xl shadow-sm transition-all font-tajawal flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                        <span wire:loading.remove wire:target="sendDailySummaryTest">📊 تجربة تقرير اليومية (EOD)</span>
+                        <span wire:loading wire:target="sendDailySummaryTest">جاري الإرسال...</span>
+                    </button>
+
+                    <button
+                        wire:click="sendLowStockTest"
+                        type="button"
+                        wire:loading.attr="disabled"
+                        class="w-full sm:w-auto px-4 py-2.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold text-xs rounded-xl shadow-sm transition-all font-tajawal flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                        <span wire:loading.remove wire:target="sendLowStockTest">⚠️ تجربة إنذار النواقص</span>
+                        <span wire:loading wire:target="sendLowStockTest">جاري الإرسال...</span>
+                    </button>
+
+                    <button
+                        wire:click="sendOverdueShiftTest"
+                        type="button"
+                        wire:loading.attr="disabled"
+                        class="w-full sm:w-auto px-4 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 font-bold text-xs rounded-xl shadow-sm transition-all font-tajawal flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                        <span wire:loading.remove wire:target="sendOverdueShiftTest">🚨 تجربة إنذار الشفتات</span>
+                        <span wire:loading wire:target="sendOverdueShiftTest">جاري الإرسال...</span>
                     </button>
                 </div>
             </div>

@@ -179,7 +179,7 @@ class TelegramService
     /**
      * Send low stock alert notification across all branches.
      */
-    public function sendLowStockNotification(): array
+    public function sendLowStockNotification(bool $previewSample = false): array
     {
         $lowStocks = StoreStock::with(['item', 'store'])
             ->whereColumn('quantity', '<=', 'min_stock')
@@ -187,6 +187,21 @@ class TelegramService
             ->get();
 
         if ($lowStocks->isEmpty()) {
+            if ($previewSample) {
+                // Send a formatted sample to demonstrate the layout
+                $msg  = "⚠️ <b>[معاينة تجريبية] إنذار نواقص وقرب نفاد المخزون</b>\n";
+                $msg .= "📅 <b>التاريخ:</b> " . now()->format('Y-m-d h:i A') . "\n";
+                $msg .= "━━━━━━━━━━━━━━━━━━━━\n\n";
+                $msg .= "الأصناف التالية وصلت إلى أو أقل من حد الأمان:\n\n";
+                $msg .= "<b>1. بن برازيلي كولومبي وسط</b>\n";
+                $msg .= "   🏬 الفرع: المخزن الرئيسي\n";
+                $msg .= "   📦 الرصيد الحالي: <code>4.50 كجم</code> (حد الإنذار: 10.0)\n\n";
+                $msg .= "<b>2. أكياس تعبئة بن 1 كجم صمام</b>\n";
+                $msg .= "   🏬 الفرع: فرع المحل\n";
+                $msg .= "   📦 الرصيد الحالي: <code>15.00 قطعة</code> (حد الإنذار: 50.0)\n\n";
+                $msg .= "🚨 <i>يرجى التنسيق لإصدار فواتير شراء أو شحن تحويلات للمخازن.</i>";
+                return $this->sendMessage($msg);
+            }
             return ['success' => true, 'message' => 'لا توجد أي أصناف ناقصة حالياً.'];
         }
 
@@ -222,7 +237,7 @@ class TelegramService
     /**
      * Send alert for cash shifts open for more than 24 hours.
      */
-    public function sendOverdueShiftNotification(): array
+    public function sendOverdueShiftNotification(bool $previewSample = false): array
     {
         $threshold = now()->subHours(24);
 
@@ -232,6 +247,19 @@ class TelegramService
             ->get();
 
         if ($overdueShifts->isEmpty()) {
+            if ($previewSample) {
+                // Send a formatted sample to demonstrate the layout
+                $msg  = "🚨 <b>[معاينة تجريبية] تحذير عاجل: شفتات كاشير مفتوحة لأكثر من 24 ساعة!</b>\n";
+                $msg .= "📅 <b>التاريخ:</b> " . now()->format('Y-m-d h:i A') . "\n";
+                $msg .= "━━━━━━━━━━━━━━━━━━━━\n\n";
+                $msg .= "الورديات التالية لم يتم تقفيلها منذ أكثر من يوم:\n\n";
+                $msg .= "👤 <b>الكاشير:</b> كاشير الصباح\n";
+                $msg .= "🏢 <b>الفرع/الدرج:</b> المخزن الرئيسي\n";
+                $msg .= "⏱️ <b>وقت الفتح:</b> " . now()->subHours(26)->format('Y-m-d h:i A') . " (مفتوح منذ 26 ساعة)\n";
+                $msg .= "💰 <b>رصيد البداية:</b> 500.00 ج.م\n\n";
+                $msg .= "⚠️ <i>يُرجى التواصل مع الكاشير فوراً لتقفيل اليومية ومراجعة عهدة الدرج.</i>";
+                return $this->sendMessage($msg);
+            }
             return ['success' => true, 'message' => 'لا توجد أي شفتات معلقة لأكثر من 24 ساعة.'];
         }
 

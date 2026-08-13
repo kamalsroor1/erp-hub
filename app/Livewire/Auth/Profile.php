@@ -183,6 +183,48 @@ class Profile extends Component
         }
     }
 
+    public function sendDailySummaryTest(\App\Services\TelegramService $telegramService)
+    {
+        abort_if(!auth()->user()?->hasRole('admin'), 403, 'غير مصرح');
+
+        $res = $telegramService->sendDailySummaryNotification();
+        $this->telegramStatusMessage = ($res['success'] ? '✅ ' : '❌ ') . $res['message'];
+
+        $this->dispatch('swal:toast', [
+            'type'  => $res['success'] ? 'success' : 'error',
+            'title' => $res['success'] ? 'تم إرسال تقرير اليومية!' : 'فشل الإرسال',
+            'text'  => $res['message']
+        ]);
+    }
+
+    public function sendLowStockTest(\App\Services\TelegramService $telegramService)
+    {
+        abort_if(!auth()->user()?->hasRole('admin'), 403, 'غير مصرح');
+
+        $res = $telegramService->sendLowStockNotification(previewSample: true);
+        $this->telegramStatusMessage = ($res['success'] ? '✅ ' : '❌ ') . $res['message'];
+
+        $this->dispatch('swal:toast', [
+            'type'  => $res['success'] ? 'success' : 'error',
+            'title' => $res['success'] ? 'تم إرسال إنذار النواقص!' : 'فشل الإرسال',
+            'text'  => $res['message']
+        ]);
+    }
+
+    public function sendOverdueShiftTest(\App\Services\TelegramService $telegramService)
+    {
+        abort_if(!auth()->user()?->hasRole('admin'), 403, 'غير مصرح');
+
+        $res = $telegramService->sendOverdueShiftNotification(previewSample: true);
+        $this->telegramStatusMessage = ($res['success'] ? '✅ ' : '❌ ') . $res['message'];
+
+        $this->dispatch('swal:toast', [
+            'type'  => $res['success'] ? 'success' : 'error',
+            'title' => $res['success'] ? 'تم إرسال إنذار الشفتات!' : 'فشل الإرسال',
+            'text'  => $res['message']
+        ]);
+    }
+
     public function render()
     {
         return view('livewire.auth.profile', [
