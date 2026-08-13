@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Services\TelegramService;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+
+class CheckLowStockAlertJob implements ShouldQueue
+{
+    use Queueable, InteractsWithQueue, SerializesModels;
+
+    public function handle(TelegramService $telegramService): void
+    {
+        $telegramService->sendLowStockNotification();
+    }
+}

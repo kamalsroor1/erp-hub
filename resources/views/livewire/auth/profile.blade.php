@@ -155,6 +155,109 @@
             </form>
         </div>
 
+        @if(auth()->user()?->hasRole('admin'))
+        <!-- 2. Telegram Bot Smart Notifications (Admin Only) -->
+        <div class="lg:col-span-3 bg-white dark:bg-slate-900/80 backdrop-blur-md border border-sky-200 dark:border-sky-900/50 rounded-3xl p-5 sm:p-7 shadow-sm">
+            <div class="flex items-center gap-3.5 pb-4 border-b border-slate-200 dark:border-slate-800/80 mb-5">
+                <div class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-500 flex items-center justify-center shadow-inner border border-sky-500/20 shrink-0 text-2xl">
+                    ✈️
+                </div>
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-tajawal flex items-center gap-2">
+                        <span>إشعارات وتقارير تيليجرام التلقائية (Telegram Bot Alerts)</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">خاص بالمدير</span>
+                    </h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">استقبال تقارير تقفيل اليومية (EOD) كل ليلة، إنذارات النواقص للمخازن، وتحذيرات الشفتات المفتوحة على تليجرامك الشخصي أو جروب الإدارة</p>
+                </div>
+            </div>
+
+            <div class="space-y-5">
+                <!-- Notifications Toggle -->
+                <div class="p-4 rounded-2xl bg-sky-50/50 dark:bg-sky-950/20 border border-sky-100 dark:border-sky-900/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-start gap-3">
+                        <span class="text-xl mt-0.5">🔔</span>
+                        <div>
+                            <p class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">تفعيل خدمة إشعارات وتقارير تيليجرام</p>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                تشغيل الإرسال التلقائي للتقارير والإنذارات المجدولة في الخلفية.
+                            </p>
+                        </div>
+                    </div>
+
+                    <label class="relative inline-flex items-center cursor-pointer shrink-0 self-end sm:self-center">
+                        <input type="checkbox" wire:model.live="telegram_notifications_enabled" class="sr-only peer">
+                        <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-sky-500"></div>
+                        <span class="ms-3 text-xs font-bold text-slate-700 dark:text-slate-300 min-w-[75px]">
+                            {{ $telegram_notifications_enabled ? 'مُفعّل' : 'مُعطّل' }}
+                        </span>
+                    </label>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    <!-- Bot Token -->
+                    <div>
+                        <label for="telegram_bot_token" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">
+                            رمز البوت (Bot Token) <span class="text-rose-500">*</span>
+                        </label>
+                        <input
+                            wire:model.defer="telegram_bot_token"
+                            type="password"
+                            id="telegram_bot_token"
+                            dir="ltr"
+                            placeholder="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ"
+                            class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm font-mono focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                        >
+                        <p class="text-[11px] text-slate-400 mt-1">يتم الحصول عليه مجاناً عبر التحدث مع <a href="https://t.me/BotFather" target="_blank" class="text-sky-500 font-bold underline">@BotFather</a></p>
+                    </div>
+
+                    <!-- Chat ID -->
+                    <div>
+                        <label for="telegram_chat_id" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">
+                            معرف المحادثة أو الجروب (Chat ID / Group ID) <span class="text-rose-500">*</span>
+                        </label>
+                        <input
+                            wire:model.defer="telegram_chat_id"
+                            type="text"
+                            id="telegram_chat_id"
+                            dir="ltr"
+                            placeholder="مثال: 123456789 أو -100123456789 للجروبات"
+                            class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm font-mono focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                        >
+                        <p class="text-[11px] text-slate-400 mt-1">لمعرفة الـ ID الخاص بك راسل <a href="https://t.me/userinfobot" target="_blank" class="text-sky-500 font-bold underline">@userinfobot</a></p>
+                    </div>
+                </div>
+
+                @if($telegramStatusMessage)
+                <div class="p-3.5 rounded-xl text-xs font-bold {{ str_starts_with($telegramStatusMessage, '✅') ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20' }}">
+                    {{ $telegramStatusMessage }}
+                </div>
+                @endif
+
+                <div class="pt-2 flex flex-col sm:flex-row items-center gap-3">
+                    <button
+                        wire:click="updateTelegramSettings"
+                        type="button"
+                        wire:loading.attr="disabled"
+                        class="w-full sm:w-auto px-6 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl shadow-md transition-all font-tajawal flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                        <span wire:loading.remove wire:target="updateTelegramSettings">💾 حفظ إعدادات تيليجرام</span>
+                        <span wire:loading wire:target="updateTelegramSettings">جاري الحفظ...</span>
+                    </button>
+
+                    <button
+                        wire:click="sendTestTelegramMessage"
+                        type="button"
+                        wire:loading.attr="disabled"
+                        class="w-full sm:w-auto px-5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sky-600 dark:text-sky-400 border border-sky-500/30 font-bold text-xs rounded-xl shadow-sm transition-all font-tajawal flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                        <span wire:loading.remove wire:target="sendTestTelegramMessage">📩 إرسال رسالة تجريبية الآن</span>
+                        <span wire:loading wire:target="sendTestTelegramMessage">جاري اختبار الإرسال...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <!-- 2. Personal Profile Info -->
         <div class="bg-white dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-sm flex flex-col justify-between">
             <div>

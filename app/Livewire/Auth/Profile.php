@@ -29,6 +29,12 @@ class Profile extends Component
     public bool $show_print_subtitle = true;
     public bool $show_print_logo = true;
 
+    // Telegram Bot Notifications
+    public ?string $telegram_bot_token = '';
+    public ?string $telegram_chat_id = '';
+    public bool $telegram_notifications_enabled = true;
+    public string $telegramStatusMessage = '';
+
     // Security
     public string $current_password = '';
     public string $new_password = '';
@@ -47,6 +53,11 @@ class Profile extends Component
         $this->show_print_company_name = Setting::getBool('show_print_company_name', true);
         $this->show_print_subtitle = Setting::getBool('show_print_subtitle', true);
         $this->show_print_logo = Setting::getBool('show_print_logo', true);
+
+        // Load Telegram Settings
+        $this->telegram_bot_token = (string)(Setting::get('telegram_bot_token') ?? config('services.telegram.bot_token') ?? '');
+        $this->telegram_chat_id = (string)(Setting::get('telegram_chat_id') ?? config('services.telegram.chat_id') ?? '');
+        $this->telegram_notifications_enabled = Setting::getBool('telegram_notifications_enabled', true);
     }
 
     public function updateProfile()
@@ -131,10 +142,51 @@ class Profile extends Component
         ]);
     }
 
+    public function updateTelegramSettings()
+    {
+        abort_if(!auth()->user()?->hasRole('admin'), 403, 'غير مصرح لك بتعديل إعدادات الإشعارات');
+
+        Setting::set('telegram_bot_token', trim($this->telegram_bot_token));
+        Setting::set('telegram_chat_id', trim($this->telegram_chat_id));
+        Setting::set('telegram_notifications_enabled', $this->telegram_notifications_enabled ? '1' : '0');
+
+        $this->dispatch('swal:toast', [
+            'type'  => 'success',
+            'title' => 'تم حفظ إعدادات تيليجرام!',
+            'text'  => 'تم تحديث بيانات البوت ومعرف المحادثة بنجاح.'
+        ]);
+    }
+
+    public function sendTestTelegramMessage(\App\Services\TelegramService $telegramService)
+    {
+        abort_if(!auth()->user()?->hasRole('admin'), 403, 'غير مصرح');
+
+        Setting::set('telegram_bot_token', trim($this->telegram_bot_token));
+        Setting::set('telegram_chat_id', trim($this->telegram_chat_id));
+
+        $res = $telegramService->sendTestNotification(trim($this->telegram_chat_id));
+
+        if ($res['success']) {
+            $this->telegramStatusMessage = '✅ ' . $res['message'];
+            $this->dispatch('swal:toast', [
+                'type'  => 'success',
+                'title' => 'تم إرسال الرسالة بنجاح!',
+                'text'  => 'وصلت الرسالة التجريبية إلى حسابك في تيليجرام بنجاح.'
+            ]);
+        } else {
+            $this->telegramStatusMessage = '❌ ' . $res['message'];
+            $this->dispatch('swal:toast', [
+                'type'  => 'error',
+                'title' => 'فشل الإرسال!',
+                'text'  => $res['message']
+            ]);
+        }
+    }
+
     public function render()
     {
         return view('livewire.auth.profile', [
             'user' => Auth::user(),
-        ]);
+        ])->layout('components.layouts.app', ['title' => 'الملف الشخصي وإعدادات النظام']);
     }
 }

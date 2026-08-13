@@ -20,3 +20,15 @@ Schedule::command('queue:restart')
 // 3. Clear old Pulse monitoring entries older than 7 days
 Schedule::command('pulse:clear --expired=7')
     ->daily();
+
+// 4. Send daily EOD business summary report to Telegram at 11:59 PM
+Schedule::command('notify:daily-summary')
+    ->dailyAt('23:59');
+
+// 5. Send daily low stock notification to Telegram at 09:00 AM
+Schedule::command('notify:low-stock')
+    ->dailyAt('09:00');
+
+// 6. Check and alert for overdue open shifts to Telegram every 2 hours
+Schedule::command('notify:overdue-shifts')
+    ->everyTwoHours();
