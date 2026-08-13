@@ -37,7 +37,10 @@ for t in TARGET_DIRS:
     mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
     chmod -R 775 storage bootstrap/cache
     
-    # 3. Database migrations and seeder
+    # 3. Install composer vendor dependencies
+    composer install --no-dev --optimize-autoloader --no-interaction
+    
+    # 4. Database migrations and seeder
     php artisan migrate --force
     php artisan db:seed --class=PermissionsSeeder --force
     php artisan db:seed --force
