@@ -28,16 +28,21 @@
     <!-- Settings Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         
-        <!-- 1. General Printing & Store Branding Settings (System-Wide) -->
+        @if(auth()->user()?->hasRole('admin'))
+        <!-- 1. General Printing & Store Branding Settings (Admin Only) -->
         <div class="lg:col-span-3 bg-white dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-sm">
             <div class="flex items-center gap-3.5 pb-4 border-b border-slate-200 dark:border-slate-800/80 mb-5">
-                <div class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 p-1 flex items-center justify-center shadow-md border border-slate-200 dark:border-slate-700 shrink-0">
-                    <img src="{{ asset('logo.png') }}" alt="اللوجو" class="w-full h-full object-contain">
+                <div class="w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 p-1 flex items-center justify-center shadow-md border border-slate-200 dark:border-slate-700 shrink-0 relative overflow-hidden">
+                    @if ($logo_file)
+                        <img src="{{ $logo_file->temporaryUrl() }}" alt="معاينة اللوجو" class="w-full h-full object-contain">
+                    @else
+                        <img src="{{ asset('logo.png') }}?v={{ time() }}" alt="اللوجو" class="w-full h-full object-contain">
+                    @endif
                 </div>
                 <div>
                     <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-tajawal flex items-center gap-2">
                         <span>إعدادات ترويسة وهُوِيّة الطباعة (Store Branding & Logo)</span>
-                        <span class="text-[10px] px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">عام لكافة المستخدمين</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">خاص بالمدير فقط</span>
                     </h2>
                     <p class="text-xs text-slate-500 dark:text-slate-400">تخصيص اللوجو واسم المؤسسة والوصف الفرعي المطبوع على إيصالات وفواتير المبيعات (A4 & Thermal 80mm)</p>
                 </div>
@@ -76,6 +81,33 @@
                         @error('company_subtitle') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
                     </div>
                 </div>
+
+                <!-- Custom Logo Upload Box -->
+                <div class="p-4 rounded-2xl bg-amber-50/40 dark:bg-amber-950/15 border border-amber-200/60 dark:border-amber-900/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl mt-0.5">🖼️</span>
+                        <div>
+                            <p class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">تغيير صورة الشعار (Logo)</p>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                ارفع ملف صورة الشعار بصيغة PNG أو JPG بدقة واضحة (شفافية الخلفية مفضلة للطباعة الحرارية).
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="shrink-0 flex items-center gap-3">
+                        <label class="px-4 py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-amber-500/40 text-amber-600 dark:text-amber-400 font-bold text-xs rounded-xl shadow-sm cursor-pointer transition-all flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            <span>اختيار صورة جديدة</span>
+                            <input type="file" wire:model="logo_file" accept="image/*" class="hidden">
+                        </label>
+                        @if($logo_file)
+                        <span class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                            تم اختيار الصورة ✓
+                        </span>
+                        @endif
+                    </div>
+                </div>
+                @error('logo_file') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
 
                 <div class="space-y-3">
                     <!-- 1. Print Company Name Toggle Box -->
@@ -148,12 +180,13 @@
                         wire:loading.attr="disabled"
                         class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs rounded-xl shadow-lg shadow-amber-600/30 transition-all font-tajawal flex items-center justify-center gap-2 cursor-pointer"
                     >
-                        <span wire:loading.remove wire:target="updateGeneralSettings">💾 حفظ إعدادات الطباعة العامة</span>
+                        <span wire:loading.remove wire:target="updateGeneralSettings">💾 حفظ إعدادات الهوية والطباعة</span>
                         <span wire:loading wire:target="updateGeneralSettings">جاري الحفظ...</span>
                     </button>
                 </div>
             </form>
         </div>
+        @endif
 
         @if(auth()->user()?->hasRole('admin'))
         <!-- 2. Telegram Bot Smart Notifications (Admin Only) -->

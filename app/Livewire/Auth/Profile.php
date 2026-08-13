@@ -3,6 +3,7 @@
 namespace App\Livewire\Auth;
 
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Auth;
@@ -15,19 +16,20 @@ use App\Models\Setting;
 #[Title('الملف الشخصي وإعدادات النظام والطباعة | سرور POS')]
 class Profile extends Component
 {
-    use RequiresAuth;
+    use RequiresAuth, WithFileUploads;
 
     // Personal Info
     public string $name = '';
     public string $email = '';
     public string $theme_preference = 'dark';
 
-    // General & Printing Settings (System-Wide)
+    // General & Printing Settings (System-Wide - Admin Only)
     public string $company_name = 'سرور كوفي';
     public string $company_subtitle = 'لتوريدات خامات مطاحن البن';
     public bool $show_print_company_name = true;
     public bool $show_print_subtitle = true;
     public bool $show_print_logo = true;
+    public $logo_file = null;
 
     // Telegram Bot Notifications
     public ?string $telegram_bot_token = '';
@@ -91,15 +93,25 @@ class Profile extends Component
 
     public function updateGeneralSettings()
     {
+        abort_if(!auth()->user()?->hasRole('admin'), 403, 'غير مصرح لك بتعديل إعدادات الهوية والطباعة');
+
         $this->validate([
             'company_name'            => ['required', 'string', 'max:255'],
             'company_subtitle'        => ['nullable', 'string', 'max:255'],
             'show_print_company_name' => ['boolean'],
             'show_print_subtitle'     => ['boolean'],
             'show_print_logo'         => ['boolean'],
+            'logo_file'               => ['nullable', 'image', 'max:3072'], // 3MB max
         ], [
             'company_name.required' => 'يرجى إدخال اسم المؤسسة أو النشاط.',
+            'logo_file.image'       => 'الملف المرفوع يجب أن يكون صورة صالحة (PNG/JPG/WEBP).',
+            'logo_file.max'         => 'حجم اللوجو يجب ألا يتجاوز 3 ميجابايت.',
         ]);
+
+        if ($this->logo_file) {
+            @copy($this->logo_file->getRealPath(), public_path('logo.png'));
+            $this->reset('logo_file');
+        }
 
         Setting::set('company_name', $this->company_name);
         Setting::set('company_subtitle', $this->company_subtitle ?? '');
@@ -109,8 +121,8 @@ class Profile extends Component
 
         $this->dispatch('swal:toast', [
             'type' => 'success',
-            'title' => 'تم حفظ إعدادات الطباعة العامة!',
-            'text' => 'تم تطبيق إعدادات الطباعة على كافة فواتير النظام بنجاح.'
+            'title' => 'تم حفظ إعدادات الهوية والطباعة!',
+            'text' => 'تم تحديث الشعار والبيانات العامة بنجاح.'
         ]);
     }
 
