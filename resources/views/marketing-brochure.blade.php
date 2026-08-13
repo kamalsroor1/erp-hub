@@ -395,39 +395,52 @@
 
             </div>
 
-            <!-- 🧩 Section: Add-ons & Bundles -->
+            <!-- 🧩 Section: Add-ons & Hardware Bundles -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 
                 <!-- Add-ons Box -->
-                <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200 space-y-2">
-                    <h4 class="font-black text-slate-900 text-xs flex items-center gap-1.5">
-                        <span>🧩</span> الإضافات المرنة حسب الطلب (Add-ons)
+                <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200 space-y-1.5">
+                    <h4 class="font-black text-slate-900 text-xs flex items-center justify-between">
+                        <span class="flex items-center gap-1.5"><span>🧩</span> الإضافات المرنة حسب الطلب (Add-ons)</span>
                     </h4>
-                    <div class="space-y-1.5 text-[11px]">
-                        <div class="flex justify-between items-center bg-white p-1.5 rounded-lg border border-slate-200/60">
+                    <div class="space-y-1 text-[10.5px]">
+                        <div class="flex justify-between items-center bg-white px-2 py-1 rounded-lg border border-slate-200/60">
                             <span>🏬 إضافة فرع أو مخزن إضافي:</span>
                             <strong class="text-amber-600 font-mono">+100 ج.م / شهر</strong>
                         </div>
-                        <div class="flex justify-between items-center bg-white p-1.5 rounded-lg border border-slate-200/60">
+                        <div class="flex justify-between items-center bg-white px-2 py-1 rounded-lg border border-slate-200/60">
                             <span>👤 إضافة كاشير أو موظف إضافي:</span>
                             <strong class="text-amber-600 font-mono">+40 ج.م / شهر</strong>
                         </div>
-                        <div class="flex justify-between items-center bg-white p-1.5 rounded-lg border border-slate-200/60">
-                            <span>📱 فواتير واتساب الذكية (500 رسالة):</span>
+                        <div class="flex justify-between items-center bg-white px-2 py-1 rounded-lg border border-slate-200/60">
+                            <span>📱 باقة فواتير واتساب الذكية (500 رسالة):</span>
                             <strong class="text-emerald-600 font-mono">100 ج.م</strong>
+                        </div>
+                        <div class="text-[9.5px] text-slate-500 font-bold text-center pt-0.5">
+                            ✓ تجربة مجانية 14 يوماً بكامل الميزات دون التزام دفع
                         </div>
                     </div>
                 </div>
 
-                <!-- Turnkey Bundle Box -->
-                <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200 space-y-2">
-                    <h4 class="font-black text-slate-900 text-xs flex items-center gap-1.5">
-                        <span>🎁</span> باقة المحل الجاهز والضمان (Turnkey Bundle)
+                <!-- Hardware Bundles Box -->
+                <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200 space-y-1.5">
+                    <h4 class="font-black text-slate-900 text-xs flex items-center justify-between">
+                        <span class="flex items-center gap-1.5"><span>🖨️</span> باقات أجهزة الكاشير (Hardware Bundles)</span>
+                        <span class="text-[9px] bg-amber-500/20 text-amber-800 px-1.5 py-0.2 rounded font-bold">أصلي وضمان سنة</span>
                     </h4>
-                    <div class="space-y-1 text-[11px] text-slate-700 leading-tight">
-                        <div>✓ <strong>أجهزة الكاشير:</strong> طابعات حرارية سريعة وقوارئ باركود ليزر.</div>
-                        <div>✓ <strong>تجهيز البيانات:</strong> رفع شيتات الأصناف وقوائم الأسعار فوراً.</div>
-                        <div>✓ <strong>تجربة مجانية 100%:</strong> 14 يوماً بكامل الميزات دون التزام دفع.</div>
+                    <div class="space-y-1 text-[10.5px]">
+                        <div class="flex justify-between items-center bg-white px-2 py-1 rounded-lg border border-slate-200/60">
+                            <span>📦 <strong>طابعة 80mm + باركود ليزر بحامل:</strong></span>
+                            <strong class="text-slate-900 font-mono">4,900 ج.م</strong>
+                        </div>
+                        <div class="flex justify-between items-center bg-white px-2 py-1 rounded-lg border border-slate-200/60">
+                            <span>⭐ <strong>طابعة + باركود + درج نقدية إلكتروني:</strong></span>
+                            <strong class="text-amber-600 font-mono">6,800 ج.م</strong>
+                        </div>
+                        <div class="flex justify-between items-center bg-amber-500/10 px-2 py-1 rounded-lg border border-amber-500/30">
+                            <span>👑 <strong>المحل الجاهز VIP</strong> (أجهزة + اشتراك سنوي Pro):</span>
+                            <strong class="text-emerald-700 font-mono">11,900 ج.م</strong>
+                        </div>
                     </div>
                 </div>
 
