@@ -1,22 +1,29 @@
 <div class="space-y-4">
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div>
-            <h2 class="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+            <h2 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2 font-tajawal">
                 <span>📥 فاتورة شراء بضاعة وتوريد للمخزن</span>
             </h2>
-            <p class="text-xs text-slate-500 dark:text-slate-400">إضافة البضاعة المشتراة بالميزان (كجم / جرام) أو القطعة، تحديث متوسط التكلفة، وإثبات حساب المورد</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">إضافة وتوريد البن الأخضر والمواد الخام بالميزان أو القطعة وتحديث متوسط التكلفة وحسابات الموردين</p>
+        </div>
+        
+        <div class="flex items-center gap-2">
+            <a href="{{ route('purchases.index') }}" class="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 text-xs font-bold transition-all">
+                سجل المشتريات ←
+            </a>
         </div>
     </div>
 
     @if($errorMessage)
-    <div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs">
-        {{ $errorMessage }}
+    <div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-bold flex items-center gap-2">
+        <span>⚠️</span>
+        <span>{{ $errorMessage }}</span>
     </div>
     @endif
 
     @if($errors->any())
-    <div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs space-y-1">
+    <div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs space-y-1">
         <div class="font-bold flex items-center gap-1.5">
             <span>⚠️</span>
             <span>يرجى تصحيح الأخطاء التالية لحفظ التوريد:</span>
@@ -29,185 +36,306 @@
     </div>
     @endif
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Left 2 Cols: Item Search and Items Table -->
-        <div class="lg:col-span-2 space-y-4">
-            <!-- Search & Add Item -->
-            <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm">
-                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">بحث سريع عن صنف لإضافته للتوريد:</label>
+    <!-- Main 2-Column Touch Layout -->
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
+        
+        <!-- ========================================== -->
+        <!-- 📦 Left Column: Touch Item Catalog (7 Cols)-->
+        <!-- ========================================== -->
+        <div class="xl:col-span-7 space-y-4">
+            
+            <!-- Quick Search Bar -->
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <div class="relative">
                     <input 
                         type="text" 
                         wire:model.live.debounce.150ms="searchQuery" 
-                        placeholder="ابحث عن بن أخضر، شاي، نسكافيه، حبهان..." 
-                        class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+                        placeholder="🔍 المس للبحث بالاسم أو الكود (بن خام، شاي، مستلزمات...)" 
+                        class="w-full h-12 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-2xl px-4 pl-10 text-sm font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     >
+                    @if($searchQuery)
+                    <button 
+                        type="button" 
+                        wire:click="$set('searchQuery', '')" 
+                        class="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs font-bold hover:bg-slate-300 cursor-pointer"
+                    >
+                        ✕
+                    </button>
+                    @endif
                 </div>
-
-                @if(count($searchResults) > 0)
-                <div class="bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl overflow-hidden divide-y divide-slate-200 dark:divide-slate-800 shadow-2xl">
-                    @foreach($searchResults as $res)
-                    <div wire:click="addItem({{ $res->id }})" class="p-3 hover:bg-slate-100 dark:hover:bg-slate-800/80 cursor-pointer flex items-center justify-between transition-colors">
-                        <div>
-                            <div class="font-bold text-slate-800 dark:text-slate-200 text-xs">{{ $res->name }}</div>
-                            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">كود: {{ $res->code }} | الوحدة: {{ $res->unit }} | رصيد حالي: {{ number_format($res->current_stock, 3) }}</div>
-                        </div>
-                        <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 font-mono">
-                            سعر التكلفة الحالي: {{ number_format($res->cost_price, 2) }} ج.م
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-                @endif
             </div>
 
-            <!-- Items Table -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
-                <div class="p-3 bg-slate-50 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
-                    <span>بنود التوريد ({{ count($items) }} صنف)</span>
-                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-normal">أدخل الكمية المشتراة بالميزان أو الوحدة بدقة</span>
+            <!-- Touch Product Cards Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                @forelse($quickCatalog as $prod)
+                <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 shadow-sm transition-all duration-200 flex flex-col justify-between overflow-hidden group">
+                    <!-- Tap to Add 1 Unit Top Area -->
+                    <button 
+                        type="button"
+                        wire:click="addItem({{ $prod->id }}, '1.000')" 
+                        class="p-3.5 text-right w-full cursor-pointer transition-colors active:bg-emerald-500/10 flex-1 flex flex-col justify-between"
+                        title="المس للإضافة (+1 {{ $prod->unit }})"
+                    >
+                        <div>
+                            <h3 class="font-extrabold text-slate-900 dark:text-white text-xs sm:text-sm line-clamp-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                                {{ $prod->name }}
+                            </h3>
+                            <p class="text-[10px] text-slate-400 font-mono mt-0.5">كود: {{ $prod->code }}</p>
+                        </div>
+
+                        <div class="mt-3 flex items-center justify-between gap-2">
+                            <span class="text-xs sm:text-sm font-black font-mono text-emerald-600 dark:text-emerald-400">
+                                {{ number_format($prod->cost_price, 2) }} <span class="text-[10px] font-normal">ج.م/{{ $prod->unit }}</span>
+                            </span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-lg font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                                المتاح: {{ number_format($prod->current_stock, 1) }}
+                            </span>
+                        </div>
+                    </button>
+
+                    <!-- Bottom Quick Bulk Presets (For Bulk Coffee / Tea) -->
+                    @if($prod->unit === 'كجم')
+                    <div class="p-2 bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 flex items-center gap-1">
+                        <button 
+                            type="button" 
+                            wire:click="addItem({{ $prod->id }}, '10.000')" 
+                            class="flex-1 h-9 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-emerald-600 hover:text-white text-[10px] font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95 cursor-pointer shadow-sm flex items-center justify-center font-mono"
+                        >
+                            +10k
+                        </button>
+                        <button 
+                            type="button" 
+                            wire:click="addItem({{ $prod->id }}, '25.000')" 
+                            class="flex-1 h-9 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-emerald-600 hover:text-white text-[10px] font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95 cursor-pointer shadow-sm flex items-center justify-center font-mono"
+                        >
+                            +25k
+                        </button>
+                        <button 
+                            type="button" 
+                            wire:click="addItem({{ $prod->id }}, '50.000')" 
+                            title="شيكارة 50 كجم"
+                            class="flex-1 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 hover:bg-emerald-600 hover:text-white text-[10px] font-bold transition-all active:scale-95 cursor-pointer shadow-sm flex items-center justify-center"
+                        >
+                            +50k شكارة
+                        </button>
+                    </div>
+                    @else
+                    <div class="p-2 bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800">
+                        <button 
+                            type="button" 
+                            wire:click="addItem({{ $prod->id }}, '1.000')" 
+                            class="w-full h-8 rounded-xl bg-emerald-600/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-600 hover:text-white text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1"
+                        >
+                            <span>➕ إضافة وحدة</span>
+                        </button>
+                    </div>
+                    @endif
+                </div>
+                @empty
+                <div class="col-span-full py-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 text-slate-400 text-sm">
+                    لا توجد أصناف مطابقة للبحث
+                </div>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 🛒 Right Column: Cart & Checkout (5 Cols)  -->
+        <!-- ========================================== -->
+        <div class="xl:col-span-5 space-y-4">
+            
+            <!-- Supplier & Store Card -->
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">🏢 المورد / جهة التوريد:</label>
+                        <select wire:model.live="supplier_id" class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            @foreach($suppliers as $sup)
+                            <option value="{{ $sup->id }}">{{ $sup->name }} (له: {{ number_format($sup->current_balance, 2) }} ج.م)</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">🏬 المخزن المستلم:</label>
+                        <select wire:model.live="store_id" class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            @foreach($stores as $st)
+                            <option value="{{ $st->id }}">
+                                @if($st->type === 'wholesale_van') 🚚 @elseif($st->type === 'main_warehouse') 🏢 @else 🏬 @endif
+                                {{ $st->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Purchase Items List -->
+            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
+                <div class="p-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                    <span class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        <span>📥 بنود فاتورة الشراء</span>
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-mono text-xs font-bold">
+                            {{ count($items) }} بنود
+                        </span>
+                    </span>
+                    @if(count($items) > 0)
+                    <button wire:click="$set('items', [])" class="text-xs text-rose-500 hover:text-rose-600 font-bold cursor-pointer">
+                        إفراغ السلة 🗑️
+                    </button>
+                    @endif
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-right text-xs">
-                        <thead class="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-800">
-                            <tr>
-                                <th class="p-3">#</th>
-                                <th class="p-3">الصنف</th>
-                                <th class="p-3 w-48">الكمية المشتراة بالميزان (الوحدة)</th>
-                                <th class="p-3 w-32">سعر تكلفة الوحدة</th>
-                                <th class="p-3 w-28">إجمالي السطر</th>
-                                <th class="p-3 text-center w-10">حذف</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
-                            @forelse($items as $idx => $line)
-                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/20">
-                                <td class="p-3 text-slate-400 font-mono">{{ $idx + 1 }}</td>
-                                <td class="p-3">
-                                    <div class="font-bold text-slate-800 dark:text-slate-200">{{ $line['name'] }}</div>
-                                    <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">الوحدة المعتمدة: <span class="text-emerald-600 dark:text-emerald-400 font-bold">{{ $line['unit'] }}</span></div>
-                                </td>
-                                <td class="p-3">
-                                    <div class="space-y-1">
-                                        <div class="relative">
-                                            <input 
-                                                type="number" 
-                                                step="0.001" 
-                                                min="0.001" 
-                                                wire:model.live.debounce.250ms="items.{{ $idx }}.quantity" 
-                                                placeholder="الكمية المشتراة" 
-                                                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1.5 text-center text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 focus:outline-none focus:border-emerald-500"
-                                            >
-                                            <span class="absolute left-2 top-1.5 text-[10px] text-slate-400 font-bold">{{ $line['unit'] }}</span>
-                                        </div>
+                <div class="max-h-[380px] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800 p-2 space-y-2">
+                    @forelse($items as $idx => $line)
+                    <div class="p-3 bg-slate-50/70 dark:bg-slate-950/70 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 space-y-2.5">
+                        <div class="flex items-start justify-between gap-2">
+                            <div>
+                                <h4 class="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
+                                    {{ $line['name'] }}
+                                </h4>
+                                <span class="text-[10px] text-slate-400 font-mono">كود: {{ $line['code'] }}</span>
+                            </div>
+                            <button 
+                                type="button" 
+                                wire:click="removeItem({{ $idx }})" 
+                                class="w-8 h-8 rounded-xl bg-rose-500/10 hover:bg-rose-500 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors cursor-pointer"
+                                title="حذف البند"
+                            >
+                                ✕
+                            </button>
+                        </div>
 
-                                        <!-- Quick Bulk Weight Presets for Coffee & Tea -->
-                                        @if($line['unit'] === 'كجم')
-                                        <div class="flex items-center gap-1 justify-center">
-                                            <button type="button" wire:click="setLineQuantity({{ $idx }}, '5.000')" class="px-1 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[9px] rounded font-mono text-slate-700 dark:text-slate-300 cursor-pointer">5kg</button>
-                                            <button type="button" wire:click="setLineQuantity({{ $idx }}, '10.000')" class="px-1 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[9px] rounded font-mono text-slate-700 dark:text-slate-300 cursor-pointer">10kg</button>
-                                            <button type="button" wire:click="setLineQuantity({{ $idx }}, '25.000')" class="px-1 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[9px] rounded font-mono text-slate-700 dark:text-slate-300 cursor-pointer">25kg</button>
-                                            <button type="button" wire:click="setLineQuantity({{ $idx }}, '50.000')" title="شيكارة / جوال بن 50 كجم" class="px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-800 hover:bg-emerald-600 text-[9px] rounded font-mono text-emerald-800 dark:text-emerald-300 hover:text-white font-bold cursor-pointer">50kg شكارة</button>
-                                        </div>
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="p-3">
+                        <!-- Stepper & Price Inputs -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-slate-200/50 dark:border-slate-800/50">
+                            <!-- Quantity Stepper Controls -->
+                            <div class="flex items-center gap-1">
+                                <button 
+                                    type="button" 
+                                    wire:click="decrementLineQty({{ $idx }}, '1.000')" 
+                                    class="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-rose-500 hover:text-white text-slate-800 dark:text-slate-200 text-base font-black transition-all active:scale-90 flex items-center justify-center cursor-pointer"
+                                >
+                                    -
+                                </button>
+                                
+                                <input 
+                                    type="number" 
+                                    step="0.001" 
+                                    min="0.001" 
+                                    wire:model.live.debounce.250ms="items.{{ $idx }}.quantity" 
+                                    class="w-full h-10 text-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-mono text-sm font-black text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                >
+
+                                <button 
+                                    type="button" 
+                                    wire:click="incrementLineQty({{ $idx }}, '1.000')" 
+                                    class="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-emerald-600 hover:text-white text-slate-800 dark:text-slate-200 text-base font-black transition-all active:scale-90 flex items-center justify-center cursor-pointer"
+                                >
+                                    +
+                                </button>
+                            </div>
+
+                            <!-- Cost Price & Total Price -->
+                            <div class="flex items-center gap-2">
+                                <div class="relative flex-1">
                                     <input 
                                         type="number" 
                                         step="0.01" 
                                         min="0" 
                                         wire:model.live.debounce.250ms="items.{{ $idx }}.cost_price" 
-                                        class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1.5 text-center text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                                        class="w-full h-10 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                        placeholder="سعر التكلفة"
                                     >
-                                </td>
-                                <td class="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                                    {{ number_format($line['total_price'], 2) }}
-                                </td>
-                                <td class="p-3 text-center">
-                                    <button wire:click="removeItem({{ $idx }})" class="p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer">🗑️</button>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="6" class="p-8 text-center text-slate-400">
-                                    لم يتم إضافة أصناف بعد. ابحث في الخانة بالأعلى لإدراج الأصناف الموردة.
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+                                    <span class="absolute left-2 top-2.5 text-[10px] text-slate-400 font-bold">ج.م</span>
+                                </div>
 
-        <!-- Right Col: Supplier and Calculations -->
-        <div class="space-y-4">
-            <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">المخزن / الفرع المستلم:</label>
-                    <select wire:model.live="store_id" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 dark:text-white">
-                        @foreach($stores as $st)
-                        <option value="{{ $st->id }}">
-                            @if($st->type === 'wholesale_van') 🚚 @elseif($st->type === 'main_warehouse') 🏢 @else 🏬 @endif
-                            {{ $st->name }}
-                        </option>
-                        @endforeach
-                    </select>
+                                <div class="text-left shrink-0 font-mono text-xs font-black text-emerald-600 dark:text-emerald-400">
+                                    {{ number_format($line['total_price'], 2) }} ج.م
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="py-12 text-center text-slate-400 text-xs">
+                        لم يتم إضافة أي أصناف للتوريد بعد. المس الأصناف من القائمة يساراً 👈
+                    </div>
+                    @endforelse
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">المورد:</label>
-                    <select wire:model.live="supplier_id" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white">
-                        @foreach($suppliers as $s)
-                        <option value="{{ $s->id }}">{{ $s->name }} ({{ $s->company_name ?? 'شركة' }})</option>
-                        @endforeach
-                    </select>
-                </div>
+                <!-- Totals & Payment Section -->
+                <div class="p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 space-y-3">
+                    <div class="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-400">
+                        <span>المجموع الفرعي للتوريد:</span>
+                        <span class="font-mono font-black text-slate-900 dark:text-white">{{ number_format($subtotal, 2) }} ج.م</span>
+                    </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">رقم فاتورة المورد (المرجع):</label>
-                    <input type="text" wire:model="supplier_invoice_ref" placeholder="مثال: فاتورة المورد #982" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white">
-                </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 mb-1">الخصم من المورد:</label>
+                            <input 
+                                type="number" 
+                                step="0.01" 
+                                min="0" 
+                                wire:model.live.debounce.250ms="discount_amount" 
+                                class="w-full h-10 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            >
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 mb-1">المدفوع نقداً للمورد:</label>
+                            <input 
+                                type="number" 
+                                step="0.01" 
+                                min="0" 
+                                wire:model.live.debounce.250ms="paid_amount" 
+                                class="w-full h-10 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            >
+                        </div>
+                    </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">الخصم المكتسب من المورد:</label>
-                    <input type="number" step="0.01" min="0" wire:model.live.debounce.250ms="discount_amount" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-rose-600 dark:text-rose-400">
-                </div>
+                    <!-- Quick Paid Buttons -->
+                    <div class="flex items-center gap-1.5">
+                        <button 
+                            type="button" 
+                            wire:click="quickSetPaidExact" 
+                            class="flex-1 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-[10px] font-bold hover:bg-emerald-600 hover:text-white transition-colors cursor-pointer"
+                        >
+                            سداد الصافي كاملاً
+                        </button>
+                        <button 
+                            type="button" 
+                            wire:click="quickSetPaidAmount('0.000')" 
+                            class="flex-1 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-[10px] font-bold hover:bg-amber-600 hover:text-white transition-colors cursor-pointer"
+                        >
+                            آجل بالكامل (0)
+                        </button>
+                    </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">المبلغ المسدد للمورد:</label>
-                    <input type="number" step="0.01" min="0" wire:model.live.debounce.250ms="paid_amount" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-900 dark:text-white">
-                </div>
-            </div>
+                    <!-- Net & Remaining -->
+                    <div class="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-1.5">
+                        <div class="flex items-center justify-between text-sm font-black text-slate-900 dark:text-white">
+                            <span>الصافي المطلوب:</span>
+                            <span class="text-xl font-mono text-emerald-600 dark:text-emerald-400">
+                                {{ number_format($net_total, 2) }} <span class="text-xs font-normal">ج.م</span>
+                            </span>
+                        </div>
 
-            <!-- Financial Totals Card -->
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm">
-                <div class="flex justify-between text-xs text-slate-500 dark:text-slate-400">
-                    <span>إجمالي التوريد:</span>
-                    <span class="font-mono font-bold text-slate-900 dark:text-white">{{ number_format($subtotal, 2) }} ج.م</span>
-                </div>
-                <div class="flex justify-between text-xs text-rose-600 dark:text-rose-400">
-                    <span>الخصم المكتسب:</span>
-                    <span class="font-mono font-bold">-{{ number_format($discount_amount, 2) }} ج.م</span>
-                </div>
-                <div class="flex justify-between text-base font-black text-emerald-600 dark:text-emerald-400 pt-2 border-t border-slate-200 dark:border-slate-800">
-                    <span>الصافي المطلوب للمورد:</span>
-                    <span class="font-mono">{{ number_format($net_total, 2) }} ج.م</span>
-                </div>
-                <div class="flex justify-between text-xs font-bold {{ bccomp($remaining_amount, '0.000', 3) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 dark:text-slate-400' }}">
-                    <span>المتبقي للمورد (آجل):</span>
-                    <span class="font-mono">{{ number_format($remaining_amount, 2) }} ج.م</span>
-                </div>
+                        <div class="flex items-center justify-between text-xs text-amber-700 dark:text-amber-400 font-bold">
+                            <span>المتبقي للمورد (آجل):</span>
+                            <span class="font-mono font-black">{{ number_format($remaining_amount, 2) }} ج.م</span>
+                        </div>
+                    </div>
 
-                <button 
-                    type="button" 
-                    wire:click="savePurchase" 
-                    class="w-full mt-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 text-xs transition-all active:scale-95 cursor-pointer"
-                >
-                    📥 تأكيد التوريد وإضافة الكمية للمخزون
-                </button>
+                    <!-- Large Submit Touch Button -->
+                    <button 
+                        type="button" 
+                        wire:click="savePurchase" 
+                        wire:loading.attr="disabled"
+                        class="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-black shadow-xl shadow-emerald-600/30 transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 mt-2"
+                    >
+                        <span wire:loading.remove wire:target="savePurchase">💾 حفظ وتوريد البضاعة للمخزن</span>
+                        <span wire:loading wire:target="savePurchase">جاري التوريد... ⏳</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>

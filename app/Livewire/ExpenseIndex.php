@@ -97,6 +97,11 @@ class ExpenseIndex extends Component
         }
     }
 
+    public function selectQuickAmount($val)
+    {
+        $this->amount = (string)$val;
+    }
+
     public function openEditModal(int $id)
     {
         abort_if(!auth()->user()?->can('expenses.manage'), 403, 'غير مصرح لك بتعديل المصروفات');

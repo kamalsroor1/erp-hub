@@ -3,13 +3,21 @@ import sys
 import time
 from playwright.sync_api import Page, expect
 from config import BASE_URL, ADMIN_PHONE, ADMIN_PASSWORD
-from helpers import wait_for_livewire, safe_goto, login_as_admin
+from helpers import wait_for_livewire, safe_goto, login_as_admin, wait_for_modal_close
 
 if hasattr(sys.stdout, 'reconfigure'):
     try:
         sys.stdout.reconfigure(encoding='utf-8', errors='replace')
     except Exception:
         pass
+
+@pytest.fixture(scope="module", autouse=True)
+def cleanup_test_data():
+    """Ensure a clean database state before and after running stores & branches tests."""
+    import subprocess
+    subprocess.run(["php", "clean_e2e.php"], capture_output=True)
+    yield
+    subprocess.run(["php", "clean_e2e.php"], capture_output=True)
 
 def test_create_employees_interactive(page: Page):
     """Test creating Cashier and Storekeeper employees via User Manager UI with live Arabic logs."""
@@ -35,19 +43,19 @@ def test_create_employees_interactive(page: Page):
     print("  [+] ظهرت نافذة ادخال بيانات المستخدم.")
     
     print("  [*] جاري كتابة بيانات الكاشير: (احمد كاشير المعادي E2E / هاتف: 01055554444 / دور: cashier)...")
-    page.locator('form input[wire\\:model*="name"]').first.fill("أحمد كاشير المعادي E2E")
-    page.locator('form input[wire\\:model*="phone"]').first.fill("01055554444")
-    page.locator('form select[wire\\:model*="role"]').first.select_option("cashier")
-    page.locator('form input[wire\\:model*="password"]').first.fill("password123")
+    page.locator('div.fixed input[placeholder*="أحمد محمود"]').fill("أحمد كاشير المعادي E2E")
+    page.locator('div.fixed input[placeholder*="01012316954"]').fill("01055554444")
+    page.locator('div.fixed select[wire\\:model="role"]').select_option("cashier")
+    page.locator('div.fixed input[placeholder*="••••••••"]').fill("password123")
     
     print("  [*] جاري حفظ بيانات الكاشير...")
-    page.locator('form button[type="submit"]:has-text("حفظ")').click()
-    wait_for_livewire(page)
+    page.locator('div.fixed button:has-text("حفظ بيانات المستخدم")').click()
+    wait_for_modal_close(page)
     
     print("  [*] جاري التحقق من ادراج الكاشير في الجدول وبادج دوره...")
-    expect(page.locator("body")).to_contain_text("أحمد كاشير المعادي E2E")
-    expect(page.locator("body")).to_contain_text("01055554444")
-    expect(page.locator("body")).to_contain_text("كاشير مبيعات")
+    expect(page.locator("table")).to_contain_text("أحمد كاشير المعادي E2E")
+    expect(page.locator("table")).to_contain_text("01055554444")
+    expect(page.locator("table")).to_contain_text("كاشير مبيعات")
     print("  [+] تم ادراج موظف الكاشير [احمد كاشير المعادي] بنجاح في النظام!")
     
     # 2. Create Storekeeper Employee
@@ -58,18 +66,18 @@ def test_create_employees_interactive(page: Page):
     expect(page.locator('form:has-text("حفظ بيانات المستخدم")')).to_be_visible()
     
     print("  [*] جاري كتابة بيانات امين المخزن: (محمود امين المخزن E2E / هاتف: 01033332222 / دور: storekeeper)...")
-    page.locator('form input[wire\\:model*="name"]').first.fill("محمود أمين المخزن E2E")
-    page.locator('form input[wire\\:model*="phone"]').first.fill("01033332222")
-    page.locator('form select[wire\\:model*="role"]').first.select_option("storekeeper")
-    page.locator('form input[wire\\:model*="password"]').first.fill("password123")
+    page.locator('div.fixed input[placeholder*="أحمد محمود"]').fill("محمود أمين المخزن E2E")
+    page.locator('div.fixed input[placeholder*="01012316954"]').fill("01033332222")
+    page.locator('div.fixed select[wire\\:model="role"]').select_option("storekeeper")
+    page.locator('div.fixed input[placeholder*="••••••••"]').fill("password123")
     
     print("  [*] جاري حفظ بيانات امين المخزن...")
-    page.locator('form button[type="submit"]:has-text("حفظ")').click()
-    wait_for_livewire(page)
+    page.locator('div.fixed button:has-text("حفظ بيانات المستخدم")').click()
+    wait_for_modal_close(page)
     
-    expect(page.locator("body")).to_contain_text("محمود أمين المخزن E2E")
-    expect(page.locator("body")).to_contain_text("01033332222")
-    expect(page.locator("body")).to_contain_text("أمين مخزن")
+    expect(page.locator("table")).to_contain_text("محمود أمين المخزن E2E")
+    expect(page.locator("table")).to_contain_text("01033332222")
+    expect(page.locator("table")).to_contain_text("أمين مخزن")
     print("  [+] تم ادراج امين المخزن [محمود امين المخزن] بنجاح في النظام!")
     
     # 3. Search Filter Verification
@@ -136,7 +144,7 @@ def test_create_retail_store_interactive(page: Page):
     
     print("  [*] جاري الضغط على 'حفظ البيانات'...")
     page.locator('button[type="submit"]:has-text("حفظ البيانات")').click()
-    wait_for_livewire(page)
+    wait_for_modal_close(page)
     
     print("  [*] جاري التحقق من ظهور كارت الفرع الجديد في القائمة...")
     expect(page.locator("body")).to_contain_text("فرع المعادي والمعرض")
@@ -175,7 +183,7 @@ def test_create_distribution_van_interactive(page: Page):
     
     print("  [*] جاري حفظ بيانات عربية التوزيع...")
     page.locator('button[type="submit"]:has-text("حفظ البيانات")').click()
-    wait_for_livewire(page)
+    wait_for_modal_close(page)
     
     print("  [*] جاري فحص ظهور العربية والكود وخط السير...")
     expect(page.locator("body")).to_contain_text("عربية توزيع جملة رقم 2")
@@ -206,7 +214,7 @@ def test_edit_store_interactive(page: Page):
     
     print("  [*] جاري حفظ التعديلات...")
     page.locator('button[type="submit"]:has-text("حفظ البيانات")').click()
-    wait_for_livewire(page)
+    wait_for_modal_close(page)
     
     print("  [*] جاري فحص انعكاس البيانات الجديدة على كارت الفرع...")
     expect(page.locator("body")).to_contain_text("01022334499")
@@ -240,7 +248,7 @@ def test_assign_employees_to_store_interactive(page: Page):
     
     print("  [*] جاري حفظ التعيينات...")
     page.locator('button:has-text("حفظ التعيينات")').click()
-    wait_for_livewire(page)
+    wait_for_modal_close(page)
     
     print("  [*] جاري فحص اشعار النجاح وتحديث ربط الموظفين بالفرع...")
     expect(page.locator("body")).to_contain_text("تم تحديث تعيينات الموظفين للفرع بنجاح")
@@ -292,7 +300,7 @@ def test_roles_and_permission_matrix_interactive(page: Page):
     
     print("  [*] 💾 جاري الضغط على 'إنشاء الدور'...")
     page.locator('button:has-text("إنشاء الدور")').click()
-    wait_for_livewire(page)
+    wait_for_modal_close(page)
     
     print("  [*] جاري التحقق من ظهور واختيار الدور الجديد...")
     expect(page.locator("body")).to_contain_text("branch_manager")
@@ -360,12 +368,12 @@ def test_store_and_user_validation_constraints(page: Page):
     wait_for_livewire(page)
     
     print("  [*] 🔍 جاري التأكد من ظهور خطأ التحقق وبقاء النافذة مفتوحة...")
-    expect(page.locator('div.fixed form')).to_contain_text("مستخدمة بالفعل")
+    expect(page.locator('form:has-text("حفظ البيانات")')).to_contain_text("مستخدمة بالفعل")
     print("  [+] تم منع تكرار كود الفرع بنجاح!")
     
     # Close modal
-    page.locator('div.fixed button:has-text("إلغاء")').click()
-    wait_for_livewire(page)
+    page.locator('button:has-text("إلغاء")').first.click()
+    wait_for_modal_close(page)
     
     # 2. User Phone Validation
     print("  [*] 👤 2. جاري محاولة إضافة مستخدم بهاتف مكرر (01055554444)...")
@@ -373,20 +381,20 @@ def test_store_and_user_validation_constraints(page: Page):
     page.locator('button:has-text("إضافة مستخدم جديد"), button:has-text("إضافة كاشير")').first.click()
     wait_for_livewire(page)
     
-    page.locator('form input[wire\\:model*="name"]').first.fill("مستخدم هاتف مكرر")
-    page.locator('form input[wire\\:model*="phone"]').first.fill("01055554444")
-    page.locator('form select[wire\\:model*="role"]').first.select_option("cashier")
-    page.locator('form input[wire\\:model*="password"]').first.fill("password123")
+    page.locator('div.fixed input[placeholder*="أحمد محمود"]').fill("مستخدم هاتف مكرر")
+    page.locator('div.fixed input[placeholder*="01012316954"]').fill("01055554444")
+    page.locator('div.fixed select[wire\\:model="role"]').select_option("cashier")
+    page.locator('div.fixed input[placeholder*="••••••••"]').fill("password123")
     
-    page.locator('form button[type="submit"]:has-text("حفظ")').click()
+    page.locator('div.fixed button:has-text("حفظ بيانات المستخدم")').click()
     wait_for_livewire(page)
     
     print("  [*] 🔍 جاري التأكد من ظهور خطأ تكرار الهاتف...")
-    expect(page.locator('div.fixed form')).to_contain_text("مسجل بالفعل")
+    expect(page.locator('form:has-text("حفظ بيانات المستخدم")')).to_contain_text("مسجل بالفعل")
     print("  [+] تم منع تكرار رقم هاتف المستخدم بنجاح!")
     
-    page.locator('div.fixed button:has-text("إلغاء")').click()
-    wait_for_livewire(page)
+    page.locator('div.fixed button:has-text("إلغاء")').first.click()
+    wait_for_modal_close(page)
 
 def test_soft_delete_and_restore_store_interactive(page: Page):
     """Test soft deleting a store, verifying trash tab, and restoring it back to active list."""
@@ -403,7 +411,7 @@ def test_soft_delete_and_restore_store_interactive(page: Page):
     page.locator('input[wire\\:model="name"]').fill("فرع مؤقت للاختبار E2E")
     page.locator('input[wire\\:model="code"]').fill("TEMP-SHOP-99")
     page.locator('button[type="submit"]:has-text("حفظ البيانات")').click()
-    wait_for_livewire(page)
+    wait_for_modal_close(page)
     
     expect(page.locator("body")).to_contain_text("فرع مؤقت للاختبار E2E")
     expect(page.locator("body")).to_contain_text("TEMP-SHOP-99")
@@ -428,12 +436,10 @@ def test_soft_delete_and_restore_store_interactive(page: Page):
     page.locator('button:has-text("استعادة")').first.click()
     wait_for_livewire(page)
     
-    print("  [*] 5. جاري العودة لتبويب الفروع 'النشطة'...")
+    print("  [*] 5. العودة لتبويب الفروع النشطة والتاكد من عودة الفرع...")
     page.locator('button:has-text("النشطة")').first.click()
     wait_for_livewire(page)
     
-    print("  [*] جاري التحقق من عودة الفرع لقائمة الفروع النشطة بكامل بياناته...")
     expect(page.locator("body")).to_contain_text("فرع مؤقت للاختبار E2E")
     expect(page.locator("body")).to_contain_text("TEMP-SHOP-99")
-    print("  [+] اكتملت دورة الحذف والاسترجاع من سلة المحذوفات بنجاح 100%!")
-    print("=" * 60 + "\n")
+    print("  [+] تمت استعادة الفرع بنجاح وعودته للفروع النشطة 100%.")

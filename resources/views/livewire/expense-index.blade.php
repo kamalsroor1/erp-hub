@@ -227,15 +227,15 @@
                 </button>
             </div>
 
-            <!-- Quick Category Tags -->
+            <!-- Quick Category Touch Tiles -->
             <div>
-                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">اختر التصنيف سريعاً:</label>
-                <div class="flex flex-wrap gap-1.5">
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">اختر التصنيف بلمسة واحدة:</label>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     @foreach($quickCategories as $cat)
                         <button
                             type="button"
                             wire:click="selectQuickCategory('{{ $cat }}')"
-                            class="px-2.5 py-1 rounded-xl text-xs font-bold transition-all border cursor-pointer {{ $category === $cat ? 'bg-amber-500 text-white border-amber-400 shadow-md shadow-amber-500/20' : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700' }}"
+                            class="h-11 px-3 rounded-2xl text-xs font-black transition-all border cursor-pointer flex items-center justify-center text-center {{ $category === $cat ? 'bg-amber-500 text-white border-amber-400 shadow-md shadow-amber-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-200' }}"
                         >
                             {{ $cat }}
                         </button>
@@ -254,38 +254,52 @@
                         type="text"
                         required
                         placeholder="مثال: شراء 500 كيس شنط مقاس وسط + 2 بكرة لاصق"
-                        class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                        class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-2xl text-slate-900 dark:text-white text-xs font-bold focus:ring-2 focus:ring-amber-500 focus:outline-none"
                     >
-                    @error('title') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                    @error('title') <span class="text-xs text-rose-500 mt-1 block font-bold">{{ $message }}</span> @enderror
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                            المبلغ المدفوع (ج.م) <span class="text-rose-500">*</span>
-                        </label>
-                        <input
-                            wire:model="amount"
-                            type="number"
-                            step="0.001"
-                            required
-                            placeholder="0.00"
-                            class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm font-mono font-bold focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                <!-- Touch Quick Amounts & Amount Input -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                        المبلغ المدفوع (ج.م) <span class="text-rose-500">*</span>
+                    </label>
+
+                    <!-- Quick Touch Amount Buttons -->
+                    <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+                        @foreach([50, 100, 200, 500, 1000, 2000] as $amt)
+                        <button 
+                            type="button" 
+                            wire:click="selectQuickAmount({{ $amt }})" 
+                            class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-amber-600 hover:text-white text-xs font-mono font-bold text-slate-700 dark:text-slate-300 transition-colors cursor-pointer border border-slate-200 dark:border-slate-700"
                         >
-                        @error('amount') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                            {{ $amt }}
+                        </button>
+                        @endforeach
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                            تاريخ الصرف <span class="text-rose-500">*</span>
-                        </label>
-                        <input
-                            wire:model="expense_date"
-                            type="date"
-                            required
-                            class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-xs font-mono focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                        >
-                        @error('expense_date') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <input
+                                wire:model="amount"
+                                type="number"
+                                step="0.001"
+                                required
+                                placeholder="0.00"
+                                class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-2xl text-slate-900 dark:text-white text-sm font-mono font-bold focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                            >
+                            @error('amount') <span class="text-xs text-rose-500 mt-1 block font-bold">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <input
+                                wire:model="expense_date"
+                                type="date"
+                                required
+                                class="w-full h-11 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-2xl text-slate-900 dark:text-white text-xs font-mono font-bold focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                            >
+                            @error('expense_date') <span class="text-xs text-rose-500 mt-1 block font-bold">{{ $message }}</span> @enderror
+                        </div>
                     </div>
                 </div>
 

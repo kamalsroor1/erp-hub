@@ -35,6 +35,15 @@ def wait_for_livewire(page: Page):
         page.wait_for_load_state("networkidle", timeout=8000)
     except Exception:
         pass
+    time.sleep(0.6)
+
+def wait_for_modal_close(page: Page):
+    """Waits for any open fixed backdrop/modal to close and detach."""
+    wait_for_livewire(page)
+    try:
+        page.wait_for_selector('div.fixed.inset-0.z-50', state='detached', timeout=3000)
+    except Exception:
+        pass
     time.sleep(0.4)
 
 def safe_goto(page: Page, path: str):

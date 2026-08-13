@@ -1,19 +1,21 @@
 <div class="space-y-6">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <div>
-            <h2 class="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-                <span>📈 التقارير المالية ومجمل الأرباح وتقييم المخزون</span>
-            </h2>
-            <p class="text-xs text-slate-500 dark:text-slate-400">تحليل الأرباح المحققة، تكلفة البضاعة المباعة (COGS)، أداء الفروع وعربيات التوزيع، وقيمة بضاعة المخزن</p>
-        </div>
+    <!-- Header & Period Filter Toolbar -->
+    <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2 font-tajawal">
+                    <span>📈 التقارير المالية ومجمل الأرباح ومؤشرات المبيعات</span>
+                </h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    لوحة تحكم إدارية متكاملة لمتابعة المبيعات، الإيرادات، التكاليف، أداء الفروع وعربيات التوزيع، وحسابات الأرباح
+                </p>
+            </div>
 
-        <div class="flex flex-wrap items-center gap-2 text-xs">
-            <!-- Store Filter Selector -->
-            <div class="flex items-center gap-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-1">
-                <span class="text-slate-500">الفرع:</span>
-                <select wire:model.live="selectedStoreId" class="bg-transparent text-slate-900 dark:text-white font-bold focus:outline-none cursor-pointer">
-                    <option value="all">🏢 إجمالي كل الفروع والعربيات</option>
+            <!-- Store Selector -->
+            <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-2xl px-3 py-2 shrink-0">
+                <span class="text-xs font-bold text-slate-500">🏬 نطاق الفرع:</span>
+                <select wire:model.live="selectedStoreId" class="bg-transparent text-xs font-black text-slate-900 dark:text-white focus:outline-none cursor-pointer">
+                    <option value="all">🏢 إجمالي كافة الفروع والمخازن وعربات التوزيع</option>
                     @foreach($stores as $st)
                     <option value="{{ $st->id }}">
                         @if($st->type === 'wholesale_van') 🚚 @elseif($st->type === 'main_warehouse') 🏢 @else 🏬 @endif
@@ -22,104 +24,391 @@
                     @endforeach
                 </select>
             </div>
+        </div>
 
-            <!-- Date Presets -->
-            <button wire:click="setFilter('today')" class="px-3 py-1.5 rounded-xl font-bold border transition-colors cursor-pointer {{ $dateFilter === 'today' ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-400 hover:bg-slate-200' }}">اليوم</button>
-            <button wire:click="setFilter('this_week')" class="px-3 py-1.5 rounded-xl font-bold border transition-colors cursor-pointer {{ $dateFilter === 'this_week' ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-400 hover:bg-slate-200' }}">هذا الأسبوع</button>
-            <button wire:click="setFilter('this_month')" class="px-3 py-1.5 rounded-xl font-bold border transition-colors cursor-pointer {{ $dateFilter === 'this_month' ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-400 hover:bg-slate-200' }}">هذا الشهر</button>
+        <!-- Date Filters Buttons & Custom Date Pickers -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <!-- Preset Period Buttons -->
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <button 
+                    type="button"
+                    wire:click="setFilter('today')" 
+                    class="px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer {{ $dateFilter === 'today' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200' }}"
+                >
+                    ☀️ مبيعات اليوم
+                </button>
+                <button 
+                    type="button"
+                    wire:click="setFilter('this_week')" 
+                    class="px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer {{ $dateFilter === 'this_week' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200' }}"
+                >
+                    📅 هذا الأسبوع
+                </button>
+                <button 
+                    type="button"
+                    wire:click="setFilter('this_month')" 
+                    class="px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer {{ $dateFilter === 'this_month' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200' }}"
+                >
+                    🗓️ هذا الشهر
+                </button>
+                <button 
+                    type="button"
+                    wire:click="setFilter('this_year')" 
+                    class="px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer {{ $dateFilter === 'this_year' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200' }}"
+                >
+                    📊 هذا العام ({{ date('Y') }})
+                </button>
+                <button 
+                    type="button"
+                    wire:click="setFilter('custom')" 
+                    class="px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer {{ $dateFilter === 'custom' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200' }}"
+                >
+                    🎯 فترة مخصصة
+                </button>
+            </div>
+
+            <!-- Custom Date Inputs -->
+            <div class="flex items-center gap-2 text-xs">
+                <span class="text-slate-400 font-bold">من:</span>
+                <input 
+                    type="date" 
+                    wire:model.live="fromDate" 
+                    class="h-9 px-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                >
+                <span class="text-slate-400 font-bold">إلى:</span>
+                <input 
+                    type="date" 
+                    wire:model.live="toDate" 
+                    class="h-9 px-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                >
+            </div>
         </div>
     </div>
 
-    <!-- 5 High Level Financial Summary Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        <!-- Revenue -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm">
-            <div class="text-xs font-bold text-slate-500 dark:text-slate-400">إجمالي المبيعات (الإيراد)</div>
-            <div class="text-xl font-black text-slate-900 dark:text-white font-mono mt-2">{{ number_format($periodic['total_sales'], 2) }} <span class="text-xs text-emerald-600 dark:text-emerald-400">ج.م</span></div>
-            <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">{{ $periodic['invoice_count'] }} فاتورة معتمدة</div>
-        </div>
+    <!-- 📑 Navigation Tabs Bar -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-200 dark:border-slate-800">
+        <button 
+            type="button"
+            wire:click="setTab('sales')" 
+            class="px-4 py-3 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 {{ $activeTab === 'sales' ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-md' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900' }}"
+        >
+            <span>📊 مبيعات وإيرادات الفترة</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono {{ $activeTab === 'sales' ? 'bg-amber-500 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                {{ $periodic['invoice_count'] }} فواتير
+            </span>
+        </button>
 
-        <!-- COGS -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm">
-            <div class="text-xs font-bold text-slate-500 dark:text-slate-400">تكلفة البضاعة المباعة (COGS)</div>
-            <div class="text-xl font-black text-rose-600 dark:text-rose-400 font-mono mt-2">{{ number_format($periodic['total_cost'], 2) }} <span class="text-xs text-rose-500 dark:text-rose-300">ج.م</span></div>
-            <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">تكلفة الشراء للبضاعة المباعة</div>
-        </div>
+        <button 
+            type="button"
+            wire:click="setTab('items')" 
+            class="px-4 py-3 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 {{ $activeTab === 'items' ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-md' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900' }}"
+        >
+            <span>📦 حركة وربحية الأصناف</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono {{ $activeTab === 'items' ? 'bg-amber-500 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                {{ count($itemProfits) }} صنف
+            </span>
+        </button>
 
-        <!-- Operational Expenses -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm">
-            <div class="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center justify-between">
-                <span>المصروفات والنثريات</span>
-                <a href="{{ route('expenses.index') }}" class="text-[10px] text-amber-600 dark:text-amber-400 hover:underline">عرض</a>
-            </div>
-            <div class="text-xl font-black text-amber-600 dark:text-amber-400 font-mono mt-2">{{ number_format($totalExpenses, 2) }} <span class="text-xs text-amber-500 dark:text-amber-300">ج.م</span></div>
-            <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">شنط، بنزين، تشغيل، صيانة</div>
-        </div>
+        <button 
+            type="button"
+            wire:click="setTab('stores')" 
+            class="px-4 py-3 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 {{ $activeTab === 'stores' ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-md' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900' }}"
+        >
+            <span>🏬 مقارنة أداء الفروع والعربيات</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono {{ $activeTab === 'stores' ? 'bg-amber-500 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                {{ count($storeBreakdown) }} فرع
+            </span>
+        </button>
 
-        <!-- Net Profit After Expenses -->
-        <div class="bg-white dark:bg-slate-900 border border-emerald-500/40 p-4 rounded-2xl relative overflow-hidden bg-gradient-to-b from-white dark:from-slate-900 to-emerald-50/60 dark:to-emerald-950/30 shadow-sm">
-            <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400">صافي الربح بعد المصاريف</div>
-            <div class="text-xl font-black {{ bccomp($netProfitAfterExpenses, '0.000', 3) >= 0 ? 'text-emerald-600 dark:text-emerald-300' : 'text-rose-600 dark:text-rose-400' }} font-mono mt-2">
-                {{ number_format($netProfitAfterExpenses, 2) }} <span class="text-xs text-emerald-600 dark:text-emerald-400">ج.م</span>
-            </div>
-            <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">الربح الصافي الفعلي بعد النفقات</div>
-        </div>
+        <button 
+            type="button"
+            wire:click="setTab('customers')" 
+            class="px-4 py-3 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 {{ $activeTab === 'customers' ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-md' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900' }}"
+        >
+            <span>👥 مبيعات وحسابات العملاء</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono {{ $activeTab === 'customers' ? 'bg-amber-500 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                {{ count($customerSales) }} عميل
+            </span>
+        </button>
 
-        <!-- Stock Valuation -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm">
-            <div class="text-xs font-bold text-slate-500 dark:text-slate-400">تقييم بضاعة المخزن (التكلفة)</div>
-            <div class="text-xl font-black text-amber-600 dark:text-amber-300 font-mono mt-2">{{ number_format($stockCostValuation, 2) }} <span class="text-xs text-amber-600 dark:text-amber-300">ج.م</span></div>
-            <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">بسعر البيع: <span class="text-slate-900 dark:text-white font-mono font-bold">{{ number_format($stockSellingValuation, 2) }}</span></div>
-        </div>
+        <button 
+            type="button"
+            wire:click="setTab('expenses')" 
+            class="px-4 py-3 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 {{ $activeTab === 'expenses' ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-md' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900' }}"
+        >
+            <span>💸 المصروفات وصافي الدخل</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono {{ $activeTab === 'expenses' ? 'bg-amber-500 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                {{ number_format($totalExpenses, 0) }} ج.م
+            </span>
+        </button>
+
+        <button 
+            type="button"
+            wire:click="setTab('inventory')" 
+            class="px-4 py-3 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 {{ $activeTab === 'inventory' ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-md' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900' }}"
+        >
+            <span>🏢 تقييم بضاعة المخزن</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono {{ $activeTab === 'inventory' ? 'bg-amber-500 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                {{ count($allItems) }} صنف
+            </span>
+        </button>
     </div>
 
-    <!-- Store-by-Store Comparative Performance (If viewing consolidated) -->
-    @if(!empty($storeBreakdown))
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
-        <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-                <span>مقارنة أداء ومبيعات الفروع وعربيات التوزيع خلال الفترة</span>
+    <!-- ======================================================== -->
+    <!-- 📊 TAB 1: مؤشرات المبيعات والإيرادات (Sales Dashboard)     -->
+    <!-- ======================================================== -->
+    @if($activeTab === 'sales')
+    <div class="space-y-6">
+        <!-- 6 Main KPI Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
+            <!-- 1. Total Sales -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl shadow-sm space-y-2">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
+                    <span>إجمالي المبيعات</span>
+                    <span class="text-emerald-500">💰</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono">
+                    {{ number_format($periodic['total_sales'], 2) }}
+                    <span class="text-xs font-normal text-emerald-600">ج.م</span>
+                </div>
+                <div class="text-[11px] text-slate-400 font-bold">
+                    {{ $periodic['invoice_count'] }} فاتورة معتمدة
+                </div>
+            </div>
+
+            <!-- 2. Cash Collected -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl shadow-sm space-y-2">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
+                    <span>التحصيل النقدي</span>
+                    <span class="text-indigo-500">💵</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400 font-mono">
+                    {{ number_format($periodic['total_paid'], 2) }}
+                    <span class="text-xs font-normal">ج.م</span>
+                </div>
+                <div class="text-[11px] text-slate-400 font-bold">
+                    تم سدادها واستلامها في الدرج
+                </div>
+            </div>
+
+            <!-- 3. Credit / Receivables in Period -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl shadow-sm space-y-2">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
+                    <span>المبيعات الآجلة (المتبقي)</span>
+                    <span class="text-amber-500">⏳</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 font-mono">
+                    {{ number_format($periodic['total_remaining'], 2) }}
+                    <span class="text-xs font-normal">ج.م</span>
+                </div>
+                <div class="text-[11px] text-slate-400 font-bold">
+                    ذمم على العملاء في هذه الفترة
+                </div>
+            </div>
+
+            <!-- 4. COGS -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl shadow-sm space-y-2">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
+                    <span>تكلفة البضاعة المباعة</span>
+                    <span class="text-rose-500">📦</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-black text-rose-600 dark:text-rose-400 font-mono">
+                    {{ number_format($periodic['total_cost'], 2) }}
+                    <span class="text-xs font-normal">ج.م</span>
+                </div>
+                <div class="text-[11px] text-slate-400 font-bold">
+                    تكلفة شراء الأصناف المباعة
+                </div>
+            </div>
+
+            <!-- 5. Gross Profit -->
+            <div class="bg-white dark:bg-slate-900 border border-emerald-500/40 p-4 rounded-3xl shadow-sm space-y-2 bg-gradient-to-b from-white dark:from-slate-900 to-emerald-500/5">
+                <div class="flex items-center justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                    <span>مجمل أرباح المبيعات</span>
+                    <span>📈</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
+                    {{ number_format($periodic['gross_profit'], 2) }}
+                    <span class="text-xs font-normal">ج.م</span>
+                </div>
+                <div class="text-[11px] text-emerald-700 dark:text-emerald-300 font-bold font-mono">
+                    هامش الربح: {{ $periodic['margin_percentage'] }}%
+                </div>
+            </div>
+
+            <!-- 6. Net Profit After Expenses -->
+            <div class="bg-white dark:bg-slate-900 border border-indigo-500/40 p-4 rounded-3xl shadow-sm space-y-2 bg-gradient-to-b from-white dark:from-slate-900 to-indigo-500/5">
+                <div class="flex items-center justify-between text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                    <span>صافي دخل النشاط</span>
+                    <span>🏆</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-black {{ bccomp($netProfitAfterExpenses, '0.000', 3) >= 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600' }} font-mono">
+                    {{ number_format($netProfitAfterExpenses, 2) }}
+                    <span class="text-xs font-normal">ج.م</span>
+                </div>
+                <div class="text-[11px] text-slate-400 font-bold">
+                    بعد خصم مصروفات ({{ number_format($totalExpenses, 2) }} ج.م)
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Store Sales Summary Card -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    <span>🏬 مقارنة أداء ومبيعات الفروع وعربيات التوزيع</span>
+                </h3>
+                <button wire:click="setTab('stores')" class="text-xs font-bold text-amber-600 hover:underline cursor-pointer">
+                    عرض المقارنة التفصيلية ←
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                @foreach($storeBreakdown as $sb)
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                            <span>{{ $sb['store']->type === 'wholesale_van' ? '🚚' : ($sb['store']->is_main ? '🏢' : '🏬') }}</span>
+                            <span>{{ $sb['store']->name }}</span>
+                        </div>
+                        <div class="text-[11px] text-slate-400 font-bold mt-1">
+                            {{ $sb['invoice_count'] }} فاتورة | مساهمة: {{ $sb['share_pct'] }}%
+                        </div>
+                    </div>
+                    <div class="text-left">
+                        <div class="text-sm font-black font-mono text-emerald-600 dark:text-emerald-400">
+                            {{ number_format($sb['total_sales'], 2) }} ج.م
+                        </div>
+                        <div class="text-[10px] text-slate-500 font-bold">
+                            ربح: {{ number_format($sb['gross_profit'], 2) }} ج.م
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- ======================================================== -->
+    <!-- 📦 TAB 2: حركة وربحية الأصناف (Items Profitability)        -->
+    <!-- ======================================================== -->
+    @if($activeTab === 'items')
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+        <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <span>📦 تحليل مبيعات وربحية الأصناف مرتبة حسب الأعلى إيراداً</span>
+            </h3>
+            <span class="text-xs text-slate-500">{{ count($itemProfits) }} صنف مباع</span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-right text-xs">
+                <thead class="bg-slate-50 dark:bg-slate-950 text-slate-500 font-bold border-b border-slate-200 dark:border-slate-800">
+                    <tr>
+                        <th class="p-3.5">#</th>
+                        <th class="p-3.5">الصنف</th>
+                        <th class="p-3.5 text-center">الكمية المباعة</th>
+                        <th class="p-3.5">إجمالي المبيعات (الإيراد)</th>
+                        <th class="p-3.5">تكلفة الشراء (COGS)</th>
+                        <th class="p-3.5">مجمل الربح</th>
+                        <th class="p-3.5 text-center">هامش الربح %</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                    @forelse($itemProfits as $index => $row)
+                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                        <td class="p-3.5 font-bold font-mono text-slate-400">{{ $index + 1 }}</td>
+                        <td class="p-3.5">
+                            <span class="font-extrabold text-slate-900 dark:text-white text-xs sm:text-sm">{{ $row['item']->name ?? 'صنف غير معروف' }}</span>
+                            @if($row['item']?->code)
+                            <span class="block text-[10px] text-slate-400 font-mono">كود: {{ $row['item']->code }}</span>
+                            @endif
+                        </td>
+                        <td class="p-3.5 text-center font-black font-mono text-slate-900 dark:text-white">
+                            {{ number_format($row['total_qty'], 2) }} {{ $row['item']?->unit }}
+                        </td>
+                        <td class="p-3.5 font-black font-mono text-emerald-600 dark:text-emerald-400">
+                            {{ number_format($row['total_revenue'], 2) }} ج.م
+                        </td>
+                        <td class="p-3.5 font-bold font-mono text-rose-600 dark:text-rose-400">
+                            {{ number_format($row['total_cogs'], 2) }} ج.م
+                        </td>
+                        <td class="p-3.5 font-black font-mono text-slate-900 dark:text-white">
+                            {{ number_format($row['profit'], 2) }} ج.م
+                        </td>
+                        <td class="p-3.5 text-center">
+                            <span class="px-2.5 py-1 rounded-xl text-[11px] font-black font-mono {{ (float)$row['margin'] >= 20 ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-600 border border-amber-500/20' }}">
+                                {{ $row['margin'] }}%
+                            </span>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7" class="p-8 text-center text-slate-400">لا توجد مبيعات أصناف مسجلة في هذه الفترة</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
+    <!-- ======================================================== -->
+    <!-- 🏬 TAB 3: مقارنة أداء الفروع والتوزيع (Stores Performance)  -->
+    <!-- ======================================================== -->
+    @if($activeTab === 'stores')
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+        <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <span>🏬 مقارنة الأداء والمبيعات عبر الفروع وعربات التوزيع</span>
             </h3>
         </div>
 
         <div class="overflow-x-auto">
             <table class="w-full text-right text-xs">
-                <thead class="bg-slate-50 dark:bg-slate-950 text-slate-500 font-semibold border-b border-slate-200 dark:border-slate-800">
+                <thead class="bg-slate-50 dark:bg-slate-950 text-slate-500 font-bold border-b border-slate-200 dark:border-slate-800">
                     <tr>
-                        <th class="p-3.5">الفرع / عربية التوزيع</th>
+                        <th class="p-3.5">الفرع / النقطة</th>
                         <th class="p-3.5 text-center">النوع</th>
                         <th class="p-3.5 text-center">عدد الفواتير</th>
                         <th class="p-3.5">إجمالي المبيعات</th>
-                        <th class="p-3.5">تكلفة البضاعة</th>
+                        <th class="p-3.5">التحصيل النقدي</th>
+                        <th class="p-3.5">الآجل (المتبقي)</th>
                         <th class="p-3.5">مجمل الربح</th>
                         <th class="p-3.5 text-center">هامش الربح %</th>
+                        <th class="p-3.5 text-center">نسبة المساهمة</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60">
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
                     @foreach($storeBreakdown as $sb)
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                        <td class="p-3.5 font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
-                            <span>@if($sb['store']->type === 'wholesale_van') 🚚 @elseif($sb['store']->type === 'main_warehouse') 🏢 @else 🏬 @endif</span>
-                            <span>{{ $sb['store']->name }}</span>
+                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                        <td class="p-3.5 font-black text-slate-900 dark:text-white text-xs sm:text-sm">
+                            {{ $sb['store']->name }}
                         </td>
                         <td class="p-3.5 text-center">
-                            @if($sb['store']->type === 'wholesale_van')
-                                <span class="px-2 py-0.5 rounded-full text-[10px] bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-bold">عربية توزيع</span>
-                            @elseif($sb['store']->type === 'main_warehouse')
-                                <span class="px-2 py-0.5 rounded-full text-[10px] bg-teal-500/10 text-teal-700 dark:text-teal-400 font-bold">مخزن رئيسي</span>
-                            @else
-                                <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/10 text-amber-700 dark:text-amber-400 font-bold">محل تجزئة</span>
-                            @endif
-                        </td>
-                        <td class="p-3.5 text-center font-mono font-bold text-slate-700 dark:text-slate-300">{{ $sb['invoice_count'] }}</td>
-                        <td class="p-3.5 font-mono font-bold text-slate-900 dark:text-white">{{ number_format($sb['total_sales'], 2) }} ج.م</td>
-                        <td class="p-3.5 font-mono text-slate-500 dark:text-slate-400">{{ number_format($sb['total_cost'], 2) }} ج.م</td>
-                        <td class="p-3.5 font-mono font-black text-emerald-600 dark:text-emerald-400">{{ number_format($sb['gross_profit'], 2) }} ج.م</td>
-                        <td class="p-3.5 text-center font-mono font-bold">
-                            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
-                                {{ $sb['margin'] }}%
+                            <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold {{ $sb['store']->type === 'wholesale_van' ? 'bg-amber-500/10 text-amber-600' : ($sb['store']->is_main ? 'bg-indigo-500/10 text-indigo-600' : 'bg-emerald-500/10 text-emerald-600') }}">
+                                {{ $sb['store']->type === 'wholesale_van' ? '🚚 سيارة توزيع' : ($sb['store']->is_main ? '🏢 رئيسي' : '🏬 فرع') }}
                             </span>
+                        </td>
+                        <td class="p-3.5 text-center font-bold font-mono">{{ $sb['invoice_count'] }}</td>
+                        <td class="p-3.5 font-black font-mono text-emerald-600 dark:text-emerald-400">
+                            {{ number_format($sb['total_sales'], 2) }} ج.م
+                        </td>
+                        <td class="p-3.5 font-bold font-mono text-indigo-600 dark:text-indigo-400">
+                            {{ number_format($sb['total_paid'], 2) }} ج.م
+                        </td>
+                        <td class="p-3.5 font-bold font-mono text-amber-600 dark:text-amber-400">
+                            {{ number_format($sb['total_remaining'], 2) }} ج.م
+                        </td>
+                        <td class="p-3.5 font-black font-mono text-slate-900 dark:text-white">
+                            {{ number_format($sb['gross_profit'], 2) }} ج.م
+                        </td>
+                        <td class="p-3.5 text-center font-black font-mono text-emerald-600">
+                            {{ $sb['margin'] }}%
+                        </td>
+                        <td class="p-3.5 text-center font-black font-mono text-indigo-600">
+                            {{ $sb['share_pct'] }}%
                         </td>
                     </tr>
                     @endforeach
@@ -129,55 +418,242 @@
     </div>
     @endif
 
-    <!-- Item-level Profitability Table -->
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
-        <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span>تحليل أرباح كل صنف مباع خلال الفترة المحددة</span>
-            </h3>
-            <button onclick="window.print()" class="px-3 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg border border-slate-300 dark:border-slate-700 cursor-pointer">
-                🖨️ طباعة التقرير
-            </button>
+    <!-- ======================================================== -->
+    <!-- 👥 TAB 4: حسابات وديون العملاء (Customers Analytics)        -->
+    <!-- ======================================================== -->
+    @if($activeTab === 'customers')
+    <div class="space-y-4">
+        <!-- Customer Debt Banner -->
+        <div class="bg-gradient-to-r from-amber-600 to-amber-500 rounded-3xl p-5 text-white shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+                <h3 class="text-base sm:text-lg font-black">إجمالي مديونيات وحسابات كافة العملاء المسجلة بالنظام</h3>
+                <p class="text-xs text-amber-100 mt-0.5">مجموع أرصدة الذمم المستحقة على العملاء حتى هذه اللحظة</p>
+            </div>
+            <div class="text-2xl sm:text-3xl font-black font-mono bg-white/20 px-4 py-2 rounded-2xl backdrop-blur-sm">
+                {{ number_format($totalAllCustomersDebt, 2) }} <span class="text-xs font-normal">ج.م</span>
+            </div>
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-right text-xs">
-                <thead class="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-800">
-                    <tr>
-                        <th class="p-3.5">الصنف</th>
-                        <th class="p-3.5">القسم</th>
-                        <th class="p-3.5 text-center">الكمية المباعة</th>
-                        <th class="p-3.5">إجمالي الإيراد</th>
-                        <th class="p-3.5">إجمالي التكلفة</th>
-                        <th class="p-3.5">صافي الربح</th>
-                        <th class="p-3.5 text-center">نسبة هامش الربح</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60">
-                    @forelse($itemProfits as $row)
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                        <td class="p-3.5 font-bold text-slate-800 dark:text-slate-100">{{ $row['item']->name ?? '—' }}</td>
-                        <td class="p-3.5 text-slate-600 dark:text-slate-400">{{ $row['item']->category ?? 'عام' }}</td>
-                        <td class="p-3.5 text-center font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                            {{ number_format($row['total_qty'], 3) }} {{ $row['item']->unit ?? 'كجم' }}
-                        </td>
-                        <td class="p-3.5 font-mono text-slate-900 dark:text-white">{{ number_format($row['total_revenue'], 2) }} ج.م</td>
-                        <td class="p-3.5 font-mono text-slate-500 dark:text-slate-400">{{ number_format($row['total_cogs'], 2) }} ج.م</td>
-                        <td class="p-3.5 font-mono font-black text-emerald-600 dark:text-emerald-400">{{ number_format($row['profit'], 2) }} ج.م</td>
-                        <td class="p-3.5 text-center font-mono font-bold text-slate-800 dark:text-slate-200">
-                            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
-                                {{ $row['margin'] }}%
-                            </span>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="7" class="p-12 text-center text-slate-400">لا توجد بيانات مبيعات في الفترة المحددة</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+            <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white">
+                    👥 كبار العملاء الأكثر شراءً وتعاملات خلال الفترة
+                </h3>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-right text-xs">
+                    <thead class="bg-slate-50 dark:bg-slate-950 text-slate-500 font-bold border-b border-slate-200 dark:border-slate-800">
+                        <tr>
+                            <th class="p-3.5">العميل</th>
+                            <th class="p-3.5">رقم الهاتف</th>
+                            <th class="p-3.5 text-center">عدد الفواتير</th>
+                            <th class="p-3.5">إجمالي المشتريات</th>
+                            <th class="p-3.5">المسدد نقداً</th>
+                            <th class="p-3.5">المتبقي بالفترة</th>
+                            <th class="p-3.5">الرصيد الإجمالي الحالي</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                        @forelse($customerSales as $cs)
+                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                            <td class="p-3.5 font-black text-slate-900 dark:text-white text-xs sm:text-sm">
+                                {{ $cs->customer?->name ?? 'عميل غير مسجل' }}
+                            </td>
+                            <td class="p-3.5 font-mono text-slate-500" dir="ltr">
+                                {{ $cs->customer?->phone ?? '-' }}
+                            </td>
+                            <td class="p-3.5 text-center font-bold font-mono">{{ $cs->total_invoices }}</td>
+                            <td class="p-3.5 font-black font-mono text-emerald-600 dark:text-emerald-400">
+                                {{ number_format($cs->total_bought, 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 font-bold font-mono text-indigo-600 dark:text-indigo-400">
+                                {{ number_format($cs->total_paid, 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 font-bold font-mono text-amber-600 dark:text-amber-400">
+                                {{ number_format($cs->total_debt_in_period, 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 font-black font-mono text-slate-900 dark:text-white">
+                                {{ number_format($cs->customer?->current_balance ?? 0, 2) }} ج.م
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="7" class="p-8 text-center text-slate-400">لا توجد حركات مبيعات عملاء في هذه الفترة</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+    @endif
+
+    <!-- ======================================================== -->
+    <!-- 💸 TAB 5: المصروفات وصافي الدخل (Expenses & Net Income)     -->
+    <!-- ======================================================== -->
+    @if($activeTab === 'expenses')
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <!-- Expenses Summary Cards -->
+        <div class="space-y-4">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-sm space-y-3">
+                <div class="text-xs font-bold text-slate-500">إجمالي مجمل الربح من المبيعات</div>
+                <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
+                    {{ number_format($periodic['gross_profit'], 2) }} ج.م
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-rose-500/30 p-5 rounded-3xl shadow-sm space-y-3 bg-gradient-to-b from-white dark:from-slate-900 to-rose-500/5">
+                <div class="text-xs font-bold text-rose-500">إجمالي المصروفات والنثريات التشغيلية</div>
+                <div class="text-2xl font-black text-rose-600 dark:text-rose-400 font-mono">
+                    -{{ number_format($totalExpenses, 2) }} ج.م
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-indigo-500/40 p-5 rounded-3xl shadow-sm space-y-3 bg-gradient-to-b from-white dark:from-slate-900 to-indigo-500/10">
+                <div class="text-xs font-bold text-indigo-600 dark:text-indigo-400">الصافي الفعلي للأرباح (Net Income)</div>
+                <div class="text-3xl font-black {{ bccomp($netProfitAfterExpenses, '0.000', 3) >= 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600' }} font-mono">
+                    {{ number_format($netProfitAfterExpenses, 2) }} <span class="text-xs font-normal">ج.م</span>
+                </div>
+                <p class="text-[11px] text-slate-500">صافي الأرباح الصريحة بعد استبعاد كافة النفقات والرواتب والمصروفات</p>
+            </div>
+        </div>
+
+        <!-- Expenses by Category Table -->
+        <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+            <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white">
+                    💸 تفصيل المصروفات حسب بنود الصرف خلال الفترة
+                </h3>
+                <a href="{{ route('expenses.index') }}" class="text-xs font-bold text-amber-600 hover:underline">
+                    إدارة المصروفات ←
+                </a>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-right text-xs">
+                    <thead class="bg-slate-50 dark:bg-slate-950 text-slate-500 font-bold border-b border-slate-200 dark:border-slate-800">
+                        <tr>
+                            <th class="p-3.5">بند / تصنيف المصروف</th>
+                            <th class="p-3.5 text-center">عدد الحركات</th>
+                            <th class="p-3.5">إجمالي المبلغ المنصرف</th>
+                            <th class="p-3.5 text-center">النسبة من إجمالي المصاريف</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                        @forelse($expensesByCategory as $ec)
+                        @php
+                            $catPct = '0.0';
+                            if (bccomp($totalExpenses, '0.000', 3) > 0) {
+                                $catPct = bcmul(bcdiv($ec->total_amount, $totalExpenses, 4), '100', 1);
+                            }
+                        @endphp
+                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                            <td class="p-3.5 font-bold text-slate-900 dark:text-white">{{ $ec->category }}</td>
+                            <td class="p-3.5 text-center font-bold font-mono">{{ $ec->count }}</td>
+                            <td class="p-3.5 font-black font-mono text-rose-600 dark:text-rose-400">
+                                {{ number_format($ec->total_amount, 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center font-black font-mono text-slate-700 dark:text-slate-300">
+                                {{ $catPct }}%
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="4" class="p-8 text-center text-slate-400">لا توجد مصروفات مسجلة في هذه الفترة</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- ======================================================== -->
+    <!-- 🏢 TAB 6: تقييم المخزون (Inventory Valuation)              -->
+    <!-- ======================================================== -->
+    @if($activeTab === 'inventory')
+    <div class="space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-sm space-y-2">
+                <div class="text-xs font-bold text-slate-500">قيمة البضاعة الحالية بسعر التكلفة</div>
+                <div class="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 font-mono">
+                    {{ number_format($stockCostValuation, 2) }} <span class="text-xs font-normal">ج.م</span>
+                </div>
+                <div class="text-[11px] text-slate-400">رأس المال المستثمر في البضاعة حالياً</div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-sm space-y-2">
+                <div class="text-xs font-bold text-slate-500">قيمة البضاعة بسعر البيع المتوقع</div>
+                <div class="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
+                    {{ number_format($stockSellingValuation, 2) }} <span class="text-xs font-normal">ج.م</span>
+                </div>
+                <div class="text-[11px] text-slate-400">المردود المتوقع عند بيع كامل المخزون</div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-indigo-500/40 p-5 rounded-3xl shadow-sm space-y-2 bg-gradient-to-b from-white dark:from-slate-900 to-indigo-500/5">
+                <div class="text-xs font-bold text-indigo-600 dark:text-indigo-400">الأرباح الكامنة في المخزن</div>
+                <div class="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400 font-mono">
+                    {{ number_format($expectedStockProfit, 2) }} <span class="text-xs font-normal">ج.م</span>
+                </div>
+                <div class="text-[11px] text-slate-400">فارق سعر البيع عن سعر التكلفة</div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+            <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white">
+                    🏢 جرد وتقييم الأصناف المسجلة بالنظام
+                </h3>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-right text-xs">
+                    <thead class="bg-slate-50 dark:bg-slate-950 text-slate-500 font-bold border-b border-slate-200 dark:border-slate-800">
+                        <tr>
+                            <th class="p-3.5">#</th>
+                            <th class="p-3.5">الصنف</th>
+                            <th class="p-3.5 text-center">الرصيد الكلي</th>
+                            <th class="p-3.5">سعر التكلفة</th>
+                            <th class="p-3.5">سعر البيع</th>
+                            <th class="p-3.5">القيمة الإجمالية بالتكلفة</th>
+                            <th class="p-3.5">القيمة بسعر البيع</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                        @foreach($allItems as $index => $item)
+                        @php
+                            $cVal = bcmul($item->current_stock, $item->cost_price, 2);
+                            $sVal = bcmul($item->current_stock, $item->selling_price, 2);
+                        @endphp
+                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                            <td class="p-3.5 font-bold font-mono text-slate-400">{{ $index + 1 }}</td>
+                            <td class="p-3.5">
+                                <span class="font-extrabold text-slate-900 dark:text-white text-xs sm:text-sm">{{ $item->name }}</span>
+                                <span class="block text-[10px] text-slate-400 font-mono">كود: {{ $item->code }}</span>
+                            </td>
+                            <td class="p-3.5 text-center font-black font-mono {{ bccomp($item->current_stock, '0.000', 3) <= 0 ? 'text-rose-600' : 'text-slate-900 dark:text-white' }}">
+                                {{ number_format($item->current_stock, 2) }} {{ $item->unit }}
+                            </td>
+                            <td class="p-3.5 font-mono text-slate-600 dark:text-slate-400">
+                                {{ number_format($item->cost_price, 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 font-bold font-mono text-slate-900 dark:text-white">
+                                {{ number_format($item->selling_price, 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 font-black font-mono text-amber-600 dark:text-amber-400">
+                                {{ number_format($cVal, 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 font-black font-mono text-emerald-600 dark:text-emerald-400">
+                                {{ number_format($sVal, 2) }} ج.م
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>

@@ -148,7 +148,7 @@
                 </div>
 
                 <!-- Modal Form -->
-                <form wire:submit.prevent="saveUser" class="space-y-4">
+                <form wire:submit="saveUser" novalidate class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                             اسم المستخدم الكامل <span class="text-rose-500">*</span>
@@ -156,11 +156,10 @@
                         <input
                             wire:model="name"
                             type="text"
-                            required
                             placeholder="مثال: أحمد محمود (كاشير)"
                             class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm placeholder-slate-400 focus:ring-2 focus:ring-amber-500 focus:outline-none"
                         >
-                        @error('name') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                        @error('name') <span class="text-xs text-rose-500 mt-1 block font-bold">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
@@ -170,12 +169,11 @@
                         <input
                             wire:model="phone"
                             type="text"
-                            required
                             dir="ltr"
                             placeholder="مثال: 01012316954"
                             class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm font-mono placeholder-slate-400 focus:ring-2 focus:ring-amber-500 focus:outline-none"
                         >
-                        @error('phone') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                        @error('phone') <span class="text-xs text-rose-500 mt-1 block font-bold">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
@@ -189,7 +187,7 @@
                             placeholder="cashier@sroor.com"
                             class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm placeholder-slate-400 focus:ring-2 focus:ring-amber-500 focus:outline-none"
                         >
-                        @error('email') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                        @error('email') <span class="text-xs text-rose-500 mt-1 block font-bold">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
@@ -216,22 +214,13 @@
                         <div class="relative">
                             <input
                                 wire:model="password"
-                                :type="showPass ? 'text' : 'password'"
-                                {{ $editingUserId ? '' : 'required' }}
+                                type="password"
                                 dir="ltr"
                                 placeholder="••••••••"
-                                class="w-full pr-4 pl-10 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm placeholder-slate-400 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                                class="w-full pr-4 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm placeholder-slate-400 focus:ring-2 focus:ring-amber-500 focus:outline-none"
                             >
-                            <button
-                                type="button"
-                                @click="showPass = !showPass"
-                                class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 hover:text-amber-500 cursor-pointer"
-                            >
-                                <span x-show="!showPass">👁️</span>
-                                <span x-show="showPass" style="display: none;">🙈</span>
-                            </button>
                         </div>
-                        @error('password') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                        @error('password') <span class="text-xs text-rose-500 mt-1 block font-bold">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="pt-2">

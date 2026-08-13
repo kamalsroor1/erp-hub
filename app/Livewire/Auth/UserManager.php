@@ -8,6 +8,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use App\Livewire\Traits\RequiresAuth;
 
 #[Layout('components.layouts.app')]
@@ -43,8 +44,8 @@ class UserManager extends Component
 
         return [
             'name'      => ['required', 'string', 'max:255'],
-            'phone'     => ['required', 'string', 'max:20', 'unique:users,phone,'.$userId],
-            'email'     => ['nullable', 'string', 'email', 'max:255', 'unique:users,email,'.$userId],
+            'phone'     => ['required', 'string', 'max:20', Rule::unique('users', 'phone')->whereNull('deleted_at')->ignore($userId)],
+            'email'     => ['nullable', 'string', 'email', 'max:255', Rule::unique('users', 'email')->whereNull('deleted_at')->ignore($userId)],
             'password'  => [$userId ? 'nullable' : 'required', 'string', 'min:6'],
             'role'      => ['required', 'string', 'exists:roles,name'],
             'is_active' => ['boolean'],

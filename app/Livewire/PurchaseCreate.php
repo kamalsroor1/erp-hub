@@ -149,6 +149,41 @@ class PurchaseCreate extends Component
         $this->remaining_amount = bccomp($rem, '0.000', 3) > 0 ? $rem : '0.000';
     }
 
+    public function incrementLineQty($index, $step = '1.000')
+    {
+        if (isset($this->items[$index])) {
+            $this->items[$index]['quantity'] = bcadd($this->items[$index]['quantity'], (string)$step, 3);
+            $this->calculateTotals();
+        }
+    }
+
+    public function decrementLineQty($index, $step = '1.000')
+    {
+        if (isset($this->items[$index])) {
+            $current = $this->items[$index]['quantity'];
+            $new = bcsub($current, (string)$step, 3);
+            if (bccomp($new, '0.001', 3) > 0) {
+                $this->items[$index]['quantity'] = $new;
+            } else {
+                $this->removeItem($index);
+                return;
+            }
+            $this->calculateTotals();
+        }
+    }
+
+    public function quickSetPaidExact()
+    {
+        $this->paid_amount = $this->net_total;
+        $this->calculateTotals();
+    }
+
+    public function quickSetPaidAmount($amount)
+    {
+        $this->paid_amount = (string)$amount;
+        $this->calculateTotals();
+    }
+
     public function savePurchase(PurchaseService $purchaseService)
     {
         abort_if(!auth()->user()?->can('purchases.create'), 403, 'غير مصرح لك بإنشاء فواتير مشتريات وتوريدات');
@@ -178,22 +213,19 @@ class PurchaseCreate extends Component
     {
         $suppliers = Supplier::active()->orderBy('name')->get();
         $stores = Store::active()->get();
-        $searchResults = [];
-
-        if (strlen($this->searchQuery) >= 1) {
-            $searchResults = Item::active()
-                ->where(function($q) {
-                    $q->where('name', 'like', "%{$this->searchQuery}%")
-                      ->orWhere('code', 'like', "%{$this->searchQuery}%");
-                })
-                ->take(8)
-                ->get();
-        }
+        
+        $quickCatalog = Item::active()
+            ->when(strlen($this->searchQuery) >= 1, function($q) {
+                $q->where('name', 'like', "%{$this->searchQuery}%")
+                  ->orWhere('code', 'like', "%{$this->searchQuery}%");
+            })
+            ->take(12)
+            ->get();
 
         return view('livewire.purchase-create', [
             'suppliers'     => $suppliers,
             'stores'        => $stores,
-            'searchResults' => $searchResults,
+            'quickCatalog'  => $quickCatalog,
         ])->layout('components.layouts.app', ['title' => 'فاتورة مشتريات وتوريد مخزني']);
     }
 }
