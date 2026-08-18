@@ -104,6 +104,19 @@
             </div>
 
             <div>
+                <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">طريقة الدفع:</label>
+                <select
+                    wire:model.live="filterPaymentMethod"
+                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-slate-900 dark:[&>option]:text-slate-100"
+                >
+                    <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="all">كل طرق الدفع</option>
+                    <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="cash">💵 نقداً (الخزينة)</option>
+                    <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="instapay">⚡ إنستاباي</option>
+                    <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="e_wallet">📲 محفظة إلكترونية</option>
+                </select>
+            </div>
+
+            <div>
                 <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">📅 من تاريخ:</label>
                 <x-datepicker wire:model.live="fromDate" placeholder="من تاريخ" />
             </div>
@@ -306,8 +319,8 @@
                         class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
                     >
                         <option value="cash">💵 نقدي من خزينة الكاشير</option>
-                        <option value="bank_transfer">🏦 تحويل بنكي / فودافون كاش / إنستاباي</option>
-                        <option value="cheque">📝 شيك بنكي</option>
+                        <option value="instapay">⚡ تحويل إنستاباي (InstaPay)</option>
+                        <option value="e_wallet">📲 محفظة إلكترونية (فودافون/أورانج/اتصالات)</option>
                     </select>
                 </div>
 

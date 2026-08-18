@@ -18,6 +18,7 @@ class ExpenseIndex extends Component
 
     public string $search = '';
     public string $filterCategory = 'all';
+    public string $filterPaymentMethod = 'all'; // all, cash, instapay, e_wallet, visa, bank_transfer, check
     public string $filterStatus = 'active'; // active, trashed, all
     public ?string $fromDate = null;
     public ?string $toDate = null;
@@ -211,6 +212,7 @@ class ExpenseIndex extends Component
                 });
             })
             ->when($this->filterCategory !== 'all', fn($q) => $q->where('category', $this->filterCategory))
+            ->when($this->filterPaymentMethod !== 'all', fn($q) => $q->where('payment_method', $this->filterPaymentMethod))
             ->when($this->fromDate, fn($q) => $q->whereDate('expense_date', '>=', $this->fromDate))
             ->when($this->toDate, fn($q) => $q->whereDate('expense_date', '<=', $this->toDate));
 
