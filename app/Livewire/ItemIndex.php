@@ -249,9 +249,10 @@ class ItemIndex extends Component
     public function render()
     {
         $baseQuery = match ($this->filterStatus) {
-            'trashed' => Item::onlyTrashed(),
-            'all'     => Item::withTrashed(),
-            default   => Item::active(),
+            'trashed'  => Item::onlyTrashed(),
+            'disabled' => Item::where('is_active', false)->whereNull('deleted_at'),
+            'all'      => Item::withTrashed(),
+            default    => Item::active(),
         };
 
         $query = $baseQuery
@@ -269,8 +270,9 @@ class ItemIndex extends Component
             ->orderBy('name');
 
         return view('livewire.item-index', [
-            'items'        => $query->paginate(15),
-            'trashedCount' => Item::onlyTrashed()->count(),
+            'items'         => $query->paginate(15),
+            'trashedCount'  => Item::onlyTrashed()->count(),
+            'disabledCount' => Item::where('is_active', false)->whereNull('deleted_at')->count(),
         ])->layout('components.layouts.app', ['title' => 'دليل الأصناف والمخزون']);
     }
 }

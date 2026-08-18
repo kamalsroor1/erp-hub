@@ -38,6 +38,12 @@
         <div class="flex flex-wrap items-center gap-1.5 text-xs">
             <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">الحالة:</span>
             <button wire:click="$set('filterStatus', 'active')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStatus === 'active' ? 'bg-emerald-600 text-white border-emerald-500' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400' }}">النشطة</button>
+            <button wire:click="$set('filterStatus', 'disabled')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs flex items-center gap-1 {{ $filterStatus === 'disabled' ? 'bg-amber-600 text-white border-amber-500' : 'border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-400' }}">
+                <span>المعطلة (مخفية)</span>
+                @if($disabledCount > 0)
+                <span class="px-1.5 py-0.2 rounded-full text-[10px] {{ $filterStatus === 'disabled' ? 'bg-white text-amber-700' : 'bg-amber-500/20 text-amber-600' }} font-mono font-bold">{{ $disabledCount }}</span>
+                @endif
+            </button>
             <button wire:click="$set('filterStatus', 'trashed')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs flex items-center gap-1 {{ $filterStatus === 'trashed' ? 'bg-rose-600 text-white border-rose-500' : 'border-slate-200 dark:border-slate-800 text-rose-600 dark:text-rose-400' }}">
                 <span>سلة المحذوفات</span>
                 @if($trashedCount > 0)
