@@ -25,6 +25,7 @@ class Invoice extends Model
         'discount_type',
         'discount_value',
         'discount_amount',
+        'shipping_cost',
         'net_total',
         'paid_amount',
         'remaining_amount',
@@ -39,6 +40,7 @@ class Invoice extends Model
             'subtotal'         => 'decimal:3',
             'discount_value'   => 'decimal:3',
             'discount_amount'  => 'decimal:3',
+            'shipping_cost'    => 'decimal:3',
             'net_total'        => 'decimal:3',
             'paid_amount'      => 'decimal:3',
             'remaining_amount' => 'decimal:3',
@@ -69,6 +71,11 @@ class Invoice extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function additionalExpenses()
+    {
+        return $this->morphMany(AdditionalExpense::class, 'document');
     }
 
     public function returns()

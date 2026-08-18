@@ -20,6 +20,7 @@ class Purchase extends Model
         'payment_status',
         'subtotal',
         'discount_amount',
+        'additional_expenses_total',
         'net_total',
         'paid_amount',
         'remaining_amount',
@@ -30,12 +31,13 @@ class Purchase extends Model
     protected function casts(): array
     {
         return [
-            'purchase_date'    => 'date',
-            'subtotal'         => 'decimal:3',
-            'discount_amount'  => 'decimal:3',
-            'net_total'        => 'decimal:3',
-            'paid_amount'      => 'decimal:3',
-            'remaining_amount' => 'decimal:3',
+            'purchase_date'             => 'date',
+            'subtotal'                  => 'decimal:3',
+            'discount_amount'           => 'decimal:3',
+            'additional_expenses_total' => 'decimal:3',
+            'net_total'                 => 'decimal:3',
+            'paid_amount'               => 'decimal:3',
+            'remaining_amount'          => 'decimal:3',
         ];
     }
 
@@ -62,6 +64,11 @@ class Purchase extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class, 'purchase_id');
+    }
+
+    public function additionalExpenses()
+    {
+        return $this->morphMany(AdditionalExpense::class, 'document');
     }
 
     public function stockMovements()
