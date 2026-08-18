@@ -377,11 +377,14 @@ class TreasuryService
         $entries = [];
 
         // Customer Payments (Inflows)
-        $payments = Payment::with(['customer', 'store'])
+        $payments = Payment::with(['customer', 'invoice'])
             ->whereNotNull('customer_id')
             ->whereDate('payment_date', '>=', $fromDate)
             ->whereDate('payment_date', '<=', $toDate)
-            ->when($storeId, fn($q) => $q->where('store_id', $storeId))
+            ->when($storeId, fn($q) => $q->where(function ($sub) use ($storeId) {
+                $sub->whereHas('invoice', fn($iq) => $iq->where('store_id', $storeId))
+                    ->orWhereNull('invoice_id');
+            }))
             ->when($selectedMethod !== 'all', fn($q) => $q->where('payment_method', $selectedMethod))
             ->get();
 
@@ -403,11 +406,14 @@ class TreasuryService
         }
 
         // Supplier Payments (Outflows)
-        $supplierPayments = Payment::with(['supplier', 'store'])
+        $supplierPayments = Payment::with(['supplier', 'purchase'])
             ->whereNotNull('supplier_id')
             ->whereDate('payment_date', '>=', $fromDate)
             ->whereDate('payment_date', '<=', $toDate)
-            ->when($storeId, fn($q) => $q->where('store_id', $storeId))
+            ->when($storeId, fn($q) => $q->where(function ($sub) use ($storeId) {
+                $sub->whereHas('purchase', fn($pq) => $pq->where('store_id', $storeId))
+                    ->orWhereNull('purchase_id');
+            }))
             ->when($selectedMethod !== 'all', fn($q) => $q->where('payment_method', $selectedMethod))
             ->get();
 
