@@ -112,4 +112,56 @@ class Item extends Model
     {
         return bccomp($this->current_stock, $this->min_stock_level, 3) <= 0;
     }
+
+    /**
+     * Determine if item can be safely deleted or if financial/inventory history prevents it
+     */
+    public function canBeDeleted(): bool
+    {
+        return empty($this->getDeletionBlockers());
+    }
+
+    /**
+     * Get list of reasons preventing deletion of this item
+     */
+    public function getDeletionBlockers(): array
+    {
+        $blockers = [];
+
+        if (bccomp((string)$this->current_stock, '0.000', 3) > 0) {
+            $blockers[] = "يوجد رصيد بضاعة متبقي بالمخزن (" . number_format((float)$this->current_stock, 3) . " {$this->unit})";
+        }
+
+        $hasStoreStock = $this->storeStocks()->where('quantity', '>', 0)->exists();
+        if ($hasStoreStock) {
+            $blockers[] = "يوجد رصيد متوفر في أحد الفروع أو عربات التوزيع";
+        }
+
+        $invoicesCount = $this->invoiceItems()->count();
+        if ($invoicesCount > 0) {
+            $blockers[] = "مسجل به {$invoicesCount} فاتورة مبيعات معتمدة";
+        }
+
+        $purchasesCount = $this->purchaseItems()->count();
+        if ($purchasesCount > 0) {
+            $blockers[] = "مسجل به {$purchasesCount} فاتورة مشتريات وتوريد";
+        }
+
+        $movementsCount = $this->stockMovements()->count();
+        if ($movementsCount > 0) {
+            $blockers[] = "يوجد له {$movementsCount} حركة مخزنية مسجلة";
+        }
+
+        $returnsCount = $this->returnItems()->count();
+        if ($returnsCount > 0) {
+            $blockers[] = "مرتبط بـ {$returnsCount} حركة مرتجعات";
+        }
+
+        $transfersCount = \App\Models\StockTransferItem::where('item_id', $this->id)->count();
+        if ($transfersCount > 0) {
+            $blockers[] = "مرتبط بـ {$transfersCount} إذن تحويل بين الفروع";
+        }
+
+        return $blockers;
+    }
 }
