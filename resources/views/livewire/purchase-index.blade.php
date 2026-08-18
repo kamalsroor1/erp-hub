@@ -122,6 +122,14 @@
                         </td>
                         <td class="p-3.5 text-center">
                             <div class="flex items-center justify-center gap-1.5">
+                                <button 
+                                    wire:click="openDetailsModal({{ $p->id }})" 
+                                    class="px-2 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-600 hover:text-white text-indigo-600 dark:text-indigo-400 font-bold text-[11px] border border-indigo-500/20 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                                    title="عرض تفاصيل الفاتورة والمصاريف"
+                                >
+                                    <span>👁️ تفاصيل</span>
+                                </button>
+
                                 @if($p->status === 'cancelled')
                                     @hasrole('admin')
                                     <button 
@@ -130,7 +138,7 @@
                                         class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-600 hover:text-white text-emerald-700 dark:text-emerald-400 font-bold text-[11px] border border-emerald-500/30 transition-colors inline-flex items-center gap-1 cursor-pointer"
                                         title="استعادة الفاتورة وإرجاع البضاعة للمخزن"
                                     >
-                                        <span>♻️ استعادة وتوريد</span>
+                                        <span>♻️ استعادة</span>
                                     </button>
                                     @endhasrole
                                 @else
@@ -141,7 +149,7 @@
                                         class="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-600 dark:text-rose-400 text-[11px] font-bold border border-rose-500/30 transition-all flex items-center gap-1 cursor-pointer"
                                         title="إلغاء الفاتورة وعكس المخزون"
                                     >
-                                        <span>🚫 إلغاء وعكس المخزن</span>
+                                        <span>🚫 إلغاء</span>
                                     </button>
                                     @endhasrole
                                 @endif
@@ -160,4 +168,140 @@
             {{ $purchases->links() }}
         </div>
     </div>
+
+    <!-- ========================================== -->
+    <!-- 👁️ Purchase Details & Expenses Modal       -->
+    <!-- ========================================== -->
+    @if($showDetailsModal && $selectedPurchase)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <!-- Header -->
+            <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-950">
+                <div>
+                    <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        <span>📦 تفاصيل فاتورة مشتريات:</span>
+                        <span class="font-mono text-emerald-600 dark:text-emerald-400">{{ $selectedPurchase->purchase_number }}</span>
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-0.5">
+                        المورد: <span class="font-bold text-slate-700 dark:text-slate-300">{{ $selectedPurchase->supplier?->name }}</span> • 
+                        التاريخ: <span class="font-mono">{{ $selectedPurchase->purchase_date?->format('Y-m-d') }}</span> • 
+                        الفرع: <span class="font-bold">{{ $selectedPurchase->store?->name ?? 'الرئيسي' }}</span>
+                    </p>
+                </div>
+                <button 
+                    wire:click="closeDetailsModal" 
+                    class="w-9 h-9 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-rose-500 hover:text-white text-slate-600 dark:text-slate-400 flex items-center justify-center text-sm font-bold transition-colors cursor-pointer"
+                >
+                    ✕
+                </button>
+            </div>
+
+            <!-- Content Body -->
+            <div class="p-4 sm:p-5 overflow-y-auto space-y-4 text-xs">
+                <!-- Items Table -->
+                <div>
+                    <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-2">📋 أصناف الفاتورة والتكلفة:</h4>
+                    <div class="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-2xl">
+                        <table class="w-full text-right">
+                            <thead class="bg-slate-50 dark:bg-slate-950 text-[11px] text-slate-500 font-bold border-b border-slate-200 dark:border-slate-800">
+                                <tr>
+                                    <th class="p-2.5">الصنف</th>
+                                    <th class="p-2.5 text-center">الكمية</th>
+                                    <th class="p-2.5 text-center">السعر الأساسي</th>
+                                    <th class="p-2.5 text-center">نصيب المصاريف</th>
+                                    <th class="p-2.5 text-center">التكلفة المحملة</th>
+                                    <th class="p-2.5 text-left">الإجمالي</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                                @foreach($selectedPurchase->items as $it)
+                                <tr>
+                                    <td class="p-2.5 font-bold text-slate-900 dark:text-white">
+                                        {{ $it->item?->name }}
+                                        <span class="block text-[10px] text-slate-400 font-mono">{{ $it->item?->code }}</span>
+                                    </td>
+                                    <td class="p-2.5 text-center font-mono font-bold">{{ number_format($it->quantity, 3) }} {{ $it->item?->unit ?? 'كجم' }}</td>
+                                    <td class="p-2.5 text-center font-mono">{{ number_format($it->base_cost_price ?? $it->cost_price, 2) }}</td>
+                                    <td class="p-2.5 text-center font-mono text-amber-600 dark:text-amber-400">
+                                        +{{ number_format($it->allocated_expense ?? 0, 2) }}
+                                    </td>
+                                    <td class="p-2.5 text-center font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                                        {{ number_format($it->cost_price, 2) }} ج.م
+                                    </td>
+                                    <td class="p-2.5 text-left font-mono font-black text-slate-900 dark:text-white">
+                                        {{ number_format($it->total_price, 2) }}
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Additional Expenses Breakdown (Landed Costs) -->
+                @if($selectedPurchase->additionalExpenses && $selectedPurchase->additionalExpenses->count() > 0)
+                <div>
+                    <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-2">🚚 تفاصيل المصاريف الملحقة بالفاتورة:</h4>
+                    <div class="overflow-x-auto border border-amber-500/20 rounded-2xl bg-amber-500/5">
+                        <table class="w-full text-right">
+                            <thead class="bg-amber-500/10 text-[11px] text-amber-900 dark:text-amber-300 font-bold border-b border-amber-500/20">
+                                <tr>
+                                    <th class="p-2.5">بند المصروف</th>
+                                    <th class="p-2.5 text-center">المبلغ</th>
+                                    <th class="p-2.5 text-center">طريقة التوزيع</th>
+                                    <th class="p-2.5 text-center">طريقة السداد</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-amber-500/10 text-[11px]">
+                                @foreach($selectedPurchase->additionalExpenses as $exp)
+                                <tr>
+                                    <td class="p-2.5 font-bold text-slate-900 dark:text-white">{{ $exp->title }}</td>
+                                    <td class="p-2.5 text-center font-mono font-black text-amber-600 dark:text-amber-400">+{{ number_format($exp->amount, 2) }} ج.م</td>
+                                    <td class="p-2.5 text-center text-slate-600 dark:text-slate-400">{{ $exp->allocation_method_label }}</td>
+                                    <td class="p-2.5 text-center">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold {{ $exp->paid_by === 'supplier_account' ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' }}">
+                                            {{ $exp->paid_by_label }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                @endif
+
+                <!-- Totals Breakdown Card -->
+                <div class="p-3.5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-bold">المجموع الفرعي:</span>
+                        <span class="font-mono font-bold text-slate-800 dark:text-slate-200 text-sm mt-0.5 block">{{ number_format($selectedPurchase->subtotal, 2) }} ج.م</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-bold">إجمالي المصاريف الملحقة:</span>
+                        <span class="font-mono font-bold text-amber-600 dark:text-amber-400 text-sm mt-0.5 block">+{{ number_format($selectedPurchase->additional_expenses_total ?? 0, 2) }} ج.م</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-bold">الصافي الإجمالي:</span>
+                        <span class="font-mono font-black text-emerald-600 dark:text-emerald-400 text-base mt-0.5 block">{{ number_format($selectedPurchase->net_total, 2) }} ج.م</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-bold">المتبقي (آجل):</span>
+                        <span class="font-mono font-black text-amber-600 dark:text-amber-400 text-sm mt-0.5 block">{{ number_format($selectedPurchase->remaining_amount, 2) }} ج.م</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex justify-end">
+                <button 
+                    wire:click="closeDetailsModal" 
+                    class="px-5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
+                >
+                    إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>

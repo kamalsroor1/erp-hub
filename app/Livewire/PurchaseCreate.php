@@ -20,7 +20,9 @@ class PurchaseCreate extends Component
     public $notes = '';
 
     public $searchQuery = '';
-    public $items = [];
+    public array $items = [];
+    public array $additional_expenses = [];
+    public $additional_expenses_total = '0.000';
 
     public $subtotal = '0.000';
     public $net_total = '0.000';
@@ -36,6 +38,8 @@ class PurchaseCreate extends Component
         'items.*.item_id'   => 'required|exists:items,id',
         'items.*.quantity'  => 'required|numeric|min:0.001',
         'items.*.cost_price'=> 'required|numeric|min:0',
+        'additional_expenses.*.title'  => 'nullable|string|max:150',
+        'additional_expenses.*.amount' => 'nullable|numeric|min:0',
     ];
 
     public function mount()
@@ -51,6 +55,30 @@ class PurchaseCreate extends Component
         if ($firstSupplier) {
             $this->supplier_id = $firstSupplier->id;
         }
+    }
+
+    public function addExpenseRow($presetTitle = 'شحن ونقل', $presetMethod = 'by_quantity', $presetPaidBy = 'supplier_account')
+    {
+        $this->additional_expenses[] = [
+            'title'             => $presetTitle,
+            'amount'            => '',
+            'allocation_method' => $presetMethod,
+            'paid_by'           => $presetPaidBy,
+            'notes'             => '',
+        ];
+        $this->calculateTotals();
+    }
+
+    public function removeExpenseRow($index)
+    {
+        unset($this->additional_expenses[$index]);
+        $this->additional_expenses = array_values($this->additional_expenses);
+        $this->calculateTotals();
+    }
+
+    public function updatedAdditionalExpenses()
+    {
+        $this->calculateTotals();
     }
 
     public function addItem($itemId, $quantity = '1.000')
@@ -124,11 +152,13 @@ class PurchaseCreate extends Component
     public function calculateTotals()
     {
         $sub = '0.000';
+        $items = is_array($this->items) ? $this->items : [];
+        $expenses = is_array($this->additional_expenses) ? $this->additional_expenses : [];
 
-        foreach ($this->items as $idx => $line) {
+        foreach ($items as $idx => $line) {
             $qty = $line['quantity'] ?? '1.000';
             $cost = $line['cost_price'] ?? '0.000';
-            $lineTotal = bcmul($qty, $cost, 3);
+            $lineTotal = bcmul((string)$qty, (string)$cost, 3);
 
             $this->items[$idx]['total_price'] = $lineTotal;
             $sub = bcadd($sub, $lineTotal, 3);
@@ -140,13 +170,84 @@ class PurchaseCreate extends Component
         if (bccomp($disc, $this->subtotal, 3) > 0) {
             $disc = $this->subtotal;
         }
-
         $this->discount_amount = $disc;
-        $this->net_total = bcsub($this->subtotal, $disc, 3);
+
+        // Calculate additional expenses
+        $expTotal = '0.000';
+        $supplierExpTotal = '0.000';
+
+        foreach ($expenses as $exp) {
+            $amt = (string)($exp['amount'] ?? '0.000');
+            if (is_numeric($amt) && bccomp($amt, '0.000', 3) > 0) {
+                $expTotal = bcadd($expTotal, $amt, 3);
+                if (($exp['paid_by'] ?? 'supplier_account') === 'supplier_account') {
+                    $supplierExpTotal = bcadd($supplierExpTotal, $amt, 3);
+                }
+            }
+        }
+
+        $this->additional_expenses_total = $expTotal;
+
+        // Net Total = (Subtotal - Discount) + Supplier-charged expenses
+        $baseNet = bcsub($this->subtotal, $disc, 3);
+        $this->net_total = bcadd($baseNet, $supplierExpTotal, 3);
 
         $paid = $this->paid_amount ?: '0.000';
         $rem = bcsub($this->net_total, $paid, 3);
         $this->remaining_amount = bccomp($rem, '0.000', 3) > 0 ? $rem : '0.000';
+    }
+
+    public function getLandedCostPreviewProperty(): array
+    {
+        $previews = [];
+        $items = is_array($this->items) ? $this->items : [];
+        $expenses = is_array($this->additional_expenses) ? $this->additional_expenses : [];
+
+        $totalQty = '0.000';
+        $totalBase = '0.000';
+        $count = count($items);
+
+        foreach ($items as $line) {
+            $q = (string)($line['quantity'] ?? '0.000');
+            $c = (string)($line['cost_price'] ?? '0.000');
+            $totalQty = bcadd($totalQty, $q, 3);
+            $totalBase = bcadd($totalBase, bcmul($q, $c, 3), 3);
+        }
+
+        foreach ($items as $idx => $line) {
+            $q = (string)($line['quantity'] ?? '0.000');
+            $baseCost = (string)($line['cost_price'] ?? '0.000');
+            $lineBaseTotal = bcmul($q, $baseCost, 3);
+            $lineAllocated = '0.000';
+
+            foreach ($expenses as $exp) {
+                $amt = (string)($exp['amount'] ?? '0.000');
+                if (!is_numeric($amt) || bccomp($amt, '0.000', 3) <= 0) continue;
+                $method = $exp['allocation_method'] ?? 'by_quantity';
+
+                if ($method === 'by_quantity' && bccomp($totalQty, '0.000', 3) > 0) {
+                    $ratio = bcdiv($q, $totalQty, 6);
+                    $lineAllocated = bcadd($lineAllocated, bcmul($amt, $ratio, 3), 3);
+                } elseif ($method === 'by_value' && bccomp($totalBase, '0.000', 3) > 0) {
+                    $ratio = bcdiv($lineBaseTotal, $totalBase, 6);
+                    $lineAllocated = bcadd($lineAllocated, bcmul($amt, $ratio, 3), 3);
+                } elseif ($method === 'equal' && $count > 0) {
+                    $lineAllocated = bcadd($lineAllocated, bcdiv($amt, (string)$count, 3), 3);
+                }
+            }
+
+            $unitAlloc = bccomp($q, '0.000', 3) > 0 ? bcdiv($lineAllocated, $q, 3) : '0.000';
+            $landedUnit = bcadd($baseCost, $unitAlloc, 3);
+
+            $previews[$idx] = [
+                'base_cost'      => $baseCost,
+                'allocated'      => $lineAllocated,
+                'unit_allocated' => $unitAlloc,
+                'landed_cost'    => $landedUnit,
+            ];
+        }
+
+        return $previews;
     }
 
     public function incrementLineQty($index, $step = '1.000')
@@ -200,6 +301,7 @@ class PurchaseCreate extends Component
                 'supplier_invoice_ref' => $this->supplier_invoice_ref,
                 'notes'                => $this->notes,
                 'items'                => $this->items,
+                'additional_expenses'  => $this->additional_expenses,
             ]);
 
             session()->flash('success', "تم توريد وإضافة البضاعة للمخزن بنجاح برقم: {$purchase->purchase_number}");

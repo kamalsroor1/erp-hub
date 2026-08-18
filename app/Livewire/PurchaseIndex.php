@@ -17,9 +17,25 @@ class PurchaseIndex extends Component
     public ?string $fromDate = null;
     public ?string $toDate = null;
 
+    public bool $showDetailsModal = false;
+    public ?Purchase $selectedPurchase = null;
+
     public function mount()
     {
         abort_if(!auth()->user()?->can('purchases.view'), 403, 'غير مصرح لك بعرض فواتير المشتريات');
+    }
+
+    public function openDetailsModal($purchaseId)
+    {
+        $this->selectedPurchase = Purchase::with(['supplier', 'items.item', 'additionalExpenses.payment', 'user', 'store'])
+            ->findOrFail($purchaseId);
+        $this->showDetailsModal = true;
+    }
+
+    public function closeDetailsModal()
+    {
+        $this->showDetailsModal = false;
+        $this->selectedPurchase = null;
     }
 
     public function cancelPurchase($purchaseId, PurchaseService $purchaseService)
