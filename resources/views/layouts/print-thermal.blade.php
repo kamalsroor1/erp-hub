@@ -132,6 +132,25 @@
             <span>-{{ number_format($invoice->discount_amount, 2) }} ج.م</span>
         </div>
         @endif
+
+        {{-- Additional Expenses Charged to Customer (e.g. Shipping / Delivery / Packing) --}}
+        @php
+            $customerExpenses = $invoice->additionalExpenses ? $invoice->additionalExpenses->whereIn('paid_by', ['customer_account', 'supplier_account']) : collect();
+        @endphp
+        @if($customerExpenses->count() > 0)
+            @foreach($customerExpenses as $cExp)
+            <div style="display: flex; justify-content: space-between;">
+                <span>+ {{ $cExp->title }}:</span>
+                <span style="font-weight: 800;">+{{ number_format($cExp->amount, 2) }} ج.م</span>
+            </div>
+            @endforeach
+        @elseif(bccomp($invoice->shipping_cost, '0.000', 3) > 0)
+            <div style="display: flex; justify-content: space-between;">
+                <span>+ الشحن / التوصيل:</span>
+                <span style="font-weight: 800;">+{{ number_format($invoice->shipping_cost, 2) }} ج.م</span>
+            </div>
+        @endif
+
         <div style="display: flex; justify-content: space-between; font-size: 14px;" class="font-black">
             <span>الصافي:</span>
             <span>{{ number_format($invoice->net_total, 2) }} ج.م</span>

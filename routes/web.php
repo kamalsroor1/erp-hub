@@ -50,12 +50,12 @@ Route::middleware('auth')->group(function () {
 
     // Printing Routes
     Route::get('/invoices/{id}/print/thermal', function ($id) {
-        $invoice = Invoice::with(['customer', 'items.item'])->findOrFail($id);
+        $invoice = Invoice::with(['customer', 'items.item', 'additionalExpenses'])->findOrFail($id);
         return view('layouts.print-thermal', compact('invoice'));
     })->name('invoices.print.thermal')->middleware('can:invoices.view');
 
     Route::get('/invoices/{id}/print/a4', function ($id) {
-        $invoice = Invoice::with(['customer', 'items.item'])->findOrFail($id);
+        $invoice = Invoice::with(['customer', 'items.item', 'additionalExpenses'])->findOrFail($id);
         return view('layouts.print-a4', compact('invoice'));
     })->name('invoices.print.a4')->middleware('can:invoices.view');
 
