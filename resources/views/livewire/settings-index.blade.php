@@ -33,6 +33,13 @@
             >
                 📊 مراقبة Pulse
             </a>
+            <a
+                href="{{ url('/telescope') }}"
+                target="_blank"
+                class="px-4 py-2.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-bold text-xs rounded-2xl shadow-md shadow-teal-600/20 transition-all flex items-center gap-2 font-tajawal"
+            >
+                🔭 تليسكوب Telescope
+            </a>
         </div>
     </div>
 
