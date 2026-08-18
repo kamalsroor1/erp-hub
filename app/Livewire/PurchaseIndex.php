@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Purchase;
+use App\Services\PurchaseService;
 use Exception;
 
 class PurchaseIndex extends Component
@@ -12,7 +13,7 @@ class PurchaseIndex extends Component
     use WithPagination;
 
     public $search = '';
-    public $filterStatus = 'active'; // active, trashed, all
+    public $filterStatus = 'confirmed'; // confirmed, cancelled, all
     public ?string $fromDate = null;
     public ?string $toDate = null;
 
@@ -21,52 +22,57 @@ class PurchaseIndex extends Component
         abort_if(!auth()->user()?->can('purchases.view'), 403, 'غير مصرح لك بعرض فواتير المشتريات');
     }
 
-    public function deletePurchase($purchaseId)
+    public function cancelPurchase($purchaseId, PurchaseService $purchaseService)
     {
-        abort_if(!auth()->user()?->can('purchases.delete'), 403, 'غير مصرح لك بأرشفة فواتير المشتريات');
+        abort_if(!auth()->user()?->can('purchases.delete'), 403, 'غير مصرح لك بإلغاء فواتير المشتريات');
 
         try {
             $purchase = Purchase::findOrFail($purchaseId);
             $num = $purchase->purchase_number;
-            $purchase->delete(); // Soft delete
+            
+            $purchaseService->cancelPurchase($purchase, 'إلغاء من قبل المستخدم');
 
-            session()->flash('success', "تم نقل فاتورة المشتريات رقم {$num} إلى سلة المحذوفات بنجاح.");
+            session()->flash('success', "تم إلغاء فاتورة المشتريات رقم {$num} وعكس الكميات من المخزون بنجاح.");
             $this->dispatch('swal:toast', [
                 'icon'  => 'success',
-                'title' => "تم أرشفة فاتورة المشتريات {$num} بنجاح!"
+                'title' => "تم إلغاء فاتورة المشتريات {$num} وعكس أثرها المخزني والمالي بنجاح!"
             ]);
         } catch (Exception $e) {
-            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => $e->getMessage()]);
+            $this->dispatch('swal:toast', [
+                'icon'  => 'error', 
+                'title' => $e->getMessage()
+            ]);
         }
     }
 
-    public function restorePurchase($purchaseId)
+    public function restorePurchase($purchaseId, PurchaseService $purchaseService)
     {
-        abort_if(!auth()->user()?->can('trash.access'), 403, 'غير مصرح لك باسترجاع فواتير المشتريات');
+        abort_if(!auth()->user()?->can('purchases.create'), 403, 'غير مصرح لك باستعادة فواتير المشتريات');
 
         try {
-            $purchase = Purchase::onlyTrashed()->findOrFail($purchaseId);
-            $purchase->restore();
+            $purchase = Purchase::findOrFail($purchaseId);
+            $num = $purchase->purchase_number;
 
-            session()->flash('success', "تم استعادة فاتورة المشتريات رقم {$purchase->purchase_number} بنجاح.");
+            $purchaseService->restorePurchase($purchase);
+
+            session()->flash('success', "تم استعادة فاتورة المشتريات رقم {$num} وإعادة إيداع بضاعتها بالمخزون بنجاح.");
             $this->dispatch('swal:toast', [
                 'icon'  => 'success',
-                'title' => "تم استعادة فاتورة المشتريات {$purchase->purchase_number} بنجاح!"
+                'title' => "تم استعادة فاتورة المشتريات {$num} وإرجاع المخزون بنجاح!"
             ]);
         } catch (Exception $e) {
-            $this->dispatch('swal:toast', ['icon' => 'error', 'title' => $e->getMessage()]);
+            $this->dispatch('swal:toast', [
+                'icon'  => 'error', 
+                'title' => $e->getMessage()
+            ]);
         }
     }
 
     public function render()
     {
-        $baseQuery = match ($this->filterStatus) {
-            'trashed' => Purchase::onlyTrashed(),
-            'all'     => Purchase::withTrashed(),
-            default   => Purchase::query(),
-        };
-
-        $query = $baseQuery->with(['supplier', 'items.item', 'user', 'store'])
+        $query = Purchase::query()
+            ->with(['supplier', 'items.item', 'user', 'store'])
+            ->when($this->filterStatus !== 'all', fn($q) => $q->where('status', $this->filterStatus))
             ->when($this->search, function ($q) {
                 $q->where('purchase_number', 'like', "%{$this->search}%")
                   ->orWhereHas('supplier', fn($s) => $s->where('name', 'like', "%{$this->search}%"))
@@ -74,11 +80,13 @@ class PurchaseIndex extends Component
             })
             ->when($this->fromDate, fn($q) => $q->whereDate('purchase_date', '>=', $this->fromDate))
             ->when($this->toDate, fn($q) => $q->whereDate('purchase_date', '<=', $this->toDate))
-            ->latest('purchase_date');
+            ->latest('purchase_date')
+            ->latest('id');
 
         return view('livewire.purchase-index', [
-            'purchases'    => $query->paginate(15),
-            'trashedCount' => Purchase::onlyTrashed()->count(),
+            'purchases'      => $query->paginate(15),
+            'confirmedCount' => Purchase::where('status', 'confirmed')->count(),
+            'cancelledCount' => Purchase::where('status', 'cancelled')->count(),
         ])->layout('components.layouts.app', ['title' => 'سجل فواتير المشتريات والتوريد']);
     }
 }
