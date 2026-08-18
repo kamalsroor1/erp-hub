@@ -122,4 +122,51 @@ class Store extends Model
     {
         return $this->hasMany(StockTransfer::class, 'to_store_id');
     }
+
+    /**
+     * Determine if store can be safely deleted or if operational records prevent it
+     */
+    public function canBeDeleted(): bool
+    {
+        return empty($this->getDeletionBlockers());
+    }
+
+    /**
+     * Get list of reasons preventing deletion of this store
+     */
+    public function getDeletionBlockers(): array
+    {
+        $blockers = [];
+
+        if ($this->is_main) {
+            $blockers[] = "هو الفرع والمخزن الرئيسي للمنشأة";
+        }
+
+        $hasStock = $this->stocks()->where('quantity', '>', 0)->exists();
+        if ($hasStock) {
+            $blockers[] = "يوجد رصيد بضاعة مخزني حالي داخل هذا الفرع";
+        }
+
+        $invoicesCount = $this->invoices()->count();
+        if ($invoicesCount > 0) {
+            $blockers[] = "مسجل به {$invoicesCount} فاتورة مبيعات";
+        }
+
+        $purchasesCount = $this->purchases()->count();
+        if ($purchasesCount > 0) {
+            $blockers[] = "مسجل به {$purchasesCount} فاتورة مشتريات وتوريد";
+        }
+
+        $transfersCount = $this->outgoingTransfers()->count() + $this->incomingTransfers()->count();
+        if ($transfersCount > 0) {
+            $blockers[] = "مسجل به {$transfersCount} إذن تحويل وشحن بضاعة";
+        }
+
+        $expensesCount = $this->expenses()->count();
+        if ($expensesCount > 0) {
+            $blockers[] = "مسجل به {$expensesCount} سند مصروفات";
+        }
+
+        return $blockers;
+    }
 }

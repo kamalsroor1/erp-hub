@@ -43,4 +43,36 @@ class Supplier extends Model
     {
         return $query->where('is_active', true);
     }
+
+    /**
+     * Determine if supplier can be safely deleted or if financial history prevents it
+     */
+    public function canBeDeleted(): bool
+    {
+        return empty($this->getDeletionBlockers());
+    }
+
+    /**
+     * Get list of reasons preventing deletion of this supplier
+     */
+    public function getDeletionBlockers(): array
+    {
+        $blockers = [];
+
+        if (bccomp((string)$this->current_balance, '0.000', 3) != 0) {
+            $blockers[] = "يوجد رصيد مستحق للمورد (" . number_format((float)$this->current_balance, 2) . " ج.م)";
+        }
+
+        $purchasesCount = $this->purchases()->count();
+        if ($purchasesCount > 0) {
+            $blockers[] = "مسجل له {$purchasesCount} فاتورة مشتريات وتوريد";
+        }
+
+        $paymentsCount = $this->payments()->count();
+        if ($paymentsCount > 0) {
+            $blockers[] = "مسجل له {$paymentsCount} سند صرف";
+        }
+
+        return $blockers;
+    }
 }
