@@ -3,13 +3,13 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div>
             <h2 class="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-                <span>☕ خلاط وتوليفات البن المخصوصة (Custom Blend Master)</span>
+                <span>🧩 تجميع وتصنيع الأصناف المركبة (Custom Product Assembly)</span>
             </h2>
-            <p class="text-xs text-slate-500 dark:text-slate-400">توليف نسب البن (برازيلي / كولومبي / حبشي / يمني) وإضافات الحبهان والمستكة وحساب السعر والخصم المخزني تلقائيًا</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">تجميع نسب ومكونات من عدة أصناف خام لإنتاج منتج مركب مع حساب السعر وتكلفة الخامات والخصم المخزني تلقائيًا</p>
         </div>
         <div class="flex items-center gap-2">
             <span class="px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 font-bold text-xs rounded-xl">
-                ⚖️ وزن التوليفة المطلوب: {{ number_format($total_weight_grams, 1) }} جرام
+                ⚖️ الوزن المطلوب: {{ number_format($total_weight_grams, 1) }} جرام
             </span>
         </div>
     </div>
@@ -25,7 +25,7 @@
         <div class="lg:col-span-2 space-y-4">
             <!-- Preset Target Weights -->
             <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm">
-                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">الوزن الصافي المطلوب للتوليفة:</label>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">الوزن الصافي المطلوب للتركيبة:</label>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <button type="button" wire:click="setPresetTargetWeight('125.000')" class="py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer {{ $target_weight_grams == '125.000' ? 'bg-amber-600 border-amber-500 text-white shadow-lg' : 'bg-slate-50 dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-slate-600 dark:text-slate-400' }}">
                         ثمن كيلو (125 جم)
@@ -45,7 +45,7 @@
             <!-- Blend Component Table -->
             <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
                 <div class="p-3 bg-slate-50 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
-                    <span>مكونات خلطة البن ونسب التوليف</span>
+                    <span>مكونات وخامات التركيبة ونسب الخلط</span>
                     <span class="text-amber-600 dark:text-amber-400 font-mono">الإجمالي: {{ $total_weight_grams }} جم</span>
                 </div>
 
@@ -53,7 +53,7 @@
                     <table class="w-full text-right text-xs">
                         <thead class="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-800">
                             <tr>
-                                <th class="p-3">نوع البن الخام</th>
+                                <th class="p-3">اسم الخامة / الصنف</th>
                                 <th class="p-3 w-28 text-center">النسبة %</th>
                                 <th class="p-3 w-32 text-center">الوزن بالجرام</th>
                                 <th class="p-3 w-28">سعر الكيلو</th>
@@ -88,7 +88,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="p-8 text-center text-slate-400">اختر أنواع البن من القائمة بالأسفل لإضافتها للتوليفة</td>
+                                <td colspan="5" class="p-8 text-center text-slate-400">اختر الخامات والأصناف من القائمة بالأسفل لإضافتها للتركيبة</td>
                             </tr>
                             @endforelse
                         </tbody>
@@ -96,9 +96,9 @@
                 </div>
             </div>
 
-            <!-- Quick Add Raw Coffee Chips -->
+            <!-- Quick Add Raw Items Chips -->
             <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2 shadow-sm">
-                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">أضف أنواع بن أخرى للخلطة:</label>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">أضف خامات ومكونات أخرى للتركيبة:</label>
                 <div class="flex flex-wrap gap-2">
                     @foreach($availableCoffees as $cof)
                     <button 

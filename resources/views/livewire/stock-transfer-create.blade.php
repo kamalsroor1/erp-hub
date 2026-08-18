@@ -49,7 +49,7 @@
                     <input 
                         type="text" 
                         wire:model.live.debounce.150ms="searchQuery" 
-                        placeholder="ابحث عن بن برازيلي، محوج، شاي لإضافته للتحويل..." 
+                        placeholder="ابحث باسم الصنف أو الباركود أو الكود لإضافته للتحويل..." 
                         class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
                     >
                     <div class="absolute left-3 top-2 text-slate-400 text-xs">🔍</div>

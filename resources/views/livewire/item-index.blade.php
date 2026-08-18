@@ -275,7 +275,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">القسم / التصنيف:</label>
-                        <input type="text" wire:model="category" placeholder="مثال: بن وتوليفات / شاي / شنط" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white">
+                        <input type="text" wire:model="category" placeholder="مثال: مواد خام / بضاعة جاهزة / معلبات / مستلزمات" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white">
                         @error('category') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                     </div>
                     <div>
