@@ -116,5 +116,33 @@ class PermissionsSeeder extends Seeder
             'items.view',
             'items.view_cost',
         ]);
+
+        // 3. Auto-Heal any previous Treasury Additional Expenses to ensure they exist in Expense table
+        try {
+            $treasuryExpenses = \App\Models\AdditionalExpense::where('paid_by', 'like', 'treasury_%')->get();
+            foreach ($treasuryExpenses as $exp) {
+                $invoice = $exp->document;
+                if ($invoice instanceof \App\Models\Invoice) {
+                    $exists = \App\Models\Expense::where('title', 'like', "%{$invoice->invoice_number}%")->where('amount', $exp->amount)->exists();
+                    if (!$exists) {
+                        $pm = str_replace('treasury_', '', $exp->paid_by) ?: 'cash';
+                        $expenseNumber = 'EXP-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -4));
+                        \App\Models\Expense::create([
+                            'expense_number' => $expenseNumber,
+                            'category'       => 'shipping',
+                            'title'          => "مصروف فاتورة [{$invoice->invoice_number}]: {$exp->title}",
+                            'amount'         => $exp->amount,
+                            'payment_method' => $pm,
+                            'expense_date'   => $invoice->invoice_date,
+                            'store_id'       => $invoice->store_id,
+                            'user_id'        => $invoice->user_id ?? 1,
+                            'notes'          => "مصروف خدمات/شحن مسدد من الخزينة لفاتورة مبيعات رقم {$invoice->invoice_number}",
+                        ]);
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // Ignore if tables not yet migrated
+        }
     }
 }

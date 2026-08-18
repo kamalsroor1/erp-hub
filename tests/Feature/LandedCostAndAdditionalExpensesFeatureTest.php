@@ -11,6 +11,7 @@ use App\Models\Store;
 use App\Models\Purchase;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\Expense;
 use App\Models\AdditionalExpense;
 use App\Services\PurchaseService;
 use App\Services\InvoiceService;
@@ -421,11 +422,13 @@ class LandedCostAndAdditionalExpensesFeatureTest extends TestCase
         $this->assertEquals('670.000', $invoice->net_total);
         $this->assertCount(3, $invoice->additionalExpenses);
 
-        // Verify treasury expense payment voucher for the 15 LE tip
+        // Verify treasury operational expense was created for the 15 LE tip
         $treasuryExpense = $invoice->additionalExpenses()->where('title', 'إكرامية طيار الدليفري')->first();
         $this->assertNotNull($treasuryExpense);
-        $this->assertNotNull($treasuryExpense->payment_id);
-        $this->assertEquals('15.000', $treasuryExpense->payment->amount);
+        $expenseRecord = Expense::where('amount', '15.000')->first();
+        $this->assertNotNull($expenseRecord);
+        $this->assertEquals('cash', $expenseRecord->payment_method);
+        $this->assertStringContainsString('إكرامية طيار الدليفري', $expenseRecord->title);
     }
 
     public function test_customer_charged_expenses_appear_in_a4_and_thermal_prints(): void

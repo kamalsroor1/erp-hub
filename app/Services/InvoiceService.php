@@ -6,6 +6,7 @@ use App\Models\Invoice;
 use App\Models\Item;
 use App\Models\Customer;
 use App\Models\Payment;
+use App\Models\Expense;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Exception;
@@ -154,18 +155,21 @@ class InvoiceService
                 if ($paidBy === 'customer_account' || $paidBy === 'supplier_account') {
                     $customerExpensesTotal = bcadd($customerExpensesTotal, $expAmount, 3);
                 } else {
-                    $paymentMethod = str_replace('treasury_', '', $paidBy);
-                    $payment = Payment::create([
-                        'payment_number' => 'PAY-EXP-' . strtoupper(uniqid()),
-                        'customer_id'    => $invoice->customer_id,
-                        'invoice_id'     => $invoice->id,
-                        'user_id'        => Auth::id() ?? 1,
+                    $paymentMethod = str_replace('treasury_', '', $paidBy) ?: 'cash';
+                    $expenseNumber = 'EXP-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -4));
+                    $expense = Expense::create([
+                        'expense_number' => $expenseNumber,
+                        'category'       => 'shipping',
+                        'title'          => "مصروف فاتورة [{$invoice->invoice_number}]: {$title}",
                         'amount'         => $expAmount,
-                        'payment_date'   => $invoice->invoice_date,
-                        'payment_method' => $paymentMethod ?: 'cash',
-                        'notes'          => "سداد مصروف ملحق [{$title}] لفاتورة مبيعات [{$invoice->invoice_number}]",
+                        'payment_method' => $paymentMethod,
+                        'expense_date'   => $invoice->invoice_date,
+                        'store_id'       => $invoice->store_id,
+                        'user_id'        => Auth::id() ?? 1,
+                        'notes'          => "مصروف خدمات/شحن مسدد من الخزينة لفاتورة مبيعات رقم {$invoice->invoice_number}",
                     ]);
-                    $expenseRecord->update(['payment_id' => $payment->id]);
+
+                    $expenseRecord->update(['notes' => ($expNotes ? "{$expNotes} | " : '') . "رقم المصروف: {$expenseNumber}"]);
                 }
             }
 
@@ -446,18 +450,21 @@ class InvoiceService
                 if ($paidBy === 'customer_account' || $paidBy === 'supplier_account') {
                     $customerExpensesTotal = bcadd($customerExpensesTotal, $expAmount, 3);
                 } else {
-                    $paymentMethod = str_replace('treasury_', '', $paidBy);
-                    $payment = Payment::create([
-                        'payment_number' => 'PAY-EXP-' . strtoupper(uniqid()),
-                        'customer_id'    => $newCustomerId,
-                        'invoice_id'     => $lockedInvoice->id,
-                        'user_id'        => Auth::id() ?? 1,
+                    $paymentMethod = str_replace('treasury_', '', $paidBy) ?: 'cash';
+                    $expenseNumber = 'EXP-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -4));
+                    $expense = Expense::create([
+                        'expense_number' => $expenseNumber,
+                        'category'       => 'shipping',
+                        'title'          => "مصروف فاتورة [{$lockedInvoice->invoice_number}]: {$title}",
                         'amount'         => $expAmount,
-                        'payment_date'   => $data['invoice_date'] ?? $lockedInvoice->invoice_date,
-                        'payment_method' => $paymentMethod ?: 'cash',
-                        'notes'          => "سداد مصروف ملحق [{$title}] لفاتورة مبيعات [{$lockedInvoice->invoice_number}]",
+                        'payment_method' => $paymentMethod,
+                        'expense_date'   => $data['invoice_date'] ?? $lockedInvoice->invoice_date,
+                        'store_id'       => $lockedInvoice->store_id,
+                        'user_id'        => Auth::id() ?? 1,
+                        'notes'          => "مصروف خدمات/شحن مسدد من الخزينة لفاتورة مبيعات رقم {$lockedInvoice->invoice_number}",
                     ]);
-                    $expenseRecord->update(['payment_id' => $payment->id]);
+
+                    $expenseRecord->update(['notes' => ($expNotes ? "{$expNotes} | " : '') . "رقم المصروف: {$expenseNumber}"]);
                 }
             }
 
