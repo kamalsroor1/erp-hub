@@ -158,6 +158,13 @@ class DailyJournalIndex extends Component
         $creditSales = $invoices->where('payment_type', 'credit')->sum('net_total');
         $partialSales = $invoices->where('payment_type', 'partial')->sum('paid_amount');
 
+        // Payment Method Breakdown
+        $instapaySales     = (string)($invoices->where('payment_method', 'instapay')->sum('paid_amount') ?: '0.000');
+        $walletSales       = (string)($invoices->where('payment_method', 'e_wallet')->sum('paid_amount') ?: '0.000');
+        $visaSales         = (string)($invoices->where('payment_method', 'visa')->sum('paid_amount') ?: '0.000');
+        $bankSales         = (string)($invoices->where('payment_method', 'bank_transfer')->sum('paid_amount') ?: '0.000');
+        $physicalCashSales = (string)($invoices->where('payment_method', 'cash')->whereIn('payment_type', ['cash', 'partial'])->sum('paid_amount') ?: '0.000');
+
         // 2. Total Cash Inflows
         $customerPayments = Payment::with('customer')
             ->whereDate('payment_date', $date)
@@ -224,6 +231,11 @@ class DailyJournalIndex extends Component
             'cashSales'            => $cashSales,
             'creditSales'          => $creditSales,
             'partialSales'         => $partialSales,
+            'physicalCashSales'    => $physicalCashSales,
+            'instapaySales'        => $instapaySales,
+            'walletSales'          => $walletSales,
+            'visaSales'            => $visaSales,
+            'bankSales'            => $bankSales,
             'customerPayments'     => $customerPayments,
             'totalCashCollected'   => $totalCashCollected,
             'expenses'             => $expenses,
