@@ -160,15 +160,17 @@ class RolePermissionManager extends Component
                     'customers.manage'    => 'إدارة دليل العملاء والمديونيات',
                     'customers.statement' => 'عرض وتصدير كشف حساب عميل',
                     'suppliers.manage'    => 'إدارة دليل الموردين وحساباتهم',
+                    'suppliers.statement' => 'عرض وتصدير كشف حساب مورد',
                 ]
             ],
             'finance' => [
                 'title' => '💰 المالية واليومية والمصروفات (Financials)',
                 'color' => 'purple',
                 'items' => [
-                    'daily_journal.view' => 'عرض اليومية النقدية والدرج والشفتات',
-                    'expenses.manage'    => 'تسجيل وتعديل وحذف المصروفات',
-                    'returns.manage'     => 'إدارة مرتجعات المبيعات والمشتريات',
+                    'daily_journal.view'        => 'عرض اليومية النقدية والدرج والشفتات',
+                    'daily_journal.close_shift' => 'فتح وتقفيل ورديات الكاشير واليومية',
+                    'expenses.manage'           => 'تسجيل وتعديل وحذف المصروفات',
+                    'returns.manage'            => 'إدارة مرتجعات المبيعات والمشتريات',
                 ]
             ],
             'admin' => [

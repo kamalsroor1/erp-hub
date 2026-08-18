@@ -196,7 +196,7 @@ Route::middleware('auth')->group(function () {
 
     // Suppliers & Purchases & Statements
     Route::get('/suppliers', SupplierIndex::class)->name('suppliers.index')->middleware('can:suppliers.manage');
-    Route::get('/suppliers/{id}/statement', SupplierStatement::class)->name('suppliers.statement')->middleware('can:suppliers.manage');
+    Route::get('/suppliers/{id}/statement', SupplierStatement::class)->name('suppliers.statement')->middleware('can:suppliers.statement');
     Route::get('/purchases', PurchaseIndex::class)->name('purchases.index')->middleware('can:purchases.view');
     Route::get('/purchases/create', PurchaseCreate::class)->name('purchases.create')->middleware('can:purchases.create');
 
@@ -228,7 +228,7 @@ Route::middleware('auth')->group(function () {
 
     // Excel & CSV Exports
     Route::get('/customers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportCustomerStatement'])->name('customers.export.csv')->middleware('can:customers.statement');
-    Route::get('/suppliers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportSupplierStatement'])->name('suppliers.export.csv')->middleware('can:suppliers.manage');
+    Route::get('/suppliers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportSupplierStatement'])->name('suppliers.export.csv')->middleware('can:suppliers.statement');
     Route::get('/items/export-csv', [App\Http\Controllers\ExportController::class, 'exportInventory'])->name('items.export.csv')->middleware('can:items.view');
 
     // Theme Toggle (Dark / Light Mode)

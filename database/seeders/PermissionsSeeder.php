@@ -46,11 +46,13 @@ class PermissionsSeeder extends Seeder
             'customers.manage'    => 'إدارة دليل العملاء',
             'customers.statement' => 'عرض وتصدير كشف حساب عميل',
             'suppliers.manage'    => 'إدارة دليل الموردين وحساباتهم',
+            'suppliers.statement' => 'عرض وتصدير كشف حساب مورد',
 
             // Financials & Daily Journal
-            'daily_journal.view'  => 'عرض اليومية النقدية وحركة الدرج والشفتات',
-            'expenses.manage'     => 'تسجيل وتعديل وحذف المصروفات',
-            'returns.manage'      => 'إدارة مرتجعات المبيعات والمشتريات',
+            'daily_journal.view'        => 'عرض اليومية النقدية وحركة الدرج والشفتات',
+            'daily_journal.close_shift' => 'فتح وتقفيل ورديات الكاشير واليومية',
+            'expenses.manage'           => 'تسجيل وتعديل وحذف المصروفات',
+            'returns.manage'            => 'إدارة مرتجعات المبيعات والمشتريات',
 
             // Admin & Reports
             'reports.view'        => 'عرض التقارير المالية والأرباح ومقارنة الفروع',
@@ -81,6 +83,7 @@ class PermissionsSeeder extends Seeder
             'customers.manage',
             'customers.statement',
             'daily_journal.view',
+            'daily_journal.close_shift',
             'returns.manage',
         ]);
 
@@ -94,6 +97,7 @@ class PermissionsSeeder extends Seeder
             'transfers.view',
             'transfers.create',
             'suppliers.manage',
+            'suppliers.statement',
             'returns.manage',
         ]);
 
@@ -104,7 +108,9 @@ class PermissionsSeeder extends Seeder
             'customers.manage',
             'customers.statement',
             'suppliers.manage',
+            'suppliers.statement',
             'daily_journal.view',
+            'daily_journal.close_shift',
             'expenses.manage',
             'reports.view',
             'items.view',
