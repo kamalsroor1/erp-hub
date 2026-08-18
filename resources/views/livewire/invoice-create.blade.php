@@ -484,9 +484,9 @@
             <!-- Financial Summary & Payment Box -->
             <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
                 
-                <!-- Payment Method Big Toggle Buttons -->
+                <!-- Payment Type Big Toggle Buttons -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">طريقة الدفع والسداد:</label>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">نوع الفاتورة والسداد:</label>
                     <div class="grid grid-cols-3 gap-2">
                         <button 
                             type="button" 
@@ -494,7 +494,7 @@
                             class="h-12 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all cursor-pointer active:scale-95 {{ $payment_type === 'cash' ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-600/30' : 'bg-slate-50 dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300' }}"
                         >
                             <span>💵</span>
-                            <span>كاش نقدي</span>
+                            <span>كاش فوري</span>
                         </button>
 
                         <button 
@@ -516,6 +516,57 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- Payment Method Quick Selection (Visible when paying cash or partial) -->
+                @if($payment_type !== 'credit')
+                <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800/80 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                            <span>💳</span>
+                            <span>وسيلة التحصيل والدفع:</span>
+                        </label>
+                        <span class="text-[10px] text-slate-400">
+                            @if($payment_method === 'cash')
+                            (يدخل درج الكاشير)
+                            @else
+                            (تحصيل إلكتروني/بنكي)
+                            @endif
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <!-- كاش -->
+                        <button 
+                            type="button" 
+                            wire:click="quickSetPaymentMethod('cash')" 
+                            class="py-2.5 px-2 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-1 border transition-all cursor-pointer active:scale-95 {{ $payment_method === 'cash' ? 'bg-emerald-600 border-emerald-600 text-white shadow-md shadow-emerald-600/30' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-emerald-500' }}"
+                        >
+                            <span class="text-base">💵</span>
+                            <span>كاش نقدي</span>
+                        </button>
+
+                        <!-- إنستاباي -->
+                        <button 
+                            type="button" 
+                            wire:click="quickSetPaymentMethod('instapay')" 
+                            class="py-2.5 px-2 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-1 border transition-all cursor-pointer active:scale-95 {{ $payment_method === 'instapay' ? 'bg-purple-600 border-purple-600 text-white shadow-md shadow-purple-600/30' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-purple-500' }}"
+                        >
+                            <span class="text-base">⚡</span>
+                            <span>إنستاباي</span>
+                        </button>
+
+                        <!-- محفظة -->
+                        <button 
+                            type="button" 
+                            wire:click="quickSetPaymentMethod('e_wallet')" 
+                            class="py-2.5 px-2 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-1 border transition-all cursor-pointer active:scale-95 {{ $payment_method === 'e_wallet' ? 'bg-rose-600 border-rose-600 text-white shadow-md shadow-rose-600/30' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-rose-500' }}"
+                        >
+                            <span class="text-base">📲</span>
+                            <span>محفظة ذكية</span>
+                        </button>
+                    </div>
+                </div>
+                @endif
 
                 <!-- Quick Cash Presets Bar -->
                 <div>

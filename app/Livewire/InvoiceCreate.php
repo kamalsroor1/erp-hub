@@ -19,6 +19,7 @@ class InvoiceCreate extends Component
     public $store_id;
     public $invoice_date;
     public $payment_type = 'cash'; // cash, credit, partial
+    public $payment_method = 'cash'; // cash, instapay, e_wallet, visa, bank_transfer
     public $discount_type = 'fixed'; // fixed, percentage
     public $discount_value = '0.000';
     public $paid_amount = '0.000';
@@ -397,6 +398,11 @@ class InvoiceCreate extends Component
         $this->updatedPaymentType();
     }
 
+    public function quickSetPaymentMethod($method)
+    {
+        $this->payment_method = $method;
+    }
+
     public function updatedItems($value, $key)
     {
         if (str_contains($key, 'quantity')) {
@@ -519,6 +525,7 @@ class InvoiceCreate extends Component
                 'store_id'       => $this->store_id,
                 'invoice_date'   => $this->invoice_date,
                 'payment_type'   => $this->payment_type,
+                'payment_method' => $this->payment_method,
                 'discount_type'  => $this->discount_type,
                 'discount_value' => $this->discount_value,
                 'paid_amount'    => $this->paid_amount,
