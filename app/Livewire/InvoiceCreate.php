@@ -42,6 +42,9 @@ class InvoiceCreate extends Component
     // Summary calculations
     public $subtotal = '0.000';
     public $discount_amount = '0.000';
+    public array $additional_expenses = [];
+    public $additional_expenses_total = '0.000';
+    public $shipping_cost = '0.000';
     public $net_total = '0.000';
     public $remaining_amount = '0.000';
 
@@ -56,6 +59,8 @@ class InvoiceCreate extends Component
         'items.*.item_id'   => 'required|exists:items,id',
         'items.*.quantity'  => 'required|numeric|min:0.001',
         'items.*.unit_price'=> 'required|numeric|min:0',
+        'additional_expenses.*.title'  => 'nullable|string|max:150',
+        'additional_expenses.*.amount' => 'nullable|numeric|min:0',
     ];
 
     public function mount()
@@ -477,7 +482,34 @@ class InvoiceCreate extends Component
             $this->discount_amount = bccomp($discountVal, $subtotal, 3) > 0 ? $subtotal : $discountVal;
         }
 
-        $net = bcsub($subtotal, $this->discount_amount, 3);
+        $afterDiscount = bcsub($subtotal, $this->discount_amount, 3);
+
+        // Dynamic Additional Expenses Processing
+        $expTotal = '0.000';
+        $customerExpTotal = '0.000';
+        $expenses = is_array($this->additional_expenses) ? $this->additional_expenses : [];
+
+        foreach ($expenses as $exp) {
+            $amt = (string)($exp['amount'] ?? '0.000');
+            if (is_numeric($amt) && bccomp($amt, '0.000', 3) > 0) {
+                $expTotal = bcadd($expTotal, $amt, 3);
+                $paidBy = $exp['paid_by'] ?? 'customer_account';
+                if ($paidBy === 'customer_account' || $paidBy === 'supplier_account') {
+                    $customerExpTotal = bcadd($customerExpTotal, $amt, 3);
+                }
+            }
+        }
+
+        // Support simple shipping_cost field if entered directly without rows
+        if (bccomp((string)($this->shipping_cost ?: '0.000'), '0.000', 3) > 0 && empty($expenses)) {
+            $customerExpTotal = bcadd($customerExpTotal, (string)$this->shipping_cost, 3);
+            $expTotal = bcadd($expTotal, (string)$this->shipping_cost, 3);
+        }
+
+        $this->additional_expenses_total = $expTotal;
+        $this->shipping_cost = $customerExpTotal;
+
+        $net = bcadd($afterDiscount, $customerExpTotal, 3);
         $this->net_total = bccomp($net, '0.000', 3) > 0 ? $net : '0.000';
 
         if ($this->payment_type === 'cash') {
@@ -491,6 +523,35 @@ class InvoiceCreate extends Component
             $rem = bcsub($this->net_total, $paid, 3);
             $this->remaining_amount = bccomp($rem, '0.000', 3) > 0 ? $rem : '0.000';
         }
+    }
+
+    public function addExpenseRow($presetTitle = 'شحن وتوصيل', $presetPaidBy = 'customer_account')
+    {
+        $this->additional_expenses[] = [
+            'title'             => $presetTitle,
+            'amount'            => '',
+            'allocation_method' => 'by_quantity',
+            'paid_by'           => $presetPaidBy,
+            'notes'             => '',
+        ];
+        $this->calculateTotals();
+    }
+
+    public function removeExpenseRow($index)
+    {
+        unset($this->additional_expenses[$index]);
+        $this->additional_expenses = array_values($this->additional_expenses);
+        $this->calculateTotals();
+    }
+
+    public function updatedAdditionalExpenses()
+    {
+        $this->calculateTotals();
+    }
+
+    public function updatedShippingCost()
+    {
+        $this->calculateTotals();
     }
 
     public function saveInvoice(InvoiceService $invoiceService, $printMode = null)
@@ -521,16 +582,18 @@ class InvoiceCreate extends Component
 
         try {
             $invoice = $invoiceService->confirmInvoice([
-                'customer_id'    => $this->customer_id,
-                'store_id'       => $this->store_id,
-                'invoice_date'   => $this->invoice_date,
-                'payment_type'   => $this->payment_type,
-                'payment_method' => $this->payment_method,
-                'discount_type'  => $this->discount_type,
-                'discount_value' => $this->discount_value,
-                'paid_amount'    => $this->paid_amount,
-                'notes'          => $this->notes,
-                'items'          => $this->items,
+                'customer_id'         => $this->customer_id,
+                'store_id'            => $this->store_id,
+                'invoice_date'        => $this->invoice_date,
+                'payment_type'        => $this->payment_type,
+                'payment_method'      => $this->payment_method,
+                'discount_type'       => $this->discount_type,
+                'discount_value'      => $this->discount_value,
+                'shipping_cost'       => $this->shipping_cost,
+                'paid_amount'         => $this->paid_amount,
+                'notes'               => $this->notes,
+                'items'               => $this->items,
+                'additional_expenses' => $this->additional_expenses,
             ]);
 
             if ($printMode === 'print' || $printMode === 'a4' || $printMode === 'thermal') {

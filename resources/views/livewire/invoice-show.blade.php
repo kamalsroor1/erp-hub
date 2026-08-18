@@ -118,6 +118,39 @@
             </table>
         </div>
 
+        <!-- Additional Expenses Breakdown (If Any) -->
+        @if($invoice->additionalExpenses && $invoice->additionalExpenses->count() > 0)
+        <div>
+            <h4 class="font-bold text-slate-800 dark:text-slate-200 text-xs mb-2">🚚 تفاصيل المصاريف الإضافية / الشحن المحملة:</h4>
+            <div class="overflow-x-auto border border-amber-500/20 rounded-xl bg-amber-500/5">
+                <table class="w-full text-right text-xs">
+                    <thead class="bg-amber-500/10 text-amber-900 dark:text-amber-300 font-bold border-b border-amber-500/20">
+                        <tr>
+                            <th class="p-2.5">بند المصروف</th>
+                            <th class="p-2.5 text-center">المبلغ</th>
+                            <th class="p-2.5 text-center">طريقة السداد / التحميل</th>
+                            <th class="p-2.5 text-left">ملاحظات</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-amber-500/10 text-xs">
+                        @foreach($invoice->additionalExpenses as $exp)
+                        <tr>
+                            <td class="p-2.5 font-bold text-slate-900 dark:text-white">{{ $exp->title }}</td>
+                            <td class="p-2.5 text-center font-mono font-black text-amber-600 dark:text-amber-400">+{{ number_format($exp->amount, 2) }} ج.م</td>
+                            <td class="p-2.5 text-center">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400">
+                                    {{ $exp->paid_by_label }}
+                                </span>
+                            </td>
+                            <td class="p-2.5 text-left text-slate-500 font-mono">{{ $exp->notes ?: '—' }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+
         <!-- Summary Totals -->
         <div class="w-full sm:w-80 mr-auto p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
             <div class="flex justify-between text-slate-500 dark:text-slate-400">
@@ -128,6 +161,12 @@
             <div class="flex justify-between text-rose-600 dark:text-rose-400">
                 <span>خصم الفاتورة:</span>
                 <span class="font-mono font-bold">-{{ number_format($invoice->discount_amount, 2) }} ج.م</span>
+            </div>
+            @endif
+            @if(bccomp($invoice->shipping_cost ?? '0.000', '0.000', 3) > 0)
+            <div class="flex justify-between text-amber-600 dark:text-amber-400">
+                <span>مصاريف الشحن / التوصيل:</span>
+                <span class="font-mono font-bold">+{{ number_format($invoice->shipping_cost, 2) }} ج.م</span>
             </div>
             @endif
             <div class="flex justify-between text-base font-black text-emerald-600 dark:text-emerald-400 pt-2 border-t border-slate-200 dark:border-slate-800">

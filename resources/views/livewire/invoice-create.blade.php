@@ -600,6 +600,109 @@
                 </div>
                 @endcan
 
+                <!-- ========================================== -->
+                <!-- 🚚 Multi-Expenses / Shipping Dynamic Box   -->
+                <!-- ========================================== -->
+                <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800/80 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300">🚚 مصاريف الشحن والخدمات الإضافية:</span>
+                            @if(bccomp($additional_expenses_total, '0.000', 3) > 0)
+                                <span class="text-[11px] font-mono font-black text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/20">
+                                    +{{ number_format($additional_expenses_total, 2) }} ج.م
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Quick Preset Buttons -->
+                    <div class="flex flex-wrap gap-1.5">
+                        <button 
+                            type="button" 
+                            wire:click="addExpenseRow('شحن وتوصيل', 'customer_account')" 
+                            class="px-2 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-amber-600 hover:text-white text-[10px] font-bold text-slate-700 dark:text-slate-300 transition-colors cursor-pointer flex items-center gap-1"
+                        >
+                            <span>🚚 + شحن</span>
+                        </button>
+                        <button 
+                            type="button" 
+                            wire:click="addExpenseRow('تغليف وكراتين', 'customer_account')" 
+                            class="px-2 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-amber-600 hover:text-white text-[10px] font-bold text-slate-700 dark:text-slate-300 transition-colors cursor-pointer flex items-center gap-1"
+                        >
+                            <span>📦 + تغليف</span>
+                        </button>
+                        <button 
+                            type="button" 
+                            wire:click="addExpenseRow('إكرامية طيار الدليفري', 'treasury_cash')" 
+                            class="px-2 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-amber-600 hover:text-white text-[10px] font-bold text-slate-700 dark:text-slate-300 transition-colors cursor-pointer flex items-center gap-1"
+                        >
+                            <span>🎁 + إكرامية</span>
+                        </button>
+                        <button 
+                            type="button" 
+                            wire:click="addExpenseRow('مصروف إضافي', 'customer_account')" 
+                            class="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-600 hover:text-white text-[10px] font-bold text-amber-700 dark:text-amber-400 border border-amber-500/20 transition-colors cursor-pointer flex items-center gap-1"
+                        >
+                            <span>➕ بند مخصص</span>
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Expense Rows -->
+                    @if(!empty($additional_expenses) && count($additional_expenses) > 0)
+                    <div class="space-y-2 pt-1">
+                        @foreach($additional_expenses as $eIdx => $exp)
+                        <div class="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 space-y-1.5 text-xs">
+                            <div class="grid grid-cols-12 gap-2 items-center">
+                                <div class="col-span-6">
+                                    <input 
+                                        type="text" 
+                                        wire:model.live.debounce.250ms="additional_expenses.{{ $eIdx }}.title" 
+                                        placeholder="اسم المصروف / الخدمة" 
+                                        class="w-full h-8 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-2 text-[11px] font-bold text-slate-800 dark:text-slate-200 focus:ring-1 focus:ring-amber-500"
+                                    >
+                                </div>
+                                <div class="col-span-5 relative">
+                                    <input 
+                                        type="number" 
+                                        step="0.01" 
+                                        min="0" 
+                                        wire:model.live.debounce.250ms="additional_expenses.{{ $eIdx }}.amount" 
+                                        placeholder="المبلغ ج.م" 
+                                        class="w-full h-8 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-2 text-[11px] font-mono font-bold text-amber-600 dark:text-amber-400 focus:ring-1 focus:ring-amber-500"
+                                    >
+                                </div>
+                                <div class="col-span-1 text-center">
+                                    <button 
+                                        type="button" 
+                                        wire:click="removeExpenseRow({{ $eIdx }})" 
+                                        class="w-6 h-6 rounded-lg bg-rose-500/10 hover:bg-rose-500 text-rose-600 hover:text-white flex items-center justify-center text-[10px] transition-colors cursor-pointer"
+                                        title="حذف المصروف"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-12 gap-2 items-center pt-1 border-t border-slate-100 dark:border-slate-800 text-[10px]">
+                                <div class="col-span-5 text-slate-500 font-bold">مين اللي هيتحمل / هيدفع؟</div>
+                                <div class="col-span-7">
+                                    <select 
+                                        wire:model.live="additional_expenses.{{ $eIdx }}.paid_by" 
+                                        class="w-full h-7 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-1 text-[10px] font-bold text-slate-700 dark:text-slate-300"
+                                    >
+                                        <option value="customer_account">مضاف على حساب العميل بالفاتورة (الزبون هيدفعه)</option>
+                                        <option value="treasury_cash">مدفوع كاش نقدًا من الخزينة (المحل اللي هيشيله - سند صرف)</option>
+                                        <option value="treasury_instapay">مدفوع عبر إنستاباي من الحساب (سند صرف)</option>
+                                        <option value="treasury_e_wallet">مدفوع من المحفظة الذكية (سند صرف)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
+                </div>
+
                 <!-- Interactive Touch Numpad (Collapsible) -->
                 <div x-show="showNumpad" x-transition.duration.200ms class="p-3 bg-slate-100 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2">
                     <div class="flex items-center justify-between">
@@ -633,6 +736,13 @@
                     <div class="flex items-center justify-between text-xs text-rose-600 dark:text-rose-400 font-bold">
                         <span>الخصم الممنوح:</span>
                         <span class="font-mono">- {{ number_format($discount_amount, 2) }} ج.م</span>
+                    </div>
+                    @endif
+
+                    @if(bccomp($shipping_cost, '0.000', 3) > 0)
+                    <div class="flex items-center justify-between text-xs text-amber-600 dark:text-amber-400 font-bold">
+                        <span>مصاريف الشحن / التوصيل:</span>
+                        <span class="font-mono">+ {{ number_format($shipping_cost, 2) }} ج.م</span>
                     </div>
                     @endif
 

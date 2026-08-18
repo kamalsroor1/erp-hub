@@ -295,6 +295,67 @@
                     </div>
                     @endif
 
+                    <!-- ========================================== -->
+                    <!-- 🚚 Dynamic Additional Expenses Block       -->
+                    <!-- ========================================== -->
+                    <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300">🚚 مصاريف الشحن والخدمات:</span>
+                            @if(bccomp($additional_expenses_total, '0.000', 3) > 0)
+                                <span class="text-[10px] font-mono font-black text-amber-600 dark:text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                                    +{{ number_format($additional_expenses_total, 2) }} ج.م
+                                </span>
+                            @endif
+                        </div>
+
+                        <!-- Quick Add Buttons -->
+                        <div class="flex flex-wrap gap-1">
+                            <button type="button" wire:click="addExpenseRow('شحن وتوصيل', 'customer_account')" class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 hover:bg-amber-600 hover:text-white text-[10px] font-bold text-slate-700 dark:text-slate-300 transition-colors cursor-pointer">🚚 + شحن</button>
+                            <button type="button" wire:click="addExpenseRow('تغليف وكراتين', 'customer_account')" class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 hover:bg-amber-600 hover:text-white text-[10px] font-bold text-slate-700 dark:text-slate-300 transition-colors cursor-pointer">📦 + تغليف</button>
+                            <button type="button" wire:click="addExpenseRow('إكرامية طيار الدليفري', 'treasury_cash')" class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 hover:bg-amber-600 hover:text-white text-[10px] font-bold text-slate-700 dark:text-slate-300 transition-colors cursor-pointer">🎁 + إكرامية</button>
+                            <button type="button" wire:click="addExpenseRow('مصروف إضافي', 'customer_account')" class="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-600 hover:text-white text-[10px] font-bold text-amber-700 dark:text-amber-400 border border-amber-500/20 transition-colors cursor-pointer">➕ مخصص</button>
+                        </div>
+
+                        <!-- Expense Rows -->
+                        @if(!empty($additional_expenses) && count($additional_expenses) > 0)
+                        <div class="space-y-1.5 pt-1">
+                            @foreach($additional_expenses as $eIdx => $exp)
+                            <div class="p-2 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 space-y-1 text-[11px]">
+                                <div class="grid grid-cols-12 gap-1.5 items-center">
+                                    <div class="col-span-6">
+                                        <input type="text" wire:model.live.debounce.250ms="additional_expenses.{{ $eIdx }}.title" placeholder="اسم المصروف" class="w-full h-7 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded px-1.5 text-[10px] font-bold text-slate-800 dark:text-slate-200">
+                                    </div>
+                                    <div class="col-span-5">
+                                        <input type="number" step="0.01" min="0" wire:model.live.debounce.250ms="additional_expenses.{{ $eIdx }}.amount" placeholder="المبلغ" class="w-full h-7 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded px-1.5 text-[10px] font-mono font-bold text-amber-600 dark:text-amber-400">
+                                    </div>
+                                    <div class="col-span-1 text-center">
+                                        <button type="button" wire:click="removeExpenseRow({{ $eIdx }})" class="w-5 h-5 rounded bg-rose-500/10 hover:bg-rose-500 text-rose-600 hover:text-white flex items-center justify-center text-[10px] cursor-pointer">✕</button>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-12 gap-1 items-center pt-1 border-t border-slate-100 dark:border-slate-800 text-[10px]">
+                                    <div class="col-span-4 text-slate-400">التحميل:</div>
+                                    <div class="col-span-8">
+                                        <select wire:model.live="additional_expenses.{{ $eIdx }}.paid_by" class="w-full h-6 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded text-[9px] font-bold">
+                                            <option value="customer_account">حساب العميل بالفاتورة</option>
+                                            <option value="treasury_cash">كاش من الخزينة</option>
+                                            <option value="treasury_instapay">إنستاباي خزينة</option>
+                                            <option value="treasury_e_wallet">محفظة إلكترونية</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                        @endif
+                    </div>
+
+                    @if(bccomp($shipping_cost, '0.000', 3) > 0)
+                    <div class="flex items-center justify-between text-amber-600 dark:text-amber-400 font-bold">
+                        <span>إجمالي مصاريف الشحن والخدمات:</span>
+                        <span class="font-mono">+{{ number_format($shipping_cost, 2) }} ج.م</span>
+                    </div>
+                    @endif
+
                     <div class="flex items-center justify-between text-sm font-black text-amber-600 dark:text-amber-400 pt-2 border-t border-slate-200 dark:border-slate-800">
                         <span>الصافي المطلوب:</span>
                         <span class="font-mono">{{ number_format($net_total, 2) }} ج.م</span>

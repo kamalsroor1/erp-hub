@@ -13,7 +13,7 @@ class InvoiceShow extends Component
     public function mount($id)
     {
         abort_if(!auth()->user()?->can('invoices.view'), 403, 'غير مصرح لك بعرض تفاصيل الفاتورة');
-        $this->invoice = Invoice::with(['customer', 'items.item', 'payments', 'user'])->findOrFail($id);
+        $this->invoice = Invoice::with(['customer', 'items.item', 'payments', 'additionalExpenses.payment', 'user', 'store'])->findOrFail($id);
     }
 
     public function deleteInvoice(InvoiceService $invoiceService)
