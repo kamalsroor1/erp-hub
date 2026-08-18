@@ -15,6 +15,7 @@ class InvoiceIndex extends Component
     public $search = '';
     public $status = 'all'; // all, confirmed, cancelled
     public $paymentStatus = 'all'; // all, paid, unpaid, partially_paid
+    public $paymentMethod = 'all'; // all, cash, instapay, e_wallet, visa, bank_transfer
     public $selectedStore = ''; // all or store_id
     public $filterStatus = 'active'; // active, trashed, all
     public ?string $fromDate = null;
@@ -118,6 +119,7 @@ class InvoiceIndex extends Component
             })
             ->when($this->status !== 'all', fn($q) => $q->where('status', $this->status))
             ->when($this->paymentStatus !== 'all', fn($q) => $q->where('payment_status', $this->paymentStatus))
+            ->when($this->paymentMethod !== 'all', fn($q) => $q->where('payment_method', $this->paymentMethod))
             ->when($this->selectedStore !== '', fn($q) => $q->where('store_id', $this->selectedStore))
             ->when($this->fromDate, fn($q) => $q->whereDate('invoice_date', '>=', $this->fromDate))
             ->when($this->toDate, fn($q) => $q->whereDate('invoice_date', '<=', $this->toDate))

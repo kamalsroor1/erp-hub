@@ -59,12 +59,33 @@
                 <button wire:click="$set('filterStatus', 'all')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $filterStatus === 'all' ? 'bg-slate-700 text-white border-slate-600' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400' }}">الكل</button>
             </div>
 
-            <div class="flex flex-wrap items-center gap-1.5">
-                <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">حالة السداد:</span>
-                <button wire:click="$set('paymentStatus', 'all')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'all' ? 'bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white' : 'border-transparent text-slate-500 dark:text-slate-400' }}">الكل</button>
-                <button wire:click="$set('paymentStatus', 'unpaid')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'unpaid' ? 'bg-rose-500/20 border-rose-500/40 text-rose-700 dark:text-rose-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">آجل</button>
-                <button wire:click="$set('paymentStatus', 'partially_paid')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'partially_paid' ? 'bg-amber-500/20 border-amber-500/40 text-amber-700 dark:text-amber-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">جزئي</button>
-                <button wire:click="$set('paymentStatus', 'paid')" class="px-2.5 py-1.5 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'paid' ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-700 dark:text-emerald-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">مدفوع</button>
+            <!-- Payment Status & Method Filters -->
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex flex-wrap items-center gap-1">
+                    <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">السداد:</span>
+                    <button wire:click="$set('paymentStatus', 'all')" class="px-2 py-1 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'all' ? 'bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white' : 'border-transparent text-slate-500 dark:text-slate-400' }}">الكل</button>
+                    <button wire:click="$set('paymentStatus', 'unpaid')" class="px-2 py-1 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'unpaid' ? 'bg-rose-500/20 border-rose-500/40 text-rose-700 dark:text-rose-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">آجل</button>
+                    <button wire:click="$set('paymentStatus', 'partially_paid')" class="px-2 py-1 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'partially_paid' ? 'bg-amber-500/20 border-amber-500/40 text-amber-700 dark:text-amber-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">جزئي</button>
+                    <button wire:click="$set('paymentStatus', 'paid')" class="px-2 py-1 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentStatus === 'paid' ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-700 dark:text-emerald-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">مدفوع</button>
+                </div>
+
+                <!-- Payment Method Filter Buttons -->
+                <div class="flex flex-wrap items-center gap-1 border-r border-slate-200 dark:border-slate-800 pr-2">
+                    <span class="text-slate-500 dark:text-slate-400 text-[11px] hidden sm:inline">وسيلة الدفع:</span>
+                    <button wire:click="$set('paymentMethod', 'all')" class="px-2 py-1 rounded-lg font-bold border transition-colors cursor-pointer text-xs {{ $paymentMethod === 'all' ? 'bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white' : 'border-transparent text-slate-500 dark:text-slate-400' }}">الكل</button>
+                    <button wire:click="$set('paymentMethod', 'cash')" class="px-2 py-1 rounded-lg font-bold border transition-colors cursor-pointer text-xs flex items-center gap-1 {{ $paymentMethod === 'cash' ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-700 dark:text-emerald-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">
+                        <span>💵</span>
+                        <span>كاش</span>
+                    </button>
+                    <button wire:click="$set('paymentMethod', 'instapay')" class="px-2 py-1 rounded-lg font-bold border transition-colors cursor-pointer text-xs flex items-center gap-1 {{ $paymentMethod === 'instapay' ? 'bg-purple-500/20 border-purple-500/40 text-purple-700 dark:text-purple-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">
+                        <span>⚡</span>
+                        <span>إنستاباي</span>
+                    </button>
+                    <button wire:click="$set('paymentMethod', 'e_wallet')" class="px-2 py-1 rounded-lg font-bold border transition-colors cursor-pointer text-xs flex items-center gap-1 {{ $paymentMethod === 'e_wallet' ? 'bg-rose-500/20 border-rose-500/40 text-rose-700 dark:text-rose-400' : 'border-transparent text-slate-500 dark:text-slate-400' }}">
+                        <span>📲</span>
+                        <span>محفظة</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -188,10 +209,27 @@
                         </td>
                         <td class="p-3.5 font-mono text-slate-500 dark:text-slate-400">{{ $inv->invoice_date->format('Y-m-d') }}</td>
                         <td class="p-3.5 text-slate-700 dark:text-slate-300">
-                            @if($inv->payment_type === 'cash') نقدي
-                            @elseif($inv->payment_type === 'credit') آجل
-                            @else جزئي
-                            @endif
+                            <div class="flex flex-col gap-1">
+                                <span class="font-bold text-xs">
+                                    @if($inv->payment_type === 'cash') كاش فوري
+                                    @elseif($inv->payment_type === 'credit') آجل (ذمم)
+                                    @else دفع جزئي
+                                    @endif
+                                </span>
+                                @if($inv->payment_type !== 'credit')
+                                    @php $pm = $inv->payment_method ?? 'cash'; @endphp
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-md w-fit border
+                                        {{ $pm === 'cash' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' : ($pm === 'instapay' ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20' : ($pm === 'e_wallet' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20' : ($pm === 'visa' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20' : 'bg-slate-100 text-slate-600 border-slate-200'))) }}">
+                                        @if($pm === 'cash') <span>💵 كاش</span>
+                                        @elseif($pm === 'instapay') <span>⚡ إنستاباي</span>
+                                        @elseif($pm === 'e_wallet') <span>📲 محفظة</span>
+                                        @elseif($pm === 'visa') <span>💳 فيزا</span>
+                                        @elseif($pm === 'bank_transfer') <span>🏦 تحويل</span>
+                                        @else <span>{{ $pm }}</span>
+                                        @endif
+                                    </span>
+                                @endif
+                            </div>
                         </td>
                         <td class="p-3.5 font-mono font-bold text-slate-900 dark:text-white">{{ number_format($inv->net_total, 2) }} ج.م</td>
                         <td class="p-3.5 font-mono text-emerald-600 dark:text-emerald-400">{{ number_format($inv->paid_amount, 2) }}</td>
