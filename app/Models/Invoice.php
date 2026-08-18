@@ -18,6 +18,7 @@ class Invoice extends Model
         'store_id',
         'invoice_date',
         'payment_type',
+        'payment_method',
         'status',
         'payment_status',
         'subtotal',
