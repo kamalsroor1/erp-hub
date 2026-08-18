@@ -230,4 +230,102 @@ class StockService
 
         return $deposit;
     }
+
+    /**
+     * Physical Stock Count Adjustment (تسوية جردية وتصحيح رصيد المخزن)
+     * Atomically corrects item quantity to match actual physical count and logs a StockMovement.
+     */
+    public function adjustStock(
+        Item $item,
+        string $actualQuantity,
+        string $reason,
+        ?int $storeId = null
+    ): StockMovement {
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($item, $actualQuantity, $reason, $storeId) {
+            $lockedItem = Item::where('id', $item->id)->lockForUpdate()->firstOrFail();
+
+            if (!$storeId) {
+                $storeId = Auth::user()?->getCurrentStore()?->id ?? Store::getMainStore()?->id;
+            }
+
+            $storeStock = null;
+            $currentStoreQty = (string)$lockedItem->current_stock;
+
+            if ($storeId) {
+                $storeStock = StoreStock::firstOrCreate(
+                    [
+                        'store_id' => $storeId,
+                        'item_id'  => $lockedItem->id,
+                    ],
+                    [
+                        'quantity'             => '0.000',
+                        'min_stock'            => $lockedItem->min_stock_level,
+                        'custom_selling_price' => null,
+                    ]
+                );
+
+                $storeStock = StoreStock::where('id', $storeStock->id)->lockForUpdate()->first();
+                $currentStoreQty = (string)$storeStock->quantity;
+            }
+
+            $diff = bcsub($actualQuantity, $currentStoreQty, 3);
+
+            if (bccomp($diff, '0.000', 3) === 0) {
+                throw new Exception("الرصيد الفعلي المدخل ({$actualQuantity}) مطابق تماماً للرصيد المسجل حالياً بالمخزن.");
+            }
+
+            $stockBefore = (string)$lockedItem->current_stock;
+            $stockAfter  = bcadd($stockBefore, $diff, 3);
+
+            if (bccomp($stockAfter, '0.000', 3) < 0) {
+                throw new Exception("لا يمكن تنفيذ التسوية: الرصيد الإجمالي للصنف سيصبح سالباً ({$stockAfter}).");
+            }
+
+            // Update StoreStock
+            if ($storeStock) {
+                $storeStock->quantity = $actualQuantity;
+                $storeStock->save();
+            }
+
+            // Update Master Item Stock
+            $lockedItem->current_stock = $stockAfter;
+            $lockedItem->save();
+
+            $isSurplus = bccomp($diff, '0.000', 3) > 0;
+            $movementType = $isSurplus ? 'stock_adjustment_in' : 'stock_adjustment_out';
+            $adjQty = $isSurplus ? $diff : bcmul($diff, '-1', 3);
+            $docNumber = 'ADJ-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -4));
+
+            $movement = StockMovement::create([
+                'item_id'         => $lockedItem->id,
+                'store_id'        => $storeId,
+                'movement_type'   => $movementType,
+                'quantity'        => $adjQty,
+                'stock_before'    => $stockBefore,
+                'stock_after'     => $stockAfter,
+                'unit_cost'       => $lockedItem->cost_price,
+                'source_type'     => Item::class,
+                'source_id'       => $lockedItem->id,
+                'document_number' => $docNumber,
+                'user_id'         => Auth::id() ?? 1,
+                'notes'           => "تسوية جردية: {$reason} (الرصيد قبل: {$currentStoreQty} | الفعلي الجديد: {$actualQuantity})",
+            ]);
+
+            app(ActivityLogService::class)->log(
+                module: 'inventory',
+                action: 'adjusted',
+                description: "تسوية جردية لصنف [{$lockedItem->name}] إلى {$actualQuantity} {$lockedItem->unit} - السبب: {$reason}",
+                subject: $lockedItem,
+                properties: [
+                    'actual_quantity' => $actualQuantity,
+                    'diff'            => $diff,
+                    'movement_type'   => $movementType,
+                    'reason'          => $reason,
+                ],
+                storeId: $storeId
+            );
+
+            return $movement;
+        });
+    }
 }
