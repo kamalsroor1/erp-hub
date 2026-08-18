@@ -127,12 +127,38 @@ class CustomerIndex extends Component
         }
     }
 
+    public function toggleActive($id)
+    {
+        abort_if(!auth()->user()?->can('customers.manage'), 403, 'غير مصرح لك بتعديل بيانات العملاء');
+        $customer = Customer::withTrashed()->findOrFail($id);
+        $customer->is_active = !$customer->is_active;
+        $customer->save();
+
+        $state = $customer->is_active ? 'تفعيل' : 'تعطيل';
+        $this->dispatch('swal:toast', [
+            'icon'  => 'info',
+            'title' => "تم {$state} العميل [{$customer->name}] بنجاح."
+        ]);
+    }
+
     public function deleteCustomer($id)
     {
         abort_if(!auth()->user()?->can('customers.manage'), 403, 'غير مصرح لك بحذف العملاء');
         $customer = Customer::findOrFail($id);
         $name = $customer->name;
-        $customer->delete(); // Soft delete
+
+        $blockers = $customer->getDeletionBlockers();
+        if (!empty($blockers)) {
+            $reasons = implode(' • ', $blockers);
+            $this->dispatch('swal:toast', [
+                'icon'  => 'warning',
+                'title' => "⚠️ لا يمكن حذف العميل [{$name}] لوجود معاملات مالية!\nيمكنك تعطيله بدلاً من حذفه."
+            ]);
+            $this->errorMessage = "لا يمكن حذف العميل [{$name}] لوجود قيود: " . implode(' ، ', $blockers) . ". يمكنك تعطيل الحساب بدلاً من الحذف.";
+            return;
+        }
+
+        $customer->delete(); // Soft delete only if clean
 
         $this->successMessage = "تم نقل العميل [{$name}] إلى سلة المحذوفات بنجاح.";
         session()->flash('success', $this->successMessage);

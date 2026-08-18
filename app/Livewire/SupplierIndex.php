@@ -97,12 +97,38 @@ class SupplierIndex extends Component
         $this->showSupplierModal = false;
     }
 
+    public function toggleActive($id)
+    {
+        abort_if(!auth()->user()?->can('suppliers.manage'), 403, 'غير مصرح لك بتعديل بيانات الموردين');
+        $supplier = Supplier::withTrashed()->findOrFail($id);
+        $supplier->is_active = !$supplier->is_active;
+        $supplier->save();
+
+        $state = $supplier->is_active ? 'تفعيل' : 'تعطيل';
+        $this->dispatch('swal:toast', [
+            'icon'  => 'info',
+            'title' => "تم {$state} المورد [{$supplier->name}] بنجاح."
+        ]);
+    }
+
     public function deleteSupplier($id)
     {
         abort_if(!auth()->user()?->can('suppliers.manage'), 403, 'غير مصرح لك بحذف الموردين');
         $supplier = Supplier::findOrFail($id);
         $name = $supplier->name;
-        $supplier->delete(); // Soft delete
+
+        $blockers = $supplier->getDeletionBlockers();
+        if (!empty($blockers)) {
+            $reasons = implode(' • ', $blockers);
+            $this->dispatch('swal:toast', [
+                'icon'  => 'warning',
+                'title' => "⚠️ لا يمكن حذف المورد [{$name}] لوجود معاملات مالية ومشتريات!\nيمكنك تعطيله بدلاً من حذفه."
+            ]);
+            session()->flash('error', "لا يمكن حذف المورد [{$name}] لوجود قيود: " . implode(' ، ', $blockers) . ". يمكنك تعطيل حسابه بدلاً من الحذف.");
+            return;
+        }
+
+        $supplier->delete(); // Soft delete only if clean
 
         session()->flash('success', "تم نقل المورد [{$name}] إلى سلة المحذوفات بنجاح.");
         $this->dispatch('swal:toast', ['icon' => 'success', 'title' => "تم نقل المورد [{$name}] إلى سلة المحذوفات بنجاح."]);
