@@ -169,6 +169,28 @@
                 {{ number_format($treasuryData['total_liquidity'], 0) }} ج.م
             </span>
         </button>
+
+        <button 
+            type="button"
+            wire:click="setTab('abc')" 
+            class="px-4 py-3 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 {{ $activeTab === 'abc' ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900' }}"
+        >
+            <span>📊 حركة البضاعة (ABC)</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono {{ $activeTab === 'abc' ? 'bg-white text-purple-800 font-black' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                {{ $abcData['total_items_count'] }} صنف
+            </span>
+        </button>
+
+        <button 
+            type="button"
+            wire:click="setTab('pnl')" 
+            class="px-4 py-3 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 {{ $activeTab === 'pnl' ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900' }}"
+        >
+            <span>🏢 أرباح وخسائر الفروع (P&L)</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono {{ $activeTab === 'pnl' ? 'bg-white text-blue-800 font-black' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                {{ count($pnlData['stores']) }} فرع
+            </span>
+        </button>
     </div>
 
     <!-- ======================================================== -->
@@ -1103,6 +1125,289 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- ======================================================== -->
+    <!-- 📊 TAB 8: تحليل حركة البضاعة والأصناف (ABC Analysis)      -->
+    <!-- ======================================================== -->
+    @if($activeTab === 'abc')
+    <div class="space-y-6">
+        <!-- ABC 3 Classification KPI Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <!-- Class A: Gold -->
+            <div class="bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border-2 border-amber-500/30 dark:border-amber-500/40 rounded-3xl p-5 shadow-sm relative overflow-hidden">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-2xl bg-amber-500 text-white font-black text-sm flex items-center justify-center shadow-md shadow-amber-500/30">A</span>
+                        <span class="text-xs font-black text-amber-600 dark:text-amber-400">الأصناف الذهبية (Top 80%)</span>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-xl bg-amber-500/20 text-amber-700 dark:text-amber-300 font-mono font-black text-xs">
+                        {{ $abcData['class_a']['count'] }} صنف
+                    </span>
+                </div>
+                <div class="text-2xl sm:text-3xl font-black font-mono text-slate-900 dark:text-white" dir="ltr">
+                    {{ number_format((float)$abcData['class_a']['profit'], 2) }} <span class="text-xs font-tajawal font-bold text-slate-500">ج.م أرباح</span>
+                </div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 flex items-center justify-between">
+                    <span>نسبة المساهمة في أرباح النشاط:</span>
+                    <span class="font-bold font-mono text-amber-600 dark:text-amber-400">{{ $abcData['class_a']['share'] }}%</span>
+                </div>
+            </div>
+
+            <!-- Class B: Silver -->
+            <div class="bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-transparent border-2 border-indigo-500/30 dark:border-indigo-500/40 rounded-3xl p-5 shadow-sm relative overflow-hidden">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-2xl bg-indigo-600 text-white font-black text-sm flex items-center justify-center shadow-md shadow-indigo-600/30">B</span>
+                        <span class="text-xs font-black text-indigo-600 dark:text-indigo-400">الأصناف المتوسطة (15%)</span>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-xl bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-mono font-black text-xs">
+                        {{ $abcData['class_b']['count'] }} صنف
+                    </span>
+                </div>
+                <div class="text-2xl sm:text-3xl font-black font-mono text-slate-900 dark:text-white" dir="ltr">
+                    {{ number_format((float)$abcData['class_b']['profit'], 2) }} <span class="text-xs font-tajawal font-bold text-slate-500">ج.م أرباح</span>
+                </div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 flex items-center justify-between">
+                    <span>نسبة المساهمة في أرباح النشاط:</span>
+                    <span class="font-bold font-mono text-indigo-600 dark:text-indigo-400">{{ $abcData['class_b']['share'] }}%</span>
+                </div>
+            </div>
+
+            <!-- Class C: Bronze / Slow -->
+            <div class="bg-gradient-to-br from-slate-500/10 via-slate-500/5 to-transparent border-2 border-slate-400/30 dark:border-slate-700 rounded-3xl p-5 shadow-sm relative overflow-hidden">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-2xl bg-slate-600 text-white font-black text-sm flex items-center justify-center shadow-md">C</span>
+                        <span class="text-xs font-black text-slate-600 dark:text-slate-400">الأصناف الراكدة / بطيئة الحركة (5%)</span>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-xl bg-slate-500/20 text-slate-700 dark:text-slate-300 font-mono font-black text-xs">
+                        {{ $abcData['class_c']['count'] }} صنف
+                    </span>
+                </div>
+                <div class="text-2xl sm:text-3xl font-black font-mono text-slate-900 dark:text-white" dir="ltr">
+                    {{ number_format((float)$abcData['class_c']['profit'], 2) }} <span class="text-xs font-tajawal font-bold text-slate-500">ج.م أرباح</span>
+                </div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 flex items-center justify-between">
+                    <span>نسبة المساهمة في أرباح النشاط:</span>
+                    <span class="font-bold font-mono text-slate-600 dark:text-slate-400">{{ $abcData['class_c']['share'] }}%</span>
+                </div>
+            </div>
+        </div>
+
+        @if(count($abcData['dead_stock']) > 0)
+        <!-- Dead Stock Alert Box -->
+        <div class="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 flex items-start gap-3">
+            <span class="text-2xl">⚠️</span>
+            <div>
+                <h4 class="text-sm font-bold text-rose-800 dark:text-rose-300">تنبيه بضاعة راكدة بالمخازن (Dead Stock):</h4>
+                <p class="text-xs text-rose-700 dark:text-rose-400 mt-0.5">
+                    يوجد <strong>{{ count($abcData['dead_stock']) }}</strong> صنف لديه رصيد مخزني حالي ولكن لم يُسجل أي حركة بيع خلال هذه الفترة ({{ $abcData['days_in_period'] }} يوم). يُوصى بعمل عروض ترويجية أو تخفيضات لتصفيتها وتحرير السيولة.
+                </p>
+            </div>
+        </div>
+        @endif
+
+        <!-- ABC Items Table -->
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white font-tajawal">جدول تصنيف حركة البضاعة والأرباح</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">معدل البيع اليومي، الإيرادات، التكلفة، ومجمل ربح كل صنف</p>
+                </div>
+                <span class="text-xs font-bold text-slate-400 font-mono">{{ count($abcData['items']) }} صنف</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-right text-xs">
+                    <thead class="bg-slate-50 dark:bg-slate-950/80 text-xs font-bold text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                        <tr>
+                            <th class="p-3.5 text-center">التصنيف</th>
+                            <th class="p-3.5">الكود</th>
+                            <th class="p-3.5">اسم الصنف</th>
+                            <th class="p-3.5 text-center">الرصيد بالمخزن</th>
+                            <th class="p-3.5 text-center">السحب اليومي</th>
+                            <th class="p-3.5 text-center">الكمية المباعة</th>
+                            <th class="p-3.5 text-center">إجمالي الإيراد</th>
+                            <th class="p-3.5 text-center">مجمل الربح</th>
+                            <th class="p-3.5 text-center">هامش الربح %</th>
+                            <th class="p-3.5 text-center">مساهمة الربح %</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60 font-sans">
+                        @foreach($abcData['items'] as $item)
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td class="p-3.5 text-center">
+                                @if($item['abc_class'] === 'A')
+                                    <span class="px-2.5 py-1 rounded-xl bg-amber-500 text-white font-black font-mono text-xs shadow-sm shadow-amber-500/30">Class A 👑</span>
+                                @elseif($item['abc_class'] === 'B')
+                                    <span class="px-2.5 py-1 rounded-xl bg-indigo-600 text-white font-black font-mono text-xs shadow-sm">Class B ⚖️</span>
+                                @else
+                                    <span class="px-2.5 py-1 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold font-mono text-xs">Class C 💤</span>
+                                @endif
+                            </td>
+                            <td class="p-3.5 font-mono text-slate-500" dir="ltr">{{ $item['code'] }}</td>
+                            <td class="p-3.5 font-bold text-slate-900 dark:text-white">{{ $item['name'] }}</td>
+                            <td class="p-3.5 text-center font-mono font-bold text-slate-700 dark:text-slate-300">
+                                {{ number_format((float)$item['current_stock'], 2) }} {{ $item['unit'] }}
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold text-cyan-600 dark:text-cyan-400">
+                                {{ number_format((float)$item['velocity'], 2) }} / يوم
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold text-slate-900 dark:text-white">
+                                {{ number_format((float)$item['quantity_sold'], 2) }}
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold text-slate-700 dark:text-slate-300">
+                                {{ number_format((float)$item['revenue'], 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-black text-emerald-600 dark:text-emerald-400">
+                                {{ number_format((float)$item['gross_profit'], 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold text-slate-600 dark:text-slate-400">
+                                {{ $item['profit_margin'] }}%
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold text-amber-600 dark:text-amber-400">
+                                {{ $item['profit_share'] }}%
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- ======================================================== -->
+    <!-- 🏢 TAB 9: أرباح وخسائر الفروع والمراكز (P&L per Branch)    -->
+    <!-- ======================================================== -->
+    @if($activeTab === 'pnl')
+    <div class="space-y-6">
+        <!-- Grand Totals 5 Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-sm">
+                <span class="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">📈 صافي المبيعات الإجمالية:</span>
+                <span class="text-xl font-black font-mono text-slate-900 dark:text-white" dir="ltr">{{ number_format((float)$pnlData['grand_revenue'], 2) }} ج.م</span>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-sm">
+                <span class="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">📦 تكلفة البضاعة المباعة (COGS):</span>
+                <span class="text-xl font-black font-mono text-slate-600 dark:text-slate-300" dir="ltr">{{ number_format((float)$pnlData['grand_cogs'], 2) }} ج.م</span>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-sm">
+                <span class="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">💰 مجمل الربح الإجمالي:</span>
+                <span class="text-xl font-black font-mono text-emerald-600 dark:text-emerald-400" dir="ltr">{{ number_format((float)$pnlData['grand_gross_profit'], 2) }} ج.م</span>
+                <span class="text-[10px] text-emerald-500 block font-bold mt-0.5">هامش: {{ $pnlData['grand_gross_margin'] }}%</span>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-sm">
+                <span class="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">💸 المصروفات التشغيلية:</span>
+                <span class="text-xl font-black font-mono text-rose-600 dark:text-rose-400" dir="ltr">{{ number_format((float)$pnlData['grand_expenses'], 2) }} ج.م</span>
+            </div>
+
+            <div class="bg-gradient-to-br from-emerald-600 to-teal-700 text-white rounded-3xl p-4 shadow-md">
+                <span class="text-xs font-bold text-emerald-100 block mb-1">🏆 صافي الربح التشغيلي:</span>
+                <span class="text-xl font-black font-mono" dir="ltr">{{ number_format((float)$pnlData['grand_net_profit'], 2) }} ج.م</span>
+                <span class="text-[10px] text-emerald-200 block font-bold mt-0.5">صافي العائد: {{ $pnlData['grand_net_margin'] }}%</span>
+            </div>
+        </div>
+
+        <!-- Comparative Branch P&L Table -->
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-200 dark:border-slate-800">
+                <h3 class="text-base font-bold text-slate-900 dark:text-white font-tajawal">مقارنة ربحية وأداء الفروع وعربات التوزيع</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">قائمة الدخل التفصيلية وصافي أرباح كل فرع بعد خصم مصروفاته المباشرة</p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-right text-xs">
+                    <thead class="bg-slate-50 dark:bg-slate-950/80 text-xs font-bold text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                        <tr>
+                            <th class="p-3.5">الفرع / النقطة</th>
+                            <th class="p-3.5 text-center">الفواتير</th>
+                            <th class="p-3.5 text-center">إجمالي المبيعات</th>
+                            <th class="p-3.5 text-center">المرتجعات</th>
+                            <th class="p-3.5 text-center">صافي الإيراد</th>
+                            <th class="p-3.5 text-center">تكلفة البضاعة (COGS)</th>
+                            <th class="p-3.5 text-center">مجمل الربح</th>
+                            <th class="p-3.5 text-center">المصروفات</th>
+                            <th class="p-3.5 text-center font-black">صافي الربح النهائي</th>
+                            <th class="p-3.5 text-center">هامش الصافي %</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60 font-sans">
+                        @foreach($pnlData['stores'] as $st)
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td class="p-3.5">
+                                <span class="font-bold text-slate-900 dark:text-white block">{{ $st['store_name'] }}</span>
+                                <span class="text-[10px] text-slate-400 font-mono" dir="ltr">{{ $st['store_code'] }}</span>
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold text-slate-700 dark:text-slate-300">
+                                {{ $st['invoices_count'] }}
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold text-slate-700 dark:text-slate-300">
+                                {{ number_format((float)$st['gross_sales'], 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold text-rose-500">
+                                {{ number_format((float)$st['returns_amount'], 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold text-slate-900 dark:text-white">
+                                {{ number_format((float)$st['net_revenue'], 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center font-mono text-slate-500 dark:text-slate-400">
+                                {{ number_format((float)$st['cogs'], 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-black text-emerald-600 dark:text-emerald-400">
+                                {{ number_format((float)$st['gross_profit'], 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold text-rose-600 dark:text-rose-400">
+                                {{ number_format((float)$st['expenses_total'], 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-black text-sm {{ bccomp((string)$st['net_operating_profit'], '0.000', 3) >= 0 ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20' : 'text-rose-600 bg-rose-50/50' }}">
+                                {{ number_format((float)$st['net_operating_profit'], 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold {{ bccomp((string)$st['net_margin'], '0.00', 2) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500' }}">
+                                {{ $st['net_margin'] }}%
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Cost Centers Breakdown -->
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
+            <h3 class="text-base font-bold text-slate-900 dark:text-white font-tajawal">توزيع المصروفات التشغيلية حسب مراكز التكلفة</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                @php
+                    $costCenterLabels = [
+                        'rent'        => '🏢 إيجارات الفروع',
+                        'utilities'   => '💡 كهرباء ومرافق',
+                        'salaries'    => '👥 رواتب وعمالة',
+                        'vehicles'    => '🚚 سيارات التوزيع',
+                        'maintenance' => '⚙️ صيانة ومعدات',
+                        'packaging'   => '📦 كراتين وتغليف',
+                        'hospitality' => '☕ ضيافة وبوفيه',
+                        'marketing'   => '📢 تسويق وإعلانات',
+                        'shipping'    => '✈️ شحن وتوصيل',
+                        'operational' => '📑 نثريات عامة',
+                    ];
+                @endphp
+                @foreach($pnlData['grand_cost_centers'] as $ccKey => $ccAmount)
+                <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800">
+                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block mb-1">
+                        {{ $costCenterLabels[$ccKey] ?? $ccKey }}
+                    </span>
+                    <span class="text-sm font-black font-mono text-slate-900 dark:text-white" dir="ltr">
+                        {{ number_format((float)$ccAmount, 2) }} ج.م
+                    </span>
+                </div>
+                @endforeach
             </div>
         </div>
     </div>

@@ -15,7 +15,7 @@ class Dashboard extends Component
 {
     use RequiresAuth;
 
-    public function render(ProfitService $profitService)
+    public function render(ProfitService $profitService, \App\Services\DashboardAnalyticsService $analyticsService)
     {
         $today = now()->toDateString();
         
@@ -24,6 +24,8 @@ class Dashboard extends Component
         
         // Non-admin always scopes to their assigned store
         $storeFilter = (!$isAdmin && $activeStoreId) ? $activeStoreId : null;
+
+        $analytics = $analyticsService->getAnalytics(storeId: $storeFilter, trendDays: 7);
 
         $todaySales = Invoice::where('status', 'confirmed')
             ->whereDate('invoice_date', $today)
@@ -71,6 +73,7 @@ class Dashboard extends Component
             'monthlyGrossProfit'  => $periodic['gross_profit'],
             'monthlyMargin'       => $periodic['margin_percentage'],
             'currentStore'        => $storeFilter ? Store::find($storeFilter) : null,
+            'analytics'           => $analytics,
         ])->layout('components.layouts.app', ['title' => 'لوحة التحكم الرئيسية']);
     }
 }

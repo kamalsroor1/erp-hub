@@ -13,6 +13,7 @@ class Expense extends Model
     protected $fillable = [
         'expense_number',
         'category',
+        'cost_center',
         'title',
         'amount',
         'expense_date',
@@ -35,5 +36,21 @@ class Expense extends Model
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class)->withTrashed();
+    }
+
+    public function getCostCenterLabelAttribute(): string
+    {
+        return match ($this->cost_center) {
+            'rent'        => 'إيجارات مقرات وفروع',
+            'utilities'   => 'كهرباء ومياه وغاز ومرافق',
+            'salaries'    => 'رواتب وعمالة وإكراميات',
+            'vehicles'    => 'وقود وزيوت وصيانة سيارات',
+            'maintenance' => 'صيانة معدات وديكورات',
+            'packaging'   => 'مطبوعات وكراتين وتعبئة',
+            'hospitality' => 'ضيافة ونظافة وبوفيه',
+            'marketing'   => 'تسويق وإعلانات ودعاية',
+            'shipping'    => 'شحن ونولون وتوصيل خارجي',
+            default       => 'مصاريف تشغيلية ونثريات عامة',
+        };
     }
 }

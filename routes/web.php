@@ -199,6 +199,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/suppliers/{id}/statement', SupplierStatement::class)->name('suppliers.statement')->middleware('can:suppliers.statement');
     Route::get('/purchases', PurchaseIndex::class)->name('purchases.index')->middleware('can:purchases.view');
     Route::get('/purchases/create', PurchaseCreate::class)->name('purchases.create')->middleware('can:purchases.create');
+    Route::get('/purchases/smart-reorder', App\Livewire\Purchases\SmartReorderIndex::class)->name('purchases.reorder')->middleware('can:purchases.view');
 
     // Returns & Reversals
     Route::get('/returns', ReturnIndex::class)->name('returns.index')->middleware('can:returns.manage');

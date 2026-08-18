@@ -7,9 +7,14 @@
             </h2>
             <p class="text-xs text-slate-500 dark:text-slate-400">سجل استلام الشحنات وتوريد المخزن وتكلفة الواردات بالكمية والأوزان</p>
         </div>
-        <a href="{{ route('purchases.create') }}" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all cursor-pointer">
-            <span>+ فاتورة شراء وتوريد جديدة</span>
-        </a>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('purchases.reorder') }}" class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white text-xs font-black rounded-xl shadow-md shadow-amber-500/20 flex items-center gap-2 transition-all cursor-pointer">
+                <span>🧠 مساعد المشتريات والتنبؤ</span>
+            </a>
+            <a href="{{ route('purchases.create') }}" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all cursor-pointer">
+                <span>+ فاتورة شراء جديدة</span>
+            </a>
+        </div>
     </div>
 
     @if (session()->has('success'))

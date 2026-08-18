@@ -55,6 +55,14 @@ class PurchaseCreate extends Component
         if ($firstSupplier) {
             $this->supplier_id = $firstSupplier->id;
         }
+
+        // Smart Reorder Prefill
+        if (session()->has('smart_reorder_prefill')) {
+            $itemIds = (array)session()->pull('smart_reorder_prefill');
+            foreach ($itemIds as $id) {
+                $this->addItem($id, '1.000');
+            }
+        }
     }
 
     public function addExpenseRow($presetTitle = 'شحن ونقل', $presetMethod = 'by_quantity', $presetPaidBy = 'supplier_account')

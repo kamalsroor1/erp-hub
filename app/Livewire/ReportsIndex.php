@@ -343,6 +343,20 @@ class ReportsIndex extends Component
             selectedMethod: $this->selectedTreasuryMethod
         );
 
+        $inventoryAnalyticsService = app(\App\Services\InventoryAnalyticsService::class);
+        $abcData = $inventoryAnalyticsService->getAbcAnalysis(
+            fromDate: $this->fromDate,
+            toDate: $this->toDate,
+            storeId: $storeFilter
+        );
+
+        $profitLossService = app(\App\Services\ProfitLossService::class);
+        $pnlData = $profitLossService->getProfitLossReport(
+            fromDate: $this->fromDate,
+            toDate: $this->toDate,
+            storeId: $storeFilter
+        );
+
         return view('livewire.reports-index', [
             'stores'                 => $stores,
             'selectedStore'          => $selectedStore,
@@ -363,6 +377,8 @@ class ReportsIndex extends Component
             'inStockCount'           => count(array_filter($inventoryItems, fn($i) => bccomp((string)$i->current_stock, '0.000', 3) > 0)),
             'zeroStockCount'         => count(array_filter($inventoryItems, fn($i) => bccomp((string)$i->current_stock, '0.000', 3) <= 0)),
             'treasuryData'           => $treasuryData,
+            'abcData'                => $abcData,
+            'pnlData'                => $pnlData,
         ])->layout('components.layouts.app', ['title' => 'التقارير المالية والمبيعات والأرباح']);
     }
 }

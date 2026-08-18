@@ -147,7 +147,7 @@
                     <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
                     <span>تنبيهات النواقص بالمخزن</span>
                 </h3>
-                <a href="{{ route('items.index') }}" class="text-xs text-slate-500 dark:text-slate-400 hover:underline">إدارة الأصناف ←</a>
+                <a href="{{ route('purchases.reorder') }}" class="text-xs text-amber-600 dark:text-amber-400 hover:underline font-bold">مساعد المشتريات ←</a>
             </div>
 
             <div class="p-3 divide-y divide-slate-200 dark:divide-slate-800/60">
@@ -169,6 +169,117 @@
                     جميع الأصناف متوفرة فوق الحد الأدنى 👍
                 </div>
                 @endforelse
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- 📈 INTERACTIVE EXECUTIVE ANALYTICS (Charts & Peak Hours) -->
+    <!-- ======================================================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 7-Day Sales Trend Bar Chart (2 Cols) -->
+        <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span>📊 حركة ومبيعات آخر 7 أيام</span>
+                    </h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">معدل البيع اليومي وعدد الفواتير الصادرة</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-left">
+                        <span class="text-[10px] text-slate-400 font-bold block">متوسط قيمة الفاتورة (Basket Size):</span>
+                        <span class="text-sm font-black font-mono text-emerald-600 dark:text-emerald-400" dir="ltr">
+                            {{ number_format((float)$analytics['period']['basket_size'], 2) }} ج.م
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            @php
+                $maxDailySales = max(1, collect($analytics['daily_trend'])->max('sales'));
+            @endphp
+            <!-- Visual CSS Bar Chart -->
+            <div class="grid grid-cols-7 gap-2 items-end h-44 pt-6 pb-2">
+                @foreach($analytics['daily_trend'] as $day)
+                @php
+                    $barHeight = $maxDailySales > 0 ? max(8, round(($day['sales'] / $maxDailySales) * 100)) : 8;
+                @endphp
+                <div class="flex flex-col items-center gap-1.5 h-full justify-end group relative">
+                    <!-- Tooltip -->
+                    <div class="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[10px] font-mono px-2 py-1 rounded-lg pointer-events-none whitespace-nowrap shadow-lg z-10">
+                        {{ $day['sales_formatted'] }} ({{ $day['invoices'] }} فاتورة)
+                    </div>
+                    
+                    <span class="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300">
+                        {{ $day['sales'] > 0 ? number_format($day['sales'], 0) : '0' }}
+                    </span>
+
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden flex items-end h-28">
+                        <div 
+                            style="height: {{ $barHeight }}%"
+                            class="w-full rounded-xl transition-all duration-500 {{ $loop->last ? 'bg-gradient-to-t from-emerald-600 to-teal-500 shadow-md shadow-emerald-500/30' : 'bg-gradient-to-t from-amber-500 to-amber-400 group-hover:from-amber-600' }}"
+                        ></div>
+                    </div>
+
+                    <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 truncate w-full text-center">
+                        {{ $day['label'] }}
+                    </span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Peak Hours & Payment Split (1 Col) -->
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
+            <div>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+                    <span>⚡ أوقات وساعات الذروة (Peak Hours)</span>
+                </h3>
+
+                @if($analytics['peak_hour'] && bccomp((string)$analytics['peak_hour']['sales'], '0.000', 3) > 0)
+                <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 mt-3 flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-bold text-amber-700 dark:text-amber-300 block">ساعة الذروة الأكثر نشاطاً:</span>
+                        <span class="text-lg font-black text-slate-900 dark:text-white font-tajawal">
+                            الساعة {{ $analytics['peak_hour']['label'] }}
+                        </span>
+                    </div>
+                    <div class="text-left font-mono">
+                        <span class="text-sm font-black text-amber-600 dark:text-amber-400 block" dir="ltr">
+                            {{ number_format((float)$analytics['peak_hour']['sales'], 2) }} ج.م
+                        </span>
+                        <span class="text-[10px] text-slate-500">{{ $analytics['peak_hour']['invoices'] }} فاتورة</span>
+                    </div>
+                </div>
+                @else
+                <div class="p-4 text-center text-slate-400 text-xs">
+                    جاري تجميع بيانات ساعات الذروة...
+                </div>
+                @endif
+            </div>
+
+            <!-- Payment Methods Split -->
+            <div class="space-y-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <span class="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-2">💳 توزيع طرق التحصيل والدفع:</span>
+                <div class="space-y-1.5">
+                    @foreach($analytics['payment_distribution'] as $pMethod)
+                    @if($pMethod['percentage'] > 0)
+                    <div>
+                        <div class="flex items-center justify-between text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-0.5">
+                            <span>{{ $pMethod['label'] }}</span>
+                            <span class="font-mono text-slate-900 dark:text-white">{{ $pMethod['percentage'] }}% ({{ number_format((float)$pMethod['amount'], 0) }} ج.م)</span>
+                        </div>
+                        <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                            <div 
+                                class="h-full rounded-full {{ $pMethod['key'] === 'cash' ? 'bg-emerald-500' : ($pMethod['key'] === 'instapay' ? 'bg-purple-600' : ($pMethod['key'] === 'e_wallet' ? 'bg-amber-500' : 'bg-cyan-500')) }}" 
+                                style="width: {{ $pMethod['percentage'] }}%"
+                            ></div>
+                        </div>
+                    </div>
+                    @endif
+                    @endforeach
+                </div>
             </div>
         </div>
     </div>

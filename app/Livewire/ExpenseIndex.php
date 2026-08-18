@@ -18,6 +18,7 @@ class ExpenseIndex extends Component
 
     public string $search = '';
     public string $filterCategory = 'all';
+    public string $filterCostCenter = 'all';
     public string $filterPaymentMethod = 'all'; // all, cash, instapay, e_wallet, visa, bank_transfer, check
     public string $filterStatus = 'active'; // active, trashed, all
     public ?string $fromDate = null;
@@ -30,6 +31,7 @@ class ExpenseIndex extends Component
 
     // Form fields
     public string $category = 'شنط وأكياس';
+    public string $cost_center = 'operational';
     public string $title = '';
     public string $amount = '0.000';
     public string $expense_date = '';
@@ -46,6 +48,19 @@ class ExpenseIndex extends Component
         'نثريات ومصاريف تشغيل',
     ];
 
+    public array $costCenters = [
+        'operational' => 'مصاريف تشغيلية ونثريات',
+        'rent'        => 'إيجارات مقرات وفروع',
+        'utilities'   => 'كهرباء ومياه وغاز ومرافق',
+        'salaries'    => 'رواتب وعمالة وإكراميات',
+        'vehicles'    => 'وقود وزيوت وصيانة سيارات',
+        'maintenance' => 'صيانة معدات وديكورات',
+        'packaging'   => 'مطبوعات وكراتين وتعبئة',
+        'hospitality' => 'ضيافة ونظافة وبوفيه',
+        'marketing'   => 'تسويق وإعلانات ودعاية',
+        'shipping'    => 'شحن ونولون وتوصيل خارجي',
+    ];
+
     public function mount()
     {
         abort_if(!auth()->user()?->can('expenses.manage'), 403, 'غير مصرح لك بإدارة المصروفات');
@@ -58,6 +73,7 @@ class ExpenseIndex extends Component
     {
         return [
             'category'       => 'required|string|max:100',
+            'cost_center'    => 'required|string|max:50',
             'title'          => 'required|string|max:255',
             'amount'         => 'required|numeric|min:0.01',
             'expense_date'   => 'required|date',
@@ -70,6 +86,7 @@ class ExpenseIndex extends Component
     {
         return [
             'category.required'     => 'يرجى اختيار تصنيف المصروف.',
+            'cost_center.required'  => 'يرجى تحديد مركز التكلفة.',
             'title.required'        => 'يرجى إدخال اسم البند / بيان الصرف (مثل: شراء شنط أو أكواب).',
             'amount.required'       => 'يرجى تحديد المبلغ المصروف.',
             'amount.min'            => 'المبلغ يجب أن يكون أكبر من الصفر.',
@@ -84,6 +101,7 @@ class ExpenseIndex extends Component
         $this->reset(['title', 'notes', 'editExpenseId']);
         $this->isEditMode = false;
         $this->category = 'شنط وأكياس';
+        $this->cost_center = 'packaging';
         $this->amount = '0.000';
         $this->expense_date = now()->toDateString();
         $this->payment_method = 'cash';
@@ -96,6 +114,15 @@ class ExpenseIndex extends Component
         if (empty($this->title)) {
             $this->title = 'شراء ' . $cat;
         }
+
+        // Auto-assign smart cost center
+        $this->cost_center = match ($cat) {
+            'شنط وأكياس', 'أكواب ورقية وبلاستيكية', 'لاصق وشرائط تغليف' => 'packaging',
+            'بوفيه وضيافة' => 'hospitality',
+            'صيانة مطاحن ومعدات' => 'maintenance',
+            'إيجار وكهرباء ومرافق' => 'utilities',
+            default => 'operational',
+        };
     }
 
     public function selectQuickAmount($val)
@@ -111,6 +138,7 @@ class ExpenseIndex extends Component
         $this->isEditMode = true;
         $this->editExpenseId = $expense->id;
         $this->category = $expense->category;
+        $this->cost_center = $expense->cost_center ?: 'operational';
         $this->title = $expense->title;
         $this->amount = (string)$expense->amount;
         $this->expense_date = $expense->expense_date->format('Y-m-d');
@@ -124,10 +152,13 @@ class ExpenseIndex extends Component
         abort_if(!auth()->user()?->can('expenses.manage'), 403, 'غير مصرح لك بحفظ المصروفات');
         $this->validate();
 
+        $currentStoreId = session('current_store_id') ?? auth()->user()?->getCurrentStore()?->id ?? 1;
+
         if ($this->isEditMode && $this->editExpenseId) {
             $expense = Expense::findOrFail($this->editExpenseId);
             $expense->update([
                 'category'       => $this->category,
+                'cost_center'    => $this->cost_center,
                 'title'          => $this->title,
                 'amount'         => $this->amount,
                 'expense_date'   => $this->expense_date,
@@ -148,10 +179,12 @@ class ExpenseIndex extends Component
             $expense = Expense::create([
                 'expense_number' => $expenseNumber,
                 'category'       => $this->category,
+                'cost_center'    => $this->cost_center,
                 'title'          => $this->title,
                 'amount'         => $this->amount,
                 'expense_date'   => $this->expense_date,
                 'payment_method' => $this->payment_method,
+                'store_id'       => $currentStoreId,
                 'user_id'        => Auth::id() ?? 1,
                 'notes'          => $this->notes,
             ]);
@@ -212,6 +245,7 @@ class ExpenseIndex extends Component
                 });
             })
             ->when($this->filterCategory !== 'all', fn($q) => $q->where('category', $this->filterCategory))
+            ->when($this->filterCostCenter !== 'all', fn($q) => $q->where('cost_center', $this->filterCostCenter))
             ->when($this->filterPaymentMethod !== 'all', fn($q) => $q->where('payment_method', $this->filterPaymentMethod))
             ->when($this->fromDate, fn($q) => $q->whereDate('expense_date', '>=', $this->fromDate))
             ->when($this->toDate, fn($q) => $q->whereDate('expense_date', '<=', $this->toDate));

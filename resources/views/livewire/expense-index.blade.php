@@ -104,6 +104,19 @@
             </div>
 
             <div>
+                <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">مركز التكلفة:</label>
+                <select
+                    wire:model.live="filterCostCenter"
+                    class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-slate-900 dark:[&>option]:text-slate-100"
+                >
+                    <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="all">كل مراكز التكلفة</option>
+                    @foreach($costCenters as $ccKey => $ccLabel)
+                        <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="{{ $ccKey }}">{{ $ccLabel }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
                 <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">طريقة الدفع:</label>
                 <select
                     wire:model.live="filterPaymentMethod"
@@ -154,9 +167,14 @@
                             {{ $exp->expense_date->format('Y-m-d') }}
                         </td>
                         <td class="px-5 py-4">
-                            <span class="px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[11px] font-bold border border-slate-200 dark:border-slate-700">
-                                {{ $exp->category }}
-                            </span>
+                            <div class="flex flex-col gap-1">
+                                <span class="px-2.5 py-0.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[11px] font-bold border border-slate-200 dark:border-slate-700 inline-block w-fit">
+                                    {{ $exp->category }}
+                                </span>
+                                <span class="text-[10px] text-amber-600 dark:text-amber-400 font-bold">
+                                    🎯 {{ $exp->cost_center_label }}
+                                </span>
+                            </div>
                         </td>
                         <td class="px-5 py-4">
                             <div class="font-bold text-slate-900 dark:text-white text-sm">{{ $exp->title }}</div>
@@ -312,16 +330,32 @@
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">طريقة الدفع:</label>
-                    <select
-                        wire:model="payment_method"
-                        class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                    >
-                        <option value="cash">💵 نقدي من خزينة الكاشير</option>
-                        <option value="instapay">⚡ تحويل إنستاباي (InstaPay)</option>
-                        <option value="e_wallet">📲 محفظة إلكترونية (فودافون/أورانج/اتصالات)</option>
-                    </select>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">مركز التكلفة:</label>
+                        <select
+                            wire:model="cost_center"
+                            class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-xs font-bold focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                        >
+                            @foreach($costCenters as $ccKey => $ccLabel)
+                                <option value="{{ $ccKey }}">{{ $ccLabel }}</option>
+                            @endforeach
+                        </select>
+                        @error('cost_center') <span class="text-xs text-rose-500 mt-1 block font-bold">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">طريقة الدفع:</label>
+                        <select
+                            wire:model="payment_method"
+                            class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-xs font-bold focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                        >
+                            <option value="cash">💵 نقداً من الخزينة (الدرج)</option>
+                            <option value="instapay">⚡ إنستاباي (InstaPay)</option>
+                            <option value="e_wallet">📲 محفظة إلكترونية</option>
+                            <option value="bank_transfer">🏦 تحويل بنكي</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div>
