@@ -5,7 +5,7 @@
             <h2 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2 font-tajawal">
                 <span>📥 فاتورة شراء بضاعة وتوريد للمخزن</span>
             </h2>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">إضافة وتوريد البن الأخضر والمواد الخام بالميزان أو القطعة وتحديث متوسط التكلفة وحسابات الموردين</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">إضافة وتوريد الأصناف والبضاعة بالميزان أو القطعة وتحديث متوسط التكلفة وحسابات الموردين</p>
         </div>
         
         <div class="flex items-center gap-2">
@@ -50,7 +50,7 @@
                     <input 
                         type="text" 
                         wire:model.live.debounce.150ms="searchQuery" 
-                        placeholder="🔍 المس للبحث بالاسم أو الكود (بن خام، شاي، مستلزمات...)" 
+                        placeholder="🔍 ابحث بالاسم أو الباركود أو الكود لإضافة صنف للتوريد..." 
                         class="w-full h-12 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-2xl px-4 pl-10 text-sm font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     >
                     @if($searchQuery)
