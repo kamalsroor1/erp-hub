@@ -17,9 +17,9 @@ Schedule::command('queue:work --stop-when-empty --tries=3 --max-time=55')
 Schedule::command('queue:restart')
     ->everySixHours();
 
-// 3. Clear old Pulse monitoring entries older than 7 days
-Schedule::command('pulse:clear --expired=7')
-    ->daily();
+// 3. Clear old Pulse monitoring entries weekly
+Schedule::command('pulse:clear --force')
+    ->weekly();
 
 // 4. Send daily EOD business summary report to Telegram at 11:59 PM
 Schedule::command('notify:daily-summary')

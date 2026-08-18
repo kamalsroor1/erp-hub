@@ -70,13 +70,14 @@ class InvoiceEdit extends Component
 
         $this->items = [];
         foreach ($this->invoice->items as $line) {
+            $itm = $line->item ?: \App\Models\Item::withTrashed()->find($line->item_id);
             $this->items[] = [
                 'item_id'         => $line->item_id,
-                'code'            => $line->item->code,
-                'name'            => $line->item->name,
-                'category'        => $line->item->category,
-                'unit'            => $line->item->unit ?: 'كجم',
-                'current_stock'   => $line->item->current_stock,
+                'code'            => $itm?->code ?? '—',
+                'name'            => $itm?->name ?? 'صنف غير معروف',
+                'category'        => $itm?->category ?? 'عام',
+                'unit'            => $itm?->unit ?: 'كجم',
+                'current_stock'   => (string)($itm?->current_stock ?? '0.000'),
                 'quantity'        => (string)$line->quantity,
                 'unit_price'      => (string)$line->unit_price,
                 'discount_amount' => (string)($line->discount_amount ?: '0.000'),
