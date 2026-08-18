@@ -11,19 +11,28 @@
                 </p>
             </div>
 
-            <!-- Store Selector -->
-            <!-- Store Selector -->
-            <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-2xl px-3 py-2 shrink-0">
-                <span class="text-xs font-bold text-slate-500 dark:text-slate-400">🏬 نطاق الفرع:</span>
-                <select wire:model.live="selectedStoreId" class="bg-transparent text-xs font-black text-slate-900 dark:text-white focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-slate-900 dark:[&>option]:text-slate-100">
-                    <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="all">🏢 إجمالي كافة الفروع والمخازن وعربات التوزيع</option>
-                    @foreach($stores as $st)
-                    <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="{{ $st->id }}">
-                        @if($st->type === 'wholesale_van') 🚚 @elseif($st->type === 'main_warehouse') 🏢 @else 🏬 @endif
-                        {{ $st->name }}
-                    </option>
-                    @endforeach
-                </select>
+            <!-- Store Selector & Print Button -->
+            <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-2xl px-3 py-2 shrink-0">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">🏬 نطاق الفرع:</span>
+                    <select wire:model.live="selectedStoreId" class="bg-transparent text-xs font-black text-slate-900 dark:text-white focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-slate-900 dark:[&>option]:text-slate-100">
+                        <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="all">🏢 إجمالي كافة الفروع والمخازن وعربات التوزيع</option>
+                        @foreach($stores as $st)
+                        <option class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white" value="{{ $st->id }}">
+                            @if($st->type === 'wholesale_van') 🚚 @elseif($st->type === 'main_warehouse') 🏢 @else 🏬 @endif
+                            {{ $st->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <a 
+                    href="{{ route('reports.print', ['tab' => $activeTab, 'store_id' => $selectedStoreId, 'from' => $fromDate, 'to' => $toDate]) }}" 
+                    target="_blank"
+                    class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-xs font-bold shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+                >
+                    <span>🖨️ طباعة التقرير A4</span>
+                </a>
             </div>
         </div>
 
