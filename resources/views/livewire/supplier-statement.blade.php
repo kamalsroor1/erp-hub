@@ -176,8 +176,8 @@
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">طريقة الدفع:</label>
                     <select wire:model="paymentMethod" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white">
                         <option value="cash">💵 نقدي (خزينة الكاشير)</option>
-                        <option value="bank_transfer">🏦 تحويل بنكي / فودافون كاش / إنستاباي</option>
-                        <option value="cheque">📝 شيك بنكي</option>
+                        <option value="instapay">⚡ تحويل إنستاباي (InstaPay)</option>
+                        <option value="e_wallet">📲 محفظة إلكترونية (فودافون/أورانج/اتصالات)</option>
                     </select>
                 </div>
 
