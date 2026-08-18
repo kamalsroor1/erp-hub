@@ -163,10 +163,37 @@
             <span>المتبقي:</span>
             <span>{{ number_format($invoice->remaining_amount, 2) }} ج.م</span>
         </div>
+
+        @php
+            $showCustomerBalance = \App\Models\Setting::getBool('thermal_show_customer_balance', true);
+            $footerNote = \App\Models\Setting::get('invoice_footer_note', 'شكراً لتعاملكم معنا');
+            $showQr = \App\Models\Setting::getBool('print_show_qr', true);
+            $customer = $invoice->customer;
+        @endphp
+
+        @if($showCustomerBalance && $customer && $customer->id != 1)
+        <div style="margin-top: 5px; padding-top: 4px; border-top: 1px dashed #000; font-size: 11px;">
+            <div style="display: flex; justify-content: space-between;">
+                <span>الرصيد الإجمالي على العميل:</span>
+                <span style="font-weight: 900;">{{ number_format($customer->current_balance, 2) }} ج.م</span>
+            </div>
+        </div>
+        @endif
     </div>
 
-    <div class="text-center py-2 border-t" style="margin-top: 8px;">
-        <p style="margin: 0; font-size: 11px; font-weight: 800;">شكراً لتعاملكم معنا</p>
+    @if($showQr)
+    <div class="text-center py-1" style="margin-top: 6px;">
+        <img 
+            src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data={{ urlencode(route('invoices.show', $invoice->id)) }}" 
+            alt="QR Code" 
+            style="width: 75px; height: 75px; margin: 0 auto; display: block;"
+        >
+        <span style="font-size: 9px; color: #555; display: block; margin-top: 2px;">امسح للتحقق من الفاتورة</span>
+    </div>
+    @endif
+
+    <div class="text-center py-2 border-t" style="margin-top: 6px;">
+        <p style="margin: 0; font-size: 11px; font-weight: 800;">{{ $footerNote ?: 'شكراً لتعاملكم معنا' }}</p>
     </div>
 
     </div>

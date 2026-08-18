@@ -56,11 +56,19 @@ class PurchaseCreate extends Component
             $this->supplier_id = $firstSupplier->id;
         }
 
-        // Smart Reorder Prefill
+        // Smart Reorder Prefill with Exact Suggested Quantities
         if (session()->has('smart_reorder_prefill')) {
-            $itemIds = (array)session()->pull('smart_reorder_prefill');
-            foreach ($itemIds as $id) {
-                $this->addItem($id, '1.000');
+            $prefill = (array)session()->pull('smart_reorder_prefill');
+            foreach ($prefill as $entry) {
+                if (is_array($entry)) {
+                    $itemId = $entry['item_id'] ?? null;
+                    $qty = (string)($entry['quantity'] ?? '1.000');
+                    if ($itemId) {
+                        $this->addItem($itemId, $qty);
+                    }
+                } else {
+                    $this->addItem((int)$entry, '1.000');
+                }
             }
         }
     }

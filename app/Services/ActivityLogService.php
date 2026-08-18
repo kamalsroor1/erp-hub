@@ -29,6 +29,9 @@ class ActivityLogService
         ?int $storeId = null
     ): ActivityLog {
         $resolvedUserId = $userId ?: Auth::id();
+        if ($resolvedUserId && !User::where('id', $resolvedUserId)->exists()) {
+            $resolvedUserId = null;
+        }
         
         $resolvedStoreId = $storeId 
             ?: session('current_store_id') 
@@ -38,6 +41,10 @@ class ActivityLogService
             ?: ($subject instanceof Purchase ? $subject->store_id : null)
             ?: ($subject instanceof Expense ? $subject->store_id : null)
             ?: Store::getMainStore()?->id;
+
+        if ($resolvedStoreId && !Store::where('id', $resolvedStoreId)->exists()) {
+            $resolvedStoreId = null;
+        }
 
         return ActivityLog::create([
             'user_id'      => $resolvedUserId,

@@ -93,7 +93,16 @@ class DashboardAnalyticsService
             }
         }
 
-        // Find peak hour
+        // Find peak hour & compute formatting
+        $peakSales = collect($hourlySales)->max(fn($item) => (float)$item['sales']) ?: 1.0;
+
+        foreach ($hourlySales as &$hRow) {
+            $hSalesFloat = (float)$hRow['sales'];
+            $hRow['intensity'] = $peakSales > 0 ? min(100, max(0, round(($hSalesFloat / $peakSales) * 100))) : 0;
+            $hRow['sales_formatted'] = number_format($hSalesFloat, 2) . ' ج.م';
+        }
+        unset($hRow);
+
         $peakHourData = collect($hourlySales)->sortByDesc(fn($item) => (float)$item['sales'])->first();
 
         // 5. Payment Methods Distribution (Period)

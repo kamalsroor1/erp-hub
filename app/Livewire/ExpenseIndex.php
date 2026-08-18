@@ -194,6 +194,13 @@ class ExpenseIndex extends Component
                 'title' => 'تم تسجيل المصروف!',
                 'text'  => "تم إضافة بند المصروف [{$expense->title}] بمبلغ " . number_format($expense->amount, 2) . " ج.م بنجاح."
             ]);
+
+            app(\App\Services\ActivityLogService::class)->log(
+                module: 'expenses',
+                action: 'created',
+                description: "تم تسجيل مصروف تشغيلي جديد [{$expense->title}] بقيمة " . number_format((float)$expense->amount, 2) . " ج.م",
+                subject: $expense
+            );
         }
 
         $this->showModal = false;
@@ -205,7 +212,15 @@ class ExpenseIndex extends Component
         abort_if(!auth()->user()?->can('expenses.manage'), 403, 'غير مصرح لك بحذف المصروفات');
         $expense = Expense::findOrFail($id);
         $title = $expense->title;
+        $amount = $expense->amount;
         $expense->delete(); // Soft delete
+
+        app(\App\Services\ActivityLogService::class)->log(
+            module: 'expenses',
+            action: 'deleted',
+            description: "تم نقل بيان المصروف [{$title}] بمبلغ " . number_format((float)$amount, 2) . " ج.م إلى سلة المحذوفات",
+            subject: $expense
+        );
 
         $this->dispatch('swal:toast', [
             'type'  => 'success',

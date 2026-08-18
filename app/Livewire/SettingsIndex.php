@@ -23,9 +23,13 @@ class SettingsIndex extends Component
     // Branding & Printing Settings
     public string $company_name = 'سرور كوفي';
     public string $company_subtitle = 'لتوريدات خامات مطاحن البن';
+    public string $invoice_footer_note = 'شكراً لتعاملكم معنا - البضاعة المباعة ترد وتستبدل خلال 14 يوماً';
     public bool $show_print_company_name = true;
     public bool $show_print_subtitle = true;
     public bool $show_print_logo = true;
+    public bool $thermal_show_customer_balance = true;
+    public bool $print_show_qr = true;
+    public string $invoice_primary_color = 'amber';
     public $logo_file = null;
 
     // Telegram Bot Notifications
@@ -41,9 +45,13 @@ class SettingsIndex extends Component
         // Load Branding Settings
         $this->company_name = Setting::get('company_name', 'سرور كوفي');
         $this->company_subtitle = Setting::get('company_subtitle', 'لتوريدات خامات مطاحن البن');
+        $this->invoice_footer_note = Setting::get('invoice_footer_note', 'شكراً لتعاملكم معنا - البضاعة المباعة ترد وتستبدل خلال 14 يوماً');
         $this->show_print_company_name = Setting::getBool('show_print_company_name', true);
         $this->show_print_subtitle = Setting::getBool('show_print_subtitle', true);
         $this->show_print_logo = Setting::getBool('show_print_logo', true);
+        $this->thermal_show_customer_balance = Setting::getBool('thermal_show_customer_balance', true);
+        $this->print_show_qr = Setting::getBool('print_show_qr', true);
+        $this->invoice_primary_color = Setting::get('invoice_primary_color', 'amber');
 
         // Load Telegram Settings
         $this->telegram_bot_token = (string)(Setting::get('telegram_bot_token') ?? config('services.telegram.bot_token') ?? '');
@@ -61,12 +69,16 @@ class SettingsIndex extends Component
         abort_if(!auth()->user()?->hasRole('admin'), 403, 'غير مصرح');
 
         $this->validate([
-            'company_name'            => ['required', 'string', 'max:255'],
-            'company_subtitle'        => ['nullable', 'string', 'max:255'],
-            'show_print_company_name' => ['boolean'],
-            'show_print_subtitle'     => ['boolean'],
-            'show_print_logo'         => ['boolean'],
-            'logo_file'               => ['nullable', 'image', 'max:3072'],
+            'company_name'                   => ['required', 'string', 'max:255'],
+            'company_subtitle'               => ['nullable', 'string', 'max:255'],
+            'invoice_footer_note'            => ['nullable', 'string', 'max:500'],
+            'show_print_company_name'        => ['boolean'],
+            'show_print_subtitle'            => ['boolean'],
+            'show_print_logo'                => ['boolean'],
+            'thermal_show_customer_balance'  => ['boolean'],
+            'print_show_qr'                  => ['boolean'],
+            'invoice_primary_color'          => ['required', 'string', 'in:amber,emerald,blue,slate'],
+            'logo_file'                      => ['nullable', 'image', 'max:3072'],
         ], [
             'company_name.required' => 'يرجى إدخال اسم المؤسسة أو النشاط.',
             'logo_file.image'       => 'الملف المرفوع يجب أن يكون صورة صالحة (PNG/JPG/WEBP).',
@@ -80,9 +92,13 @@ class SettingsIndex extends Component
 
         Setting::set('company_name', $this->company_name);
         Setting::set('company_subtitle', $this->company_subtitle ?? '');
+        Setting::set('invoice_footer_note', $this->invoice_footer_note ?? '');
         Setting::set('show_print_company_name', $this->show_print_company_name ? '1' : '0');
         Setting::set('show_print_subtitle', $this->show_print_subtitle ? '1' : '0');
         Setting::set('show_print_logo', $this->show_print_logo ? '1' : '0');
+        Setting::set('thermal_show_customer_balance', $this->thermal_show_customer_balance ? '1' : '0');
+        Setting::set('print_show_qr', $this->print_show_qr ? '1' : '0');
+        Setting::set('invoice_primary_color', $this->invoice_primary_color);
 
         $this->dispatch('swal:toast', [
             'type'  => 'success',

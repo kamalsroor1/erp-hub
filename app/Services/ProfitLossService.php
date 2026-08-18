@@ -8,15 +8,28 @@ use App\Models\Expense;
 use App\Models\Store;
 use App\Models\ReturnDocument;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class ProfitLossService
 {
+    public static function clearCache(?int $storeId = null): void
+    {
+        $prefix = 'sroor_pnl_' . ($storeId ?? 'all');
+        Cache::forget($prefix);
+        if ($storeId) {
+            Cache::forget('sroor_pnl_all');
+        }
+    }
+
     /**
      * Get Comprehensive Profit & Loss Statement per branch/van and company-wide
      */
     public function getProfitLossReport(string $fromDate, string $toDate, ?int $storeId = null): array
     {
-        $stores = Store::active()->get();
+        $cacheKey = "sroor_pnl_" . ($storeId ?? 'all') . "_{$fromDate}_{$toDate}";
+
+        return Cache::remember($cacheKey, now()->addMinutes(15), function () use ($fromDate, $toDate, $storeId) {
+            $stores = Store::active()->get();
 
         $storeReports = [];
         $grandRevenue = '0.000';
@@ -67,7 +80,7 @@ class ProfitLossService
             // 2. Returns in period
             $returns = ReturnDocument::with(['items.item'])
                 ->where('store_id', $store->id)
-                ->where('return_type', 'sale_return')
+                ->where('return_type', 'sales_return')
                 ->whereDate('return_date', '>=', $fromDate)
                 ->whereDate('return_date', '<=', $toDate)
                 ->get();
@@ -175,5 +188,6 @@ class ProfitLossService
             'from_date'         => $fromDate,
             'to_date'           => $toDate,
         ];
+        });
     }
 }

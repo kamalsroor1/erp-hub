@@ -7,18 +7,32 @@ use App\Models\InvoiceItem;
 use App\Models\Store;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class InventoryAnalyticsService
 {
+    public static function clearCache(?int $storeId = null): void
+    {
+        $prefix = 'sroor_abc_' . ($storeId ?? 'all');
+        Cache::forget($prefix);
+        // Also clear the 'all' key when specific store is cleared
+        if ($storeId) {
+            Cache::forget('sroor_abc_all');
+        }
+    }
+
     /**
      * Perform ABC Analysis and calculate sales velocity and dead stock
      */
     public function getAbcAnalysis(string $fromDate, string $toDate, ?int $storeId = null, string $sortBy = 'profit'): array
     {
-        $daysInPeriod = max(1, Carbon::parse($fromDate)->diffInDays(Carbon::parse($toDate)) + 1);
+        $cacheKey = "sroor_abc_" . ($storeId ?? 'all') . "_{$fromDate}_{$toDate}_{$sortBy}";
 
-        // 1. Get all active items with their current stock and unit cost
-        $items = Item::active()->get()->keyBy('id');
+        return Cache::remember($cacheKey, now()->addMinutes(15), function () use ($fromDate, $toDate, $storeId, $sortBy) {
+            $daysInPeriod = max(1, Carbon::parse($fromDate)->diffInDays(Carbon::parse($toDate)) + 1);
+
+            // 1. Get all active items with their current stock and unit cost
+            $items = Item::active()->get()->keyBy('id');
 
         // 2. Aggregate sales per item in period
         $salesQuery = InvoiceItem::query()
@@ -73,7 +87,7 @@ class InventoryAnalyticsService
                 'unit'               => $item->unit,
                 'current_stock'      => $currentStock,
                 'stock_value'        => $stockValue,
-                'unit_price'         => (string)$item->sale_price,
+                'unit_price'         => (string)$item->selling_price,
                 'unit_cost'          => $unitCost,
                 'quantity_sold'      => $qtySold,
                 'revenue'            => $revenue,
@@ -190,5 +204,6 @@ class InventoryAnalyticsService
                     : '0.0',
             ],
         ];
+        });
     }
 }

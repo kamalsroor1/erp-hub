@@ -230,6 +230,55 @@
                             </span>
                         </label>
                     </div>
+
+                    <!-- 4. Thermal Show Customer Balance -->
+                    <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <p class="text-sm font-bold text-slate-900 dark:text-white">إظهار الرصيد السابق والمتبقي على العميل في الإيصال الحراري</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                طباعة كشف حساب مصغر في ذيل الفاتورة للعملاء الآجلين
+                            </p>
+                        </div>
+
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0 self-end sm:self-center">
+                            <input type="checkbox" wire:model.live="thermal_show_customer_balance" class="sr-only peer">
+                            <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-amber-500"></div>
+                            <span class="ms-3 text-xs font-bold text-slate-700 dark:text-slate-300 min-w-[75px]">
+                                {{ $thermal_show_customer_balance ? 'مُفعّل (ظاهر)' : 'مُعطّل (مخفي)' }}
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- 5. Print Show QR Code -->
+                    <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <p class="text-sm font-bold text-slate-900 dark:text-white">إظهار رمز الاستجابة السريع (QR Code) للتحقق</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                طباعة QR كود إلكتروني للتحقق من الفاتورة ومطابقتها
+                            </p>
+                        </div>
+
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0 self-end sm:self-center">
+                            <input type="checkbox" wire:model.live="print_show_qr" class="sr-only peer">
+                            <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-amber-500"></div>
+                            <span class="ms-3 text-xs font-bold text-slate-700 dark:text-slate-300 min-w-[75px]">
+                                {{ $print_show_qr ? 'مُفعّل (ظاهر)' : 'مُعطّل (مخفي)' }}
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- 6. Invoice Footer Note Text -->
+                    <div class="pt-2">
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">
+                            نص التذييل والشكر في أسفل الفاتورة (Footer Note):
+                        </label>
+                        <input
+                            wire:model.defer="invoice_footer_note"
+                            type="text"
+                            placeholder="مثال: شكراً لتعاملكم معنا - البضاعة المباعة ترد وتستبدل خلال 14 يوماً"
+                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-2xl text-slate-900 dark:text-white text-xs font-bold focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                        >
+                    </div>
                 </div>
 
                 <div class="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-800">

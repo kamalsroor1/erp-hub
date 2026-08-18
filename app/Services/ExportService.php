@@ -295,4 +295,45 @@ class ExportService
 
         return $this->streamCsv($filename, $headers, $rows);
     }
+
+    /**
+     * Export ABC Inventory Analysis and Dead Stock to Excel / CSV
+     */
+    public function exportAbcAnalysis(array $abcData, string $filename = 'abc-inventory-analysis.csv'): StreamedResponse
+    {
+        $headers = [
+            'تصنيف ABC',
+            'كود الصنف',
+            'اسم الصنف',
+            'الرصيد الحالي بالمخزن',
+            'الوحدة',
+            'معدل السحب اليومي',
+            'الكمية المباعة في الفترة',
+            'إجمالي الإيراد (ج.م)',
+            'تكلفة البضاعة المباعة (ج.م)',
+            'مجمل الربح (ج.م)',
+            'هامش الربح %',
+            'نسبة المساهمة في الأرباح %',
+        ];
+
+        $rows = [];
+        foreach ($abcData['items'] as $item) {
+            $rows[] = [
+                'Class ' . $item['abc_class'],
+                $item['code'],
+                $item['name'],
+                number_format((float)$item['current_stock'], 3),
+                $item['unit'],
+                number_format((float)$item['velocity'], 3),
+                number_format((float)$item['quantity_sold'], 3),
+                number_format((float)$item['revenue'], 2),
+                number_format((float)$item['cogs'], 2),
+                number_format((float)$item['gross_profit'], 2),
+                $item['profit_margin'] . '%',
+                $item['profit_share'] . '%',
+            ];
+        }
+
+        return $this->streamCsv($filename, $headers, $rows);
+    }
 }

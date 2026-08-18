@@ -30,7 +30,7 @@ class SmartReorderIndex extends Component
         $this->selectedItems = $criticalItemIds;
     }
 
-    public function createPurchaseOrder()
+    public function createPurchaseOrder(ReorderAssistantService $service)
     {
         if (empty($this->selectedItems)) {
             $this->dispatch('swal:toast', [
@@ -41,8 +41,30 @@ class SmartReorderIndex extends Component
             return;
         }
 
-        // Store selected items in session to pre-fill purchase create
-        session(['smart_reorder_prefill' => $this->selectedItems]);
+        $storeFilter = ($this->selectedStoreId && $this->selectedStoreId !== 'all') ? (int)$this->selectedStoreId : null;
+        $data = $service->getReorderSuggestions(
+            storeId: $storeFilter,
+            analysisDays: $this->analysisDays,
+            targetCoverDays: $this->targetCoverDays
+        );
+
+        $suggestionsMap = collect($data['suggestions'])->keyBy('id');
+
+        $prefillItems = [];
+        foreach ($this->selectedItems as $itemId) {
+            $suggested = $suggestionsMap->get($itemId);
+            $qty = $suggested && bccomp((string)$suggested['suggested_quantity'], '0.000', 3) > 0
+                ? (string)$suggested['suggested_quantity']
+                : '1.000';
+
+            $prefillItems[] = [
+                'item_id'  => (int)$itemId,
+                'quantity' => $qty,
+            ];
+        }
+
+        // Store structured items in session to pre-fill purchase create
+        session(['smart_reorder_prefill' => $prefillItems]);
 
         return redirect()->route('purchases.create');
     }

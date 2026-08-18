@@ -283,7 +283,7 @@ class SelectedFeaturesSuiteTest extends TestCase
         // Livewire Dashboard Test
         Livewire::test(\App\Livewire\Dashboard::class)
             ->assertStatus(200)
-            ->assertSee('أوقات وساعات الذروة');
+            ->assertSee('ساعات الذروة');
     }
 
     public function test_smart_reorder_assistant_calculates_velocity_and_depletion(): void
@@ -348,5 +348,30 @@ class SelectedFeaturesSuiteTest extends TestCase
             'cost_center' => 'utilities',
             'amount'      => '450.000',
         ]);
+    }
+
+    public function test_notification_center_renders_and_reports_low_stock(): void
+    {
+        Item::create([
+            'name'            => 'صنف ناقص للتنبيه',
+            'code'            => 'NOTIF-LOW',
+            'cost_price'      => '50.000',
+            'selling_price'   => '80.000',
+            'current_stock'   => '1.000',
+            'min_stock_level' => '5.000',
+            'unit'            => 'كجم',
+            'is_active'       => true,
+        ]);
+
+        Livewire::test(\App\Livewire\NotificationCenter::class)
+            ->assertStatus(200)
+            ->assertSee('نواقص بالمخزن');
+    }
+
+    public function test_reports_index_exports_abc_excel(): void
+    {
+        Livewire::test(\App\Livewire\ReportsIndex::class)
+            ->call('exportAbc')
+            ->assertFileDownloaded('abc-inventory-' . now()->toDateString() . '-to-' . now()->toDateString() . '.csv');
     }
 }

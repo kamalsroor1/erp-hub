@@ -1014,6 +1014,9 @@
                     </div>
                     @endif
 
+                    <!-- 🔔 Live Notification Center -->
+                    <livewire:notification-center />
+
                     <!-- ☀️ / 🌙 Theme Toggle Button -->
                     <button
                         type="button"

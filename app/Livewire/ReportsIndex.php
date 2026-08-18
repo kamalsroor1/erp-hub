@@ -62,6 +62,18 @@ class ReportsIndex extends Component
         $this->activeTab = $tab;
     }
 
+    public function exportAbc()
+    {
+        $storeFilter = ($this->selectedStoreId && $this->selectedStoreId !== 'all') ? (int)$this->selectedStoreId : null;
+        $service = app(\App\Services\InventoryAnalyticsService::class);
+        $data = $service->getAbcAnalysis($this->fromDate, $this->toDate, $storeFilter);
+
+        $exportService = app(\App\Services\ExportService::class);
+        $filename = 'abc-inventory-' . $this->fromDate . '-to-' . $this->toDate . '.csv';
+
+        return $exportService->exportAbcAnalysis($data, $filename);
+    }
+
     public function render(ProfitService $profitService)
     {
         $storeFilter = ($this->selectedStoreId && $this->selectedStoreId !== 'all') 

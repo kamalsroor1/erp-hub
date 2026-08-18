@@ -1213,12 +1213,27 @@
 
         <!-- ABC Items Table -->
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden">
-            <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                     <h3 class="text-base font-bold text-slate-900 dark:text-white font-tajawal">جدول تصنيف حركة البضاعة والأرباح</h3>
                     <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">معدل البيع اليومي، الإيرادات، التكلفة، ومجمل ربح كل صنف</p>
                 </div>
-                <span class="text-xs font-bold text-slate-400 font-mono">{{ count($abcData['items']) }} صنف</span>
+                <div class="flex items-center gap-2">
+                    <button
+                        type="button"
+                        wire:click="exportAbc"
+                        class="px-3.5 py-2 bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white rounded-xl text-xs font-bold border border-emerald-500/30 transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                        <span>📥 تصدير Excel</span>
+                    </button>
+                    <a
+                        href="{{ route('reports.print', ['tab' => 'abc', 'store_id' => $selectedStoreId, 'from' => $fromDate, 'to' => $toDate]) }}"
+                        target="_blank"
+                        class="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold shadow-md shadow-purple-600/20 transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                        <span>🖨️ طباعة A4 / PDF</span>
+                    </a>
+                </div>
             </div>
 
             <div class="overflow-x-auto">
@@ -1318,9 +1333,20 @@
 
         <!-- Comparative Branch P&L Table -->
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden">
-            <div class="p-5 border-b border-slate-200 dark:border-slate-800">
-                <h3 class="text-base font-bold text-slate-900 dark:text-white font-tajawal">مقارنة ربحية وأداء الفروع وعربات التوزيع</h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">قائمة الدخل التفصيلية وصافي أرباح كل فرع بعد خصم مصروفاته المباشرة</p>
+            <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white font-tajawal">مقارنة ربحية وأداء الفروع وعربات التوزيع</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">قائمة الدخل التفصيلية وصافي أرباح كل فرع بعد خصم مصروفاته المباشرة</p>
+                </div>
+                <div>
+                    <a
+                        href="{{ route('reports.print', ['tab' => 'pnl', 'store_id' => $selectedStoreId, 'from' => $fromDate, 'to' => $toDate]) }}"
+                        target="_blank"
+                        class="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/20 transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                        <span>🖨️ طباعة قائمة الدخل (A4 / PDF)</span>
+                    </a>
+                </div>
             </div>
 
             <div class="overflow-x-auto">

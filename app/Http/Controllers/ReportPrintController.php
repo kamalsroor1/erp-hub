@@ -34,6 +34,8 @@ class ReportPrintController extends Controller
             'expenses'  => $this->printExpensesReport($fromDate, $toDate, $storeId, $storeName),
             'inventory' => $this->printInventoryReport($storeId, $storeName),
             'treasury'  => $this->printTreasuryReport($fromDate, $toDate, $storeId, $storeName, $request->query('method', 'all')),
+            'abc'       => $this->printAbcReport($fromDate, $toDate, $storeId, $storeName),
+            'pnl'       => $this->printProfitLossReport($fromDate, $toDate, $storeId, $storeName),
             default     => $this->printSalesReport($fromDate, $toDate, $storeId, $storeName, $profitService),
         };
     }
@@ -464,6 +466,128 @@ class ReportPrintController extends Controller
             ['value' => '+' . number_format((float)$data['total_inflows'], 2) . ' ج.م', 'class' => 'font-mono font-bold text-emerald-700'],
             ['value' => '-' . number_format((float)$data['total_outflows'], 2) . ' ج.م', 'class' => 'font-mono font-bold text-rose-700'],
             ['value' => number_format((float)$data['total_liquidity'], 2) . ' ج.م', 'class' => 'font-mono font-black text-emerald-800'],
+        ];
+
+        return view('layouts.print-report-a4', compact(
+            'reportTitle', 'storeName', 'fromDate', 'toDate', 'kpis', 'tableHeaders', 'tableRows', 'tableTotals'
+        ));
+    }
+
+    protected function printAbcReport($fromDate, $toDate, $storeId, $storeName)
+    {
+        $reportTitle = 'تقرير تحليل حركة البضاعة والأرباح (ABC Analysis)';
+
+        $service = app(\App\Services\InventoryAnalyticsService::class);
+        $data = $service->getAbcAnalysis($fromDate, $toDate, $storeId);
+
+        $kpis = [
+            ['label' => 'الأصناف الذهبية (Class A)', 'value' => "{$data['class_a']['count']} صنف ({$data['class_a']['share']}%)"],
+            ['label' => 'الأصناف المتوسطة (Class B)', 'value' => "{$data['class_b']['count']} صنف ({$data['class_b']['share']}%)"],
+            ['label' => 'الأصناف الراكدة (Class C)', 'value' => "{$data['class_c']['count']} صنف ({$data['class_c']['share']}%)"],
+            ['label' => 'إجمالي مجمل الأرباح', 'value' => number_format((float)$data['total_profit'], 2) . ' ج.م'],
+        ];
+
+        $tableHeaders = [
+            ['title' => 'التصنيف'],
+            ['title' => 'الكود'],
+            ['title' => 'اسم الصنف'],
+            ['title' => 'الرصيد بالمخزن'],
+            ['title' => 'السحب اليومي'],
+            ['title' => 'الكمية المباعة'],
+            ['title' => 'إجمالي الإيراد'],
+            ['title' => 'مجمل الربح'],
+            ['title' => 'هامش الربح %'],
+            ['title' => 'نسبة المساهمة %'],
+        ];
+
+        $tableRows = [];
+        foreach ($data['items'] as $item) {
+            $tableRows[] = [
+                ['value' => 'Class ' . $item['abc_class'], 'class' => 'font-bold ' . ($item['abc_class'] === 'A' ? 'text-amber-600' : ($item['abc_class'] === 'B' ? 'text-indigo-600' : 'text-slate-600'))],
+                ['value' => $item['code'], 'class' => 'font-mono text-slate-500'],
+                ['value' => $item['name'], 'class' => 'font-bold'],
+                ['value' => number_format((float)$item['current_stock'], 2) . ' ' . $item['unit'], 'class' => 'font-mono'],
+                ['value' => number_format((float)$item['velocity'], 2) . ' /يوم', 'class' => 'font-mono text-cyan-700'],
+                ['value' => number_format((float)$item['quantity_sold'], 2), 'class' => 'font-mono font-bold'],
+                ['value' => number_format((float)$item['revenue'], 2) . ' ج.م', 'class' => 'font-mono'],
+                ['value' => number_format((float)$item['gross_profit'], 2) . ' ج.م', 'class' => 'font-mono font-bold text-emerald-700'],
+                ['value' => $item['profit_margin'] . '%', 'class' => 'font-mono'],
+                ['value' => $item['profit_share'] . '%', 'class' => 'font-mono font-bold text-amber-700'],
+            ];
+        }
+
+        $tableTotals = [
+            ['value' => 'الإجمالي'],
+            ['value' => '—'],
+            ['value' => count($data['items']) . ' صنف'],
+            ['value' => '—'],
+            ['value' => '—'],
+            ['value' => '—'],
+            ['value' => number_format((float)$data['total_revenue'], 2) . ' ج.م', 'class' => 'font-mono font-bold'],
+            ['value' => number_format((float)$data['total_profit'], 2) . ' ج.م', 'class' => 'font-mono font-bold text-emerald-800'],
+            ['value' => '—'],
+            ['value' => '100%'],
+        ];
+
+        return view('layouts.print-report-a4', compact(
+            'reportTitle', 'storeName', 'fromDate', 'toDate', 'kpis', 'tableHeaders', 'tableRows', 'tableTotals'
+        ));
+    }
+
+    protected function printProfitLossReport($fromDate, $toDate, $storeId, $storeName)
+    {
+        $reportTitle = 'قائمة الدخل والأرباح والخسائر للفروع (P&L)';
+
+        $service = app(\App\Services\ProfitLossService::class);
+        $data = $service->getProfitLossReport($fromDate, $toDate, $storeId);
+
+        $kpis = [
+            ['label' => 'صافي المبيعات الإجمالية', 'value' => number_format((float)$data['grand_revenue'], 2) . ' ج.م'],
+            ['label' => 'تكلفة البضاعة المباعة (COGS)', 'value' => number_format((float)$data['grand_cogs'], 2) . ' ج.م'],
+            ['label' => 'المصروفات التشغيلية', 'value' => number_format((float)$data['grand_expenses'], 2) . ' ج.م'],
+            ['label' => 'صافي الربح التشغيلي', 'value' => number_format((float)$data['grand_net_profit'], 2) . ' ج.م (' . $data['grand_net_margin'] . '%)'],
+        ];
+
+        $tableHeaders = [
+            ['title' => 'الفرع / النقطة'],
+            ['title' => 'عدد الفواتير'],
+            ['title' => 'إجمالي المبيعات'],
+            ['title' => 'المرتجعات'],
+            ['title' => 'صافي الإيراد'],
+            ['title' => 'تكلفة البضاعة (COGS)'],
+            ['title' => 'مجمل الربح'],
+            ['title' => 'المصروفات'],
+            ['title' => 'صافي الربح النهائي'],
+            ['title' => 'هامش الصافي %'],
+        ];
+
+        $tableRows = [];
+        foreach ($data['stores'] as $st) {
+            $tableRows[] = [
+                ['value' => $st['store_name'] . ' (' . $st['store_code'] . ')', 'class' => 'font-bold'],
+                ['value' => (string)$st['invoices_count'], 'class' => 'font-mono'],
+                ['value' => number_format((float)$st['gross_sales'], 2) . ' ج.م', 'class' => 'font-mono'],
+                ['value' => number_format((float)$st['returns_amount'], 2) . ' ج.م', 'class' => 'font-mono text-rose-600'],
+                ['value' => number_format((float)$st['net_revenue'], 2) . ' ج.م', 'class' => 'font-mono font-bold'],
+                ['value' => number_format((float)$st['cogs'], 2) . ' ج.م', 'class' => 'font-mono text-slate-500'],
+                ['value' => number_format((float)$st['gross_profit'], 2) . ' ج.م', 'class' => 'font-mono font-bold text-emerald-700'],
+                ['value' => number_format((float)$st['expenses_total'], 2) . ' ج.م', 'class' => 'font-mono text-rose-700'],
+                ['value' => number_format((float)$st['net_operating_profit'], 2) . ' ج.م', 'class' => 'font-mono font-black ' . (bccomp((string)$st['net_operating_profit'], '0.000', 3) >= 0 ? 'text-emerald-800' : 'text-rose-800')],
+                ['value' => $st['net_margin'] . '%', 'class' => 'font-mono font-bold'],
+            ];
+        }
+
+        $tableTotals = [
+            ['value' => 'الإجمالي المجمع'],
+            ['value' => '—'],
+            ['value' => '—'],
+            ['value' => '—'],
+            ['value' => number_format((float)$data['grand_revenue'], 2) . ' ج.م', 'class' => 'font-mono font-bold'],
+            ['value' => number_format((float)$data['grand_cogs'], 2) . ' ج.م', 'class' => 'font-mono'],
+            ['value' => number_format((float)$data['grand_gross_profit'], 2) . ' ج.م', 'class' => 'font-mono font-bold text-emerald-700'],
+            ['value' => number_format((float)$data['grand_expenses'], 2) . ' ج.م', 'class' => 'font-mono text-rose-700'],
+            ['value' => number_format((float)$data['grand_net_profit'], 2) . ' ج.م', 'class' => 'font-mono font-black text-emerald-800'],
+            ['value' => $data['grand_net_margin'] . '%', 'class' => 'font-mono font-bold'],
         ];
 
         return view('layouts.print-report-a4', compact(

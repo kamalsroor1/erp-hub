@@ -110,8 +110,8 @@
                         @forelse($recentInvoices as $inv)
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                             <td class="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">{{ $inv->invoice_number }}</td>
-                            <td class="p-3 font-bold text-slate-800 dark:text-slate-200">{{ $inv->customer->name }}</td>
-                            <td class="p-3 text-slate-500 dark:text-slate-400 font-mono">{{ $inv->invoice_date->format('Y-m-d') }}</td>
+                            <td class="p-3 font-bold text-slate-800 dark:text-slate-200">{{ $inv->customer?->name ?? 'عميل نقدي' }}</td>
+                            <td class="p-3 text-slate-500 dark:text-slate-400 font-mono">{{ $inv->invoice_date?->format('Y-m-d') ?? '—' }}</td>
                             <td class="p-3 font-mono font-bold text-slate-900 dark:text-white">{{ number_format($inv->net_total, 2) }} ج.م</td>
                             <td class="p-3">
                                 @if($inv->status === 'cancelled')
@@ -232,29 +232,51 @@
 
         <!-- Peak Hours & Payment Split (1 Col) -->
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
-            <div>
-                <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-                    <span>⚡ أوقات وساعات الذروة (Peak Hours)</span>
-                </h3>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span>⚡ توزيع ساعات الذروة (24 ساعة)</span>
+                    </h3>
+                    @if($analytics['peak_hour'] && bccomp((string)$analytics['peak_hour']['sales'], '0.000', 3) > 0)
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400">
+                        الذروة: {{ $analytics['peak_hour']['label'] }}
+                    </span>
+                    @endif
+                </div>
 
-                @if($analytics['peak_hour'] && bccomp((string)$analytics['peak_hour']['sales'], '0.000', 3) > 0)
-                <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 mt-3 flex items-center justify-between">
-                    <div>
-                        <span class="text-[11px] font-bold text-amber-700 dark:text-amber-300 block">ساعة الذروة الأكثر نشاطاً:</span>
-                        <span class="text-lg font-black text-slate-900 dark:text-white font-tajawal">
-                            الساعة {{ $analytics['peak_hour']['label'] }}
-                        </span>
+                <!-- 24-Hour Micro Heatmap Grid -->
+                <div class="space-y-1.5">
+                    <div class="grid grid-cols-12 gap-1 pt-1">
+                        @foreach($analytics['hourly_sales'] as $hData)
+                        <div class="group relative flex flex-col items-center">
+                            <!-- Tooltip -->
+                            <div class="absolute -top-12 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[10px] font-mono px-2 py-1 rounded-lg pointer-events-none whitespace-nowrap shadow-xl z-20">
+                                <strong>{{ $hData['label'] }}</strong>: {{ $hData['sales_formatted'] }} ({{ $hData['invoices'] }} فاتورة)
+                            </div>
+
+                            <div 
+                                class="w-full h-8 rounded-lg transition-all cursor-pointer flex items-end justify-center overflow-hidden border border-slate-200/50 dark:border-slate-800 {{ $hData['intensity'] >= 75 ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/30' : ($hData['intensity'] >= 40 ? 'bg-amber-400/80 text-slate-900' : ($hData['intensity'] > 0 ? 'bg-amber-200/70 dark:bg-amber-950/60 text-slate-600' : 'bg-slate-100 dark:bg-slate-800/60')) }}"
+                                title="{{ $hData['label'] }}: {{ $hData['sales_formatted'] }}"
+                            >
+                                @if($hData['intensity'] > 0)
+                                <div class="w-full bg-amber-600/40" style="height: {{ max(15, $hData['intensity']) }}%"></div>
+                                @endif
+                            </div>
+                            <span class="text-[8px] font-mono text-slate-400 mt-0.5">{{ $hData['hour'] }}</span>
+                        </div>
+                        @endforeach
                     </div>
-                    <div class="text-left font-mono">
-                        <span class="text-sm font-black text-amber-600 dark:text-amber-400 block" dir="ltr">
-                            {{ number_format((float)$analytics['peak_hour']['sales'], 2) }} ج.م
-                        </span>
-                        <span class="text-[10px] text-slate-500">{{ $analytics['peak_hour']['invoices'] }} فاتورة</span>
+                    <div class="flex items-center justify-between text-[9px] text-slate-400 font-mono px-1">
+                        <span>12ص (منتصف الليل)</span>
+                        <span>12م (ظهراً)</span>
+                        <span>11م (مساءً)</span>
                     </div>
                 </div>
-                @else
-                <div class="p-4 text-center text-slate-400 text-xs">
-                    جاري تجميع بيانات ساعات الذروة...
+
+                @if($analytics['peak_hour'] && bccomp((string)$analytics['peak_hour']['sales'], '0.000', 3) > 0)
+                <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between">
+                    <span class="text-[11px] font-bold text-amber-700 dark:text-amber-300">أعلى ساعة مبيعات: {{ $analytics['peak_hour']['label'] }}</span>
+                    <span class="text-xs font-black font-mono text-amber-600 dark:text-amber-400" dir="ltr">{{ $analytics['peak_hour']['sales_formatted'] }} ({{ $analytics['peak_hour']['invoices'] }} فواتير)</span>
                 </div>
                 @endif
             </div>
