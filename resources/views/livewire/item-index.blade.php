@@ -150,10 +150,30 @@
                         <td class="p-3.5 text-center">
                             @if($item->trashed())
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">محذوف</span>
+                            @elseif(!$item->is_active)
+                                <button 
+                                    wire:click="toggleActive({{ $item->id }})" 
+                                    title="الصنف معطل ومخفي من شاشة المبيعات - انقر لإعادة التفعيل"
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-500/10 text-slate-600 dark:text-slate-400 border border-slate-500/20 hover:bg-slate-500/20 transition-colors cursor-pointer"
+                                >
+                                    ⏸️ معطل
+                                </button>
                             @elseif($item->isLowStock())
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">ناقص بالمخزن</span>
+                                <button 
+                                    wire:click="toggleActive({{ $item->id }})" 
+                                    title="الصنف نشط ولكن رصيده قليل - انقر لتعطيله"
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 transition-colors cursor-pointer"
+                                >
+                                    ⚠️ ناقص
+                                </button>
                             @else
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">متوفر</span>
+                                <button 
+                                    wire:click="toggleActive({{ $item->id }})" 
+                                    title="الصنف نشط ومتاح في البيع - انقر لتعطيله"
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors cursor-pointer"
+                                >
+                                    ✅ نشط
+                                </button>
                             @endif
                         </td>
                         <td class="p-3.5 text-center">
@@ -169,7 +189,25 @@
                                     </button>
                                     @endcan
                                 @else
+                                    @can('items.view')
+                                    <a 
+                                        href="{{ route('items.movements', $item->id) }}" 
+                                        title="كارت حركة الصنف"
+                                        class="px-2 py-1 bg-indigo-500/10 hover:bg-indigo-600 text-indigo-600 dark:text-indigo-400 hover:text-white rounded-lg text-xs font-bold border border-indigo-500/20 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                                    >
+                                        <span>📋</span>
+                                    </a>
+                                    @endcan
+
                                     @can('items.edit')
+                                    <button 
+                                        wire:click="openAdjustmentModal({{ $item->id }})" 
+                                        title="تسوية جردية وتصحيح رصيد المخزن"
+                                        class="px-2 py-1 bg-amber-500/10 hover:bg-amber-600 text-amber-600 dark:text-amber-400 hover:text-white rounded-lg text-xs font-bold border border-amber-500/20 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                                    >
+                                        <span>⚖️</span>
+                                    </button>
+
                                     <button 
                                         wire:click="openEditModal({{ $item->id }})" 
                                         title="تعديل بيانات الصنف"
@@ -182,8 +220,7 @@
                                     @can('items.delete')
                                     <button 
                                         wire:click="deleteItem({{ $item->id }})" 
-                                        wire:confirm="هل أنت متأكد من نقل هذا الصنف لسلة المحذوفات والأرشيف؟"
-                                        title="أرشفة الصنف"
+                                        title="حذف الصنف (مسموح فقط في حال عدم وجود معاملات تاريخية)"
                                         class="px-2 py-1 bg-rose-500/10 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white rounded-lg text-xs font-bold border border-rose-500/20 transition-colors inline-flex items-center gap-1 cursor-pointer"
                                     >
                                         <span>🗑️</span>
@@ -283,6 +320,95 @@
                     <button type="button" wire:click="$set('showModal', false)" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold cursor-pointer">إلغاء</button>
                     <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/30 cursor-pointer">
                         {{ $isEditMode ? 'حفظ التعديلات' : 'إضافة الصنف' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
+
+    <!-- Stock Adjustment Modal (نافذة التسوية الجردية وتصحيح رصيد المخزن) -->
+    @if($showAdjustmentModal)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-lg p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="font-bold text-amber-600 dark:text-amber-400 text-base flex items-center gap-2">
+                    <span>⚖️ تسوية جردية وتصحيح رصيد الصنف</span>
+                </h3>
+                <button wire:click="$set('showAdjustmentModal', false)" class="text-slate-400 hover:text-slate-700 dark:hover:text-white">✕</button>
+            </div>
+
+            <!-- Item Info Banner -->
+            <div class="p-3.5 bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-between text-xs">
+                <div>
+                    <span class="text-slate-400 block text-[10px]">الصنف المطلوب تسويته:</span>
+                    <strong class="text-slate-900 dark:text-white text-sm">{{ $adjustItemName }}</strong>
+                </div>
+                <div class="text-left">
+                    <span class="text-slate-400 block text-[10px]">الرصيد المسجل حالياً:</span>
+                    <span class="font-mono font-bold text-slate-700 dark:text-slate-300 text-sm">{{ number_format($currentRecordedStock, 3) }} {{ $adjustItemUnit }}</span>
+                </div>
+            </div>
+
+            <form wire:submit.prevent="saveStockAdjustment" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        الرصيد الفعلي على الميزان / بالجرد الفعلي ({{ $adjustItemUnit }}): <span class="text-rose-500">*</span>
+                    </label>
+                    <input 
+                        type="number" 
+                        step="0.001" 
+                        wire:model.live="actualCountStock" 
+                        required 
+                        class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-base font-mono font-black text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
+                    >
+                    @error('actualCountStock') <span class="text-rose-500 text-[10px] block mt-1">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Difference Calculator Preview -->
+                @php
+                    $diffVal = bcsub((string)($actualCountStock ?: '0'), (string)$currentRecordedStock, 3);
+                @endphp
+                <div class="p-3 rounded-xl border text-xs flex items-center justify-between {{ bccomp($diffVal, '0.000', 3) > 0 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300' : (bccomp($diffVal, '0.000', 3) < 0 ? 'bg-rose-500/10 border-rose-500/30 text-rose-700 dark:text-rose-300' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400') }}">
+                    <div class="flex items-center gap-1.5 font-bold">
+                        @if(bccomp($diffVal, '0.000', 3) > 0)
+                            <span>📈</span>
+                            <span>فارق تسوية بالزيادة (+):</span>
+                        @elseif(bccomp($diffVal, '0.000', 3) < 0)
+                            <span>📉</span>
+                            <span>فارق تسوية بالعجز/الهالك (-):</span>
+                        @else
+                            <span>⚖️</span>
+                            <span>لا يوجد فارق:</span>
+                        @endif
+                    </div>
+                    <span class="font-mono font-black text-sm" dir="ltr">
+                        {{ number_format($diffVal, 3) }} {{ $adjustItemUnit }}
+                    </span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">سبب التسوية الجردية: <span class="text-rose-500">*</span></label>
+                    <select wire:model="adjustmentReason" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
+                        <option value="عجز جرد وتصحيح وزن">عجز جرد وتصحيح وزن خطأ</option>
+                        <option value="هالك تحميص وتشغيل">هالك تحميص وتشغيل</option>
+                        <option value="بضاعة تالفة / كسر / انسكاب">بضاعة تالفة / كسر / انسكاب</option>
+                        <option value="زيادة جرد / خطأ تسجيل سابق">زيادة جرد / خطأ تسجيل سابق</option>
+                        <option value="تسوية جرد دوري معتمد">تسوية جرد دوري معتمد</option>
+                        <option value="أخرى">أخرى (موضحة بالملاحظات)</option>
+                    </select>
+                    @error('adjustmentReason') <span class="text-rose-500 text-[10px] block mt-1">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">ملاحظات توضيحية إضافية:</label>
+                    <input type="text" wire:model="adjustmentNotes" placeholder="أي تفاصيل لمدير الفرع أو المحاسب..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+                    <button type="button" wire:click="$set('showAdjustmentModal', false)" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold cursor-pointer">إلغاء</button>
+                    <button type="submit" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-amber-600/30 cursor-pointer flex items-center gap-1.5">
+                        <span>💾 تأكيد وتطبيق التسوية</span>
                     </button>
                 </div>
             </form>

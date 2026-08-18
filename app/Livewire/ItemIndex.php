@@ -33,6 +33,16 @@ class ItemIndex extends Component
     public $min_stock_level = '5.000';
     public $notes = '';
 
+    // Stock Adjustment Modal Properties
+    public $showAdjustmentModal = false;
+    public $adjustItemId = null;
+    public $adjustItemName = '';
+    public $adjustItemUnit = 'كجم';
+    public $currentRecordedStock = '0.000';
+    public $actualCountStock = '0.000';
+    public $adjustmentReason = 'عجز جرد وتصحيح وزن';
+    public $adjustmentNotes = '';
+
     protected function rules()
     {
         return [
@@ -143,12 +153,84 @@ class ItemIndex extends Component
         $this->showModal = false;
     }
 
+    public function openAdjustmentModal($itemId)
+    {
+        abort_if(!auth()->user()?->can('items.edit'), 403, 'غير مصرح لك بتسوية المخزون');
+        $item = Item::findOrFail($itemId);
+        $this->adjustItemId = $item->id;
+        $this->adjustItemName = $item->name;
+        $this->adjustItemUnit = $item->unit ?: 'كجم';
+        $this->currentRecordedStock = (string)$item->current_stock;
+        $this->actualCountStock = (string)$item->current_stock;
+        $this->adjustmentReason = 'عجز جرد وتصحيح وزن';
+        $this->adjustmentNotes = '';
+        $this->showAdjustmentModal = true;
+    }
+
+    public function saveStockAdjustment(StockService $stockService)
+    {
+        abort_if(!auth()->user()?->can('items.edit'), 403, 'غير مصرح لك بتسوية المخزون');
+        $this->validate([
+            'actualCountStock' => 'required|numeric|min:0',
+            'adjustmentReason' => 'required|string|min:3',
+        ]);
+
+        try {
+            $item = Item::findOrFail($this->adjustItemId);
+            $fullReason = $this->adjustmentReason . ($this->adjustmentNotes ? " - {$this->adjustmentNotes}" : '');
+            
+            $stockService->adjustStock(
+                item: $item,
+                actualQuantity: (string)$this->actualCountStock,
+                reason: $fullReason
+            );
+
+            $this->showAdjustmentModal = false;
+            session()->flash('success', "تم تنفيذ التسوية الجردية لصنف [{$item->name}] وضبط الرصيد الفعلي إلى {$this->actualCountStock} {$this->adjustItemUnit} بنجاح.");
+            $this->dispatch('swal:toast', [
+                'icon'  => 'success',
+                'title' => "تم تسوية وتصحيح رصيد [{$item->name}] بنجاح!"
+            ]);
+        } catch (\Exception $e) {
+            $this->dispatch('swal:toast', [
+                'icon'  => 'error',
+                'title' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function toggleActive($id)
+    {
+        abort_if(!auth()->user()?->can('items.edit'), 403, 'غير مصرح لك بتعديل حالة الصنف');
+        $item = Item::withTrashed()->findOrFail($id);
+        $item->is_active = !$item->is_active;
+        $item->save();
+
+        $state = $item->is_active ? 'تفعيل' : 'تعطيل وإخفاء من المبيعات';
+        $this->dispatch('swal:toast', [
+            'icon'  => 'info',
+            'title' => "تم {$state} للصنف [{$item->name}] بنجاح."
+        ]);
+    }
+
     public function deleteItem($id)
     {
         abort_if(!auth()->user()?->can('items.delete'), 403, 'غير مصرح لك بحذف أو أرشفة الأصناف');
         $item = Item::findOrFail($id);
         $name = $item->name;
-        $item->delete(); // Soft delete
+
+        $blockers = $item->getDeletionBlockers();
+        if (!empty($blockers)) {
+            $reasons = implode(' • ', $blockers);
+            $this->dispatch('swal:toast', [
+                'icon'  => 'warning',
+                'title' => "⚠️ لا يمكن حذف [{$name}] لوجود معاملات مرتبطة! يمكنك تعطيله بدلاً من حذفه."
+            ]);
+            session()->flash('error', "لا يمكن حذف الصنف [{$name}] لوجود قيود تاريخية: " . implode(' ، ', $blockers) . ". يمكنك الضغط على زر (تعطيل) لإيقاف بيعه دون التأثير على الحسابات.");
+            return;
+        }
+
+        $item->delete(); // Soft delete allowed only if 0 history
 
         session()->flash('success', "تم نقل الصنف [{$name}] إلى سلة المحذوفات بنجاح.");
         $this->dispatch('swal:toast', ['icon' => 'success', 'title' => "تم أرشفة الصنف [{$name}] بنجاح."]);
