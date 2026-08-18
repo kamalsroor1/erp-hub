@@ -73,14 +73,19 @@
         </div>
     </div>
 
+    @php
+        $companyName = \App\Models\Setting::get('company_name', 'مؤسسة سرور التجارية');
+        $companySubtitle = \App\Models\Setting::get('company_subtitle', 'للتجارة والتوزيع وإدارة المخزون');
+    @endphp
+
     <!-- Official Header -->
     <div class="border-b-2 border-slate-900 pb-4 mb-4">
         <div class="flex items-center justify-between">
             <div class="space-y-1">
                 <h1 class="text-xl font-black text-slate-950 flex items-center gap-2">
-                    <span>☕ سرور كوفي | Sroor Coffee ERP</span>
+                    <span>🏢 {{ $companyName }}</span>
                 </h1>
-                <p class="text-xs font-bold text-slate-600">نظام إدارة المخازن والمبيعات وتوليفات البن</p>
+                <p class="text-xs font-bold text-slate-600">{{ $companySubtitle }}</p>
                 <div class="text-[10px] text-slate-500 font-mono">
                     تاريخ استخراج التقرير: {{ now()->format('Y-m-d H:i') }} | بواسطة: {{ auth()->user()?->name ?? 'المسؤول' }}
                 </div>

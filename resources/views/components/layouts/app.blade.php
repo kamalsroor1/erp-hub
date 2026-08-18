@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @php
-        $siteCompanyName = \App\Models\Setting::get('company_name', 'سرور كوفي');
-        $siteSubtitle = \App\Models\Setting::get('company_subtitle', 'لتوريدات خامات مطاحن البن');
+        $siteCompanyName = \App\Models\Setting::get('company_name', 'سرور ERP');
+        $siteSubtitle = \App\Models\Setting::get('company_subtitle', 'لإدارة المبيعات والمخزون والتوزيع');
     @endphp
     <title>{{ $title ?? $siteCompanyName }} | {{ $siteCompanyName }} - {{ $siteSubtitle }}</title>
     
@@ -47,7 +47,7 @@
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="سرور كوفي">
+    <meta name="apple-mobile-web-app-title" content="{{ $siteCompanyName }}">
 
     <!-- Flatpickr (Modern Date Picker with Arabic Locale) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -1320,7 +1320,7 @@
                 <div class="flex items-center gap-3">
                     <img src="{{ asset('logo.png') }}" class="w-10 h-10 object-contain rounded-xl p-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700" alt="لوجو">
                     <div>
-                        <h3 class="font-black text-slate-900 dark:text-white text-base font-tajawal">تثبيت تطبيق سرور كوفي</h3>
+                        <h3 class="font-black text-slate-900 dark:text-white text-base font-tajawal">تثبيت تطبيق {{ $siteCompanyName }}</h3>
                         <p class="text-xs text-slate-500">على الشاشة الرئيسية للهاتف أو الكمبيوتر</p>
                     </div>
                 </div>

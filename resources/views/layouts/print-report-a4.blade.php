@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $reportTitle }} - A4 (سرور كوفي)</title>
+    @php
+        $companyName = \App\Models\Setting::get('company_name', 'مؤسسة سرور التجارية');
+        $companySubtitle = \App\Models\Setting::get('company_subtitle', 'للتجارة والتوزيع وإدارة المبيعات والمخزون');
+    @endphp
+    <title>{{ $reportTitle }} - A4 ({{ $companyName }})</title>
     
     <!-- Cairo / Tajawal Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -78,9 +82,9 @@
         <div class="flex items-center justify-between">
             <div class="space-y-1">
                 <h1 class="text-xl font-black text-slate-950 flex items-center gap-2">
-                    <span>☕ سرور كوفي | Sroor Coffee ERP</span>
+                    <span>🏢 {{ $companyName }}</span>
                 </h1>
-                <p class="text-xs font-bold text-slate-600">نظام إدارة الحسابات والأرباح والمخازن</p>
+                <p class="text-xs font-bold text-slate-600">{{ $companySubtitle }}</p>
                 <div class="text-[10px] text-slate-500 font-mono">
                     تاريخ الاستخراج: {{ now()->format('Y-m-d H:i') }} | بواسطة: {{ auth()->user()?->name ?? 'المسؤول' }}
                 </div>
