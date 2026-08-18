@@ -427,4 +427,74 @@ class LandedCostAndAdditionalExpensesFeatureTest extends TestCase
         $this->assertNotNull($treasuryExpense->payment_id);
         $this->assertEquals('15.000', $treasuryExpense->payment->amount);
     }
+
+    public function test_customer_charged_expenses_appear_in_a4_and_thermal_prints(): void
+    {
+        $item = Item::create([
+            'name'              => 'صنف مبيعات فاخر',
+            'code'              => 'EXP-ITEM-01',
+            'unit'              => 'قطعة',
+            'cost_price'        => '50.000',
+            'sale_price'        => '100.000',
+            'current_stock'     => '10.000',
+            'weighted_avg_cost' => '50.000',
+            'is_active'         => true,
+        ]);
+
+        /** @var InvoiceService $invoiceService */
+        $invoiceService = app(InvoiceService::class);
+
+        $invoice = $invoiceService->confirmInvoice([
+            'customer_id'    => $this->customer->id,
+            'store_id'       => $this->store->id,
+            'invoice_date'   => '2026-08-18',
+            'payment_type'   => 'cash',
+            'payment_method' => 'cash',
+            'items'          => [
+                [
+                    'item_id'    => $item->id,
+                    'quantity'   => '2.000',
+                    'unit_price' => '100.000',
+                ],
+            ],
+            'additional_expenses' => [
+                [
+                    'title'             => 'مصاريف الشحن والتوصيل',
+                    'amount'            => '35.000',
+                    'allocation_method' => 'by_quantity',
+                    'paid_by'           => 'customer_account',
+                ],
+                [
+                    'title'             => 'تغليف هدايا',
+                    'amount'            => '15.000',
+                    'allocation_method' => 'equal',
+                    'paid_by'           => 'customer_account',
+                ],
+                [
+                    'title'             => 'إكرامية داخلية للمحل',
+                    'amount'            => '10.000',
+                    'allocation_method' => 'equal',
+                    'paid_by'           => 'treasury_cash',
+                ],
+            ],
+        ]);
+
+        // 1. Check A4 Print contains customer expenses
+        $this->get(route('invoices.print.a4', $invoice->id))
+            ->assertStatus(200)
+            ->assertSee('مصاريف الشحن والتوصيل')
+            ->assertSee('35.00')
+            ->assertSee('تغليف هدايا')
+            ->assertSee('15.00')
+            ->assertDontSee('إكرامية داخلية للمحل'); // Internal treasury expense must NOT appear to customer
+
+        // 2. Check Thermal Print contains customer expenses
+        $this->get(route('invoices.print.thermal', $invoice->id))
+            ->assertStatus(200)
+            ->assertSee('مصاريف الشحن والتوصيل')
+            ->assertSee('35.00')
+            ->assertSee('تغليف هدايا')
+            ->assertSee('15.00')
+            ->assertDontSee('إكرامية داخلية للمحل');
+    }
 }
