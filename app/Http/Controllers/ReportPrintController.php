@@ -33,6 +33,7 @@ class ReportPrintController extends Controller
             'customers' => $this->printCustomersReport($fromDate, $toDate, $storeId, $storeName),
             'expenses'  => $this->printExpensesReport($fromDate, $toDate, $storeId, $storeName),
             'inventory' => $this->printInventoryReport($storeId, $storeName),
+            'treasury'  => $this->printTreasuryReport($fromDate, $toDate, $storeId, $storeName, $request->query('method', 'all')),
             default     => $this->printSalesReport($fromDate, $toDate, $storeId, $storeName, $profitService),
         };
     }
@@ -408,6 +409,62 @@ class ReportPrintController extends Controller
 
         $fromDate = null;
         $toDate = now()->toDateString();
+
+        return view('layouts.print-report-a4', compact(
+            'reportTitle', 'storeName', 'fromDate', 'toDate', 'kpis', 'tableHeaders', 'tableRows', 'tableTotals'
+        ));
+    }
+
+    protected function printTreasuryReport($fromDate, $toDate, $storeId, $storeName, $selectedMethod = 'all')
+    {
+        $reportTitle = 'تقرير الخزائن والسيولة وسجل التحويلات المالية';
+        $treasuryService = app(\App\Services\TreasuryService::class);
+        $data = $treasuryService->getTreasuryReport($fromDate, $toDate, $storeId, $selectedMethod);
+
+        $kpis = [
+            ['label' => 'درج النقدية (كاش)', 'value' => number_format((float)($data['accounts']['cash']['closing_balance'] ?? 0), 2) . ' ج.م', 'class' => 'text-emerald-700 font-bold'],
+            ['label' => 'إنستاباي (InstaPay)', 'value' => number_format((float)($data['accounts']['instapay']['closing_balance'] ?? 0), 2) . ' ج.م', 'class' => 'text-purple-700 font-bold'],
+            ['label' => 'المحافظ الذكية', 'value' => number_format((float)($data['accounts']['e_wallet']['closing_balance'] ?? 0), 2) . ' ج.م', 'class' => 'text-amber-700 font-bold'],
+            ['label' => 'إجمالي المقبوضات (+)', 'value' => '+' . number_format((float)$data['total_inflows'], 2) . ' ج.م', 'class' => 'text-slate-800'],
+            ['label' => 'إجمالي المدفوعات (-)', 'value' => '-' . number_format((float)$data['total_outflows'], 2) . ' ج.م', 'class' => 'text-rose-700'],
+            ['label' => '💰 إجمالي السيولة المجمعة (الكامل في الجميع)', 'value' => number_format((float)$data['total_liquidity'], 2) . ' ج.م', 'class' => 'text-emerald-800 text-base font-black'],
+        ];
+
+        $tableHeaders = [
+            ['title' => 'التاريخ والوقت'],
+            ['title' => 'رقم السند / المستند'],
+            ['title' => 'نوع الحركة'],
+            ['title' => 'الخزينة'],
+            ['title' => 'الطرف والبيان'],
+            ['title' => 'المقبوضات (+)'],
+            ['title' => 'المدفوعات (-)'],
+            ['title' => 'الرصيد بعد الحركة'],
+        ];
+
+        $tableRows = [];
+        foreach ($data['ledger_entries'] as $ent) {
+            $tableRows[] = [
+                ['value' => $ent['date'] . ' ' . $ent['time'], 'class' => 'font-mono text-slate-500'],
+                ['value' => $ent['doc_number'], 'class' => 'font-mono font-bold'],
+                ['value' => $ent['type_label']],
+                ['value' => $ent['method_label'], 'class' => 'font-bold'],
+                ['value' => $ent['party'] . ($ent['notes'] ? " - {$ent['notes']}" : '')],
+                ['value' => bccomp($ent['debit'], '0.000', 3) > 0 ? '+' . number_format((float)$ent['debit'], 2) . ' ج.م' : '—', 'class' => 'font-mono font-bold text-emerald-700'],
+                ['value' => bccomp($ent['credit'], '0.000', 3) > 0 ? '-' . number_format((float)$ent['credit'], 2) . ' ج.م' : '—', 'class' => 'font-mono font-bold text-rose-700'],
+                ['value' => number_format((float)$ent['running_balance'], 2) . ' ج.م', 'class' => 'font-mono font-bold text-slate-900'],
+            ];
+        }
+
+        $tableTotals = [
+            ['value' => 'الإجمالي المجمع (الكامل في الجميع)'],
+            ['value' => '—'],
+            ['value' => '—'],
+            ['value' => '—'],
+            ['value' => '—'],
+            ['value' => '+' . number_format((float)$data['total_inflows'], 2) . ' ج.م', 'class' => 'font-mono font-bold text-emerald-700'],
+            ['value' => '-' . number_format((float)$data['total_outflows'], 2) . ' ج.م', 'class' => 'font-mono font-bold text-rose-700'],
+            ['value' => number_format((float)$data['total_liquidity'], 2) . ' ج.م', 'class' => 'font-mono font-black text-emerald-800'],
+        ];
 
         return view('layouts.print-report-a4', compact(
             'reportTitle', 'storeName', 'fromDate', 'toDate', 'kpis', 'tableHeaders', 'tableRows', 'tableTotals'

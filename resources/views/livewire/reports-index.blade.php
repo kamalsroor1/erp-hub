@@ -158,6 +158,17 @@
                 {{ count($allItems) }} صنف
             </span>
         </button>
+
+        <button 
+            type="button"
+            wire:click="setTab('treasury')" 
+            class="px-4 py-3 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 {{ $activeTab === 'treasury' ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900' }}"
+        >
+            <span>💰 الخزائن والسيولة والتحويلات</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono {{ $activeTab === 'treasury' ? 'bg-white text-emerald-800 font-black' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                {{ number_format($treasuryData['total_liquidity'], 0) }} ج.م
+            </span>
+        </button>
     </div>
 
     <!-- ======================================================== -->
@@ -707,6 +718,389 @@
                             </td>
                         </tr>
                         @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- ======================================================== -->
+    <!-- 💰 TAB 7: تقرير الخزائن والسيولة والتحويلات المالية         -->
+    <!-- ======================================================== -->
+    @if($activeTab === 'treasury')
+    <div class="space-y-6">
+        <!-- Top KPI Cards: Individual Treasuries + Grand Total Combined Liquidity -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- 1. Cash Drawer -->
+            @php $cashAcc = $treasuryData['accounts']['cash'] ?? null; @endphp
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden group hover:border-emerald-400 transition-all">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">💵 درج النقدية (كاش)</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-mono">
+                        {{ $cashAcc['liquidity_share'] ?? '0' }}% من السيولة
+                    </span>
+                </div>
+                <div class="text-2xl font-black font-mono text-slate-900 dark:text-white mt-2">
+                    {{ number_format((float)($cashAcc['closing_balance'] ?? 0), 2) }} <span class="text-xs text-slate-400">ج.م</span>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 font-mono">
+                    <span class="text-emerald-600 font-bold">وارد: +{{ number_format((float)($cashAcc['inflows'] ?? 0), 2) }}</span>
+                    <span class="text-rose-500 font-bold">صادر: -{{ number_format((float)($cashAcc['outflows'] ?? 0), 2) }}</span>
+                </div>
+            </div>
+
+            <!-- 2. InstaPay -->
+            @php $instaAcc = $treasuryData['accounts']['instapay'] ?? null; @endphp
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden group hover:border-purple-400 transition-all">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">⚡ حساب إنستاباي (InstaPay)</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-mono">
+                        {{ $instaAcc['liquidity_share'] ?? '0' }}% من السيولة
+                    </span>
+                </div>
+                <div class="text-2xl font-black font-mono text-purple-700 dark:text-purple-400 mt-2">
+                    {{ number_format((float)($instaAcc['closing_balance'] ?? 0), 2) }} <span class="text-xs text-slate-400">ج.م</span>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 font-mono">
+                    <span class="text-emerald-600 font-bold">وارد: +{{ number_format((float)($instaAcc['inflows'] ?? 0), 2) }}</span>
+                    <span class="text-rose-500 font-bold">صادر: -{{ number_format((float)($instaAcc['outflows'] ?? 0), 2) }}</span>
+                </div>
+            </div>
+
+            <!-- 3. Smart E-Wallet -->
+            @php $walletAcc = $treasuryData['accounts']['e_wallet'] ?? null; @endphp
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden group hover:border-amber-400 transition-all">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">📲 المحافظ الذكية (فودافون/أورنج)</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-mono">
+                        {{ $walletAcc['liquidity_share'] ?? '0' }}% من السيولة
+                    </span>
+                </div>
+                <div class="text-2xl font-black font-mono text-amber-600 dark:text-amber-400 mt-2">
+                    {{ number_format((float)($walletAcc['closing_balance'] ?? 0), 2) }} <span class="text-xs text-slate-400">ج.م</span>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 font-mono">
+                    <span class="text-emerald-600 font-bold">وارد: +{{ number_format((float)($walletAcc['inflows'] ?? 0), 2) }}</span>
+                    <span class="text-rose-500 font-bold">صادر: -{{ number_format((float)($walletAcc['outflows'] ?? 0), 2) }}</span>
+                </div>
+            </div>
+
+            <!-- 4. Grand Total Combined Liquidity (الكامل في الجميع) -->
+            <div class="bg-gradient-to-tr from-slate-950 via-slate-900 to-emerald-950 text-white p-5 rounded-3xl border border-emerald-500/30 shadow-xl relative overflow-hidden group">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-emerald-300">💰 إجمالي السيولة المجمعة (الكامل في الجميع)</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500 text-slate-950">100% كاش متاح</span>
+                </div>
+                <div class="text-2xl sm:text-3xl font-black font-mono text-emerald-400 mt-2">
+                    {{ number_format((float)$treasuryData['total_liquidity'], 2) }} <span class="text-xs text-emerald-200">ج.م</span>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-emerald-200/80 mt-3 pt-3 border-t border-emerald-800/40 font-mono">
+                    <span>مقبوضات: +{{ number_format((float)$treasuryData['total_inflows'], 2) }}</span>
+                    <span>مدفوعات: -{{ number_format((float)$treasuryData['total_outflows'], 2) }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action / Sub-Filters Bar -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-100/80 dark:bg-slate-900/60 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <div class="flex items-center gap-2 overflow-x-auto">
+                <span class="text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">عرض كشف حساب:</span>
+                <button 
+                    type="button" 
+                    wire:click="$set('selectedTreasuryMethod', 'all')"
+                    class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer {{ $selectedTreasuryMethod === 'all' ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-sm' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200' }}"
+                >
+                    كل الخزن والحسابات
+                </button>
+                <button 
+                    type="button" 
+                    wire:click="$set('selectedTreasuryMethod', 'cash')"
+                    class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer {{ $selectedTreasuryMethod === 'cash' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200' }}"
+                >
+                    💵 درج الكاش
+                </button>
+                <button 
+                    type="button" 
+                    wire:click="$set('selectedTreasuryMethod', 'instapay')"
+                    class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer {{ $selectedTreasuryMethod === 'instapay' ? 'bg-purple-600 text-white shadow-sm' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200' }}"
+                >
+                    ⚡ إنستاباي
+                </button>
+                <button 
+                    type="button" 
+                    wire:click="$set('selectedTreasuryMethod', 'e_wallet')"
+                    class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer {{ $selectedTreasuryMethod === 'e_wallet' ? 'bg-amber-600 text-white shadow-sm' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200' }}"
+                >
+                    📲 المحافظ الذكية
+                </button>
+            </div>
+
+            <div class="flex items-center gap-2 self-end sm:self-center">
+                <a 
+                    href="{{ route('reports.print', ['tab' => 'treasury', 'store_id' => $selectedStoreId, 'from' => $fromDate, 'to' => $toDate, 'method' => $selectedTreasuryMethod]) }}" 
+                    target="_blank"
+                    class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-white dark:text-slate-950 rounded-xl font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+                >
+                    <span>🖨️ طباعة تقرير الخزينة A4</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 1. Multi-Account Comparison Summary Table -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+            <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/50">
+                <div>
+                    <h3 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">
+                        📑 جدول ملخص ومقارنة الخزائن وحسابات الدفع (Balances & Movements Summary)
+                    </h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        يوضح الرصيد الافتتاحي، وحركات الفترة، وصافي التحويلات، والرصيد النهائي لكل خزينة
+                    </p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-right border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-extrabold border-b border-slate-200 dark:border-slate-700">
+                            <th class="p-3.5">الخزينة / الحساب</th>
+                            <th class="p-3.5 text-center">رصيد أول المدة</th>
+                            <th class="p-3.5 text-center text-emerald-700 dark:text-emerald-400">مقبوضات الفترة (+)</th>
+                            <th class="p-3.5 text-center text-rose-700 dark:text-rose-400">مدفوعات ومصروفات (-)</th>
+                            <th class="p-3.5 text-center text-sky-700 dark:text-sky-400">تحويلات واردة (+)</th>
+                            <th class="p-3.5 text-center text-orange-700 dark:text-orange-400">تحويلات وعمولات (-)</th>
+                            <th class="p-3.5 text-center text-indigo-700 dark:text-indigo-400 font-black">الرصيد الختامي الحالي</th>
+                            <th class="p-3.5 text-center">نسبة السيولة</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                        @foreach($treasuryData['accounts'] as $acc)
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td class="p-3.5 font-bold flex items-center gap-2">
+                                <span class="text-base">{{ $acc['icon'] }}</span>
+                                <span class="text-slate-900 dark:text-white font-black">{{ $acc['label'] }}</span>
+                            </td>
+                            <td class="p-3.5 text-center font-mono text-slate-500 dark:text-slate-400">
+                                {{ number_format((float)$acc['opening_balance'], 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                                +{{ number_format((float)$acc['inflows'], 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold text-rose-600 dark:text-rose-400">
+                                -{{ number_format((float)$acc['outflows'], 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold text-sky-600 dark:text-sky-400">
+                                +{{ number_format((float)$acc['transfers_in'], 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold text-orange-600 dark:text-orange-400">
+                                -{{ number_format((float)bcadd((string)$acc['transfers_out'], (string)$acc['fees'], 3), 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-black text-sm text-slate-900 dark:text-white bg-slate-50/80 dark:bg-slate-800/60">
+                                {{ number_format((float)$acc['closing_balance'], 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-black {{ $acc['badge_class'] }}">
+                                    {{ $acc['liquidity_share'] }}%
+                                </span>
+                            </td>
+                        </tr>
+                        @endforeach
+                        <!-- Grand Total Row -->
+                        <tr class="bg-slate-900 text-white dark:bg-slate-950 font-black text-xs sm:text-sm border-t-2 border-slate-700">
+                            <td class="p-4">
+                                💰 الإجمالي الشامل (الكامل في الجميع)
+                            </td>
+                            <td class="p-4 text-center font-mono">
+                                {{ number_format((float)$treasuryData['total_opening'], 2) }} ج.م
+                            </td>
+                            <td class="p-4 text-center font-mono text-emerald-400">
+                                +{{ number_format((float)$treasuryData['total_inflows'], 2) }} ج.م
+                            </td>
+                            <td class="p-4 text-center font-mono text-rose-400">
+                                -{{ number_format((float)$treasuryData['total_outflows'], 2) }} ج.م
+                            </td>
+                            <td class="p-4 text-center font-mono text-sky-400">
+                                +{{ number_format((float)$treasuryData['total_transfers_in'], 2) }} ج.م
+                            </td>
+                            <td class="p-4 text-center font-mono text-orange-400">
+                                -{{ number_format((float)bcadd((string)$treasuryData['total_transfers_out'], (string)$treasuryData['total_fees'], 3), 2) }} ج.م
+                            </td>
+                            <td class="p-4 text-center font-mono text-emerald-400 text-base font-black bg-slate-950/60">
+                                {{ number_format((float)$treasuryData['total_liquidity'], 2) }} ج.م
+                            </td>
+                            <td class="p-4 text-center">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500 text-slate-950 font-black">100%</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 2. Inter-Treasury Transfers History Table -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+            <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/50">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center font-bold text-base">
+                        🔄
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">
+                            سجل التحويلات المالية بين الخزن (Inter-Treasury Transfers Log)
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">
+                            كافة التحويلات بين الكاش والإنستاباي والمحافظ مع تفاصيل العمولات والمستخدم المنفذ
+                        </p>
+                    </div>
+                </div>
+                <span class="px-2.5 py-1 bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-mono font-bold text-xs rounded-xl">
+                    {{ count($treasuryData['transfers']) }} تحويل
+                </span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-right border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-extrabold border-b border-slate-200 dark:border-slate-700">
+                            <th class="p-3.5">رقم التحويل</th>
+                            <th class="p-3.5">التاريخ والوقت</th>
+                            <th class="p-3.5">من خزينة</th>
+                            <th class="p-3.5">إلى خزينة</th>
+                            <th class="p-3.5 text-center">المبلغ المحول</th>
+                            <th class="p-3.5 text-center">عمولة السحب</th>
+                            <th class="p-3.5">الفرع</th>
+                            <th class="p-3.5">المسؤول</th>
+                            <th class="p-3.5">البيان والملاحظات</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                        @forelse($treasuryData['transfers'] as $trf)
+                        @php
+                            $fromEnum = \App\Enums\PaymentMethod::tryFrom($trf->from_method);
+                            $toEnum   = \App\Enums\PaymentMethod::tryFrom($trf->to_method);
+                        @endphp
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td class="p-3.5 font-mono font-bold text-purple-600 dark:text-purple-400">
+                                {{ $trf->transfer_number }}
+                            </td>
+                            <td class="p-3.5 font-mono text-slate-500">
+                                {{ $trf->transfer_date->format('Y-m-d') }}
+                                <span class="text-[10px] text-slate-400">({{ $trf->created_at->format('H:i') }})</span>
+                            </td>
+                            <td class="p-3.5">
+                                <span class="inline-flex items-center gap-1 font-bold text-rose-600 dark:text-rose-400">
+                                    <span>{{ $fromEnum?->icon() }}</span>
+                                    <span>{{ $fromEnum?->shortLabel() ?? $trf->from_method }}</span>
+                                </span>
+                            </td>
+                            <td class="p-3.5">
+                                <span class="inline-flex items-center gap-1 font-bold text-emerald-600 dark:text-emerald-400">
+                                    <span>{{ $toEnum?->icon() }}</span>
+                                    <span>{{ $toEnum?->shortLabel() ?? $trf->to_method }}</span>
+                                </span>
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-black text-slate-900 dark:text-white">
+                                {{ number_format((float)$trf->amount, 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-center font-mono {{ bccomp((string)$trf->transfer_fee, '0.000', 3) > 0 ? 'text-amber-600 font-bold' : 'text-slate-400' }}">
+                                {{ number_format((float)$trf->transfer_fee, 2) }} ج.م
+                            </td>
+                            <td class="p-3.5 text-slate-600 dark:text-slate-400">
+                                {{ $trf->store?->name ?? 'المركز الرئيسي' }}
+                            </td>
+                            <td class="p-3.5 font-medium text-slate-700 dark:text-slate-300">
+                                {{ $trf->creator?->name ?? 'النظام' }}
+                            </td>
+                            <td class="p-3.5 text-slate-500 dark:text-slate-400">
+                                {{ $trf->notes ?: '—' }}
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="9" class="p-8 text-center text-slate-400">
+                                لا توجد حركات تحويل مسجلة بين الخزن خلال هذه الفترة.
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. Running Chronological Ledger Table -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+            <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/50">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold text-base">
+                        📜
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">
+                            كشف حركة الخزينة التسلسلي والرصيد اللحظي (Running Treasury Ledger)
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">
+                            عرض تفصيلي زمني لكافة المقبوضات والمدفوعات والمصروفات والتحويلات مع الرصيد التراكمي
+                        </p>
+                    </div>
+                </div>
+                <span class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-mono font-bold text-xs rounded-xl">
+                    {{ count($treasuryData['ledger_entries']) }} حركة
+                </span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-right border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-extrabold border-b border-slate-200 dark:border-slate-700">
+                            <th class="p-3.5">التاريخ والوقت</th>
+                            <th class="p-3.5">رقم السند / المستند</th>
+                            <th class="p-3.5">نوع الحركة</th>
+                            <th class="p-3.5">الخزينة</th>
+                            <th class="p-3.5">الطرف والبيان</th>
+                            <th class="p-3.5 text-center text-emerald-700 dark:text-emerald-400">المقبوضات (وارد +)</th>
+                            <th class="p-3.5 text-center text-rose-700 dark:text-rose-400">المدفوعات (صادر -)</th>
+                            <th class="p-3.5 text-center text-indigo-700 dark:text-indigo-400 font-black">الرصيد بعد الحركة</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                        @forelse($treasuryData['ledger_entries'] as $ent)
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td class="p-3.5 font-mono text-slate-500">
+                                {{ $ent['date'] }} <span class="text-[10px] text-slate-400">({{ $ent['time'] }})</span>
+                            </td>
+                            <td class="p-3.5 font-mono font-bold text-slate-900 dark:text-white">
+                                {{ $ent['doc_number'] }}
+                            </td>
+                            <td class="p-3.5">
+                                <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold {{ $ent['debit'] > 0 ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300' : 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300' }}">
+                                    {{ $ent['type_label'] }}
+                                </span>
+                            </td>
+                            <td class="p-3.5 font-bold text-slate-700 dark:text-slate-300">
+                                {{ $ent['method_label'] }}
+                            </td>
+                            <td class="p-3.5">
+                                <span class="font-bold text-slate-900 dark:text-white">{{ $ent['party'] }}</span>
+                                <span class="text-[10px] text-slate-400 block">{{ $ent['notes'] }}</span>
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold {{ bccomp($ent['debit'], '0.000', 3) > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-300 dark:text-slate-600' }}">
+                                {{ bccomp($ent['debit'], '0.000', 3) > 0 ? '+' . number_format((float)$ent['debit'], 2) : '—' }}
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-bold {{ bccomp($ent['credit'], '0.000', 3) > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-300 dark:text-slate-600' }}">
+                                {{ bccomp($ent['credit'], '0.000', 3) > 0 ? '-' . number_format((float)$ent['credit'], 2) : '—' }}
+                            </td>
+                            <td class="p-3.5 text-center font-mono font-black text-slate-900 dark:text-white bg-slate-50/50 dark:bg-slate-800/30">
+                                {{ number_format((float)$ent['running_balance'], 2) }} ج.م
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="8" class="p-8 text-center text-slate-400">
+                                لا توجد حركات مسجلة بالخزينة خلال هذه الفترة.
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

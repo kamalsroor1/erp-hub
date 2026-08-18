@@ -45,6 +45,11 @@
                 <x-datepicker wire:model.live="selectedDate" class="w-32 !py-1 !px-2 !text-xs !bg-transparent !border-none focus:!ring-0" placeholder="اختر التاريخ" />
             </div>
 
+            <!-- View Full Treasury Report Button -->
+            <a href="{{ route('reports.index') }}?tab=treasury" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer font-tajawal">
+                <span>💰 تقرير الخزائن والسيولة</span>
+            </a>
+
             <!-- Print Daily Summary Button -->
             <a href="{{ route('daily.journal.print', ['date' => $selectedDate, 'store_id' => $selectedStoreId, 'autoprint' => 1]) }}" target="_blank" class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer font-tajawal">
                 <span>🖨️ طباعة تقرير A4 رسمي</span>

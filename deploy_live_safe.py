@@ -65,6 +65,7 @@ def main():
                 # 4. Safe Database Migration (Preserves all existing data 100%)
                 echo "🗄️ Running Safe Database Migrations (Zero Data Loss)..."
                 $PHP84 artisan migrate --force || true
+                $PHP84 artisan db:seed --class=PermissionsSeeder --force || true
 
                 # 5. Clear and Rebuild Caches
                 echo "⚡ Refreshing Application Cache..."

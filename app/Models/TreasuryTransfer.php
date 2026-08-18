@@ -38,6 +38,11 @@ class TreasuryTransfer extends Model
         return $this->belongsTo(User::class)->withTrashed();
     }
 
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id')->withTrashed();
+    }
+
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class)->withTrashed();

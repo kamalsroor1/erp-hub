@@ -14,9 +14,10 @@ use Illuminate\Support\Facades\DB;
 
 class ReportsIndex extends Component
 {
-    public $activeTab = 'sales'; // sales, items, stores, customers, expenses, inventory
+    public $activeTab = 'sales'; // sales, items, stores, customers, expenses, inventory, treasury
     public $dateFilter = 'today'; // today, this_week, this_month, this_year, custom
     public $selectedStoreId = 'all';
+    public $selectedTreasuryMethod = 'all'; // all, cash, instapay, e_wallet, visa
     public $inventoryStockFilter = 'all'; // all, in_stock, out_of_stock
     public $fromDate;
     public $toDate;
@@ -334,6 +335,14 @@ class ReportsIndex extends Component
 
         $expectedStockProfit = bcsub($stockSellingValuation, $stockCostValuation, 3);
 
+        $treasuryService = app(\App\Services\TreasuryService::class);
+        $treasuryData = $treasuryService->getTreasuryReport(
+            fromDate: $this->fromDate,
+            toDate: $this->toDate,
+            storeId: $storeFilter,
+            selectedMethod: $this->selectedTreasuryMethod
+        );
+
         return view('livewire.reports-index', [
             'stores'                 => $stores,
             'selectedStore'          => $selectedStore,
@@ -353,6 +362,7 @@ class ReportsIndex extends Component
             'totalInventoryCount'    => count($inventoryItems),
             'inStockCount'           => count(array_filter($inventoryItems, fn($i) => bccomp((string)$i->current_stock, '0.000', 3) > 0)),
             'zeroStockCount'         => count(array_filter($inventoryItems, fn($i) => bccomp((string)$i->current_stock, '0.000', 3) <= 0)),
+            'treasuryData'           => $treasuryData,
         ])->layout('components.layouts.app', ['title' => 'التقارير المالية والمبيعات والأرباح']);
     }
 }
