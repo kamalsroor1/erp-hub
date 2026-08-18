@@ -125,6 +125,87 @@
         </div>
     </div>
 
+    <!-- ========================================== -->
+    <!-- 🏛️ Live Treasury & Multi-Account Balances -->
+    <!-- ========================================== -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <span>🏛️ أرصدة الخزن وحسابات الدفع الفعلية الحالية</span>
+                </h3>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400">متابعة دقيقة لرصيد الكاش، إنستاباي، والمحافظ مع إمكانية التحويل المباشر بين الحسابات</p>
+            </div>
+            <button 
+                type="button" 
+                wire:click="openTransferModal" 
+                class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold rounded-xl shadow-md shadow-purple-600/20 flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto"
+            >
+                <span>🔄 تحويل رصيد بين الخزن</span>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <!-- 1. Cash Drawer -->
+            @php $cashBal = $treasuryBalances['cash'] ?? null; @endphp
+            <div class="p-3.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 space-y-1">
+                <div class="flex items-center justify-between text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                    <span class="flex items-center gap-1">💵 درج النقدية (الكاش)</span>
+                </div>
+                <div class="text-xl font-black text-emerald-700 dark:text-emerald-300 font-mono">
+                    {{ number_format($cashBal['balance'] ?? 0, 2) }} <span class="text-xs font-normal">ج.م</span>
+                </div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 pt-1 border-t border-emerald-500/10 flex justify-between">
+                    <span>وارد: +{{ number_format($cashBal['inflows'] ?? 0, 1) }}</span>
+                    <span>صادر: -{{ number_format($cashBal['outflows'] ?? 0, 1) }}</span>
+                </div>
+            </div>
+
+            <!-- 2. InstaPay -->
+            @php $instaBal = $treasuryBalances['instapay'] ?? null; @endphp
+            <div class="p-3.5 rounded-xl border border-purple-500/20 bg-purple-500/5 space-y-1">
+                <div class="flex items-center justify-between text-xs font-bold text-purple-700 dark:text-purple-400">
+                    <span class="flex items-center gap-1">⚡ حساب إنستاباي (InstaPay)</span>
+                </div>
+                <div class="text-xl font-black text-purple-700 dark:text-purple-300 font-mono">
+                    {{ number_format($instaBal['balance'] ?? 0, 2) }} <span class="text-xs font-normal">ج.م</span>
+                </div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 pt-1 border-t border-purple-500/10 flex justify-between">
+                    <span>وارد: +{{ number_format($instaBal['inflows'] ?? 0, 1) }}</span>
+                    <span>صادر: -{{ number_format($instaBal['outflows'] ?? 0, 1) }}</span>
+                </div>
+            </div>
+
+            <!-- 3. E-Wallet -->
+            @php $walletBal = $treasuryBalances['e_wallet'] ?? null; @endphp
+            <div class="p-3.5 rounded-xl border border-rose-500/20 bg-rose-500/5 space-y-1">
+                <div class="flex items-center justify-between text-xs font-bold text-rose-700 dark:text-rose-400">
+                    <span class="flex items-center gap-1">📲 المحفظة الذكية (كاش)</span>
+                </div>
+                <div class="text-xl font-black text-rose-700 dark:text-rose-300 font-mono">
+                    {{ number_format($walletBal['balance'] ?? 0, 2) }} <span class="text-xs font-normal">ج.م</span>
+                </div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 pt-1 border-t border-rose-500/10 flex justify-between">
+                    <span>وارد: +{{ number_format($walletBal['inflows'] ?? 0, 1) }}</span>
+                    <span>صادر: -{{ number_format($walletBal['outflows'] ?? 0, 1) }}</span>
+                </div>
+            </div>
+
+            <!-- 4. Total Liquidity -->
+            <div class="p-3.5 rounded-xl border-2 border-indigo-500/40 bg-indigo-500/5 space-y-1">
+                <div class="flex items-center justify-between text-xs font-black text-indigo-700 dark:text-indigo-400">
+                    <span class="flex items-center gap-1">💰 إجمالي السيولة النقدية</span>
+                </div>
+                <div class="text-xl font-black text-indigo-700 dark:text-indigo-300 font-mono">
+                    {{ number_format($treasuryBalances['total_liquidity'] ?? 0, 2) }} <span class="text-xs font-normal">ج.م</span>
+                </div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 pt-1 border-t border-indigo-500/10">
+                    مجموع كل الخزائن والحسابات
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 5 Daily High-Level Metric Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <!-- 1. Opening Cash Balance -->
@@ -199,6 +280,9 @@
                 </button>
                 <button @click="tab = 'purchases'" :class="tab === 'purchases' ? 'bg-amber-600 text-white shadow' : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'" class="px-2.5 sm:px-3 py-1.5 rounded-xl transition-all cursor-pointer">
                     🛒 المشتريات ({{ $purchases->count() }})
+                </button>
+                <button @click="tab = 'transfers'" :class="tab === 'transfers' ? 'bg-purple-600 text-white shadow' : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'" class="px-2.5 sm:px-3 py-1.5 rounded-xl transition-all cursor-pointer">
+                    🔄 التحويلات بين الخزن ({{ $transfers->count() }})
                 </button>
             </div>
 
@@ -360,6 +444,61 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Tab 5: Treasury Transfers Table -->
+            <div x-show="tab === 'transfers'" x-cloak class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+                <div class="p-3 bg-slate-50 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800 font-bold text-xs text-slate-900 dark:text-white flex items-center justify-between">
+                    <span>حركات التحويل بين الخزن وحسابات الدفع يوم {{ $selectedDate }}</span>
+                    <button type="button" wire:click="openTransferModal" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-[10px] font-bold cursor-pointer">
+                        + تحويل جديد
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-xs">
+                        <thead class="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-800">
+                            <tr>
+                                <th class="p-3">رقم التحويل</th>
+                                <th class="p-3">من الخزينة</th>
+                                <th class="p-3">إلى الخزينة</th>
+                                <th class="p-3">الوقت</th>
+                                <th class="p-3">المبلغ المحول</th>
+                                <th class="p-3">الرسوم / العمولة</th>
+                                <th class="p-3">المسؤول والبيان</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                            @forelse($transfers as $trf)
+                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                                <td class="p-3 font-mono font-bold text-purple-600 dark:text-purple-400">{{ $trf->transfer_number }}</td>
+                                <td class="p-3">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                                        {{ $trf->from_method_icon }} {{ $trf->from_method_label }}
+                                    </span>
+                                </td>
+                                <td class="p-3">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
+                                        {{ $trf->to_method_icon }} {{ $trf->to_method_label }}
+                                    </span>
+                                </td>
+                                <td class="p-3 text-slate-500 dark:text-slate-400 font-mono text-[11px]">{{ $trf->created_at->format('h:i A') }}</td>
+                                <td class="p-3 font-mono font-black text-slate-900 dark:text-white">{{ number_format($trf->amount, 2) }} ج.م</td>
+                                <td class="p-3 font-mono text-rose-600 dark:text-rose-400">{{ bccomp($trf->transfer_fee, '0.000', 3) > 0 ? number_format($trf->transfer_fee, 2) . ' ج.م' : '—' }}</td>
+                                <td class="p-3 text-slate-600 dark:text-slate-400 text-[11px]">
+                                    <span class="font-bold text-slate-800 dark:text-slate-200">{{ $trf->user->name ?? 'مستخدم' }}</span>
+                                    @if($trf->notes)
+                                        <div class="text-[10px] text-slate-400">{{ $trf->notes }}</div>
+                                    @endif
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="7" class="p-8 text-center text-slate-400">لا توجد تحويلات مسجلة بين الخزن في هذا اليوم</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <!-- Right Col: Daily Shifts Log & Drawer Reconciliation -->
@@ -480,6 +619,94 @@
             <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
                 <button type="button" wire:click="$set('showCloseModal', false)" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold cursor-pointer">إلغاء</button>
                 <button type="button" wire:click="submitCloseShift" class="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-rose-600/30 cursor-pointer">تأكيد التقفيل وإصدار Z-Report</button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Treasury Transfer Modal -->
+    @if($showTransferModal)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
+                    <span>🔄 تحويل رصيد مالي بين الخزائن والحسابات</span>
+                </h3>
+                <button wire:click="$set('showTransferModal', false)" class="text-slate-400 hover:text-slate-700 dark:hover:text-white text-sm cursor-pointer">✕</button>
+            </div>
+
+            @if($errorMessage)
+            <div class="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 text-xs font-bold">
+                {{ $errorMessage }}
+            </div>
+            @endif
+
+            <div class="space-y-3.5 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- From Method -->
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">التحويل من (الخزينة المحول منها):</label>
+                        <select wire:model.live="transfer_from_method" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500">
+                            @foreach(\App\Enums\PaymentMethod::activeMethods() as $m)
+                            @php $b = $treasuryBalances[$m->value]['balance'] ?? '0.000'; @endphp
+                            <option value="{{ $m->value }}">{{ $m->icon() }} {{ $m->label() }} (رصيد: {{ number_format($b, 2) }} ج.م)</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- To Method -->
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">التحويل إلى (الخزينة المستلمة):</label>
+                        <select wire:model.live="transfer_to_method" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500">
+                            @foreach(\App\Enums\PaymentMethod::activeMethods() as $m)
+                            @php $b = $treasuryBalances[$m->value]['balance'] ?? '0.000'; @endphp
+                            <option value="{{ $m->value }}">{{ $m->icon() }} {{ $m->label() }} (رصيد: {{ number_format($b, 2) }} ج.م)</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Amount & Fees -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">المبلغ المراد تحويله (ج.م):</label>
+                        <input 
+                            type="number" 
+                            step="0.001" 
+                            min="0.001" 
+                            wire:model="transfer_amount" 
+                            placeholder="0.00" 
+                            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono font-bold text-purple-600 dark:text-purple-400 focus:ring-2 focus:ring-purple-500"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">رسوم / عمولة التحويل (اختياري):</label>
+                        <input 
+                            type="number" 
+                            step="0.001" 
+                            min="0" 
+                            wire:model="transfer_fee" 
+                            placeholder="0.00" 
+                            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-purple-500"
+                        >
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">البيان / سبب التحويل:</label>
+                    <input 
+                        type="text" 
+                        wire:model="transfer_notes" 
+                        placeholder="مثال: سحب كاش من الـ ATM لتغذية درج المحل..." 
+                        class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500"
+                    >
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+                <button type="button" wire:click="$set('showTransferModal', false)" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold cursor-pointer">إلغاء</button>
+                <button type="button" wire:click="executeTransfer" class="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-600/30 cursor-pointer">تأكيد وتنفيذ التحويل</button>
             </div>
         </div>
     </div>

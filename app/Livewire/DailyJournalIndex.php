@@ -10,7 +10,9 @@ use App\Models\Purchase;
 use App\Models\ReturnDocument;
 use App\Models\CashShift;
 use App\Models\Store;
+use App\Models\TreasuryTransfer;
 use App\Services\ShiftService;
+use App\Services\TreasuryService;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 
@@ -27,6 +29,14 @@ class DailyJournalIndex extends Component
     public $close_notes = '';
     public $showOpenModal = false;
     public $showCloseModal = false;
+
+    // Treasury Transfer Modal
+    public $showTransferModal = false;
+    public $transfer_from_method = 'instapay';
+    public $transfer_to_method = 'cash';
+    public $transfer_amount = '';
+    public $transfer_fee = '';
+    public $transfer_notes = '';
 
     public $errorMessage = '';
     public $successMessage = '';
@@ -135,7 +145,57 @@ class DailyJournalIndex extends Component
         }
     }
 
-    public function render(ShiftService $shiftService)
+    public function openTransferModal()
+    {
+        $this->transfer_amount = '';
+        $this->transfer_fee = '';
+        $this->transfer_notes = '';
+        $this->errorMessage = '';
+        $this->showTransferModal = true;
+    }
+
+    public function executeTransfer(TreasuryService $treasuryService)
+    {
+        $this->errorMessage = '';
+        $this->successMessage = '';
+
+        $this->validate([
+            'transfer_from_method' => 'required|in:cash,instapay,e_wallet,visa,bank_transfer',
+            'transfer_to_method'   => 'required|in:cash,instapay,e_wallet,visa,bank_transfer|different:transfer_from_method',
+            'transfer_amount'      => 'required|numeric|min:0.001',
+            'transfer_fee'         => 'nullable|numeric|min:0',
+            'transfer_notes'       => 'nullable|string|max:500',
+        ], [
+            'transfer_to_method.different' => 'عفواً، لا يمكن التحويل لنفس الحساب أو الخزينة!',
+            'transfer_amount.required'     => 'يرجى كتابة المبلغ المراد تحويله.',
+            'transfer_amount.min'          => 'يجب أن يكون المبلغ أكبر من الصفر.',
+        ]);
+
+        try {
+            $storeId = ($this->selectedStoreId && $this->selectedStoreId !== 'all') 
+                ? (int)$this->selectedStoreId 
+                : (session('current_store_id') ?? auth()->user()?->getCurrentStore()?->id);
+
+            $transfer = $treasuryService->transfer([
+                'from_method'   => $this->transfer_from_method,
+                'to_method'     => $this->transfer_to_method,
+                'amount'        => $this->transfer_amount,
+                'transfer_fee'  => $this->transfer_fee ?: '0.000',
+                'store_id'      => $storeId,
+                'transfer_date' => $this->selectedDate ?: now()->toDateString(),
+                'notes'         => $this->transfer_notes,
+            ]);
+
+            $this->showTransferModal = false;
+            $fromName = $transfer->from_method_label;
+            $toName   = $transfer->to_method_label;
+            $this->successMessage = "تم تحويل مبلغ {$transfer->amount} ج.م بنجاح من [{$fromName}] إلى [{$toName}] برقم قيد {$transfer->transfer_number}.";
+        } catch (Exception $e) {
+            $this->errorMessage = $e->getMessage();
+        }
+    }
+
+    public function render(ShiftService $shiftService, TreasuryService $treasuryService)
     {
         $date = $this->selectedDate ?: now()->toDateString();
         $storeFilter = ($this->selectedStoreId && $this->selectedStoreId !== 'all') 
@@ -222,6 +282,16 @@ class DailyJournalIndex extends Component
             $activeShiftTotals = $shiftService->calculateShiftTotals($this->activeShift);
         }
 
+        // 9. Treasury & Multi-Account Balances
+        $treasuryBalances = $treasuryService->getBalances(storeId: $storeFilter, date: $date);
+
+        // 10. Treasury Transfers on this day
+        $transfers = TreasuryTransfer::with(['user', 'store'])
+            ->whereDate('transfer_date', $date)
+            ->when($storeFilter, fn($q) => $q->where('store_id', $storeFilter))
+            ->latest('id')
+            ->get();
+
         return view('livewire.daily-journal-index', [
             'stores'               => $stores,
             'currentStore'         => $storeFilter ? Store::find($storeFilter) : null,
@@ -249,6 +319,8 @@ class DailyJournalIndex extends Component
             'expectedCashInDrawer' => $expectedCashInDrawer,
             'shiftsOnDate'         => $shiftsOnDate,
             'activeShiftTotals'    => $activeShiftTotals,
+            'treasuryBalances'     => $treasuryBalances,
+            'transfers'            => $transfers,
         ])->layout('components.layouts.app', ['title' => "يومية المبيعات وحركة الدرج - {$date}"]);
     }
 }
