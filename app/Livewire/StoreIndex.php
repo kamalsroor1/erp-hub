@@ -135,13 +135,20 @@ class StoreIndex extends Component
     {
         abort_if(!auth()->user()?->can('stores.manage'), 403, 'غير مصرح لك بحذف الفروع');
         $store = Store::findOrFail($id);
-        if ($store->is_main) {
-            $this->errorMessage = 'لا يمكن حذف أو أرشفة الفرع / المخزن الرئيسي للمؤسسة.';
+        $name = $store->name;
+
+        $blockers = $store->getDeletionBlockers();
+        if (!empty($blockers)) {
+            $reasons = implode(' • ', $blockers);
+            $this->dispatch('swal:toast', [
+                'icon'  => 'warning',
+                'title' => "⚠️ لا يمكن حذف الفرع [{$name}]!\nالأسباب:\n{$reasons}"
+            ]);
+            $this->errorMessage = "لا يمكن حذف الفرع [{$name}] لوجود قيود: " . implode(' ، ', $blockers) . ". يمكنك تعطيل الفرع بدلاً من حذفه.";
             return;
         }
 
-        $name = $store->name;
-        $store->delete(); // Soft delete
+        $store->delete(); // Soft delete only if clean
 
         $this->successMessage = "تم نقل الفرع [{$name}] إلى سلة المحذوفات بنجاح.";
         session()->flash('success', $this->successMessage);
