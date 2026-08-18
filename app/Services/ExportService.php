@@ -216,4 +216,83 @@ class ExportService
         $filename = "جرد_وتقييم_المخزون_" . date('Y-m-d') . ".csv";
         return $this->streamCsv($filename, $headers, $rows);
     }
+
+    /**
+     * Export Item Movements (Stock Card) to CSV with full Arabic Excel support
+     */
+    public function exportItemMovements(
+        Item $item,
+        ?string $fromDate = null,
+        ?string $toDate = null,
+        ?int $storeId = null,
+        ?string $filterType = null
+    ): StreamedResponse {
+        $filename = "حركة_صنف_{$item->name}_" . date('Y-m-d') . ".csv";
+        $headers = [
+            'التاريخ والوقت',
+            'نوع الحركة',
+            'رقم المستند',
+            'الفرع / المخزن',
+            'الوارد (+)',
+            'المنصرف (-)',
+            'الرصيد بعد الحركة',
+            'المسؤول',
+            'البيان والملاحظات'
+        ];
+
+        $inTypes = [
+            'purchase_in', 'stock_deposit_in', 'stock_adjustment_in',
+            'cancellation_in', 'transfer_in', 'sales_return_in', 'purchase_restore_in'
+        ];
+
+        $outTypes = [
+            'sales_out', 'waste_out', 'stock_adjustment_out',
+            'transfer_out', 'purchase_cancel_out', 'purchase_return_out'
+        ];
+
+        $adjTypes = ['stock_adjustment_in', 'stock_adjustment_out', 'stock_deposit_in'];
+
+        $query = \App\Models\StockMovement::with(['user', 'store'])
+            ->where('item_id', $item->id)
+            ->when($storeId, fn($q) => $q->where('store_id', $storeId))
+            ->when($fromDate, fn($q) => $q->whereDate('created_at', '>=', $fromDate))
+            ->when($toDate, fn($q) => $q->whereDate('created_at', '<=', $toDate))
+            ->when($filterType === 'in', fn($q) => $q->whereIn('movement_type', $inTypes))
+            ->when($filterType === 'out', fn($q) => $q->whereIn('movement_type', $outTypes))
+            ->when($filterType === 'adjustments', fn($q) => $q->whereIn('movement_type', $adjTypes))
+            ->oldest('created_at');
+
+        $rows = [];
+        foreach ($query->get() as $row) {
+            $isIn = in_array($row->movement_type, $inTypes);
+            $typeLabel = match ($row->movement_type) {
+                'sales_out'            => 'فاتورة بيع',
+                'purchase_in'          => 'توريد مشتريات',
+                'purchase_cancel_out'  => 'إلغاء فاتورة شراء',
+                'purchase_restore_in'  => 'استعادة فاتورة شراء',
+                'cancellation_in'      => 'إلغاء فاتورة بيع',
+                'stock_adjustment_in'  => 'تسوية جرد (زيادة +)',
+                'stock_adjustment_out' => 'تسوية جرد (عجز/هالك -)',
+                'stock_deposit_in'     => 'إيداع / رصيد افتتاحي',
+                'transfer_in'          => 'تحويل وارد',
+                'transfer_out'         => 'تحويل صادر',
+                'sales_return_in'      => 'مرتجع مبيعات',
+                default                => $row->movement_type,
+            };
+
+            $rows[] = [
+                $row->created_at->format('Y-m-d H:i'),
+                $typeLabel,
+                $row->document_number ?: '—',
+                $row->store?->name ?? 'المخزن الرئيسي',
+                $isIn ? number_format((float)$row->quantity, 3) : '0.000',
+                !$isIn ? number_format((float)$row->quantity, 3) : '0.000',
+                number_format((float)$row->stock_after, 3) . ' ' . $item->unit,
+                $row->user?->name ?? 'النظام',
+                $row->notes ?: '—',
+            ];
+        }
+
+        return $this->streamCsv($filename, $headers, $rows);
+    }
 }

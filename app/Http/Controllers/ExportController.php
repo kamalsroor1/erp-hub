@@ -24,4 +24,15 @@ class ExportController extends Controller
     {
         return $exportService->exportInventory();
     }
+
+    public function exportItemMovements($id, \Illuminate\Http\Request $request, ExportService $exportService)
+    {
+        $item = \App\Models\Item::withTrashed()->findOrFail($id);
+        $storeId = ($request->query('store_id') && $request->query('store_id') !== 'all') ? (int)$request->query('store_id') : null;
+        $fromDate = $request->query('from');
+        $toDate = $request->query('to');
+        $filterType = $request->query('type');
+
+        return $exportService->exportItemMovements($item, $fromDate, $toDate, $storeId, $filterType);
+    }
 }
