@@ -117,7 +117,60 @@ class InvoiceService
                 $invoiceDiscountAmount = $subtotal;
             }
 
-            $netTotal = bcsub($subtotal, $invoiceDiscountAmount, 3);
+            // S3.5: Process Dynamic Additional Expenses
+            $rawExpenses = $data['additional_expenses'] ?? [];
+            $additionalExpensesTotal = '0.000';
+            $customerExpensesTotal = '0.000';
+
+            if (!empty($data['shipping_cost']) && bccomp((string)$data['shipping_cost'], '0.000', 3) > 0 && empty($rawExpenses)) {
+                $rawExpenses[] = [
+                    'title'             => 'مصاريف شحن وتوصيل',
+                    'amount'            => (string)$data['shipping_cost'],
+                    'allocation_method' => 'by_quantity',
+                    'paid_by'           => 'customer_account',
+                ];
+            }
+
+            foreach ($rawExpenses as $exp) {
+                $expAmount = (string)($exp['amount'] ?? '0.000');
+                if (bccomp($expAmount, '0.000', 3) <= 0) {
+                    continue;
+                }
+                $title = trim($exp['title'] ?? 'مصاريف إضافية');
+                $method = $exp['allocation_method'] ?? 'by_quantity';
+                $paidBy = $exp['paid_by'] ?? 'customer_account';
+                $expNotes = $exp['notes'] ?? null;
+
+                $additionalExpensesTotal = bcadd($additionalExpensesTotal, $expAmount, 3);
+
+                $expenseRecord = $invoice->additionalExpenses()->create([
+                    'title'             => $title,
+                    'amount'            => $expAmount,
+                    'allocation_method' => $method,
+                    'paid_by'           => $paidBy,
+                    'notes'             => $expNotes,
+                ]);
+
+                if ($paidBy === 'customer_account' || $paidBy === 'supplier_account') {
+                    $customerExpensesTotal = bcadd($customerExpensesTotal, $expAmount, 3);
+                } else {
+                    $paymentMethod = str_replace('treasury_', '', $paidBy);
+                    $payment = Payment::create([
+                        'payment_number' => 'PAY-EXP-' . strtoupper(uniqid()),
+                        'customer_id'    => $invoice->customer_id,
+                        'invoice_id'     => $invoice->id,
+                        'user_id'        => Auth::id() ?? 1,
+                        'amount'         => $expAmount,
+                        'payment_date'   => $invoice->invoice_date,
+                        'payment_method' => $paymentMethod ?: 'cash',
+                        'notes'          => "سداد مصروف ملحق [{$title}] لفاتورة مبيعات [{$invoice->invoice_number}]",
+                    ]);
+                    $expenseRecord->update(['payment_id' => $payment->id]);
+                }
+            }
+
+            $afterDiscount = bcsub($subtotal, $invoiceDiscountAmount, 3);
+            $netTotal = bcadd($afterDiscount, $customerExpensesTotal, 3);
 
             // S4: Payments and Remaining Amounts
             $paidAmount = '0.000';
@@ -148,6 +201,7 @@ class InvoiceService
                 'discount_type'    => $discountType,
                 'discount_value'   => $discountValue,
                 'discount_amount'  => $invoiceDiscountAmount,
+                'shipping_cost'    => $customerExpensesTotal,
                 'net_total'        => $netTotal,
                 'paid_amount'      => $paidAmount,
                 'remaining_amount' => $remainingAmount,
@@ -347,7 +401,68 @@ class InvoiceService
                 $invoiceDiscountAmount = $subtotal;
             }
 
-            $netTotal = bcsub($subtotal, $invoiceDiscountAmount, 3);
+            // 3.5. Dynamic additional expenses in edit
+            $rawExpenses = $data['additional_expenses'] ?? [];
+            $additionalExpensesTotal = '0.000';
+            $customerExpensesTotal = '0.000';
+
+            // Delete old additional expenses and their payment vouchers
+            foreach ($lockedInvoice->additionalExpenses as $oldExp) {
+                if ($oldExp->payment_id) {
+                    Payment::where('id', $oldExp->payment_id)->delete();
+                }
+                $oldExp->delete();
+            }
+
+            if (!empty($data['shipping_cost']) && bccomp((string)$data['shipping_cost'], '0.000', 3) > 0 && empty($rawExpenses)) {
+                $rawExpenses[] = [
+                    'title'             => 'مصاريف شحن وتوصيل',
+                    'amount'            => (string)$data['shipping_cost'],
+                    'allocation_method' => 'by_quantity',
+                    'paid_by'           => 'customer_account',
+                ];
+            }
+
+            foreach ($rawExpenses as $exp) {
+                $expAmount = (string)($exp['amount'] ?? '0.000');
+                if (bccomp($expAmount, '0.000', 3) <= 0) {
+                    continue;
+                }
+                $title = trim($exp['title'] ?? 'مصاريف إضافية');
+                $method = $exp['allocation_method'] ?? 'by_quantity';
+                $paidBy = $exp['paid_by'] ?? 'customer_account';
+                $expNotes = $exp['notes'] ?? null;
+
+                $additionalExpensesTotal = bcadd($additionalExpensesTotal, $expAmount, 3);
+
+                $expenseRecord = $lockedInvoice->additionalExpenses()->create([
+                    'title'             => $title,
+                    'amount'            => $expAmount,
+                    'allocation_method' => $method,
+                    'paid_by'           => $paidBy,
+                    'notes'             => $expNotes,
+                ]);
+
+                if ($paidBy === 'customer_account' || $paidBy === 'supplier_account') {
+                    $customerExpensesTotal = bcadd($customerExpensesTotal, $expAmount, 3);
+                } else {
+                    $paymentMethod = str_replace('treasury_', '', $paidBy);
+                    $payment = Payment::create([
+                        'payment_number' => 'PAY-EXP-' . strtoupper(uniqid()),
+                        'customer_id'    => $newCustomerId,
+                        'invoice_id'     => $lockedInvoice->id,
+                        'user_id'        => Auth::id() ?? 1,
+                        'amount'         => $expAmount,
+                        'payment_date'   => $data['invoice_date'] ?? $lockedInvoice->invoice_date,
+                        'payment_method' => $paymentMethod ?: 'cash',
+                        'notes'          => "سداد مصروف ملحق [{$title}] لفاتورة مبيعات [{$lockedInvoice->invoice_number}]",
+                    ]);
+                    $expenseRecord->update(['payment_id' => $payment->id]);
+                }
+            }
+
+            $afterDiscount = bcsub($subtotal, $invoiceDiscountAmount, 3);
+            $netTotal = bcadd($afterDiscount, $customerExpensesTotal, 3);
 
             // 4. Payment calculations
             $paymentType = $data['payment_type'] ?? 'cash';
@@ -383,6 +498,7 @@ class InvoiceService
                 'discount_type'    => $discountType,
                 'discount_value'   => $discountValue,
                 'discount_amount'  => $invoiceDiscountAmount,
+                'shipping_cost'    => $customerExpensesTotal,
                 'net_total'        => $netTotal,
                 'paid_amount'      => $paidAmount,
                 'remaining_amount' => $remainingAmount,

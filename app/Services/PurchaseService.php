@@ -21,75 +21,174 @@ class PurchaseService
     }
 
     /**
-     * Create and confirm purchase invoice
+     * Create and confirm purchase invoice with landed costs allocation
      */
     public function createPurchase(array $data): Purchase
     {
         return DB::transaction(function () use ($data) {
-            $subtotal = '0.000';
+            $baseSubtotal = '0.000';
             $storeId = $data['store_id'] ?? Auth::user()?->getCurrentStore()?->id ?? \App\Models\Store::getMainStore()?->id;
 
             $purchase = Purchase::create([
-                'purchase_number'      => $data['purchase_number'] ?? $this->generateUniqueNumber(),
-                'supplier_id'          => $data['supplier_id'],
-                'user_id'              => Auth::id() ?? 1,
-                'store_id'             => $storeId,
-                'purchase_date'        => $data['purchase_date'] ?? now()->toDateString(),
-                'status'               => 'confirmed',
-                'payment_status'       => 'unpaid',
-                'subtotal'             => '0.000',
-                'discount_amount'      => $data['discount_amount'] ?? '0.000',
-                'net_total'            => '0.000',
-                'paid_amount'          => '0.000',
-                'remaining_amount'     => '0.000',
-                'supplier_invoice_ref' => $data['supplier_invoice_ref'] ?? null,
-                'notes'                => $data['notes'] ?? null,
+                'purchase_number'           => $data['purchase_number'] ?? $this->generateUniqueNumber(),
+                'supplier_id'               => $data['supplier_id'],
+                'user_id'                   => Auth::id() ?? 1,
+                'store_id'                  => $storeId,
+                'purchase_date'             => $data['purchase_date'] ?? now()->toDateString(),
+                'status'                    => 'confirmed',
+                'payment_status'            => 'unpaid',
+                'subtotal'                  => '0.000',
+                'discount_amount'           => $data['discount_amount'] ?? '0.000',
+                'additional_expenses_total' => '0.000',
+                'net_total'                 => '0.000',
+                'paid_amount'               => '0.000',
+                'remaining_amount'          => '0.000',
+                'supplier_invoice_ref'      => $data['supplier_invoice_ref'] ?? null,
+                'notes'                     => $data['notes'] ?? null,
             ]);
 
+            $rawExpenses = $data['additional_expenses'] ?? [];
+            $additionalExpensesTotal = '0.000';
+            $supplierExpensesTotal = '0.000';
+
+            // 1. Calculate overall items quantity and base totals for ratio distribution
+            $totalQuantity = '0.000';
+            $totalBaseValuation = '0.000';
+            $itemsCount = count($data['items']);
+
+            foreach ($data['items'] as $line) {
+                $qty = (string)($line['quantity'] ?? '0.000');
+                $baseCost = (string)($line['cost_price'] ?? '0.000');
+                $totalQuantity = bcadd($totalQuantity, $qty, 3);
+                $totalBaseValuation = bcadd($totalBaseValuation, bcmul($qty, $baseCost, 3), 3);
+            }
+
+            // 2. Process each item line and allocate landed expenses
             foreach ($data['items'] as $line) {
                 $item = Item::where('id', $line['item_id'])->lockForUpdate()->firstOrFail();
 
-                $quantity  = $line['quantity'];
-                $costPrice = $line['cost_price'];
-                $lineTotal = bcmul($quantity, $costPrice, 3);
+                $quantity = (string)$line['quantity'];
+                $baseCostPrice = (string)$line['cost_price'];
+                $lineBaseTotal = bcmul($quantity, $baseCostPrice, 3);
+                $baseSubtotal = bcadd($baseSubtotal, $lineBaseTotal, 3);
 
+                // Allocate expenses to this line
+                $lineAllocatedExpense = '0.000';
+                foreach ($rawExpenses as $exp) {
+                    $expAmount = (string)($exp['amount'] ?? '0.000');
+                    if (bccomp($expAmount, '0.000', 3) <= 0) {
+                        continue;
+                    }
+
+                    $method = $exp['allocation_method'] ?? 'by_quantity';
+                    $allocated = '0.000';
+
+                    if ($method === 'by_quantity' && bccomp($totalQuantity, '0.000', 3) > 0) {
+                        // Ratio = line.qty / totalQuantity
+                        $ratio = bcdiv($quantity, $totalQuantity, 6);
+                        $allocated = bcmul($expAmount, $ratio, 3);
+                    } elseif ($method === 'by_value' && bccomp($totalBaseValuation, '0.000', 3) > 0) {
+                        // Ratio = line.baseTotal / totalBaseValuation
+                        $ratio = bcdiv($lineBaseTotal, $totalBaseValuation, 6);
+                        $allocated = bcmul($expAmount, $ratio, 3);
+                    } elseif ($method === 'equal' && $itemsCount > 0) {
+                        $allocated = bcdiv($expAmount, (string)$itemsCount, 3);
+                    }
+
+                    $lineAllocatedExpense = bcadd($lineAllocatedExpense, $allocated, 3);
+                }
+
+                // Landed Unit Cost = Base Cost + (Allocated Expense / Quantity)
+                $unitAllocatedExpense = bccomp($quantity, '0.000', 3) > 0
+                    ? bcdiv($lineAllocatedExpense, $quantity, 3)
+                    : '0.000';
+                $landedUnitCost = bcadd($baseCostPrice, $unitAllocatedExpense, 3);
+
+                // Create PurchaseItem
                 $purchase->items()->create([
-                    'item_id'     => $item->id,
-                    'quantity'    => $quantity,
-                    'cost_price'  => $costPrice,
-                    'total_price' => $lineTotal,
+                    'item_id'           => $item->id,
+                    'quantity'          => $quantity,
+                    'base_cost_price'   => $baseCostPrice,
+                    'allocated_expense' => $lineAllocatedExpense,
+                    'cost_price'        => $landedUnitCost, // Landed unit cost
+                    'total_price'       => $lineBaseTotal,
                 ]);
 
-                // Calculate weighted average cost
+                // Calculate weighted average cost with Landed Unit Cost
                 $newWac = $this->calculateWeightedAverageCost(
-                    currentStock: $item->current_stock,
-                    currentWac: $item->weighted_avg_cost ?: $item->cost_price,
+                    currentStock: (string)$item->current_stock,
+                    currentWac: (string)($item->weighted_avg_cost ?: $item->cost_price),
                     newQuantity: $quantity,
-                    newCost: $costPrice
+                    newCost: $landedUnitCost
                 );
 
-                $item->cost_price = $costPrice;
+                $item->cost_price = $landedUnitCost;
                 $item->weighted_avg_cost = $newWac;
                 $item->save();
 
-                // Add to inventory
+                // Add to inventory with Landed Cost
                 $this->stockService->addStock(
                     item: $item,
-                    quantity: (string)$quantity,
-                    unitCost: (string)$costPrice,
+                    quantity: $quantity,
+                    unitCost: $landedUnitCost,
                     source: $purchase,
                     documentNumber: $purchase->purchase_number,
                     movementType: 'purchase_in',
-                    notes: "توريد بضاعة بفاتورة شراء رقم {$purchase->purchase_number}",
+                    notes: "توريد بضاعة بفاتورة شراء رقم {$purchase->purchase_number}" . (bccomp($unitAllocatedExpense, '0.000', 3) > 0 ? " (شامل مصاريف محملة +{$unitAllocatedExpense} ج.م/وحدة)" : ''),
                     storeId: $storeId
                 );
-
-                $subtotal = bcadd($subtotal, $lineTotal, 3);
             }
 
-            $discountAmount = $data['discount_amount'] ?? '0.000';
-            $netTotal = bcsub($subtotal, $discountAmount, 3);
-            $paidAmount = $data['paid_amount'] ?? '0.000';
+            // 3. Process and Save Additional Expenses & Generate Treasury Vouchers
+            foreach ($rawExpenses as $exp) {
+                $expAmount = (string)($exp['amount'] ?? '0.000');
+                if (bccomp($expAmount, '0.000', 3) <= 0) {
+                    continue;
+                }
+
+                $title = trim($exp['title'] ?? 'مصاريف إضافية');
+                $method = $exp['allocation_method'] ?? 'by_quantity';
+                $paidBy = $exp['paid_by'] ?? 'supplier_account';
+                $expNotes = $exp['notes'] ?? null;
+
+                $additionalExpensesTotal = bcadd($additionalExpensesTotal, $expAmount, 3);
+
+                $expenseRecord = $purchase->additionalExpenses()->create([
+                    'title'             => $title,
+                    'amount'            => $expAmount,
+                    'allocation_method' => $method,
+                    'paid_by'           => $paidBy,
+                    'notes'             => $expNotes,
+                ]);
+
+                if ($paidBy === 'supplier_account') {
+                    // Charged to supplier balance
+                    $supplierExpensesTotal = bcadd($supplierExpensesTotal, $expAmount, 3);
+                } else {
+                    // Paid from treasury (Cash, Instapay, E-wallet)
+                    $paymentMethod = str_replace('treasury_', '', $paidBy);
+                    $payment = Payment::create([
+                        'payment_number' => 'PAY-EXP-' . strtoupper(uniqid()),
+                        'supplier_id'    => $purchase->supplier_id,
+                        'purchase_id'    => $purchase->id,
+                        'user_id'        => Auth::id() ?? 1,
+                        'amount'         => $expAmount,
+                        'payment_date'   => $purchase->purchase_date,
+                        'payment_method' => $paymentMethod,
+                        'notes'          => "سداد مصروف ملحق [{$title}] لفاتورة مشتريات [{$purchase->purchase_number}]",
+                    ]);
+                    $expenseRecord->update(['payment_id' => $payment->id]);
+                }
+            }
+
+            // 4. Calculate Net Total
+            $discountAmount = (string)($data['discount_amount'] ?? '0.000');
+            $netTotal = bcsub($baseSubtotal, $discountAmount, 3);
+            if (bccomp($supplierExpensesTotal, '0.000', 3) > 0) {
+                $netTotal = bcadd($netTotal, $supplierExpensesTotal, 3);
+            }
+
+            $paidAmount = (string)($data['paid_amount'] ?? '0.000');
             $remainingAmount = bcsub($netTotal, $paidAmount, 3);
 
             $paymentStatus = 'unpaid';
@@ -98,15 +197,16 @@ class PurchaseService
             }
 
             $purchase->update([
-                'subtotal'         => $subtotal,
-                'discount_amount'  => $discountAmount,
-                'net_total'        => $netTotal,
-                'paid_amount'      => $paidAmount,
-                'remaining_amount' => $remainingAmount,
-                'payment_status'   => $paymentStatus,
+                'subtotal'                  => $baseSubtotal,
+                'discount_amount'           => $discountAmount,
+                'additional_expenses_total' => $additionalExpensesTotal,
+                'net_total'                 => $netTotal,
+                'paid_amount'               => $paidAmount,
+                'remaining_amount'          => $remainingAmount,
+                'payment_status'            => $paymentStatus,
             ]);
 
-            // Record payment voucher if paid
+            // 5. Record direct supplier payment voucher if paid amount exists
             if (bccomp($paidAmount, '0.000', 3) > 0) {
                 Payment::create([
                     'payment_number' => 'PAY-PUR-' . strtoupper(uniqid()),
@@ -120,7 +220,7 @@ class PurchaseService
                 ]);
             }
 
-            // Update supplier balance
+            // 6. Update supplier balance
             $this->supplierBalanceService->updateBalance($purchase->supplier_id);
 
             $this->auditLogService->log(
@@ -133,7 +233,7 @@ class PurchaseService
             $this->activityLogService->logPurchase(
                 action: 'created',
                 purchase: $purchase,
-                description: "تم إنشاء فاتورة مشتريات وتوريد بضاعة رقم [{$purchase->purchase_number}] من المورد ({$purchase->supplier?->name}) بإجمالي " . number_format((float)$purchase->net_total, 2) . " ج.م"
+                description: "تم إنشاء فاتورة مشتريات وتوريد بضاعة رقم [{$purchase->purchase_number}] من المورد ({$purchase->supplier?->name}) بإجمالي " . number_format((float)$purchase->net_total, 2) . " ج.م" . (bccomp($additionalExpensesTotal, '0.000', 3) > 0 ? " (شامل مصاريف ملحقة " . number_format((float)$additionalExpensesTotal, 2) . " ج.م)" : '')
             );
 
             return $purchase;
