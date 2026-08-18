@@ -24,11 +24,11 @@
         <!-- Store & Cashier Info -->
         <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl font-bold border border-amber-500/20 shrink-0 shadow-inner">
-                ☕
+                🛒
             </div>
             <div>
                 <h1 class="text-lg md:text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-                    <span>☕ كاشير ومبيعات مطحنة البن والشاي والتوزيع (Touch POS)</span>
+                    <span>🛒 نقطة البيع والكاشير السريع (Touch POS)</span>
                 </h1>
                 <div class="flex items-center gap-2 mt-0.5 flex-wrap">
                     <span class="text-xs font-bold text-slate-500 dark:text-slate-400">الفرع الحالي:</span>
@@ -42,18 +42,8 @@
             </div>
         </div>
 
-        <!-- Top Right Actions & Quick Blender -->
+        <!-- Top Right Actions -->
         <div class="flex items-center gap-2 flex-wrap">
-            {{-- خلاط التوليفات موقوف مؤقتاً حسب طلب الإدارة --}}
-            {{--
-            @can('items.create')
-            <a href="{{ route('coffee.blender') }}" target="_blank" class="px-3.5 py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs font-bold flex items-center gap-2 transition-all cursor-pointer">
-                <span>☕ خلاط التوليفات</span>
-                <span class="text-[10px] bg-amber-500/20 px-1.5 py-0.5 rounded">F4</span>
-            </a>
-            @endcan
-            --}}
-
             <button 
                 type="button" 
                 @click="showNumpad = !showNumpad" 
@@ -102,7 +92,7 @@
                     <input 
                         type="text" 
                         wire:model.live.debounce.150ms="searchQuery" 
-                        placeholder="🔍 ابحث بالاسم أو الباركود (بن برازيلي، شاي، نسكافيه، حبهان)..." 
+                        placeholder="🔍 ابحث بالاسم أو الباركود أو كود الصنف..." 
                         class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
                         autofocus
                     >
@@ -112,51 +102,26 @@
                 </div>
 
                 <!-- Big Touch Category Pills -->
-                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none pt-1">
                     <button 
                         type="button"
                         wire:click="$set('selectedCategory', 'all')" 
-                        class="h-12 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 {{ $selectedCategory === 'all' ? 'bg-emerald-600 text-white shadow-emerald-600/30' : 'bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700' }}"
+                        class="px-4 py-2.5 rounded-xl font-bold text-xs shrink-0 flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 {{ $selectedCategory === 'all' ? 'bg-amber-600 text-white shadow-amber-600/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700' }}"
                     >
                         <span>📦</span>
-                        <span>الكل</span>
+                        <span>كل الأصناف</span>
                     </button>
 
+                    @foreach($categories as $cat)
                     <button 
                         type="button"
-                        wire:click="$set('selectedCategory', 'بن وتوليفات')" 
-                        class="h-12 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 {{ $selectedCategory === 'بن وتوليفات' ? 'bg-amber-600 text-white shadow-amber-600/30' : 'bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700' }}"
+                        wire:click="$set('selectedCategory', '{{ $cat }}')" 
+                        class="px-4 py-2.5 rounded-xl font-bold text-xs shrink-0 flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 {{ $selectedCategory === $cat ? 'bg-amber-600 text-white shadow-amber-600/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700' }}"
                     >
-                        <span>☕</span>
-                        <span>بن وتوليفات</span>
+                        <span>🏷️</span>
+                        <span>{{ $cat }}</span>
                     </button>
-
-                    <button 
-                        type="button"
-                        wire:click="$set('selectedCategory', 'شاي وأعشاب')" 
-                        class="h-12 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 {{ $selectedCategory === 'شاي وأعشاب' ? 'bg-teal-600 text-white shadow-teal-600/30' : 'bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700' }}"
-                    >
-                        <span>🍵</span>
-                        <span>شاي وأعشاب</span>
-                    </button>
-
-                    <button 
-                        type="button"
-                        wire:click="$set('selectedCategory', 'نسكافيه ومشروبات سريعة')" 
-                        class="h-12 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 {{ $selectedCategory === 'نسكافيه ومشروبات سريعة' ? 'bg-indigo-600 text-white shadow-indigo-600/30' : 'bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700' }}"
-                    >
-                        <span>🥤</span>
-                        <span>نسكافيه</span>
-                    </button>
-
-                    <button 
-                        type="button"
-                        wire:click="$set('selectedCategory', 'تحبيشات وإضافات')" 
-                        class="h-12 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 {{ $selectedCategory === 'تحبيشات وإضافات' ? 'bg-rose-600 text-white shadow-rose-600/30' : 'bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700' }}"
-                    >
-                        <span>🌿</span>
-                        <span>حبهان ومستكة</span>
-                    </button>
+                    @endforeach
                 </div>
             </div>
 

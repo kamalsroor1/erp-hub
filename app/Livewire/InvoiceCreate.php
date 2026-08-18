@@ -637,13 +637,20 @@ class InvoiceCreate extends Component
             ->take(12)
             ->get();
 
+        $categories = Item::active()
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->pluck('category');
+
         return view('livewire.invoice-create', [
             'customers'         => $customers,
             'filteredCustomers' => $filteredCustomers,
             'selectedCustomer'  => $selectedCustomer,
             'stores'            => $stores,
+            'categories'        => $categories,
             'quickCatalog'      => $quickCatalog,
             'currentStore'      => Store::find($this->store_id),
-        ])->layout('components.layouts.app', ['title' => 'نقطة البيع ومطحنة البن والشاي (POS)']);
+        ])->layout('components.layouts.app', ['title' => 'نقطة البيع والكاشير السريع (POS)']);
     }
 }

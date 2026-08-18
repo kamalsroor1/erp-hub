@@ -349,8 +349,15 @@ class InvoiceEdit extends Component
             ->take(12)
             ->get();
 
+        $categories = Item::active()
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->pluck('category');
+
         return view('livewire.invoice-edit', [
             'customers'    => $customers,
+            'categories'   => $categories,
             'quickCatalog' => $quickCatalog,
         ])->layout('components.layouts.app', ['title' => "تعديل الفاتورة رقم {$this->invoice_number}"]);
     }

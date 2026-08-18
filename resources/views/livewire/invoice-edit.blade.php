@@ -46,29 +46,22 @@
                     <input 
                         type="text" 
                         wire:model.live.debounce.150ms="searchQuery" 
-                        placeholder="ابحث عن بن برازيلي، بن محوج، شاي، نسكافيه، حبهان لإضافته للفاتورة..." 
+                        placeholder="🔍 ابحث باسم الصنف أو الباركود أو الكود لإضافته للفاتورة..." 
                         class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-amber-500"
                     >
                     <div class="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</div>
                 </div>
 
                 <!-- Category Filters -->
-                <div class="flex flex-wrap items-center gap-1.5 pt-1 text-[11px]">
-                    <button wire:click="$set('selectedCategory', 'all')" class="px-3 py-1 rounded-xl font-bold transition-colors cursor-pointer {{ $selectedCategory === 'all' ? 'bg-amber-600 text-white shadow' : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800' }}">
-                        الكل
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none pt-1 text-[11px]">
+                    <button wire:click="$set('selectedCategory', 'all')" class="px-3 py-1.5 rounded-xl font-bold transition-colors shrink-0 cursor-pointer {{ $selectedCategory === 'all' ? 'bg-amber-600 text-white shadow' : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                        📦 كل الأصناف
                     </button>
-                    <button wire:click="$set('selectedCategory', 'بن وتوليفات')" class="px-3 py-1 rounded-xl font-bold transition-colors cursor-pointer {{ $selectedCategory === 'بن وتوليفات' ? 'bg-amber-600 text-white shadow' : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800' }}">
-                        ☕ بن وتوليفات
+                    @foreach($categories as $cat)
+                    <button wire:click="$set('selectedCategory', '{{ $cat }}')" class="px-3 py-1.5 rounded-xl font-bold transition-colors shrink-0 cursor-pointer {{ $selectedCategory === $cat ? 'bg-amber-600 text-white shadow' : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800' }}">
+                        🏷️ {{ $cat }}
                     </button>
-                    <button wire:click="$set('selectedCategory', 'شاي وأعشاب')" class="px-3 py-1 rounded-xl font-bold transition-colors cursor-pointer {{ $selectedCategory === 'شاي وأعشاب' ? 'bg-teal-600 text-white shadow' : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800' }}">
-                        🍵 شاي وأعشاب
-                    </button>
-                    <button wire:click="$set('selectedCategory', 'نسكافيه ومشروبات سريعة')" class="px-3 py-1 rounded-xl font-bold transition-colors cursor-pointer {{ $selectedCategory === 'نسكافيه ومشروبات سريعة' ? 'bg-indigo-600 text-white shadow' : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800' }}">
-                        🥤 نسكافيه ومشروبات
-                    </button>
-                    <button wire:click="$set('selectedCategory', 'تحبيشات وإضافات')" class="px-3 py-1 rounded-xl font-bold transition-colors cursor-pointer {{ $selectedCategory === 'تحبيشات وإضافات' ? 'bg-rose-600 text-white shadow' : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800' }}">
-                        🌿 حبهان ومستكة
-                    </button>
+                    @endforeach
                 </div>
 
                 <!-- Quick Product Cards Grid -->
