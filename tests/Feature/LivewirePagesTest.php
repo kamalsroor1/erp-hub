@@ -62,7 +62,7 @@ class LivewirePagesTest extends TestCase
 
     public function test_pos_invoice_create_renders_successfully(): void
     {
-        $this->get(route('invoices.create'))->assertStatus(200)->assertSee('كاشير ومبيعات مطحنة البن');
+        $this->get(route('invoices.create'))->assertStatus(200)->assertSee('نقطة البيع والكاشير السريع');
     }
 
     public function test_items_index_renders_successfully(): void
