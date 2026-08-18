@@ -122,8 +122,67 @@ Route::middleware('auth')->group(function () {
         ));
     })->name('daily.journal.print')->middleware('can:daily_journal.view');
 
-    // Items & Inventory
+    // Items & Inventory Movements
     Route::get('/items', ItemIndex::class)->name('items.index')->middleware('can:items.view');
+    Route::get('/items/{id}/movements', App\Livewire\ItemMovements::class)->name('items.movements')->middleware('can:items.view');
+    Route::get('/items/{id}/movements/print', function ($id, \Illuminate\Http\Request $request) {
+        $item = \App\Models\Item::withTrashed()->findOrFail($id);
+        $storeId = ($request->query('store_id') && $request->query('store_id') !== 'all') ? (int)$request->query('store_id') : null;
+        $fromDate = $request->query('from');
+        $toDate = $request->query('to');
+        $filterType = $request->query('type');
+
+        if ($storeId) {
+            $inTypes = ['purchase_in', 'stock_deposit_in', 'stock_adjustment_in', 'cancellation_in', 'transfer_in', 'sales_return_in', 'purchase_restore_in'];
+            $outTypes = ['sales_out', 'waste_out', 'stock_adjustment_out', 'transfer_out', 'purchase_cancel_out', 'purchase_return_out'];
+        } else {
+            $inTypes = ['purchase_in', 'stock_deposit_in', 'stock_adjustment_in', 'cancellation_in', 'sales_return_in', 'purchase_restore_in'];
+            $outTypes = ['sales_out', 'waste_out', 'stock_adjustment_out', 'purchase_cancel_out', 'purchase_return_out'];
+        }
+
+        $allFilterInTypes = ['purchase_in', 'stock_deposit_in', 'stock_adjustment_in', 'cancellation_in', 'transfer_in', 'sales_return_in', 'purchase_restore_in'];
+        $allFilterOutTypes = ['sales_out', 'waste_out', 'stock_adjustment_out', 'transfer_out', 'purchase_cancel_out', 'purchase_return_out'];
+        $adjTypes = ['stock_adjustment_in', 'stock_adjustment_out', 'stock_deposit_in'];
+
+        $storeName = 'كافة الفروع والمخازن';
+        if ($storeId) {
+            $st = \App\Models\Store::find($storeId);
+            if ($st) $storeName = $st->name;
+        }
+
+        $baseQuery = \App\Models\StockMovement::with(['user', 'store'])
+            ->where('item_id', $item->id)
+            ->when($storeId, fn($q) => $q->where('store_id', $storeId))
+            ->when($fromDate, fn($q) => $q->whereDate('created_at', '>=', $fromDate))
+            ->when($toDate, fn($q) => $q->whereDate('created_at', '<=', $toDate))
+            ->when($filterType === 'in', fn($q) => $q->whereIn('movement_type', $allFilterInTypes))
+            ->when($filterType === 'out', fn($q) => $q->whereIn('movement_type', $allFilterOutTypes))
+            ->when($filterType === 'adjustments', fn($q) => $q->whereIn('movement_type', $adjTypes));
+
+        $allMovements = (clone $baseQuery)->get();
+        $totalIn = '0.000';
+        $totalOut = '0.000';
+        foreach ($allMovements as $mov) {
+            if (in_array($mov->movement_type, $inTypes)) {
+                $totalIn = bcadd($totalIn, (string)$mov->quantity, 3);
+            } elseif (in_array($mov->movement_type, $outTypes)) {
+                $totalOut = bcadd($totalOut, (string)$mov->quantity, 3);
+            }
+        }
+        $netMovement = bcsub($totalIn, $totalOut, 3);
+        $currentScopeStock = $storeId
+            ? (string)(\App\Models\StoreStock::where('store_id', $storeId)->where('item_id', $item->id)->value('quantity') ?: '0.000')
+            : (string)$item->current_stock;
+
+        $movements = $baseQuery->oldest('created_at')->get();
+
+        return view('layouts.print-item-movements-a4', compact(
+            'item', 'storeName', 'fromDate', 'toDate', 'movements',
+            'totalIn', 'totalOut', 'netMovement', 'currentScopeStock'
+        ));
+    })->name('items.movements.print')->middleware('can:items.view');
+
+    Route::get('/items/{id}/export-movements-csv', [App\Http\Controllers\ExportController::class, 'exportItemMovements'])->name('items.movements.export')->middleware('can:items.view');
 
     // Multi-Store, Vans & Warehouse Management
     Route::get('/stores', App\Livewire\StoreIndex::class)->name('stores')->middleware('can:stores.manage');
@@ -147,6 +206,7 @@ Route::middleware('auth')->group(function () {
 
     // Financial & Profit Reports (Admin & Accountant / reports.view)
     Route::get('/reports', ReportsIndex::class)->name('reports.index')->middleware('can:reports.view');
+    Route::get('/reports/print', [App\Http\Controllers\ReportPrintController::class, 'printReport'])->name('reports.print')->middleware('can:reports.view');
 
     // Operational Expenses & Supplies
     Route::get('/expenses', App\Livewire\ExpenseIndex::class)->name('expenses.index')->middleware('can:expenses.manage');
