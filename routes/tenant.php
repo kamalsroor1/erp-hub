@@ -48,6 +48,9 @@ Route::middleware([
         Route::get('/invoices/{id}', [\App\Http\Controllers\InvoiceController::class, 'show'])->name('invoices.show')->middleware('can:invoices.view');
         Route::get('/invoices/{id}/edit', [\App\Http\Controllers\InvoiceController::class, 'edit'])->name('invoices.edit')->middleware('can:invoices.edit');
         Route::put('/invoices/{id}', [\App\Http\Controllers\InvoiceController::class, 'update'])->name('invoices.update')->middleware('can:invoices.edit');
+        Route::post('/invoices/{id}/cancel', [\App\Http\Controllers\InvoiceController::class, 'cancel'])->name('invoices.cancel')->middleware('can:invoices.cancel');
+        Route::delete('/invoices/{id}', [\App\Http\Controllers\InvoiceController::class, 'destroy'])->name('invoices.destroy')->middleware('can:invoices.delete');
+        Route::post('/invoices/{id}/restore', [\App\Http\Controllers\InvoiceController::class, 'restore'])->name('invoices.restore')->middleware('can:trash.access');
 
         // Printing Routes
         Route::get('/invoices/{id}/print/thermal', function ($id) {

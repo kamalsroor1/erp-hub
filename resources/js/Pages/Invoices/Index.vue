@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, watch, computed } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -10,10 +10,12 @@ import { trans } from '@/helpers/trans';
 
 const props = defineProps({
     invoices: { type: Object, required: true },
+    stats: { type: Object, default: () => ({ total_count: 0, total_net: 0, total_paid: 0, total_remaining: 0 }) },
     filters: { type: Object, default: () => ({}) },
     stores: { type: Array, default: () => [] },
 });
 
+const page = usePage();
 const { formatMoney } = useMoney();
 
 // Search & Filter state
@@ -27,6 +29,54 @@ const dateTo = ref(props.filters.to || '');
 
 // Filter Drawer State
 const isDrawerOpen = ref(false);
+
+// Cancel Modal State
+const showCancelModal = ref(false);
+const cancelTargetInvoice = ref(null);
+const cancelReason = ref('');
+const isCancelling = ref(false);
+
+const openCancelModal = (inv) => {
+    cancelTargetInvoice.value = inv;
+    cancelReason.value = '';
+    showCancelModal.value = true;
+};
+
+const confirmCancel = () => {
+    if (!cancelReason.value || cancelReason.value.trim().length < 3) {
+        alert('يرجى كتابة سبب الإلغاء (3 أحرف على الأقل)');
+        return;
+    }
+    isCancelling.value = true;
+    router.post(`/invoices/${cancelTargetInvoice.value.id}/cancel`, {
+        reason: cancelReason.value,
+    }, {
+        preserveScroll: true,
+        onSuccess: () => {
+            showCancelModal.value = false;
+            cancelTargetInvoice.value = null;
+        },
+        onFinish: () => {
+            isCancelling.value = false;
+        },
+    });
+};
+
+const confirmDelete = (inv) => {
+    if (confirm(`هل أنت متأكد من حذف الفاتورة رقم #${inv.invoice_number} ونقلها لسلة المحذوفات؟ سيتم إرجاع البضاعة للمخزن فورياً.`)) {
+        router.delete(`/invoices/${inv.id}`, {
+            preserveScroll: true,
+        });
+    }
+};
+
+const restoreInvoice = (inv) => {
+    if (confirm(`هل ترغب في استعادة الفاتورة رقم #${inv.invoice_number} من سلة المحذوفات؟`)) {
+        router.post(`/invoices/${inv.id}/restore`, {}, {
+            preserveScroll: true,
+        });
+    }
+};
 
 // Active filters count calculator
 const activeFiltersCount = computed(() => {
@@ -166,6 +216,45 @@ const printA4 = (id) => {
                     <span class="text-base font-black">+</span>
                     <span>فاتورة بيع جديدة (F2)</span>
                 </Link>
+            </div>
+
+            <!-- 4 Top KPI Summary Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 font-tajawal">
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
+                    <span class="text-[11px] text-slate-400 font-bold block">إجمالي الفواتير</span>
+                    <div class="text-xl font-black font-mono text-white flex items-center gap-1.5">
+                        <span>🧾</span>
+                        <span>{{ stats.total_count }}</span>
+                        <span class="text-xs font-tajawal text-slate-400 font-normal">فاتورة</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
+                    <span class="text-[11px] text-slate-400 font-bold block">إجمالي المبيعات (الصافي)</span>
+                    <div class="text-xl font-black font-mono text-emerald-400 flex items-center gap-1.5">
+                        <span>💰</span>
+                        <span>{{ formatMoney(stats.total_net) }}</span>
+                        <span class="text-xs font-tajawal text-slate-400 font-normal">ج.م</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
+                    <span class="text-[11px] text-slate-400 font-bold block">المحصل فعلياً</span>
+                    <div class="text-xl font-black font-mono text-amber-400 flex items-center gap-1.5">
+                        <span>💵</span>
+                        <span>{{ formatMoney(stats.total_paid) }}</span>
+                        <span class="text-xs font-tajawal text-slate-400 font-normal">ج.م</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
+                    <span class="text-[11px] text-slate-400 font-bold block">المتبقي الآجل (مديونيات)</span>
+                    <div class="text-xl font-black font-mono text-rose-400 flex items-center gap-1.5">
+                        <span>⏳</span>
+                        <span>{{ formatMoney(stats.total_remaining) }}</span>
+                        <span class="text-xs font-tajawal text-slate-400 font-normal">ج.م</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Quick Action Bar & Drawer Toggle -->
@@ -336,14 +425,26 @@ const printA4 = (id) => {
                                 <!-- Actions -->
                                 <td class="py-3.5 text-center">
                                     <div class="flex items-center justify-center gap-1.5">
+                                        <!-- View Show Page -->
                                         <Link
                                             :href="`/invoices/${inv.id}`"
-                                            class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition"
+                                            class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer"
                                             title="عرض تفاصيل الفاتورة"
                                         >
                                             👁️
                                         </Link>
 
+                                        <!-- Edit Invoice (Only if not cancelled and not deleted) -->
+                                        <Link
+                                            v-if="inv.status !== 'cancelled' && status !== 'trash'"
+                                            :href="`/invoices/${inv.id}/edit`"
+                                            class="p-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-400 transition cursor-pointer"
+                                            title="تعديل الفاتورة"
+                                        >
+                                            ✏️
+                                        </Link>
+
+                                        <!-- Print Thermal Receipt -->
                                         <button
                                             @click="printThermal(inv.id)"
                                             type="button"
@@ -353,6 +454,7 @@ const printA4 = (id) => {
                                             🖨️
                                         </button>
 
+                                        <!-- Print A4 Invoice -->
                                         <button
                                             @click="printA4(inv.id)"
                                             type="button"
@@ -360,6 +462,39 @@ const printA4 = (id) => {
                                             title="طباعة فاتورة رسمية A4"
                                         >
                                             📄
+                                        </button>
+
+                                        <!-- Cancel Invoice Action (if not cancelled) -->
+                                        <button
+                                            v-if="inv.status !== 'cancelled' && status !== 'trash'"
+                                            @click="openCancelModal(inv)"
+                                            type="button"
+                                            class="p-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 transition cursor-pointer"
+                                            title="إلغاء الفاتورة وعكس المخزون"
+                                        >
+                                            🚫
+                                        </button>
+
+                                        <!-- Restore from Trash -->
+                                        <button
+                                            v-if="status === 'trash'"
+                                            @click="restoreInvoice(inv)"
+                                            type="button"
+                                            class="p-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 transition cursor-pointer"
+                                            title="استعادة الفاتورة من سلة المحذوفات"
+                                        >
+                                            ♻️
+                                        </button>
+
+                                        <!-- Delete / Archive -->
+                                        <button
+                                            v-if="status !== 'trash'"
+                                            @click="confirmDelete(inv)"
+                                            type="button"
+                                            class="p-1.5 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition cursor-pointer"
+                                            title="حذف / أرشفة الفاتورة"
+                                        >
+                                            🗑️
                                         </button>
                                     </div>
                                 </td>
@@ -483,5 +618,49 @@ const printA4 = (id) => {
                 </div>
             </div>
         </FilterDrawer>
+
+        <!-- Cancel Invoice Reason Modal -->
+        <div v-if="showCancelModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl font-tajawal animate-in fade-in zoom-in-95 duration-150">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h3 class="text-base font-black text-white flex items-center gap-2">
+                        <span>⚠️ إلغاء الفاتورة وعكس المخزون</span>
+                    </h3>
+                    <button @click="showCancelModal = false" class="text-slate-400 hover:text-white font-bold cursor-pointer">✕</button>
+                </div>
+
+                <p class="text-xs text-slate-300">
+                    أنت على وشك إلغاء الفاتورة رقم <b class="font-mono text-amber-400">#{{ cancelTargetInvoice?.invoice_number }}</b>. سيتم إرجاع كافة البضائع إلى رصيد الفرع/المخزن فورياً، وإلغاء أثرها المالي.
+                </p>
+
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-300">سبب الإلغاء الإلزامي *</label>
+                    <textarea
+                        v-model="cancelReason"
+                        rows="3"
+                        placeholder="اكتب سبب إلغاء الفاتورة هنا (مثال: طلب العميل إرجاع البضاعة، خطأ في السعر...)"
+                        class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white placeholder:text-slate-500 focus:border-rose-500 focus:outline-none"
+                    ></textarea>
+                </div>
+
+                <div class="flex items-center gap-2 pt-2">
+                    <button
+                        @click="showCancelModal = false"
+                        type="button"
+                        class="flex-1 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
+                    >
+                        تراجع
+                    </button>
+                    <button
+                        :disabled="isCancelling || !cancelReason || cancelReason.trim().length < 3"
+                        @click="confirmCancel"
+                        type="button"
+                        class="flex-1 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-black transition shadow-lg shadow-rose-600/30 cursor-pointer"
+                    >
+                        {{ isCancelling ? 'جاري الإلغاء...' : 'تأكيد الإلغاء وعكس الأثر' }}
+                    </button>
+                </div>
+            </div>
+        </div>
     </AppLayout>
 </template>

@@ -66,12 +66,21 @@ final class InvoiceController extends Controller
             $query->whereDate('invoice_date', '<=', $dateTo);
         }
 
+        $statsQuery = clone $query;
+        $stats = [
+            'total_count' => (int)$statsQuery->count(),
+            'total_net' => (float)$statsQuery->where('status', '!=', 'cancelled')->sum('net_total'),
+            'total_paid' => (float)$statsQuery->where('status', '!=', 'cancelled')->sum('paid_amount'),
+            'total_remaining' => (float)$statsQuery->where('status', '!=', 'cancelled')->sum('remaining_amount'),
+        ];
+
         $invoices = $query->latest('id')->paginate(15)->withQueryString();
 
         $stores = Store::where('is_active', true)->get(['id', 'name', 'type', 'is_main']);
 
         return Inertia::render('Invoices/Index', [
             'invoices' => InvoiceSummaryResource::collection($invoices),
+            'stats' => $stats,
             'filters' => [
                 'search' => $search,
                 'store_id' => $storeId ?: 'all',
@@ -226,5 +235,49 @@ final class InvoiceController extends Controller
         $updated = $invoiceService->updateInvoice($invoice, $validated);
 
         return redirect()->route('invoices.show', $updated->id)->with('success', "تم تعديل الفاتورة رقم {$updated->invoice_number} بنجاح");
+    }
+
+    /**
+     * Cancel an invoice and safely reverse stock and financials.
+     */
+    public function cancel(Request $request, int $id, \App\Services\InvoiceService $invoiceService)
+    {
+        abort_if(!auth()->user()?->can('invoices.cancel'), 403, 'غير مصرح لك بإلغاء الفواتير');
+
+        $validated = $request->validate([
+            'reason' => 'required|string|min:3|max:500',
+        ]);
+
+        $invoice = Invoice::findOrFail($id);
+        $invoiceService->cancelInvoice($invoice, $validated['reason']);
+
+        return redirect()->back()->with('success', "تم إلغاء الفاتورة رقم {$invoice->invoice_number} وعكس أثرها المخزني والمالي بنجاح.");
+    }
+
+    /**
+     * Archive/Delete an invoice and reverse stock.
+     */
+    public function destroy(int $id, \App\Services\InvoiceService $invoiceService)
+    {
+        abort_if(!auth()->user()?->can('invoices.delete'), 403, 'غير مصرح لك بحذف الفواتير');
+
+        $invoice = Invoice::findOrFail($id);
+        $num = $invoice->invoice_number;
+        $invoiceService->deleteInvoice($invoice);
+
+        return redirect()->back()->with('success', "تم حذف الفاتورة رقم {$num} وإرجاع المخزون بنجاح.");
+    }
+
+    /**
+     * Restore an archived/trashed invoice.
+     */
+    public function restore(int $id)
+    {
+        abort_if(!auth()->user()?->can('trash.access'), 403, 'غير مصرح لك باسترجاع الفواتير المحذوفة');
+
+        $invoice = Invoice::onlyTrashed()->findOrFail($id);
+        $invoice->restore();
+
+        return redirect()->back()->with('success', "تم استعادة الفاتورة رقم {$invoice->invoice_number} بنجاح.");
     }
 }
