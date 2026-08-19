@@ -60,6 +60,33 @@ class Login extends Component
             $attemptEmail = Auth::attempt(['email' => $cleanPhone, 'password' => $this->password, 'is_active' => true], $this->remember);
         }
 
+        // Central Super Admin fallback when running in Tenant Context
+        if (!$attemptPhone && !$attemptEmail && function_exists('tenant') && tenant()) {
+            $centralUser = tenancy()->central(function () use ($cleanPhone) {
+                return User::where('phone', $cleanPhone)->orWhere('email', $cleanPhone)->first();
+            });
+
+            if ($centralUser && \Illuminate\Support\Facades\Hash::check($this->password, $centralUser->password) && $centralUser->hasRole('admin')) {
+                $mainStore = \App\Models\Store::first();
+                $tenantUser = User::firstOrCreate(
+                    ['phone' => $centralUser->phone],
+                    [
+                        'name' => $centralUser->name,
+                        'email' => $centralUser->email,
+                        'password' => $centralUser->password,
+                        'is_active' => true,
+                        'default_store_id' => $mainStore?->id,
+                        'theme_preference' => $centralUser->theme_preference ?? 'dark',
+                    ]
+                );
+                $adminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin']);
+                $tenantUser->syncRoles([$adminRole]);
+
+                Auth::login($tenantUser, $this->remember);
+                $attemptPhone = true;
+            }
+        }
+
         if (!$attemptPhone && !$attemptEmail) {
             RateLimiter::hit($throttleKey, 60);
 
@@ -97,7 +124,7 @@ class Login extends Component
             'text'  => 'تم تسجيل الدخول بنجاح إلى منظومة سرور POS.'
         ]);
 
-        return $this->redirectIntended(default: route('dashboard'));
+        return $this->redirect(route('dashboard'), navigate: false);
     }
 
     public function render()
