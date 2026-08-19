@@ -1,0 +1,166 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Http\Controllers;
+
+use App\Models\Item;
+use App\Models\Store;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
+use Inertia\Response;
+
+final class ItemController extends Controller
+{
+    public function index(Request $request): Response
+    {
+        $search = trim((string)$request->input('search', ''));
+        $category = $request->input('category', 'all');
+        $stockStatus = $request->input('stock_status', 'all');
+        $status = $request->input('status', 'all');
+
+        $query = Item::with(['storeStocks.store']);
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('code', 'like', "%{$search}%")
+                  ->orWhere('notes', 'like', "%{$search}%");
+            });
+        }
+
+        if ($category && $category !== 'all') {
+            $query->where('category', $category);
+        }
+
+        if ($stockStatus === 'low') {
+            $query->whereColumn('current_stock', '<=', 'min_stock_level')->where('current_stock', '>', 0);
+        } elseif ($stockStatus === 'out') {
+            $query->where('current_stock', '<=', 0);
+        } elseif ($stockStatus === 'in_stock') {
+            $query->where('current_stock', '>', 0);
+        }
+
+        if ($status === 'active') {
+            $query->where('is_active', true);
+        } elseif ($status === 'inactive') {
+            $query->where('is_active', false);
+        }
+
+        $items = $query->latest('id')->paginate(20)->withQueryString();
+
+        $categories = Item::whereNotNull('category')->where('category', '!=', '')->distinct()->pluck('category')->values();
+
+        // Calculate Quick Metrics
+        $totalItemsCount = Item::count();
+        $lowStockCount = Item::whereColumn('current_stock', '<=', 'min_stock_level')->where('is_active', true)->count();
+        $totalStockValue = (float)Item::selectRaw('SUM(current_stock * cost_price) as total_val')->value('total_val');
+
+        return Inertia::render('Items/Index', [
+            'items' => $items->through(fn($item) => [
+                'id' => $item->id,
+                'code' => $item->code,
+                'name' => $item->name,
+                'category' => $item->category,
+                'unit' => $item->unit ?? 'كجم',
+                'current_stock' => (float)$item->current_stock,
+                'cost_price' => (float)$item->cost_price,
+                'selling_price' => (float)$item->selling_price,
+                'min_stock_level' => (float)$item->min_stock_level,
+                'is_active' => (bool)$item->is_active,
+                'is_low_stock' => $item->isLowStock(),
+                'notes' => $item->notes,
+                'store_stocks' => $item->storeStocks->map(fn($ss) => [
+                    'store_id' => $ss->store_id,
+                    'store_name' => $ss->store?->name,
+                    'quantity' => (float)$ss->quantity,
+                    'custom_selling_price' => $ss->custom_selling_price ? (float)$ss->custom_selling_price : null,
+                ]),
+                'can_be_deleted' => $item->canBeDeleted(),
+                'deletion_blockers' => $item->getDeletionBlockers(),
+            ]),
+            'categories' => $categories,
+            'metrics' => [
+                'total_items' => $totalItemsCount,
+                'low_stock_count' => $lowStockCount,
+                'total_stock_value' => $totalStockValue,
+            ],
+            'filters' => [
+                'search' => $search,
+                'category' => $category ?: 'all',
+                'stock_status' => $stockStatus ?: 'all',
+                'status' => $status ?: 'all',
+            ],
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'nullable|string|max:100|unique:items,code',
+            'category' => 'nullable|string|max:100',
+            'unit' => 'required|string|max:50',
+            'cost_price' => 'required|numeric|min:0',
+            'selling_price' => 'required|numeric|min:0',
+            'min_stock_level' => 'nullable|numeric|min:0',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        DB::transaction(function () use ($validated) {
+            Item::create([
+                'name' => $validated['name'],
+                'code' => $validated['code'] ?? null,
+                'category' => $validated['category'] ?? null,
+                'unit' => $validated['unit'],
+                'cost_price' => $validated['cost_price'],
+                'weighted_avg_cost' => $validated['cost_price'],
+                'selling_price' => $validated['selling_price'],
+                'min_stock_level' => $validated['min_stock_level'] ?? '0.000',
+                'current_stock' => '0.000',
+                'is_active' => true,
+                'notes' => $validated['notes'] ?? null,
+            ]);
+        });
+
+        return redirect()->back()->with('success', 'تم إضافة الصنف الجديد بنجاح');
+    }
+
+    public function update(Request $request, int $id)
+    {
+        $item = Item::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'nullable|string|max:100|unique:items,code,' . $item->id,
+            'category' => 'nullable|string|max:100',
+            'unit' => 'required|string|max:50',
+            'cost_price' => 'required|numeric|min:0',
+            'selling_price' => 'required|numeric|min:0',
+            'min_stock_level' => 'nullable|numeric|min:0',
+            'is_active' => 'boolean',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        DB::transaction(function () use ($item, $validated) {
+            $item->update($validated);
+        });
+
+        return redirect()->back()->with('success', 'تم تعديل بيانات الصنف بنجاح');
+    }
+
+    public function destroy(int $id)
+    {
+        $item = Item::findOrFail($id);
+
+        if (!$item->canBeDeleted()) {
+            return redirect()->back()->with('error', 'لا يمكن حذف الصنف لوجود حركات مالية أو مخزنية مرتبطة به');
+        }
+
+        DB::transaction(function () use ($item) {
+            $item->delete();
+        });
+
+        return redirect()->back()->with('success', 'تم حذف الصنف بنجاح');
+    }
+}
