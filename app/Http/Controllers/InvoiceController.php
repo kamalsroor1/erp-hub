@@ -150,4 +150,81 @@ final class InvoiceController extends Controller
             ],
         ]);
     }
+
+    public function edit(int $id): Response
+    {
+        $invoice = Invoice::with([
+            'customer',
+            'store',
+            'items.item',
+            'additionalExpenses'
+        ])->findOrFail($id);
+
+        if ($invoice->status === 'cancelled') {
+            abort(400, 'لا يمكن تعديل فاتورة ملغاة.');
+        }
+
+        $customers = \App\Models\Customer::where('is_active', true)->select('id', 'name', 'phone')->get();
+        $items = \App\Models\Item::where('is_active', true)->select('id', 'name', 'code', 'selling_price', 'current_stock', 'unit')->get();
+
+        return Inertia::render('Invoices/Edit', [
+            'invoice' => [
+                'id' => $invoice->id,
+                'invoice_number' => $invoice->invoice_number,
+                'customer_id' => $invoice->customer_id,
+                'invoice_date' => $invoice->invoice_date->toDateString(),
+                'payment_type' => $invoice->payment_type,
+                'payment_method' => $invoice->payment_method,
+                'discount_type' => $invoice->discount_type ?: 'fixed',
+                'discount_value' => (float)$invoice->discount_value,
+                'paid_amount' => (float)$invoice->paid_amount,
+                'notes' => $invoice->notes,
+                'items' => $invoice->items->map(fn($item) => [
+                    'item_id' => $item->item_id,
+                    'name' => $item->item?->name ?? 'صنف',
+                    'code' => $item->item?->code,
+                    'unit' => $item->item?->unit ?? 'كجم',
+                    'current_stock' => (float)($item->item?->current_stock ?? 0),
+                    'quantity' => (float)$item->quantity,
+                    'unit_price' => (float)$item->unit_price,
+                    'discount_amount' => (float)($item->discount_amount ?: 0),
+                    'total_price' => (float)$item->total_price,
+                ]),
+                'additional_expenses' => $invoice->additionalExpenses->map(fn($exp) => [
+                    'title' => $exp->title,
+                    'amount' => (float)$exp->amount,
+                ]),
+            ],
+            'customers' => $customers,
+            'items_catalog' => $items,
+        ]);
+    }
+
+    public function update(Request $request, int $id, \App\Services\InvoiceService $invoiceService)
+    {
+        $invoice = Invoice::findOrFail($id);
+
+        $validated = $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'invoice_date' => 'required|date',
+            'payment_type' => 'required|in:cash,credit,partial',
+            'discount_type' => 'nullable|in:fixed,percentage',
+            'discount_value' => 'nullable|numeric|min:0',
+            'paid_amount' => 'nullable|numeric|min:0',
+            'shipping_cost' => 'nullable|numeric|min:0',
+            'notes' => 'nullable|string|max:1000',
+            'items' => 'required|array|min:1',
+            'items.*.item_id' => 'required|exists:items,id',
+            'items.*.quantity' => 'required|numeric|min:0.001',
+            'items.*.unit_price' => 'required|numeric|min:0',
+            'items.*.discount_amount' => 'nullable|numeric|min:0',
+            'additional_expenses' => 'nullable|array',
+            'additional_expenses.*.title' => 'nullable|string|max:150',
+            'additional_expenses.*.amount' => 'nullable|numeric|min:0',
+        ]);
+
+        $updated = $invoiceService->updateInvoice($invoice, $validated);
+
+        return redirect()->route('invoices.show', $updated->id)->with('success', "تم تعديل الفاتورة رقم {$updated->invoice_number} بنجاح");
+    }
 }
