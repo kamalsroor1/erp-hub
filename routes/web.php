@@ -189,10 +189,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/items/{id}/export-movements-csv', [App\Http\Controllers\ExportController::class, 'exportItemMovements'])->name('items.movements.export')->middleware('can:items.view');
 
     // Multi-Store, Vans & Warehouse Management
-    Route::get('/stores', App\Livewire\StoreIndex::class)->name('stores')->middleware('can:stores.manage');
-    Route::get('/store-stocks', App\Livewire\StoreStockIndex::class)->name('store-stocks')->middleware('can:items.view');
-    Route::get('/stock-transfers', App\Livewire\StockTransferIndex::class)->name('stock-transfers')->middleware('can:transfers.view');
-    Route::get('/stock-transfers/create', App\Livewire\StockTransferCreate::class)->name('stock-transfers.create')->middleware('can:transfers.create');
+    Route::get('/stores', [\App\Http\Controllers\StoreController::class, 'index'])->name('stores')->middleware('can:stores.manage');
+    Route::post('/stores', [\App\Http\Controllers\StoreController::class, 'store'])->name('stores.store')->middleware('can:stores.manage');
+    Route::put('/stores/{id}', [\App\Http\Controllers\StoreController::class, 'update'])->name('stores.update')->middleware('can:stores.manage');
+    Route::get('/store-stocks', [\App\Http\Controllers\StoreController::class, 'stocks'])->name('store-stocks')->middleware('can:items.view');
+    Route::get('/stock-transfers', [\App\Http\Controllers\StockTransferController::class, 'index'])->name('stock-transfers')->middleware('can:transfers.view');
+    Route::get('/stock-transfers/create', [\App\Http\Controllers\StockTransferController::class, 'create'])->name('stock-transfers.create')->middleware('can:transfers.create');
+    Route::post('/stock-transfers', [\App\Http\Controllers\StockTransferController::class, 'store'])->name('stock-transfers.store')->middleware('can:transfers.create');
 
     // Customers & Statements
     Route::get('/customers', [\App\Http\Controllers\CustomerController::class, 'index'])->name('customers.index')->middleware('can:customers.manage');
@@ -209,20 +212,26 @@ Route::middleware('auth')->group(function () {
     Route::delete('/suppliers/{id}', [\App\Http\Controllers\SupplierController::class, 'destroy'])->name('suppliers.destroy')->middleware('can:suppliers.manage');
     Route::post('/suppliers/{id}/pay', [\App\Http\Controllers\SupplierController::class, 'pay'])->name('suppliers.pay')->middleware('can:suppliers.manage');
     Route::get('/suppliers/{id}/statement', SupplierStatement::class)->name('suppliers.statement')->middleware('can:suppliers.statement');
-    Route::get('/purchases', PurchaseIndex::class)->name('purchases.index')->middleware('can:purchases.view');
-    Route::get('/purchases/create', PurchaseCreate::class)->name('purchases.create')->middleware('can:purchases.create');
-    Route::get('/purchases/smart-reorder', App\Livewire\Purchases\SmartReorderIndex::class)->name('purchases.reorder')->middleware('can:purchases.view');
+    Route::get('/purchases', [\App\Http\Controllers\PurchaseController::class, 'index'])->name('purchases.index')->middleware('can:purchases.view');
+    Route::get('/purchases/create', [\App\Http\Controllers\PurchaseController::class, 'create'])->name('purchases.create')->middleware('can:purchases.create');
+    Route::post('/purchases', [\App\Http\Controllers\PurchaseController::class, 'store'])->name('purchases.store')->middleware('can:purchases.create');
+    Route::post('/purchases/{id}/cancel', [\App\Http\Controllers\PurchaseController::class, 'cancel'])->name('purchases.cancel')->middleware('can:purchases.delete');
+    Route::get('/purchases/smart-reorder', [\App\Http\Controllers\PurchaseController::class, 'smartReorder'])->name('purchases.reorder')->middleware('can:purchases.view');
 
     // Returns & Reversals
-    Route::get('/returns', ReturnIndex::class)->name('returns.index')->middleware('can:returns.manage');
-    Route::get('/returns/create', ReturnCreate::class)->name('returns.create')->middleware('can:returns.manage');
+    Route::get('/returns', [\App\Http\Controllers\ReturnController::class, 'index'])->name('returns.index')->middleware('can:returns.manage');
+    Route::get('/returns/create', [\App\Http\Controllers\ReturnController::class, 'create'])->name('returns.create')->middleware('can:returns.manage');
+    Route::post('/returns', [\App\Http\Controllers\ReturnController::class, 'store'])->name('returns.store')->middleware('can:returns.manage');
+    Route::delete('/returns/{id}', [\App\Http\Controllers\ReturnController::class, 'destroy'])->name('returns.destroy')->middleware('can:returns.manage');
 
     // Financial & Profit Reports (Admin & Accountant / reports.view)
-    Route::get('/reports', ReportsIndex::class)->name('reports.index')->middleware('can:reports.view');
-    Route::get('/reports/print', [App\Http\Controllers\ReportPrintController::class, 'printReport'])->name('reports.print')->middleware('can:reports.view');
+    Route::get('/reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.index')->middleware('can:reports.view');
 
     // Operational Expenses & Supplies
-    Route::get('/expenses', App\Livewire\ExpenseIndex::class)->name('expenses.index')->middleware('can:expenses.manage');
+    Route::get('/expenses', [\App\Http\Controllers\ExpenseController::class, 'index'])->name('expenses.index')->middleware('can:expenses.manage');
+    Route::post('/expenses', [\App\Http\Controllers\ExpenseController::class, 'store'])->name('expenses.store')->middleware('can:expenses.manage');
+    Route::put('/expenses/{id}', [\App\Http\Controllers\ExpenseController::class, 'update'])->name('expenses.update')->middleware('can:expenses.manage');
+    Route::delete('/expenses/{id}', [\App\Http\Controllers\ExpenseController::class, 'destroy'])->name('expenses.destroy')->middleware('can:expenses.manage');
 
     // Coffee Blending Master & Roastery Recipe
     Route::get('/coffee-blender', [\App\Http\Controllers\CoffeeBlenderController::class, 'index'])->name('coffee.blender')->middleware('can:items.create');
@@ -236,12 +245,26 @@ Route::middleware('auth')->group(function () {
     Route::post('/daily-journal/expense', [\App\Http\Controllers\DailyJournalController::class, 'storeExpense'])->name('daily.journal.expense')->middleware('can:daily_journal.view');
 
     // Auth, Profile, Settings, Trash, Activity Logs & User Management
-    Route::get('/activity-logs', App\Livewire\ActivityLogIndex::class)->name('activity-logs.index')->middleware('can:logs.view');
-    Route::get('/trash', App\Livewire\TrashIndex::class)->name('trash.index')->middleware('can:trash.access');
-    Route::get('/profile', App\Livewire\Auth\Profile::class)->name('profile');
-    Route::get('/settings', App\Livewire\SettingsIndex::class)->name('settings.index')->middleware('can:roles.manage');
-    Route::get('/users', App\Livewire\Auth\UserManager::class)->name('users.index')->middleware('can:roles.manage');
-    Route::get('/roles', App\Livewire\Auth\RolePermissionManager::class)->name('roles.index')->middleware('can:roles.manage');
+    Route::get('/activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index')->middleware('can:logs.view');
+    
+    Route::get('/trash', [\App\Http\Controllers\TrashController::class, 'index'])->name('trash.index')->middleware('can:trash.access');
+    Route::post('/trash/{type}/{id}/restore', [\App\Http\Controllers\TrashController::class, 'restore'])->name('trash.restore')->middleware('can:trash.access');
+    Route::delete('/trash/{type}/{id}/force-delete', [\App\Http\Controllers\TrashController::class, 'forceDelete'])->name('trash.force-delete')->middleware('can:trash.access');
+
+    Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'show'])->name('profile');
+    Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+
+    Route::get('/settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('settings.index')->middleware('can:roles.manage');
+    Route::post('/settings', [\App\Http\Controllers\SettingController::class, 'update'])->name('settings.update')->middleware('can:roles.manage');
+
+    Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index')->middleware('can:roles.manage');
+    Route::post('/users', [\App\Http\Controllers\UserController::class, 'store'])->name('users.store')->middleware('can:roles.manage');
+    Route::put('/users/{id}', [\App\Http\Controllers\UserController::class, 'update'])->name('users.update')->middleware('can:roles.manage');
+    Route::delete('/users/{id}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy')->middleware('can:roles.manage');
+    Route::post('/users/{id}/toggle-active', [\App\Http\Controllers\UserController::class, 'toggleActive'])->name('users.toggle')->middleware('can:roles.manage');
+
+    Route::get('/roles', [\App\Http\Controllers\RoleController::class, 'index'])->name('roles.index')->middleware('can:roles.manage');
+    Route::put('/roles/{id}', [\App\Http\Controllers\RoleController::class, 'update'])->name('roles.update')->middleware('can:roles.manage');
 
     // Excel & CSV Exports
     Route::get('/customers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportCustomerStatement'])->name('customers.export.csv')->middleware('can:customers.statement');
