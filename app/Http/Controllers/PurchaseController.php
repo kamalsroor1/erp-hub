@@ -1,0 +1,172 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Http\Controllers;
+
+use App\Models\Purchase;
+use App\Models\Supplier;
+use App\Models\Item;
+use App\Services\PurchaseService;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
+
+final class PurchaseController extends Controller
+{
+    public function index(Request $request): Response
+    {
+        $search = trim((string)$request->input('search', ''));
+        $status = $request->input('status', 'all');
+        $supplierId = $request->input('supplier_id');
+        $dateFrom = $request->input('from');
+        $dateTo = $request->input('to');
+
+        $query = Purchase::with(['supplier', 'items.item', 'user', 'store']);
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('purchase_number', 'like', "%{$search}%")
+                  ->orWhere('supplier_invoice_ref', 'like', "%{$search}%")
+                  ->orWhereHas('supplier', fn($sq) => $sq->where('name', 'like', "%{$search}%")->orWhere('company_name', 'like', "%{$search}%"));
+            });
+        }
+
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        if ($supplierId && $supplierId !== 'all') {
+            $query->where('supplier_id', (int)$supplierId);
+        }
+
+        if ($dateFrom) {
+            $query->whereDate('purchase_date', '>=', $dateFrom);
+        }
+
+        if ($dateTo) {
+            $query->whereDate('purchase_date', '<=', $dateTo);
+        }
+
+        $purchases = $query->latest('id')->paginate(15)->withQueryString();
+
+        $totalPurchases = (float)Purchase::where('status', 'confirmed')->sum('net_total');
+        $confirmedCount = Purchase::where('status', 'confirmed')->count();
+        $unpaidTotal = (float)Purchase::where('status', 'confirmed')->sum('remaining_amount');
+
+        $suppliers = Supplier::where('is_active', true)->select('id', 'name', 'company_name')->get();
+
+        return Inertia::render('Purchases/Index', [
+            'purchases' => $purchases->through(fn($p) => [
+                'id' => $p->id,
+                'purchase_number' => $p->purchase_number,
+                'supplier_name' => $p->supplier?->name ?: 'مورد عام',
+                'company_name' => $p->supplier?->company_name,
+                'purchase_date' => $p->purchase_date->toDateString(),
+                'net_total' => (float)$p->net_total,
+                'paid_amount' => (float)$p->paid_amount,
+                'remaining_amount' => (float)$p->remaining_amount,
+                'status' => $p->status,
+                'payment_status' => $p->payment_status,
+                'items_count' => $p->items->count(),
+                'user_name' => $p->user?->name,
+                'store_name' => $p->store?->name,
+                'items' => $p->items->map(fn($item) => [
+                    'id' => $item->id,
+                    'item_name' => $item->item?->name,
+                    'quantity' => (float)$item->quantity,
+                    'unit_cost' => (float)$item->unit_cost,
+                    'subtotal' => (float)$item->subtotal,
+                ]),
+            ]),
+            'metrics' => [
+                'total_purchases' => $totalPurchases,
+                'confirmed_count' => $confirmedCount,
+                'unpaid_total' => $unpaidTotal,
+            ],
+            'suppliers' => $suppliers->map(fn($s) => [
+                'id' => $s->id,
+                'name' => $s->company_name ? "{$s->name} ({$s->company_name})" : $s->name,
+            ]),
+            'filters' => [
+                'search' => $search,
+                'status' => $status,
+                'supplier_id' => $supplierId,
+                'from' => $dateFrom,
+                'to' => $dateTo,
+            ],
+        ]);
+    }
+
+    public function create(): Response
+    {
+        $suppliers = Supplier::where('is_active', true)
+            ->select('id', 'name', 'company_name', 'phone')
+            ->orderBy('name')
+            ->get();
+
+        $items = Item::where('is_active', true)
+            ->select('id', 'name', 'code', 'category', 'unit', 'cost_price', 'current_stock')
+            ->orderBy('name')
+            ->get();
+
+        return Inertia::render('Purchases/Create', [
+            'suppliers' => $suppliers->map(fn($s) => [
+                'id' => $s->id,
+                'name' => $s->company_name ? "{$s->name} - {$s->company_name}" : $s->name,
+            ]),
+            'items' => $items,
+        ]);
+    }
+
+    public function store(Request $request, PurchaseService $purchaseService)
+    {
+        $validated = $request->validate([
+            'supplier_id' => 'required|exists:suppliers,id',
+            'purchase_date' => 'required|date',
+            'supplier_invoice_ref' => 'nullable|string|max:100',
+            'paid_amount' => 'nullable|numeric|min:0',
+            'discount_amount' => 'nullable|numeric|min:0',
+            'notes' => 'nullable|string|max:500',
+            'items' => 'required|array|min:1',
+            'items.*.item_id' => 'required|exists:items,id',
+            'items.*.quantity' => 'required|numeric|min:0.001',
+            'items.*.unit_cost' => 'required|numeric|min:0',
+        ]);
+
+        $purchase = $purchaseService->createPurchase($validated);
+
+        return redirect()->route('purchases.index')->with('success', "تم تسجيل وتأكيد فاتورة الشراء رقم {$purchase->purchase_number} وإيداع الكميات في المخزون بنجاح");
+    }
+
+    public function cancel(int $id, PurchaseService $purchaseService)
+    {
+        $purchase = Purchase::findOrFail($id);
+
+        $purchaseService->cancelPurchase($purchase, 'إلغاء من خلال لوحة التحكم');
+
+        return redirect()->back()->with('success', "تم إلغاء فاتورة الشراء رقم {$purchase->purchase_number} وعكس أثرها المالي والمخزني بنجاح");
+    }
+
+    public function smartReorder(): Response
+    {
+        // Items where current stock is less than or equal to minimum safety stock
+        $criticalItems = Item::where('is_active', true)
+            ->whereColumn('current_stock', '<=', 'min_stock_level')
+            ->orderBy('current_stock', 'asc')
+            ->get();
+
+        return Inertia::render('Purchases/SmartReorder', [
+            'items' => $criticalItems->map(fn($item) => [
+                'id' => $item->id,
+                'name' => $item->name,
+                'code' => $item->code,
+                'category' => $item->category,
+                'unit' => $item->unit,
+                'current_stock' => (float)$item->current_stock,
+                'min_stock_level' => (float)$item->min_stock_level,
+                'suggested_reorder_qty' => max((float)($item->min_stock_level * 2 - $item->current_stock), 10.0),
+                'cost_price' => (float)$item->cost_price,
+            ]),
+        ]);
+    }
+}
