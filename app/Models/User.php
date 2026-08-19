@@ -17,6 +17,8 @@ class User extends Authenticatable
         'phone',
         'email',
         'password',
+        'api_token',
+        'last_login_at',
         'is_active',
         'default_store_id',
         'theme_preference',
@@ -26,6 +28,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'api_token',
     ];
 
     protected function casts(): array
