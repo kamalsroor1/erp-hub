@@ -22,6 +22,17 @@ class ReturnService
     ) {}
 
     /**
+     * Dispatch and create return document based on return_type
+     */
+    public function createReturn(array $data): ReturnDocument
+    {
+        if (($data['return_type'] ?? '') === 'purchase_return') {
+            return $this->createPurchaseReturn($data);
+        }
+        return $this->createSalesReturn($data);
+    }
+
+    /**
      * Process sales return from customer (with stock return to inventory)
      */
     public function createSalesReturn(array $data): ReturnDocument
