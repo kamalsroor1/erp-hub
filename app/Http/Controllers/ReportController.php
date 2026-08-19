@@ -69,7 +69,7 @@ final class ReportController extends Controller
             }
         });
 
-        $totalCogs = (float)$itemsQuery->select(DB::raw('SUM(quantity * unit_cost) as total_cogs'))->value('total_cogs') ?: 0.0;
+        $totalCogs = (float)$itemsQuery->select(DB::raw('SUM(quantity * cost_price) as total_cogs'))->value('total_cogs') ?: 0.0;
         $grossProfit = max($totalSales - $totalCogs, 0.0);
 
         // Expenses
@@ -99,7 +99,7 @@ final class ReportController extends Controller
                 $q->where('store_id', (int)$storeId);
             }
         })
-        ->select('item_id', DB::raw('SUM(quantity) as total_qty'), DB::raw('SUM(subtotal) as total_revenue'))
+        ->select('item_id', DB::raw('SUM(quantity) as total_qty'), DB::raw('SUM(total_price) as total_revenue'))
         ->groupBy('item_id')
         ->orderByDesc('total_revenue')
         ->limit(10)
