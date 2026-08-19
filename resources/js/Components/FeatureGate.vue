@@ -1,0 +1,67 @@
+<script setup>
+import { usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+
+const props = defineProps({
+    feature: {
+        type: String,
+        default: null,
+    },
+    showFallback: {
+        type: Boolean,
+        default: false,
+    },
+});
+
+const page = usePage();
+
+// Safely evaluate feature access across tenant overrides and plan definitions
+const isAllowed = computed(() => {
+    if (!props.feature) {
+        return true;
+    }
+
+    const tenant = page.props.tenant;
+    if (!tenant) {
+        return true;
+    }
+
+    // 1. Check manual feature overrides on tenant
+    if (Array.isArray(tenant.enabled_features) && tenant.enabled_features.includes(props.feature)) {
+        return true;
+    }
+
+    // 2. Check plan features map
+    if (tenant.plan && tenant.plan.features && typeof tenant.plan.features === 'object') {
+        if (tenant.plan.features[props.feature] !== undefined) {
+            return Boolean(tenant.plan.features[props.feature]);
+        }
+    }
+
+    // 3. Fallback to direct features if present
+    if (tenant.features && typeof tenant.features === 'object' && tenant.features[props.feature] !== undefined) {
+        return Boolean(tenant.features[props.feature]);
+    }
+
+    return true;
+});
+</script>
+
+<template>
+    <template v-if="isAllowed">
+        <slot />
+    </template>
+    <template v-else-if="showFallback">
+        <slot name="fallback">
+            <div class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-between text-xs text-amber-500">
+                <div class="flex items-center gap-2">
+                    <span>🔒</span>
+                    <span class="font-bold">هذه الميزة تتطلب ترقية الباقة</span>
+                </div>
+                <a href="/pricing" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-lg text-[10px] transition">
+                    ترقية الآن
+                </a>
+            </div>
+        </slot>
+    </template>
+</template>
