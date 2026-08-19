@@ -1,0 +1,290 @@
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+
+use App\Livewire\Auth\Login;
+use App\Livewire\InvoiceCreate;
+use App\Livewire\InvoiceIndex;
+use App\Livewire\InvoiceShow;
+use App\Livewire\ItemIndex;
+use App\Livewire\CustomerIndex;
+use App\Livewire\CustomerStatement;
+use App\Livewire\SupplierIndex;
+use App\Livewire\SupplierStatement;
+use App\Livewire\PurchaseCreate;
+use App\Livewire\PurchaseIndex;
+use App\Livewire\ReturnCreate;
+use App\Livewire\ReturnIndex;
+use App\Livewire\ReportsIndex;
+use App\Models\Invoice;
+
+/*
+|--------------------------------------------------------------------------
+| Tenant Routes (Isolated Database Context)
+|--------------------------------------------------------------------------
+| Every route in this group runs within the isolated database and storage
+| context of the identified tenant.
+*/
+
+Route::middleware([
+    'web',
+    InitializeTenancyByDomain::class,
+    PreventAccessFromCentralDomains::class,
+])->group(function () {
+
+    // 1. Guest Authentication Routes (Inertia.js + Vue 3)
+    Route::middleware('guest')->group(function () {
+        Route::get('/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'create'])->name('login');
+        Route::post('/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
+    });
+
+    // 2. Logout Route
+    Route::post('/logout', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])->name('logout')->middleware('auth');
+
+    // 3. Protected POS, ERP & Inventory Routes
+    Route::middleware('auth')->group(function () {
+        // Dashboard (Inertia.js + Vue 3 SPA)
+        Route::get('/', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+
+        // Invoices & POS (Vue 3 Fast Cashier Engine)
+        Route::get('/pos', [\App\Http\Controllers\POSController::class, 'index'])->name('pos.index')->middleware('can:pos.access');
+        Route::get('/invoices/create', [\App\Http\Controllers\POSController::class, 'index'])->name('invoices.create')->middleware('can:pos.access');
+        Route::post('/pos/invoices', [\App\Http\Controllers\POSController::class, 'store'])->name('pos.invoices.store')->middleware('can:pos.access');
+        Route::post('/pos/customers', [\App\Http\Controllers\POSController::class, 'storeCustomer'])->name('pos.customers.store')->middleware('can:pos.access');
+        Route::get('/pos/customer-last-price', [\App\Http\Controllers\POSController::class, 'getCustomerLastPrice'])->name('pos.customer_last_price')->middleware('can:pos.access');
+
+        Route::get('/invoices', [\App\Http\Controllers\InvoiceController::class, 'index'])->name('invoices.index')->middleware('can:invoices.view');
+        Route::get('/invoices/{id}', [\App\Http\Controllers\InvoiceController::class, 'show'])->name('invoices.show')->middleware('can:invoices.view');
+        Route::get('/invoices/{id}/edit', App\Livewire\InvoiceEdit::class)->name('invoices.edit')->middleware('can:invoices.edit');
+
+        // Printing Routes
+        Route::get('/invoices/{id}/print/thermal', function ($id) {
+            $invoice = Invoice::with(['customer', 'items.item', 'additionalExpenses'])->findOrFail($id);
+            return view('layouts.print-thermal', compact('invoice'));
+        })->name('invoices.print.thermal')->middleware('can:invoices.view');
+
+        Route::get('/invoices/{id}/print/a4', function ($id) {
+            $invoice = Invoice::with(['customer', 'items.item', 'additionalExpenses'])->findOrFail($id);
+            return view('layouts.print-a4', compact('invoice'));
+        })->name('invoices.print.a4')->middleware('can:invoices.view');
+
+        // Daily Journal A4 Print Route
+        Route::get('/daily-journal/print', function (\Illuminate\Http\Request $request) {
+            $date = $request->query('date', now()->toDateString());
+            $storeId = $request->query('store_id', 'all');
+            $storeFilter = ($storeId !== 'all' && is_numeric($storeId)) ? (int)$storeId : null;
+
+            $storeName = 'كافة الفروع والعربيات';
+            if ($storeFilter) {
+                $st = \App\Models\Store::find($storeFilter);
+                if ($st) $storeName = $st->name;
+            }
+
+            // Invoices
+            $invoices = Invoice::with(['customer', 'store'])
+                ->whereDate('invoice_date', $date)
+                ->where('status', 'confirmed')
+                ->when($storeFilter, fn($q) => $q->where('store_id', $storeFilter))
+                ->latest('id')
+                ->get();
+
+            $invoicesCount = $invoices->count();
+            $totalSales = (string)($invoices->sum('total_amount') ?: '0.000');
+            $cashSales = (string)($invoices->where('payment_type', 'cash')->sum('total_amount') ?: '0.000');
+            $creditSales = (string)($invoices->where('payment_type', 'credit')->sum('total_amount') ?: '0.000');
+            $partialSales = (string)($invoices->where('payment_type', 'partial')->sum('total_amount') ?: '0.000');
+            $partialPaid = (string)($invoices->where('payment_type', 'partial')->sum('paid_amount') ?: '0.000');
+
+            $customerPayments = (string)(\App\Models\Payment::whereDate('payment_date', $date)->whereNotNull('customer_id')->sum('amount') ?: '0.000');
+            $totalCashCollected = bcadd((string)bcadd($cashSales, $partialPaid, 3), (string)$customerPayments, 3);
+
+            $expenses = \App\Models\Expense::with('store')
+                ->whereDate('expense_date', $date)
+                ->when($storeFilter, fn($q) => $q->where('store_id', $storeFilter))
+                ->get();
+            $totalExpenses = (string)($expenses->sum('amount') ?: '0.000');
+
+            $supplierPayments = \App\Models\Payment::with('supplier')
+                ->whereDate('payment_date', $date)
+                ->whereNotNull('supplier_id')
+                ->get();
+            $totalSupplierPaid = (string)($supplierPayments->sum('amount') ?: '0.000');
+
+            $totalOutflows = bcadd($totalExpenses, $totalSupplierPaid, 3);
+            $netCashToday = bcsub((string)$totalCashCollected, $totalOutflows, 3);
+
+            $shiftsOnDate = \App\Models\CashShift::with(['user', 'store'])
+                ->whereDate('opened_at', $date)
+                ->when($storeFilter, fn($q) => $q->where('store_id', $storeFilter))
+                ->latest('id')
+                ->get();
+
+            $openingCashBalance = $shiftsOnDate->count() > 0 ? (string)$shiftsOnDate->first()->opening_cash_balance : '0.000';
+            $expectedCashInDrawer = bcadd($openingCashBalance, $netCashToday, 3);
+
+            return view('layouts.print-daily-journal-a4', compact(
+                'date', 'storeName', 'invoices', 'invoicesCount', 'totalSales',
+                'cashSales', 'creditSales', 'partialSales', 'customerPayments',
+                'totalCashCollected', 'expenses', 'totalExpenses', 'supplierPayments',
+                'totalSupplierPaid', 'netCashToday', 'openingCashBalance',
+                'expectedCashInDrawer', 'shiftsOnDate'
+            ));
+        })->name('daily.journal.print')->middleware('can:daily_journal.view');
+
+        // Items & Inventory Movements
+        Route::get('/items', [\App\Http\Controllers\ItemController::class, 'index'])->name('items.index')->middleware('can:items.view');
+        Route::post('/items', [\App\Http\Controllers\ItemController::class, 'store'])->name('items.store')->middleware('can:items.manage');
+        Route::put('/items/{id}', [\App\Http\Controllers\ItemController::class, 'update'])->name('items.update')->middleware('can:items.manage');
+        Route::delete('/items/{id}', [\App\Http\Controllers\ItemController::class, 'destroy'])->name('items.destroy')->middleware('can:items.manage');
+        Route::get('/items/{id}/movements', App\Livewire\ItemMovements::class)->name('items.movements')->middleware('can:items.view');
+        Route::get('/items/{id}/movements/print', function ($id, \Illuminate\Http\Request $request) {
+            $item = \App\Models\Item::withTrashed()->findOrFail($id);
+            $storeId = ($request->query('store_id') && $request->query('store_id') !== 'all') ? (int)$request->query('store_id') : null;
+            $fromDate = $request->query('from');
+            $toDate = $request->query('to');
+            $filterType = $request->query('type');
+
+            if ($storeId) {
+                $inTypes = ['purchase_in', 'stock_deposit_in', 'stock_adjustment_in', 'cancellation_in', 'transfer_in', 'sales_return_in', 'purchase_restore_in'];
+                $outTypes = ['sales_out', 'waste_out', 'stock_adjustment_out', 'transfer_out', 'purchase_cancel_out', 'purchase_return_out'];
+            } else {
+                $inTypes = ['purchase_in', 'stock_deposit_in', 'stock_adjustment_in', 'cancellation_in', 'sales_return_in', 'purchase_restore_in'];
+                $outTypes = ['sales_out', 'waste_out', 'stock_adjustment_out', 'purchase_cancel_out', 'purchase_return_out'];
+            }
+
+            $allFilterInTypes = ['purchase_in', 'stock_deposit_in', 'stock_adjustment_in', 'cancellation_in', 'transfer_in', 'sales_return_in', 'purchase_restore_in'];
+            $allFilterOutTypes = ['sales_out', 'waste_out', 'stock_adjustment_out', 'transfer_out', 'purchase_cancel_out', 'purchase_return_out'];
+            $adjTypes = ['stock_adjustment_in', 'stock_adjustment_out', 'stock_deposit_in'];
+
+            $storeName = 'كافة الفروع والمخازن';
+            if ($storeId) {
+                $st = \App\Models\Store::find($storeId);
+                if ($st) $storeName = $st->name;
+            }
+
+            $baseQuery = \App\Models\StockMovement::with(['user', 'store'])
+                ->where('item_id', $item->id)
+                ->when($storeId, fn($q) => $q->where('store_id', $storeId))
+                ->when($fromDate, fn($q) => $q->whereDate('created_at', '>=', $fromDate))
+                ->when($toDate, fn($q) => $q->whereDate('created_at', '<=', $toDate))
+                ->when($filterType === 'in', fn($q) => $q->whereIn('movement_type', $allFilterInTypes))
+                ->when($filterType === 'out', fn($q) => $q->whereIn('movement_type', $allFilterOutTypes))
+                ->when($filterType === 'adjustments', fn($q) => $q->whereIn('movement_type', $adjTypes));
+
+            $allMovements = (clone $baseQuery)->get();
+            $totalIn = '0.000';
+            $totalOut = '0.000';
+            foreach ($allMovements as $mov) {
+                if (in_array($mov->movement_type, $inTypes)) {
+                    $totalIn = bcadd($totalIn, (string)$mov->quantity, 3);
+                } elseif (in_array($mov->movement_type, $outTypes)) {
+                    $totalOut = bcadd($totalOut, (string)$mov->quantity, 3);
+                }
+            }
+            $netMovement = bcsub($totalIn, $totalOut, 3);
+            $currentScopeStock = $storeId
+                ? (string)(\App\Models\StoreStock::where('store_id', $storeId)->where('item_id', $item->id)->value('quantity') ?: '0.000')
+                : (string)$item->current_stock;
+
+            $movements = $baseQuery->oldest('created_at')->get();
+
+            return view('layouts.print-item-movements-a4', compact(
+                'item', 'storeName', 'fromDate', 'toDate', 'movements',
+                'totalIn', 'totalOut', 'netMovement', 'currentScopeStock'
+            ));
+        })->name('items.movements.print')->middleware('can:items.view');
+
+        Route::get('/items/{id}/export-movements-csv', [App\Http\Controllers\ExportController::class, 'exportItemMovements'])->name('items.movements.export')->middleware('can:items.view');
+
+        // Multi-Store, Vans & Warehouse Management
+        Route::get('/stores', App\Livewire\StoreIndex::class)->name('stores')->middleware('can:stores.manage');
+        Route::get('/store-stocks', App\Livewire\StoreStockIndex::class)->name('store-stocks')->middleware('can:items.view');
+        Route::get('/stock-transfers', App\Livewire\StockTransferIndex::class)->name('stock-transfers')->middleware('can:transfers.view');
+        Route::get('/stock-transfers/create', App\Livewire\StockTransferCreate::class)->name('stock-transfers.create')->middleware('can:transfers.create');
+
+        // Customers & Statements
+        Route::get('/customers', [\App\Http\Controllers\CustomerController::class, 'index'])->name('customers.index')->middleware('can:customers.manage');
+        Route::post('/customers', [\App\Http\Controllers\CustomerController::class, 'store'])->name('customers.store')->middleware('can:customers.manage');
+        Route::put('/customers/{id}', [\App\Http\Controllers\CustomerController::class, 'update'])->name('customers.update')->middleware('can:customers.manage');
+        Route::delete('/customers/{id}', [\App\Http\Controllers\CustomerController::class, 'destroy'])->name('customers.destroy')->middleware('can:customers.manage');
+        Route::post('/customers/{id}/payments', [\App\Http\Controllers\CustomerController::class, 'collectPayment'])->name('customers.payments')->middleware('can:customers.manage');
+        Route::get('/customers/{id}/statement', [\App\Http\Controllers\CustomerController::class, 'statement'])->name('customers.statement')->middleware('can:customers.statement');
+
+        // Suppliers & Purchases & Statements
+        Route::get('/suppliers', [\App\Http\Controllers\SupplierController::class, 'index'])->name('suppliers.index')->middleware('can:suppliers.manage');
+        Route::post('/suppliers', [\App\Http\Controllers\SupplierController::class, 'store'])->name('suppliers.store')->middleware('can:suppliers.manage');
+        Route::put('/suppliers/{id}', [\App\Http\Controllers\SupplierController::class, 'update'])->name('suppliers.update')->middleware('can:suppliers.manage');
+        Route::delete('/suppliers/{id}', [\App\Http\Controllers\SupplierController::class, 'destroy'])->name('suppliers.destroy')->middleware('can:suppliers.manage');
+        Route::post('/suppliers/{id}/pay', [\App\Http\Controllers\SupplierController::class, 'pay'])->name('suppliers.pay')->middleware('can:suppliers.manage');
+        Route::get('/suppliers/{id}/statement', SupplierStatement::class)->name('suppliers.statement')->middleware('can:suppliers.statement');
+        Route::get('/purchases', PurchaseIndex::class)->name('purchases.index')->middleware('can:purchases.view');
+        Route::get('/purchases/create', PurchaseCreate::class)->name('purchases.create')->middleware('can:purchases.create');
+        Route::get('/purchases/smart-reorder', App\Livewire\Purchases\SmartReorderIndex::class)->name('purchases.reorder')->middleware('can:purchases.view');
+
+        // Returns & Reversals
+        Route::get('/returns', ReturnIndex::class)->name('returns.index')->middleware('can:returns.manage');
+        Route::get('/returns/create', ReturnCreate::class)->name('returns.create')->middleware('can:returns.manage');
+
+        // Financial & Profit Reports (Admin & Accountant / reports.view)
+        Route::get('/reports', ReportsIndex::class)->name('reports.index')->middleware('can:reports.view');
+        Route::get('/reports/print', [App\Http\Controllers\ReportPrintController::class, 'printReport'])->name('reports.print')->middleware('can:reports.view');
+
+        // Operational Expenses & Supplies
+        Route::get('/expenses', App\Livewire\ExpenseIndex::class)->name('expenses.index')->middleware('can:expenses.manage');
+
+        // Coffee Blending Master & Roastery Recipe
+        Route::get('/coffee-blender', [\App\Http\Controllers\CoffeeBlenderController::class, 'index'])->name('coffee.blender')->middleware('can:items.create');
+        Route::post('/coffee-blender/invoice', [\App\Http\Controllers\CoffeeBlenderController::class, 'createInvoice'])->name('coffee.blender.invoice')->middleware('can:items.create');
+
+        // Daily Journal & Cashier Shifts (يوم بيوم)
+        Route::get('/daily-journal', [\App\Http\Controllers\DailyJournalController::class, 'index'])->name('daily.journal')->middleware('can:daily_journal.view');
+        Route::get('/shifts', [\App\Http\Controllers\DailyJournalController::class, 'index'])->name('shifts.index')->middleware('can:daily_journal.view');
+        Route::post('/daily-journal/open-shift', [\App\Http\Controllers\DailyJournalController::class, 'openShift'])->name('daily.journal.open_shift')->middleware('can:daily_journal.view');
+        Route::post('/daily-journal/close-shift/{id}', [\App\Http\Controllers\DailyJournalController::class, 'closeShift'])->name('daily.journal.close_shift')->middleware('can:daily_journal.view');
+        Route::post('/daily-journal/expense', [\App\Http\Controllers\DailyJournalController::class, 'storeExpense'])->name('daily.journal.expense')->middleware('can:daily_journal.view');
+
+        // Auth, Profile, Settings, Trash, Activity Logs & User Management
+        Route::get('/activity-logs', App\Livewire\ActivityLogIndex::class)->name('activity-logs.index')->middleware('can:logs.view');
+        Route::get('/trash', App\Livewire\TrashIndex::class)->name('trash.index')->middleware('can:trash.access');
+        Route::get('/profile', App\Livewire\Auth\Profile::class)->name('profile');
+        Route::get('/settings', App\Livewire\SettingsIndex::class)->name('settings.index')->middleware('can:roles.manage');
+        Route::get('/users', App\Livewire\Auth\UserManager::class)->name('users.index')->middleware('can:roles.manage');
+        Route::get('/roles', App\Livewire\Auth\RolePermissionManager::class)->name('roles.index')->middleware('can:roles.manage');
+
+        // Excel & CSV Exports
+        Route::get('/customers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportCustomerStatement'])->name('customers.export.csv')->middleware('can:customers.statement');
+        Route::get('/suppliers/{id}/export-csv', [App\Http\Controllers\ExportController::class, 'exportSupplierStatement'])->name('suppliers.export.csv')->middleware('can:suppliers.statement');
+        Route::get('/items/export-csv', [App\Http\Controllers\ExportController::class, 'exportInventory'])->name('items.export.csv')->middleware('can:items.view');
+
+        // Theme Toggle (Dark / Light Mode)
+        Route::post('/theme-toggle', function (\Illuminate\Http\Request $request) {
+            $theme = $request->input('theme', 'dark');
+            if (in_array($theme, ['dark', 'light']) && Auth::check()) {
+                Auth::user()->update(['theme_preference' => $theme]);
+            }
+            return response()->json(['status' => 'success', 'theme' => $theme]);
+        })->name('theme.toggle');
+
+        // Store Switcher (Fast active branch/van switch for authorized users)
+        Route::post('/store/switch', function (\Illuminate\Http\Request $request) {
+            $storeId = (int)$request->input('store_id');
+            $store = \App\Models\Store::where('id', $storeId)->where('is_active', true)->first();
+
+            if ($store) {
+                $user = Auth::user();
+                if ($user->hasRole('admin') || $user->stores()->where('stores.id', $storeId)->exists() || (int)$user->default_store_id === $storeId) {
+                    session(['current_store_id' => $storeId]);
+                    return response()->json(['status' => 'success', 'store' => $store]);
+                }
+            }
+
+            return response()->json(['status' => 'error', 'message' => 'غير مصرح'], 403);
+        })->name('store.switch');
+    });
+});
+
