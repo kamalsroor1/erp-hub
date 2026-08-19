@@ -212,6 +212,7 @@ Route::middleware('auth')->group(function () {
 
     // Financial & Profit Reports (Admin & Accountant / reports.view)
     Route::get('/reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.index')->middleware('can:reports.view');
+    Route::get('/reports/export-abc', [\App\Http\Controllers\ReportController::class, 'exportAbc'])->name('reports.export.abc')->middleware('can:reports.view');
 
     // Operational Expenses & Supplies
     Route::get('/expenses', [\App\Http\Controllers\ExpenseController::class, 'index'])->name('expenses.index')->middleware('can:expenses.manage');
@@ -232,6 +233,7 @@ Route::middleware('auth')->group(function () {
 
     // Auth, Profile, Settings, Trash, Activity Logs & User Management
     Route::get('/activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index')->middleware('can:logs.view');
+    Route::get('/activity-logs/export-csv', [\App\Http\Controllers\ActivityLogController::class, 'exportCsv'])->name('activity-logs.export.csv')->middleware('can:logs.view');
     
     Route::get('/trash', [\App\Http\Controllers\TrashController::class, 'index'])->name('trash.index')->middleware('can:trash.access');
     Route::post('/trash/{type}/{id}/restore', [\App\Http\Controllers\TrashController::class, 'restore'])->name('trash.restore')->middleware('can:trash.access');
@@ -242,6 +244,13 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('settings.index')->middleware('can:roles.manage');
     Route::post('/settings', [\App\Http\Controllers\SettingController::class, 'update'])->name('settings.update')->middleware('can:roles.manage');
+    Route::post('/settings/telegram/test', [\App\Http\Controllers\SettingController::class, 'sendTestTelegram'])->name('settings.telegram.test')->middleware('can:roles.manage');
+    Route::post('/settings/telegram/daily-summary', [\App\Http\Controllers\SettingController::class, 'sendDailySummaryTelegram'])->name('settings.telegram.daily_summary')->middleware('can:roles.manage');
+    Route::post('/settings/telegram/low-stock', [\App\Http\Controllers\SettingController::class, 'sendLowStockTelegram'])->name('settings.telegram.low_stock')->middleware('can:roles.manage');
+    Route::post('/settings/telegram/overdue-shifts', [\App\Http\Controllers\SettingController::class, 'sendOverdueShiftTelegram'])->name('settings.telegram.overdue_shifts')->middleware('can:roles.manage');
+    Route::post('/settings/telegram/backup', [\App\Http\Controllers\SettingController::class, 'sendBackupTelegram'])->name('settings.telegram.backup')->middleware('can:roles.manage');
+    Route::get('/settings/backup/download', [\App\Http\Controllers\SettingController::class, 'downloadBackup'])->name('settings.backup.download')->middleware('can:roles.manage');
+    Route::post('/settings/clear-cache', [\App\Http\Controllers\SettingController::class, 'clearCache'])->name('settings.clear_cache')->middleware('can:roles.manage');
 
     Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index')->middleware('can:roles.manage');
     Route::post('/users', [\App\Http\Controllers\UserController::class, 'store'])->name('users.store')->middleware('can:roles.manage');
