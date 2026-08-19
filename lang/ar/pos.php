@@ -39,4 +39,8 @@ return [
     'status_cancelled'          => 'ملغاة',
     'status_partially_paid'     => 'مسدد جزئياً',
     'status_unpaid'             => 'آجل غير مسدد',
+    'invoice_saved_success'     => 'تم حفظ الفاتورة بنجاح!',
+    'invoice_confirmed_success' => 'تم إصدار الفاتورة رقم [:number] بنجاح!',
+    'empty_cart_error'          => 'يرجى إضافة أصناف إلى السلة أولاً!',
+    'no_active_store_error'     => 'يرجى تحديد فرع نشط أولاً!',
 ];
