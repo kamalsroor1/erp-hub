@@ -101,6 +101,41 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
                 'warning' => fn () => $request->session()->get('warning'),
             ],
+            'system_notifications' => function () use ($user) {
+                if (!$user) return [];
+                $alerts = [];
+
+                // 1. Low stock alert
+                $lowStockCount = \App\Models\Item::where('is_active', true)
+                    ->whereColumn('current_stock', '<=', 'min_stock_level')
+                    ->count();
+
+                if ($lowStockCount > 0) {
+                    $alerts[] = [
+                        'type' => 'danger',
+                        'icon' => '🚨',
+                        'title' => "نواقص بالمخزن ({$lowStockCount} صنف)",
+                        'description' => 'أصناف بلغت أو تجاوزت حد الطلب الأدنى',
+                        'link' => '/purchases/smart-reorder',
+                        'link_label' => 'إعادة الطلب الذكي',
+                    ];
+                }
+
+                // 2. Customer Debt alert
+                $debtCount = \App\Models\Customer::where('is_active', true)->where('current_balance', '>', 0)->count();
+                if ($debtCount > 0) {
+                    $alerts[] = [
+                        'type' => 'warning',
+                        'icon' => '👥',
+                        'title' => "مديونيات عملاء ({$debtCount} عميل)",
+                        'description' => 'يوجد عملاء مستحق عليهم مبالغ آجلة بحاجة للتحصيل',
+                        'link' => '/customers',
+                        'link_label' => 'قائمة العملاء المدينين',
+                    ];
+                }
+
+                return $alerts;
+            },
         ];
     }
 }

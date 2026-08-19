@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { Link, usePage, router } from '@inertiajs/vue3';
 import FeatureGate from '@/Components/FeatureGate.vue';
@@ -17,9 +17,12 @@ const isAdmin = computed(() => user.value.roles?.includes('admin'));
 const isSidebarOpen = ref(false);
 const isSidebarCollapsed = ref(false);
 
-// Header user menu & Store modal state
+// Header user menu, Notification dropdown & Store modal state
 const showUserMenu = ref(false);
+const showNotifications = ref(false);
 const showStoreModal = ref(false);
+
+const notifications = computed(() => page.props.system_notifications || []);
 
 // Theme Composable
 const { currentTheme, toggleTheme, initTheme } = useTheme(user.value.theme_preference || 'dark');
@@ -49,6 +52,7 @@ const handleKeydown = (e) => {
     if (e.key === 'Escape') {
         showStoreModal.value = false;
         showUserMenu.value = false;
+        showNotifications.value = false;
         isSidebarOpen.value = false;
     }
 };
@@ -232,6 +236,67 @@ const getUserRoleLabel = computed(() => {
                         <span class="px-1.5 py-0.2 rounded bg-slate-950/25 text-white text-[10px] font-mono">F2</span>
                     </Link>
                 </FeatureGate>
+
+                <!-- Notification Center Dropdown -->
+                <div class="relative" @click.stop>
+                    <button
+                        @click="showNotifications = !showNotifications; showUserMenu = false"
+                        type="button"
+                        class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition relative cursor-pointer"
+                        title="مركز التنبيهات والإشعارات"
+                    >
+                        <span class="text-sm">🔔</span>
+                        <span
+                            v-if="notifications.length > 0"
+                            class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white font-black text-[9px] flex items-center justify-center animate-pulse"
+                        >
+                            {{ notifications.length }}
+                        </span>
+                    </button>
+
+                    <!-- Notifications Dropdown Panel -->
+                    <div
+                        v-if="showNotifications"
+                        class="absolute left-0 mt-2 w-80 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-3 z-50 space-y-2 font-tajawal"
+                    >
+                        <div class="flex items-center justify-between pb-2 border-b border-slate-800 px-1">
+                            <span class="text-xs font-black text-white flex items-center gap-1.5">
+                                <span>🔔</span>
+                                <span>مركز التنبيهات المباشرة</span>
+                            </span>
+                            <span class="text-[10px] text-amber-400 font-bold">
+                                {{ notifications.length }} إشعار
+                            </span>
+                        </div>
+
+                        <div class="space-y-2 max-h-72 overflow-y-auto">
+                            <div
+                                v-for="(n, nIdx) in notifications"
+                                :key="nIdx"
+                                class="p-2.5 rounded-2xl bg-slate-950/80 border border-slate-800/80 space-y-1 hover:border-slate-700 transition"
+                            >
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm">{{ n.icon }}</span>
+                                    <span class="text-xs font-black text-white">{{ n.title }}</span>
+                                </div>
+                                <p class="text-[11px] text-slate-400 leading-snug">{{ n.description }}</p>
+                                <div class="pt-1 flex justify-end">
+                                    <Link
+                                        :href="n.link"
+                                        @click="showNotifications = false"
+                                        class="text-[10px] font-bold text-amber-400 hover:text-amber-300 transition"
+                                    >
+                                        {{ n.link_label }} ←
+                                    </Link>
+                                </div>
+                            </div>
+
+                            <div v-if="notifications.length === 0" class="py-6 text-center text-xs text-slate-500 font-bold">
+                                ✨ لا توجد تنبيهات عاجلة، كل شيء يسير بانتظام!
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Theme Toggle Button -->
                 <button
