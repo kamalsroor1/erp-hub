@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, computed, watch } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -157,6 +157,12 @@ const deleteCustomer = (c) => {
             preserveScroll: true,
         });
     }
+};
+
+const toggleActive = (c) => {
+    router.post(`/customers/${c.id}/toggle-active`, {}, {
+        preserveScroll: true,
+    });
 };
 </script>
 
@@ -338,6 +344,17 @@ const deleteCustomer = (c) => {
                                             title="تعديل بيانات العميل"
                                         >
                                             ✏️
+                                        </button>
+
+                                        <!-- Toggle Active -->
+                                        <button
+                                            @click="toggleActive(c)"
+                                            type="button"
+                                            class="p-1.5 rounded-xl transition cursor-pointer"
+                                            :class="c.is_active ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 hover:bg-slate-700 text-slate-500'"
+                                            :title="c.is_active ? 'الحساب نشط (اضغط للتعطيل)' : 'الحساب معطل (اضغط للتفعيل)'"
+                                        >
+                                            {{ c.is_active ? '🟢' : '⚪' }}
                                         </button>
 
                                         <!-- Delete -->

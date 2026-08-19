@@ -9,6 +9,7 @@ import { useMoney } from '@/Composables/useMoney';
 const props = defineProps({
     item: { type: Object, required: true },
     movements: { type: Object, required: true },
+    stats: { type: Object, default: () => ({ total_in: 0, total_out: 0, net_movement: 0, current_scope_stock: 0 }) },
     stores: { type: Array, default: () => [] },
     filters: { type: Object, default: () => ({}) },
 });
@@ -21,20 +22,52 @@ const storeId = ref(props.filters.store_id || 'all');
 const movementType = ref(props.filters.type || 'all');
 
 const storeOptions = [
-    { id: 'all', name: 'كافة الفروع والمخازن' },
-    ...props.stores
+    { id: 'all', name: '🏬 كافة الفروع والمخازن' },
+    ...props.stores.map(s => ({ id: s.id, name: `🏬 ${s.name}` }))
 ];
 
 const movementTypeOptions = [
     { id: 'all', name: 'كافة أنواع الحركات' },
-    { id: 'sale', name: 'مبيعات وفواتير POS 🛒' },
-    { id: 'purchase', name: 'مشتريات وتوريدات 🚛' },
+    { id: 'purchase_in', name: 'توريد مشتريات 🚛' },
+    { id: 'sales_out', name: 'مبيعات وفواتير POS 🛒' },
     { id: 'transfer_in', name: 'تحويل وارد من مخزن 📥' },
     { id: 'transfer_out', name: 'تحويل منصرف إلى مخزن 📤' },
-    { id: 'return_in', name: 'مرتجع مبيعات من عميل ↩️' },
-    { id: 'return_out', name: 'مرتجع مشتريات إلى مورد ↪️' },
-    { id: 'adjustment', name: 'تسوية وجرد مخزني ⚖️' },
+    { id: 'sales_return_in', name: 'مرتجع مبيعات من عميل ↩️' },
+    { id: 'purchase_return_out', name: 'مرتجع مشتريات إلى مورد ↪️' },
+    { id: 'stock_adjustment_in', name: 'تسوية جردية (إضافة) ⚖️' },
+    { id: 'stock_adjustment_out', name: 'تسوية جردية (خصم) ⚖️' },
+    { id: 'cancellation_in', name: 'إلغاء فاتورة مبيعات 🚫' },
+    { id: 'waste_out', name: 'هالك وتالف 🗑️' },
 ];
+
+const applyDatePreset = (preset) => {
+    const now = new Date();
+    const formatDate = (d) => d.toISOString().split('T')[0];
+
+    if (preset === 'today') {
+        dateFrom.value = formatDate(now);
+        dateTo.value = formatDate(now);
+    } else if (preset === 'this_week') {
+        const firstDay = new Date(now.setDate(now.getDate() - now.getDay()));
+        const lastDay = new Date(now.setDate(now.getDate() - now.getDay() + 6));
+        dateFrom.value = formatDate(firstDay);
+        dateTo.value = formatDate(lastDay);
+    } else if (preset === 'this_month') {
+        const start = new Date(now.getFullYear(), now.getMonth(), 1);
+        const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        dateFrom.value = formatDate(start);
+        dateTo.value = formatDate(end);
+    } else if (preset === 'this_year') {
+        const start = new Date(now.getFullYear(), 0, 1);
+        const end = new Date(now.getFullYear(), 11, 31);
+        dateFrom.value = formatDate(start);
+        dateTo.value = formatDate(end);
+    } else if (preset === 'all') {
+        dateFrom.value = '';
+        dateTo.value = '';
+    }
+    applyFilters();
+};
 
 const applyFilters = () => {
     router.get(`/items/${props.item.id}/movements`, {
@@ -47,6 +80,26 @@ const applyFilters = () => {
         preserveScroll: true,
         replace: true,
     });
+};
+
+const printReport = () => {
+    window.print();
+};
+
+const getMovementBadge = (type) => {
+    const map = {
+        'purchase_in': { label: 'توريد مشتريات', class: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
+        'sales_out': { label: 'مبيعات وفواتير', class: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30' },
+        'transfer_in': { label: 'تحويل وارد', class: 'bg-teal-500/15 text-teal-400 border-teal-500/30' },
+        'transfer_out': { label: 'تحويل منصرف', class: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
+        'sales_return_in': { label: 'مرتجع مبيعات', class: 'bg-blue-500/15 text-blue-400 border-blue-500/30' },
+        'purchase_return_out': { label: 'مرتجع مشتريات', class: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
+        'stock_adjustment_in': { label: 'تسوية (إضافة)', class: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
+        'stock_adjustment_out': { label: 'تسوية (خصم)', class: 'bg-rose-500/15 text-rose-400 border-rose-500/30' },
+        'cancellation_in': { label: 'إلغاء فاتورة', class: 'bg-rose-500/15 text-rose-400 border-rose-500/30' },
+        'waste_out': { label: 'هالك وتالف', class: 'bg-rose-500/15 text-rose-400 border-rose-500/30' },
+    };
+    return map[type] || { label: type, class: 'bg-slate-800 text-slate-300 border-slate-700' };
 };
 </script>
 
@@ -75,49 +128,106 @@ const applyFilters = () => {
                     </div>
                 </div>
 
-                <div class="p-4 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-3">
-                    <span class="text-xs text-slate-400 font-bold">الرصيد الفعلي الحالي:</span>
-                    <span class="font-mono font-black text-amber-400 text-lg">{{ item.current_stock }} {{ item.unit }}</span>
+                <div class="flex items-center gap-2">
+                    <button
+                        @click="printReport"
+                        type="button"
+                        class="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-indigo-600/20 transition cursor-pointer"
+                    >
+                        <span>📄</span>
+                        <span>طباعة تقرير الحركة A4</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- Filter Controls -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm grid grid-cols-1 sm:grid-cols-4 gap-3">
-                <div class="space-y-1">
-                    <label class="text-[11px] font-bold text-slate-300">نوع الحركة</label>
-                    <SearchableSelect
-                        v-model="movementType"
-                        :options="movementTypeOptions"
-                        placeholder="اختر النوع..."
-                    />
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-[11px] font-bold text-slate-300">الفرع / المخزن</label>
-                    <SearchableSelect
-                        v-model="storeId"
-                        :options="storeOptions"
-                        placeholder="اختر المخزن..."
-                    />
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-[11px] font-bold text-slate-300">من تاريخ</label>
-                    <DatePicker v-model="dateFrom" placeholder="من..." />
-                </div>
-
-                <div class="space-y-1 flex items-end gap-2">
-                    <div class="flex-1">
-                        <label class="text-[11px] font-bold text-slate-300">إلى تاريخ</label>
-                        <DatePicker v-model="dateTo" placeholder="إلى..." />
+            <!-- 4 Top KPI Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
+                    <span class="text-[11px] text-slate-400 font-bold block">الوارد الإجمالي للفترة (+)</span>
+                    <div class="text-xl font-black font-mono text-emerald-400 flex items-center gap-1.5">
+                        <span>📥</span>
+                        <span>{{ stats.total_in }}</span>
+                        <span class="text-xs font-tajawal text-slate-400 font-normal">{{ item.unit }}</span>
                     </div>
-                    <button
-                        @click="applyFilters"
-                        type="button"
-                        class="h-10 px-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer"
-                    >
-                        تطبيق
-                    </button>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
+                    <span class="text-[11px] text-slate-400 font-bold block">المنصرف والمبيعات (-)</span>
+                    <div class="text-xl font-black font-mono text-rose-400 flex items-center gap-1.5">
+                        <span>📤</span>
+                        <span>{{ stats.total_out }}</span>
+                        <span class="text-xs font-tajawal text-slate-400 font-normal">{{ item.unit }}</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
+                    <span class="text-[11px] text-slate-400 font-bold block">صافي الحركة للفترة</span>
+                    <div class="text-xl font-black font-mono flex items-center gap-1.5" :class="stats.net_movement >= 0 ? 'text-emerald-400' : 'text-rose-400'">
+                        <span>⚖️</span>
+                        <span>{{ stats.net_movement >= 0 ? '+' : '' }}{{ stats.net_movement }}</span>
+                        <span class="text-xs font-tajawal text-slate-400 font-normal">{{ item.unit }}</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
+                    <span class="text-[11px] text-slate-400 font-bold block">رصيد النطاق الحالي</span>
+                    <div class="text-xl font-black font-mono text-amber-400 flex items-center gap-1.5">
+                        <span>📦</span>
+                        <span>{{ stats.current_scope_stock }}</span>
+                        <span class="text-xs font-tajawal text-slate-400 font-normal">{{ item.unit }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Controls & Presets -->
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-3">
+                <!-- Date Presets Bar -->
+                <div class="flex flex-wrap items-center gap-1.5 pb-2 border-b border-slate-800/80 text-xs">
+                    <span class="text-slate-500 font-bold text-[11px] ml-1">فترات سريعة:</span>
+                    <button @click="applyDatePreset('today')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">اليوم</button>
+                    <button @click="applyDatePreset('this_week')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">هذا الأسبوع</button>
+                    <button @click="applyDatePreset('this_month')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">هذا الشهر</button>
+                    <button @click="applyDatePreset('this_year')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">هذا العام</button>
+                    <button @click="applyDatePreset('all')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">كافة الحركات</button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-bold text-slate-300">نوع الحركة</label>
+                        <SearchableSelect
+                            v-model="movementType"
+                            :options="movementTypeOptions"
+                            placeholder="اختر النوع..."
+                        />
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-bold text-slate-300">الفرع / المخزن</label>
+                        <SearchableSelect
+                            v-model="storeId"
+                            :options="storeOptions"
+                            placeholder="اختر المخزن..."
+                        />
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-bold text-slate-300">من تاريخ</label>
+                        <DatePicker v-model="dateFrom" placeholder="من..." />
+                    </div>
+
+                    <div class="space-y-1 flex items-end gap-2">
+                        <div class="flex-1">
+                            <label class="text-[11px] font-bold text-slate-300">إلى تاريخ</label>
+                            <DatePicker v-model="dateTo" placeholder="إلى..." />
+                        </div>
+                        <button
+                            @click="applyFilters"
+                            type="button"
+                            class="h-10 px-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer"
+                        >
+                            تطبيق
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -144,10 +254,10 @@ const applyFilters = () => {
 
                                 <td class="py-3.5 font-tajawal font-bold">
                                     <span
-                                        class="px-2 py-0.5 rounded-full text-[10px]"
-                                        :class="m.quantity > 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'"
+                                        class="px-2.5 py-1 rounded-xl text-[10px] font-black border"
+                                        :class="getMovementBadge(m.movement_type).class"
                                     >
-                                        {{ m.movement_type }}
+                                        {{ getMovementBadge(m.movement_type).label }}
                                     </span>
                                 </td>
 

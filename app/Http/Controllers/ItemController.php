@@ -172,6 +172,17 @@ final class ItemController extends Controller
         $storeId = $request->input('store_id', 'all');
         $movementType = $request->input('type', 'all');
 
+        $storeFilter = ($storeId !== 'all' && is_numeric($storeId)) ? (int)$storeId : null;
+
+        $inTypes = [
+            'purchase_in', 'stock_deposit_in', 'stock_adjustment_in',
+            'cancellation_in', 'transfer_in', 'sales_return_in', 'purchase_restore_in'
+        ];
+        $outTypes = [
+            'sales_out', 'waste_out', 'stock_adjustment_out',
+            'transfer_out', 'purchase_cancel_out', 'purchase_return_out'
+        ];
+
         $query = \App\Models\StockMovement::with(['user', 'store'])
             ->where('item_id', $item->id);
 
@@ -183,13 +194,34 @@ final class ItemController extends Controller
             $query->whereDate('created_at', '<=', $dateTo);
         }
 
-        if ($storeId !== 'all') {
-            $query->where('store_id', (int)$storeId);
+        if ($storeFilter) {
+            $query->where('store_id', $storeFilter);
         }
 
         if ($movementType !== 'all') {
             $query->where('movement_type', $movementType);
         }
+
+        // Stats calculation for the filtered scope
+        $statsQuery = clone $query;
+        $allMovements = $statsQuery->get();
+
+        $totalIn = '0.000';
+        $totalOut = '0.000';
+
+        foreach ($allMovements as $mov) {
+            if (in_array($mov->movement_type, $inTypes)) {
+                $totalIn = bcadd($totalIn, (string)$mov->quantity, 3);
+            } elseif (in_array($mov->movement_type, $outTypes)) {
+                $totalOut = bcadd($totalOut, (string)$mov->quantity, 3);
+            }
+        }
+
+        $netMovement = bcsub($totalIn, $totalOut, 3);
+
+        $currentScopeStock = $storeFilter
+            ? (float)(\App\Models\StoreStock::where('store_id', $storeFilter)->where('item_id', $item->id)->value('quantity') ?: 0)
+            : (float)$item->current_stock;
 
         $movements = $query->latest('id')->paginate(20)->withQueryString();
         $stores = Store::where('is_active', true)->select('id', 'name')->get();
@@ -218,6 +250,12 @@ final class ItemController extends Controller
                 'notes' => $m->notes,
                 'created_at' => $m->created_at->format('Y-m-d H:i:s'),
             ]),
+            'stats' => [
+                'total_in' => (float)$totalIn,
+                'total_out' => (float)$totalOut,
+                'net_movement' => (float)$netMovement,
+                'current_scope_stock' => $currentScopeStock,
+            ],
             'stores' => $stores,
             'filters' => [
                 'from' => $dateFrom,

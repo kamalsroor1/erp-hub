@@ -114,7 +114,7 @@ final class CustomerController extends Controller
         return redirect()->back()->with('success', 'تم تعديل بيانات العميل بنجاح');
     }
 
-    public function collectPayment(Request $request, int $id)
+    public function collectPayment(Request $request, int $id, \App\Services\PaymentService $paymentService)
     {
         $customer = Customer::findOrFail($id);
 
@@ -125,79 +125,24 @@ final class CustomerController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
-        DB::transaction(function () use ($customer, $validated) {
-            Payment::create([
-                'customer_id' => $customer->id,
-                'amount' => $validated['amount'],
-                'payment_method' => $validated['payment_method'],
-                'payment_date' => $validated['payment_date'],
-                'user_id' => auth()->id(),
-                'notes' => $validated['notes'] ?? 'تحصيل دفعة نقدية من الحساب',
-            ]);
-
-            // Deduct collected amount from current_balance
-            $customer->current_balance = bcsub((string)$customer->current_balance, (string)$validated['amount'], 3);
-            $customer->save();
-        });
+        $paymentService->recordCustomerPayment([
+            'customer_id'    => $customer->id,
+            'amount'         => (string)$validated['amount'],
+            'payment_method' => $validated['payment_method'],
+            'payment_date'   => $validated['payment_date'],
+            'notes'          => $validated['notes'] ?? 'تحصيل دفعة نقدية من الحساب',
+        ]);
 
         return redirect()->back()->with('success', 'تم تسجيل سند التحصيل وقيد الدفعة بنجاح');
     }
 
-    public function statement(Request $request, int $id): Response
+    public function statement(Request $request, int $id, \App\Services\CustomerBalanceService $balanceService): Response
     {
         $customer = Customer::findOrFail($id);
         $dateFrom = $request->input('from');
         $dateTo = $request->input('to');
 
-        // Fetch Invoices
-        $invoices = Invoice::where('customer_id', $customer->id)
-            ->where('status', 'confirmed')
-            ->when($dateFrom, fn($q) => $q->whereDate('invoice_date', '>=', $dateFrom))
-            ->when($dateTo, fn($q) => $q->whereDate('invoice_date', '<=', $dateTo))
-            ->get();
-
-        // Fetch Payments
-        $payments = Payment::where('customer_id', $customer->id)
-            ->when($dateFrom, fn($q) => $q->whereDate('payment_date', '>=', $dateFrom))
-            ->when($dateTo, fn($q) => $q->whereDate('payment_date', '<=', $dateTo))
-            ->get();
-
-        // Merge entries into chronological ledger
-        $ledger = collect();
-
-        foreach ($invoices as $inv) {
-            $ledger->push([
-                'id' => 'inv-' . $inv->id,
-                'date' => $inv->invoice_date->toDateString(),
-                'type' => 'invoice',
-                'description' => "فاتورة مبيعات رقم #{$inv->invoice_number}",
-                'debit' => (float)$inv->net_total,
-                'credit' => (float)$inv->paid_amount,
-                'reference_id' => $inv->id,
-            ]);
-        }
-
-        foreach ($payments as $pay) {
-            $ledger->push([
-                'id' => 'pay-' . $pay->id,
-                'date' => $pay->payment_date->toDateString(),
-                'type' => 'payment',
-                'description' => "سند قبض وتحصيل ({$pay->payment_method}) " . ($pay->notes ? " - {$pay->notes}" : ''),
-                'debit' => 0.0,
-                'credit' => (float)$pay->amount,
-                'reference_id' => $pay->id,
-            ]);
-        }
-
-        $sortedLedger = $ledger->sortBy('date')->values();
-
-        // Compute running balance
-        $runningBalance = 0.0;
-        $processedLedger = $sortedLedger->map(function ($row) use (&$runningBalance) {
-            $runningBalance += ($row['debit'] - $row['credit']);
-            $row['balance'] = $runningBalance;
-            return $row;
-        });
+        $ledgerData = $balanceService->getCustomerLedger($customer, $dateFrom, $dateTo);
 
         return Inertia::render('Customers/Statement', [
             'customer' => [
@@ -208,12 +153,37 @@ final class CustomerController extends Controller
                 'tax_number' => $customer->tax_number,
                 'current_balance' => (float)$customer->current_balance,
             ],
-            'ledger' => $processedLedger,
+            'ledger' => array_map(function ($row) {
+                return [
+                    'date' => $row['date'],
+                    'type' => $row['type'],
+                    'ref_number' => $row['ref_number'],
+                    'debit' => (float)$row['debit'],
+                    'credit' => (float)$row['credit'],
+                    'notes' => $row['notes'],
+                    'balance_after' => (float)$row['balance_after'],
+                ];
+            }, $ledgerData['entries']),
+            'summary' => [
+                'total_debit' => (float)collect($ledgerData['entries'])->sum(fn($r) => (float)$r['debit']),
+                'total_credit' => (float)collect($ledgerData['entries'])->sum(fn($r) => (float)$r['credit']),
+                'current_balance' => (float)$customer->current_balance,
+            ],
             'filters' => [
                 'from' => $dateFrom,
                 'to' => $dateTo,
             ],
         ]);
+    }
+
+    public function toggleActive(int $id)
+    {
+        $customer = Customer::findOrFail($id);
+        $customer->is_active = !$customer->is_active;
+        $customer->save();
+
+        $statusText = $customer->is_active ? 'تفعيل' : 'تعطيل';
+        return redirect()->back()->with('success', "تم {$statusText} العميل [{$customer->name}] بنجاح");
     }
 
     public function destroy(int $id)

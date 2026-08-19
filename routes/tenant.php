@@ -205,6 +205,7 @@ Route::middleware([
         Route::post('/customers', [\App\Http\Controllers\CustomerController::class, 'store'])->name('customers.store')->middleware('can:customers.manage');
         Route::put('/customers/{id}', [\App\Http\Controllers\CustomerController::class, 'update'])->name('customers.update')->middleware('can:customers.manage');
         Route::delete('/customers/{id}', [\App\Http\Controllers\CustomerController::class, 'destroy'])->name('customers.destroy')->middleware('can:customers.manage');
+        Route::post('/customers/{id}/toggle-active', [\App\Http\Controllers\CustomerController::class, 'toggleActive'])->name('customers.toggle_active')->middleware('can:customers.manage');
         Route::post('/customers/{id}/payments', [\App\Http\Controllers\CustomerController::class, 'collectPayment'])->name('customers.payments')->middleware('can:customers.manage');
         Route::get('/customers/{id}/statement', [\App\Http\Controllers\CustomerController::class, 'statement'])->name('customers.statement')->middleware('can:customers.statement');
 
