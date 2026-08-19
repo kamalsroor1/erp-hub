@@ -1,0 +1,389 @@
+<script setup>
+import { ref, watch } from 'vue';
+import { Head, Link, useForm, router } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import SearchableSelect from '@/Components/SearchableSelect.vue';
+
+const props = defineProps({
+    users: { type: Object, required: true },
+    roles: { type: Array, default: () => [] },
+    stores: { type: Array, default: () => [] },
+    filters: { type: Object, default: () => ({}) },
+});
+
+const search = ref(props.filters.search || '');
+const roleFilter = ref(props.filters.role || 'all');
+
+const applyFilters = () => {
+    router.get('/users', {
+        search: search.value || undefined,
+        role: roleFilter.value !== 'all' ? roleFilter.value : undefined,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+    });
+};
+
+let searchTimer = null;
+watch([search, roleFilter], () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        applyFilters();
+    }, 400);
+});
+
+// Add / Edit Modal
+const showModal = ref(false);
+const editingUser = ref(null);
+
+const userForm = useForm({
+    name: '',
+    phone: '',
+    email: '',
+    password: '',
+    role: 'cashier',
+    default_store_id: props.stores[0]?.id || null,
+    is_active: true,
+});
+
+const storeOptions = [
+    { id: null, name: 'كافة الفروع / بدون تقييد' },
+    ...props.stores
+];
+
+const openCreateModal = () => {
+    editingUser.value = null;
+    userForm.reset();
+    userForm.clearErrors();
+    showModal.value = true;
+};
+
+const openEditModal = (u) => {
+    editingUser.value = u;
+    userForm.clearErrors();
+    userForm.name = u.name;
+    userForm.phone = u.phone;
+    userForm.email = u.email || '';
+    userForm.password = '';
+    userForm.role = u.primary_role;
+    userForm.default_store_id = u.default_store_id;
+    userForm.is_active = u.is_active;
+    showModal.value = true;
+};
+
+const saveUser = () => {
+    if (editingUser.value) {
+        userForm.put(`/users/${editingUser.value.id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                showModal.value = false;
+            }
+        });
+    } else {
+        userForm.post('/users', {
+            preserveScroll: true,
+            onSuccess: () => {
+                showModal.value = false;
+            }
+        });
+    }
+};
+
+const toggleUser = (u) => {
+    router.post(`/users/${u.id}/toggle-active`, {}, {
+        preserveScroll: true,
+    });
+};
+
+const deleteUser = (u) => {
+    if (confirm(`هل أنت متأكد من حذف حساب (${u.name})؟`)) {
+        router.delete(`/users/${u.id}`, {
+            preserveScroll: true,
+        });
+    }
+};
+</script>
+
+<template>
+    <Head title="إدارة المستخدمين وصلاحيات الكاشير" />
+
+    <AppLayout>
+        <div class="space-y-6 font-tajawal">
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl">👥</span>
+                        <h1 class="text-xl sm:text-2xl font-black text-white">
+                            إدارة حسابات المستخدمين، الكاشير، وصلاحيات الفروع
+                        </h1>
+                    </div>
+                    <p class="text-xs text-slate-400 font-bold">
+                        إنشاء وتعديل حسابات الدخول، تعيين الأدوار (كاشير، محاسب، أمين مخزن)، وتحديد الفروع
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-2.5">
+                    <Link
+                        href="/roles"
+                        class="h-11 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
+                    >
+                        <span>🛡️</span>
+                        <span>مصفوفة الصلاحيات</span>
+                    </Link>
+
+                    <button
+                        @click="openCreateModal"
+                        type="button"
+                        class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
+                    >
+                        <span class="text-base font-black">+</span>
+                        <span>إضافة مستخدم جديد</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Filter Bar -->
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-3">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-3">
+                    <div class="w-full md:w-96 relative">
+                        <input
+                            v-model="search"
+                            type="text"
+                            placeholder="... بحث باسم المستخدم أو رقم الهاتف أو البريد"
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-950/80 border border-slate-800 rounded-2xl text-xs text-white placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
+                        >
+                        <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
+                            🔍
+                        </span>
+                    </div>
+
+                    <div class="w-full md:w-auto flex items-center gap-2">
+                        <select
+                            v-model="roleFilter"
+                            class="px-3.5 py-2.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                        >
+                            <option value="all">كافة الأدوار والوظائف</option>
+                            <option value="admin">مدير النظام 👑</option>
+                            <option value="cashier">كاشير مبيعات 🛒</option>
+                            <option value="storekeeper">أمين مخزن 📦</option>
+                            <option value="accountant">محاسب 💼</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-xs">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                                <th class="pb-3">الاسم والبيانات</th>
+                                <th class="pb-3">رقم الهاتف للدخول</th>
+                                <th class="pb-3">الدور والوظيفة</th>
+                                <th class="pb-3">الفرع / المخزن الافتراضي</th>
+                                <th class="pb-3 text-center">حالة الحساب</th>
+                                <th class="pb-3 text-center">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 font-sans">
+                            <tr v-for="u in users.data" :key="u.id" class="hover:bg-slate-800/30 transition">
+                                <td class="py-3.5">
+                                    <div class="font-black text-white font-tajawal text-sm">{{ u.name }}</div>
+                                    <div v-if="u.email" class="text-[10px] text-slate-500 font-mono">{{ u.email }}</div>
+                                </td>
+
+                                <td class="py-3.5 font-mono font-bold text-amber-400 text-xs">
+                                    {{ u.phone }}
+                                </td>
+
+                                <td class="py-3.5 font-tajawal">
+                                    <span
+                                        class="px-2.5 py-1 rounded-xl text-xs font-bold"
+                                        :class="[
+                                            u.primary_role === 'admin' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                                            (u.primary_role === 'cashier' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-300')
+                                        ]"
+                                    >
+                                        {{ u.primary_role === 'admin' ? 'مدير 👑' : (u.primary_role === 'cashier' ? 'كاشير 🛒' : (u.primary_role === 'storekeeper' ? 'أمين مخزن 📦' : 'محاسب 💼')) }}
+                                    </span>
+                                </td>
+
+                                <td class="py-3.5 font-tajawal text-slate-300">
+                                    {{ u.default_store_name || 'كافة الفروع 🌐' }}
+                                </td>
+
+                                <td class="py-3.5 text-center">
+                                    <button
+                                        @click="toggleUser(u)"
+                                        type="button"
+                                        class="px-2.5 py-0.5 rounded-full text-[10px] font-bold font-tajawal transition cursor-pointer"
+                                        :class="u.is_active ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'"
+                                    >
+                                        {{ u.is_active ? 'مفعل 🟢' : 'معطل 🔴' }}
+                                    </button>
+                                </td>
+
+                                <td class="py-3.5 text-center">
+                                    <div class="flex items-center justify-center gap-1.5 font-tajawal">
+                                        <button
+                                            @click="openEditModal(u)"
+                                            type="button"
+                                            class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold transition cursor-pointer"
+                                        >
+                                            تعديل ✏️
+                                        </button>
+
+                                        <button
+                                            @click="deleteUser(u)"
+                                            type="button"
+                                            class="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition cursor-pointer"
+                                        >
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div v-if="!users.data || users.data.length === 0" class="py-16 text-center space-y-2">
+                        <span class="text-3xl">👥</span>
+                        <p class="text-xs font-bold text-slate-400 font-tajawal">لا يوجد مستخدمين مسجلين</p>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div v-if="users.links && users.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
+                    <span class="text-xs text-slate-400 font-tajawal">
+                        عرض {{ users.from || 0 }} إلى {{ users.to || 0 }} من إجمالي {{ users.total || 0 }} مستخدم
+                    </span>
+
+                    <div class="flex items-center gap-1">
+                        <template v-for="(link, lIdx) in users.links" :key="lIdx">
+                            <Link
+                                v-if="link.url"
+                                :href="link.url"
+                                class="px-3 py-1.5 rounded-xl text-xs font-bold transition"
+                                :class="link.active ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'"
+                                v-html="link.label"
+                            />
+                            <span
+                                v-else
+                                class="px-3 py-1.5 rounded-xl text-xs text-slate-600 font-bold"
+                                v-html="link.label"
+                            />
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add / Edit User Modal -->
+        <div
+            v-if="showModal"
+            @click="showModal = false"
+            class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
+            dir="rtl"
+        >
+            <div @click.stop class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h3 class="font-black text-base text-white">
+                        {{ editingUser ? 'تعديل بيانات وصلاحيات المستخدم' : 'إضافة حساب مستخدم / كاشير جديد 👤' }}
+                    </h3>
+                    <button @click="showModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
+                </div>
+
+                <form @submit.prevent="saveUser" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-300">الاسم الكامل *</label>
+                            <input
+                                v-model="userForm.name"
+                                type="text"
+                                required
+                                placeholder="مثال: أحمد محمد"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                            >
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-300">رقم الهاتف للدخول *</label>
+                            <input
+                                v-model="userForm.phone"
+                                type="text"
+                                required
+                                placeholder="01xxxxxxxxx"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-amber-500 focus:outline-none"
+                            >
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-300">البريد الإلكتروني (اختياري)</label>
+                            <input
+                                v-model="userForm.email"
+                                type="email"
+                                placeholder="user@example.com"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-amber-500 focus:outline-none"
+                            >
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-300">
+                                {{ editingUser ? 'كلمة المرور (اتركه فارغاً لعدم التغيير)' : 'كلمة المرور *' }}
+                            </label>
+                            <input
+                                v-model="userForm.password"
+                                type="password"
+                                :required="!editingUser"
+                                placeholder="••••••••"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-amber-500 focus:outline-none"
+                            >
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-300">الدور والوظيفة *</label>
+                            <select
+                                v-model="userForm.role"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                            >
+                                <option value="cashier">كاشير مبيعات ونقطة بيع 🛒</option>
+                                <option value="storekeeper">أمين مخزن وتوريدات 📦</option>
+                                <option value="accountant">محاسب ومدقق مالي 💼</option>
+                                <option value="admin">مدير النظام (كامل الصلاحيات) 👑</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-300">الفرع / المخزن المعين عليه</label>
+                            <SearchableSelect
+                                v-model="userForm.default_store_id"
+                                :options="storeOptions"
+                                placeholder="اختر الفرع..."
+                            />
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                        <button
+                            @click="showModal = false"
+                            type="button"
+                            class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
+                        >
+                            إلغاء
+                        </button>
+                        <button
+                            type="submit"
+                            :disabled="userForm.processing"
+                            class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                        >
+                            {{ userForm.processing ? 'جاري الحفظ...' : 'حفظ المستخدم' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </AppLayout>
+</template>
