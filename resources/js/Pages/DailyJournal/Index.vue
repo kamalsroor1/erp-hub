@@ -1,0 +1,555 @@
+<script setup>
+import { ref, watch } from 'vue';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import DatePicker from '@/Components/DatePicker.vue';
+import SearchableSelect from '@/Components/SearchableSelect.vue';
+import { useMoney } from '@/Composables/useMoney';
+
+const props = defineProps({
+    date: { type: String, required: true },
+    active_shift: { type: Object, default: null },
+    summary: { type: Object, required: true },
+    invoices: { type: Array, default: () => [] },
+    expenses: { type: Array, default: () => [] },
+});
+
+const { formatMoney } = useMoney();
+
+const selectedDate = ref(props.date);
+
+watch(selectedDate, (newDate) => {
+    if (newDate && newDate !== props.date) {
+        router.get('/daily-journal', { date: newDate }, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    }
+});
+
+// Shift Open Modal
+const showOpenShiftModal = ref(false);
+const openShiftForm = useForm({
+    opening_cash_balance: '0.00',
+    notes: '',
+});
+
+const submitOpenShift = () => {
+    openShiftForm.post('/daily-journal/open-shift', {
+        preserveScroll: true,
+        onSuccess: () => {
+            showOpenShiftModal.value = false;
+        }
+    });
+};
+
+// Shift Close Modal (Z-Report)
+const showCloseShiftModal = ref(false);
+const closeShiftForm = useForm({
+    actual_cash_balance: '',
+    notes: '',
+});
+
+const submitCloseShift = () => {
+    if (!props.active_shift) return;
+    closeShiftForm.post(`/daily-journal/close-shift/${props.active_shift.id}`, {
+        preserveScroll: true,
+        onSuccess: () => {
+            showCloseShiftModal.value = false;
+        }
+    });
+};
+
+// Quick Expense Modal
+const showExpenseModal = ref(false);
+const expenseForm = useForm({
+    title: '',
+    amount: '',
+    cost_center: 'operational',
+    payment_method: 'cash',
+    notes: '',
+});
+
+const costCenterOptions = [
+    { id: 'operational', name: 'مصاريف تشغيلية ونثريات عامة ☕' },
+    { id: 'salaries', name: 'رواتب وعمالة وإكراميات 👥' },
+    { id: 'utilities', name: 'كهرباء ومياه وغاز ومرافق ⚡' },
+    { id: 'rent', name: 'إيجارات مقرات وفروع 🏬' },
+    { id: 'packaging', name: 'مطبوعات وكراتين وتعبئة 📦' },
+    { id: 'hospitality', name: 'ضيافة ونظافة وبوفيه 🧹' },
+    { id: 'maintenance', name: 'صيانة معدات وديكورات 🔧' },
+    { id: 'vehicles', name: 'وقود وزيوت وصيانة سيارات 🚚' },
+    { id: 'shipping', name: 'شحن ونولون وتوصيل خارجي ✈️' },
+];
+
+const paymentMethodOptions = [
+    { id: 'cash', name: 'نقدي من درج الخزينة 💵' },
+    { id: 'instapay', name: 'إستاباي ⚡' },
+    { id: 'wallet', name: 'محفظة إلكترونية 📱' },
+    { id: 'bank', name: 'حساب بنكي 🏦' },
+];
+
+const submitExpense = () => {
+    expenseForm.post('/daily-journal/expense', {
+        preserveScroll: true,
+        onSuccess: () => {
+            expenseForm.reset();
+            showExpenseModal.value = false;
+        }
+    });
+};
+
+const printJournal = () => {
+    window.print();
+};
+</script>
+
+<template>
+    <Head title="اليومية العامة ووردية الخزينة" />
+
+    <AppLayout>
+        <div class="space-y-6 font-tajawal">
+            <!-- Header & Shift Bar -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 no-print">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl">📅</span>
+                        <h1 class="text-xl sm:text-2xl font-black text-white">
+                            اليومية العامة وحركة الخزينة والدرج
+                        </h1>
+                    </div>
+                    <p class="text-xs text-slate-400 font-bold">
+                        حركة المبيعات النقدية، المصروفات التشغيلية، وسندات الصرف والقبض
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <!-- Date Picker -->
+                    <div class="w-44">
+                        <DatePicker v-model="selectedDate" placeholder="اختر اليومية..." />
+                    </div>
+
+                    <!-- Add Expense Button -->
+                    <button
+                        @click="showExpenseModal = true"
+                        type="button"
+                        class="h-10 px-4 rounded-2xl bg-rose-600/90 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-rose-600/20 transition cursor-pointer"
+                    >
+                        <span>💸</span>
+                        <span>تسجيل مصروف تشغيلي</span>
+                    </button>
+
+                    <!-- Shift Control Button -->
+                    <button
+                        v-if="!active_shift"
+                        @click="showOpenShiftModal = true"
+                        type="button"
+                        class="h-10 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition cursor-pointer"
+                    >
+                        <span>🟢</span>
+                        <span>فتح وردية الخزينة</span>
+                    </button>
+                    <button
+                        v-else
+                        @click="showCloseShiftModal = true"
+                        type="button"
+                        class="h-10 px-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition cursor-pointer"
+                    >
+                        <span>🔒</span>
+                        <span>إغلاق الوردية (Z-Report)</span>
+                    </button>
+
+                    <button
+                        @click="printJournal"
+                        type="button"
+                        class="h-10 px-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1 transition cursor-pointer"
+                    >
+                        <span>🖨️</span>
+                        <span>طباعة A4</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Shift Card -->
+            <div
+                class="rounded-3xl p-5 border flex flex-col md:flex-row items-center justify-between gap-4"
+                :class="active_shift ? 'bg-slate-900 border-emerald-500/30' : 'bg-slate-900 border-slate-800'"
+            >
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl font-black"
+                        :class="active_shift ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-500'"
+                    >
+                        {{ active_shift ? '🟢' : '🔒' }}
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-black text-white text-base">
+                                {{ active_shift ? `الوردية الحالية: ${active_shift.shift_number}` : 'الوردية مقفلة حالياً' }}
+                            </span>
+                            <span
+                                class="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                                :class="active_shift ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 text-slate-400'"
+                            >
+                                {{ active_shift ? 'مفتوحة وجاهزة للعمليات' : 'لا توجد وردية نشطة' }}
+                            </span>
+                        </div>
+                        <p v-if="active_shift" class="text-xs text-slate-400 mt-0.5">
+                            الكاشير: <strong class="text-white">{{ active_shift.user_name }}</strong> | تم الفتح: <span class="font-mono text-amber-400">{{ active_shift.opened_at }}</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div v-if="active_shift" class="text-left font-mono">
+                    <span class="text-xs text-slate-400 font-tajawal">عهدة فتح الدرج (الرصيد الافتتاحي):</span>
+                    <div class="text-lg font-black text-emerald-400">
+                        {{ formatMoney(active_shift.opening_cash_balance) }} <span class="text-xs text-white">ج.م</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Summary Matrix Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Total Inflow -->
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
+                    <span class="text-xs text-emerald-400 font-bold">إجمالي المقبوضات النقدية (داخل)</span>
+                    <div class="text-2xl font-black font-mono text-emerald-400">
+                        {{ formatMoney(summary.total_cash_in) }} <span class="text-xs text-white">ج.م</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400 font-bold space-y-0.5 pt-1 border-t border-slate-800/80">
+                        <div>مبيعات كاش: <span class="font-mono text-white">{{ formatMoney(summary.cash_sales) }}</span></div>
+                        <div>تحصيلات عملاء: <span class="font-mono text-white">{{ formatMoney(summary.customer_payments) }}</span></div>
+                    </div>
+                </div>
+
+                <!-- Total Outflow -->
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
+                    <span class="text-xs text-rose-400 font-bold">إجمالي المدفوعات النقدية (خارج)</span>
+                    <div class="text-2xl font-black font-mono text-rose-400">
+                        {{ formatMoney(summary.total_cash_out) }} <span class="text-xs text-white">ج.م</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400 font-bold space-y-0.5 pt-1 border-t border-slate-800/80">
+                        <div>سداد موردين: <span class="font-mono text-white">{{ formatMoney(summary.supplier_payments) }}</span></div>
+                        <div>مصروفات تشغيلية: <span class="font-mono text-white">{{ formatMoney(summary.total_expenses) }}</span></div>
+                    </div>
+                </div>
+
+                <!-- Net Day Cash -->
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
+                    <span class="text-xs text-slate-400 font-bold">صافي حركة النقدية لليوم</span>
+                    <div
+                        class="text-2xl font-black font-mono"
+                        :class="summary.net_cash_today >= 0 ? 'text-amber-400' : 'text-rose-400'"
+                    >
+                        {{ formatMoney(summary.net_cash_today) }} <span class="text-xs text-white">ج.م</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400 font-bold pt-1 border-t border-slate-800/80">
+                        مبيعات آجلة مسجلة: <span class="font-mono text-amber-300">{{ formatMoney(summary.credit_sales) }} ج.م</span>
+                    </div>
+                </div>
+
+                <!-- Expected Drawer Balance -->
+                <div class="bg-slate-900 border border-amber-500/30 rounded-3xl p-5 shadow-sm space-y-2 bg-gradient-to-br from-slate-900 to-amber-950/20">
+                    <span class="text-xs text-amber-400 font-black">💵 الرصيد المتوقع بالدرج الآن</span>
+                    <div class="text-3xl font-black font-mono text-amber-400">
+                        {{ formatMoney(summary.expected_cash_in_drawer) }} <span class="text-xs text-white">ج.م</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400 font-bold pt-1 border-t border-slate-800/80">
+                        شامل العهدة الافتتاحية: <span class="font-mono text-white">{{ formatMoney(summary.opening_cash_balance) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Columns: Invoices of the Day & Expenses of the Day -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Invoices Log of Date -->
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div class="flex items-center gap-2">
+                            <span>🧾</span>
+                            <h3 class="font-black text-sm text-white">فواتير مبيعات اليوم ({{ invoices.length }})</h3>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-xs">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                                    <th class="pb-2">رقم الفاتورة</th>
+                                    <th class="pb-2">العميل</th>
+                                    <th class="pb-2 font-mono">الإجمالي</th>
+                                    <th class="pb-2">طريقة الدفع</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60 font-sans">
+                                <tr v-for="inv in invoices" :key="inv.id" class="hover:bg-slate-800/30 transition">
+                                    <td class="py-2.5 font-mono font-bold">
+                                        <Link :href="`/invoices/${inv.id}`" class="text-amber-400 hover:underline">
+                                            {{ inv.invoice_number }}
+                                        </Link>
+                                    </td>
+                                    <td class="py-2.5 text-slate-200 font-tajawal">{{ inv.customer_name }}</td>
+                                    <td class="py-2.5 font-mono font-bold text-white">{{ formatMoney(inv.net_total) }}</td>
+                                    <td class="py-2.5">
+                                        <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-800 text-slate-300 font-tajawal">
+                                            {{ inv.payment_method === 'cash' ? 'كاش 💵' : (inv.payment_method === 'credit' ? 'آجل 🚨' : 'جزئي ⚖️') }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div v-if="invoices.length === 0" class="py-8 text-center text-slate-500 text-xs font-bold font-tajawal">
+                            لا توجد فواتير مبيعات مسجلة في هذا اليوم
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expenses Log of Date -->
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div class="flex items-center gap-2">
+                            <span>💸</span>
+                            <h3 class="font-black text-sm text-white">المصروفات التشغيلية لليوم ({{ expenses.length }})</h3>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-xs">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                                    <th class="pb-2">بيان المصروف</th>
+                                    <th class="pb-2">بند التكلفة</th>
+                                    <th class="pb-2 font-mono">المبلغ</th>
+                                    <th class="pb-2">الوسيلة</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60 font-sans">
+                                <tr v-for="exp in expenses" :key="exp.id" class="hover:bg-slate-800/30 transition">
+                                    <td class="py-2.5 font-bold text-slate-200 font-tajawal">{{ exp.title }}</td>
+                                    <td class="py-2.5 text-slate-400 font-tajawal text-[11px]">{{ exp.cost_center_label }}</td>
+                                    <td class="py-2.5 font-mono font-bold text-rose-400">{{ formatMoney(exp.amount) }} ج.م</td>
+                                    <td class="py-2.5 text-slate-400 font-tajawal text-[11px]">{{ exp.payment_method }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div v-if="expenses.length === 0" class="py-8 text-center text-slate-500 text-xs font-bold font-tajawal">
+                            لا توجد مصروفات مسجلة في هذا اليوم
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Open Shift Modal -->
+        <div
+            v-if="showOpenShiftModal"
+            @click="showOpenShiftModal = false"
+            class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
+            dir="rtl"
+        >
+            <div @click.stop class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h3 class="font-black text-base text-white">🟢 فتح وردية خزينة جديدة</h3>
+                    <button @click="showOpenShiftModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
+                </div>
+
+                <form @submit.prevent="submitOpenShift" class="space-y-4">
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-300">عهدة فتح الدرج (الرصيد الافتتاحي ج.م) *</label>
+                        <input
+                            v-model="openShiftForm.opening_cash_balance"
+                            type="number"
+                            step="0.01"
+                            required
+                            placeholder="0.00"
+                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-sm text-emerald-400 font-mono font-black focus:border-amber-500 focus:outline-none"
+                        >
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-300">ملاحظات الفتح</label>
+                        <input
+                            v-model="openShiftForm.notes"
+                            type="text"
+                            placeholder="... أي تفاصيل عن العهدة"
+                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                        >
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                        <button
+                            @click="showOpenShiftModal = false"
+                            type="button"
+                            class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
+                        >
+                            إلغاء
+                        </button>
+                        <button
+                            type="submit"
+                            :disabled="openShiftForm.processing"
+                            class="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black shadow-lg shadow-emerald-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                        >
+                            {{ openShiftForm.processing ? 'جاري الفتح...' : 'بدء وفتح الوردية 🟢' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Close Shift Modal (Z-Report) -->
+        <div
+            v-if="showCloseShiftModal"
+            @click="showCloseShiftModal = false"
+            class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
+            dir="rtl"
+        >
+            <div @click.stop class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div>
+                        <h3 class="font-black text-base text-white">🔒 إغلاق الوردية واعتماد تقرير Z-Report</h3>
+                        <p class="text-xs text-amber-400 font-mono mt-0.5">{{ active_shift?.shift_number }}</p>
+                    </div>
+                    <button @click="showCloseShiftModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
+                </div>
+
+                <div class="bg-slate-950/90 rounded-2xl p-4 border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-slate-400">النقدية المتوقعة بالدرج (الحسابي):</span>
+                        <span class="font-mono font-black text-amber-400">{{ formatMoney(summary.expected_cash_in_drawer) }} ج.م</span>
+                    </div>
+                </div>
+
+                <form @submit.prevent="submitCloseShift" class="space-y-4">
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-300">النقدية الفعلية بعد الجرد بالدرج (ج.م) *</label>
+                        <input
+                            v-model="closeShiftForm.actual_cash_balance"
+                            type="number"
+                            step="0.01"
+                            required
+                            placeholder="0.00"
+                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-sm text-emerald-400 font-mono font-black focus:border-amber-500 focus:outline-none"
+                        >
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-300">ملاحظات الإغلاق</label>
+                        <input
+                            v-model="closeShiftForm.notes"
+                            type="text"
+                            placeholder="... سبب العجز أو الزيادة إن وجد"
+                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                        >
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                        <button
+                            @click="showCloseShiftModal = false"
+                            type="button"
+                            class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
+                        >
+                            إلغاء
+                        </button>
+                        <button
+                            type="submit"
+                            :disabled="closeShiftForm.processing"
+                            class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                        >
+                            {{ closeShiftForm.processing ? 'جاري الإغلاق...' : 'إغلاق الوردية واعتماد Z-Report 🔒' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quick Expense Modal -->
+        <div
+            v-if="showExpenseModal"
+            @click="showExpenseModal = false"
+            class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
+            dir="rtl"
+        >
+            <div @click.stop class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h3 class="font-black text-base text-white">💸 تسجيل مصروف تشغيلي</h3>
+                    <button @click="showExpenseModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
+                </div>
+
+                <form @submit.prevent="submitExpense" class="space-y-4">
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-300">بيان / عنوان المصروف *</label>
+                        <input
+                            v-model="expenseForm.title"
+                            type="text"
+                            required
+                            placeholder="مثال: فاتورة كهرباء / بوفيه ومشروبات..."
+                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                        >
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-300">المبلغ (ج.م) *</label>
+                            <input
+                                v-model="expenseForm.amount"
+                                type="number"
+                                step="0.01"
+                                required
+                                placeholder="0.00"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-rose-400 font-mono font-black focus:border-amber-500 focus:outline-none"
+                            >
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-300">وسيلة الدفع *</label>
+                            <SearchableSelect
+                                v-model="expenseForm.payment_method"
+                                :options="paymentMethodOptions"
+                                placeholder="اختر وسيلة الدفع..."
+                            />
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-300">بند / مركز التكلفة *</label>
+                        <SearchableSelect
+                            v-model="expenseForm.cost_center"
+                            :options="costCenterOptions"
+                            placeholder="اختر بند التكلفة..."
+                        />
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-300">ملاحظات إضافية</label>
+                        <input
+                            v-model="expenseForm.notes"
+                            type="text"
+                            placeholder="... أي تفاصيل أخرى"
+                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                        >
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                        <button
+                            @click="showExpenseModal = false"
+                            type="button"
+                            class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
+                        >
+                            إلغاء
+                        </button>
+                        <button
+                            type="submit"
+                            :disabled="expenseForm.processing"
+                            class="px-5 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-black shadow-lg shadow-rose-600/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                        >
+                            {{ expenseForm.processing ? 'جاري التسجيل...' : 'تسجيل المصروف 💸' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </AppLayout>
+</template>
