@@ -27,5 +27,8 @@ Homestead.yaml
 Thumbs.db
 /database/*.sqlite
 /database/*.sqlite-journal
+/database/tenant*
+test_api_auth.php
+test_*.php
 tests_e2e/screenshots/
 tests_e2e/__pycache__/
