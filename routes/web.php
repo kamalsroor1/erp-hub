@@ -19,18 +19,14 @@ use App\Livewire\ReturnIndex;
 use App\Livewire\ReportsIndex;
 use App\Models\Invoice;
 
-// 1. Guest Authentication Routes
+// 1. Guest Authentication Routes (Inertia.js + Vue 3)
 Route::middleware('guest')->group(function () {
-    Route::get('/login', Login::class)->name('login');
+    Route::get('/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
 });
 
 // 2. Logout Route
-Route::post('/logout', function () {
-    Auth::logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-    return redirect()->route('login');
-})->name('logout')->middleware('auth');
+Route::post('/logout', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])->name('logout')->middleware('auth');
 
 // 📄 Public Marketing Brochure & Pricing PDF Presentation
 Route::get('/brochure', function () {
@@ -39,13 +35,18 @@ Route::get('/brochure', function () {
 
 // 3. Protected POS, ERP & Inventory Routes
 Route::middleware('auth')->group(function () {
-    // Dashboard (All authenticated users can see dashboard)
-    Route::get('/', Dashboard::class)->name('dashboard');
+    // Dashboard (Inertia.js + Vue 3 SPA)
+    Route::get('/', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
-    // Invoices & POS
-    Route::get('/invoices', InvoiceIndex::class)->name('invoices.index')->middleware('can:invoices.view');
-    Route::get('/invoices/create', InvoiceCreate::class)->name('invoices.create')->middleware('can:pos.access');
-    Route::get('/invoices/{id}', InvoiceShow::class)->name('invoices.show')->middleware('can:invoices.view');
+    // Invoices & POS (Vue 3 Fast Cashier Engine)
+    Route::get('/pos', [\App\Http\Controllers\POSController::class, 'index'])->name('pos.index')->middleware('can:pos.access');
+    Route::get('/invoices/create', [\App\Http\Controllers\POSController::class, 'index'])->name('invoices.create')->middleware('can:pos.access');
+    Route::post('/pos/invoices', [\App\Http\Controllers\POSController::class, 'store'])->name('pos.invoices.store')->middleware('can:pos.access');
+    Route::post('/pos/customers', [\App\Http\Controllers\POSController::class, 'storeCustomer'])->name('pos.customers.store')->middleware('can:pos.access');
+    Route::get('/pos/customer-last-price', [\App\Http\Controllers\POSController::class, 'getCustomerLastPrice'])->name('pos.customer_last_price')->middleware('can:pos.access');
+
+    Route::get('/invoices', [\App\Http\Controllers\InvoiceController::class, 'index'])->name('invoices.index')->middleware('can:invoices.view');
+    Route::get('/invoices/{id}', [\App\Http\Controllers\InvoiceController::class, 'show'])->name('invoices.show')->middleware('can:invoices.view');
     Route::get('/invoices/{id}/edit', App\Livewire\InvoiceEdit::class)->name('invoices.edit')->middleware('can:invoices.edit');
 
     // Printing Routes
@@ -123,7 +124,10 @@ Route::middleware('auth')->group(function () {
     })->name('daily.journal.print')->middleware('can:daily_journal.view');
 
     // Items & Inventory Movements
-    Route::get('/items', ItemIndex::class)->name('items.index')->middleware('can:items.view');
+    Route::get('/items', [\App\Http\Controllers\ItemController::class, 'index'])->name('items.index')->middleware('can:items.view');
+    Route::post('/items', [\App\Http\Controllers\ItemController::class, 'store'])->name('items.store')->middleware('can:items.manage');
+    Route::put('/items/{id}', [\App\Http\Controllers\ItemController::class, 'update'])->name('items.update')->middleware('can:items.manage');
+    Route::delete('/items/{id}', [\App\Http\Controllers\ItemController::class, 'destroy'])->name('items.destroy')->middleware('can:items.manage');
     Route::get('/items/{id}/movements', App\Livewire\ItemMovements::class)->name('items.movements')->middleware('can:items.view');
     Route::get('/items/{id}/movements/print', function ($id, \Illuminate\Http\Request $request) {
         $item = \App\Models\Item::withTrashed()->findOrFail($id);
@@ -191,11 +195,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/stock-transfers/create', App\Livewire\StockTransferCreate::class)->name('stock-transfers.create')->middleware('can:transfers.create');
 
     // Customers & Statements
-    Route::get('/customers', CustomerIndex::class)->name('customers.index')->middleware('can:customers.manage');
-    Route::get('/customers/{id}/statement', CustomerStatement::class)->name('customers.statement')->middleware('can:customers.statement');
+    Route::get('/customers', [\App\Http\Controllers\CustomerController::class, 'index'])->name('customers.index')->middleware('can:customers.manage');
+    Route::post('/customers', [\App\Http\Controllers\CustomerController::class, 'store'])->name('customers.store')->middleware('can:customers.manage');
+    Route::put('/customers/{id}', [\App\Http\Controllers\CustomerController::class, 'update'])->name('customers.update')->middleware('can:customers.manage');
+    Route::delete('/customers/{id}', [\App\Http\Controllers\CustomerController::class, 'destroy'])->name('customers.destroy')->middleware('can:customers.manage');
+    Route::post('/customers/{id}/payments', [\App\Http\Controllers\CustomerController::class, 'collectPayment'])->name('customers.payments')->middleware('can:customers.manage');
+    Route::get('/customers/{id}/statement', [\App\Http\Controllers\CustomerController::class, 'statement'])->name('customers.statement')->middleware('can:customers.statement');
 
     // Suppliers & Purchases & Statements
-    Route::get('/suppliers', SupplierIndex::class)->name('suppliers.index')->middleware('can:suppliers.manage');
+    Route::get('/suppliers', [\App\Http\Controllers\SupplierController::class, 'index'])->name('suppliers.index')->middleware('can:suppliers.manage');
+    Route::post('/suppliers', [\App\Http\Controllers\SupplierController::class, 'store'])->name('suppliers.store')->middleware('can:suppliers.manage');
+    Route::put('/suppliers/{id}', [\App\Http\Controllers\SupplierController::class, 'update'])->name('suppliers.update')->middleware('can:suppliers.manage');
+    Route::delete('/suppliers/{id}', [\App\Http\Controllers\SupplierController::class, 'destroy'])->name('suppliers.destroy')->middleware('can:suppliers.manage');
+    Route::post('/suppliers/{id}/pay', [\App\Http\Controllers\SupplierController::class, 'pay'])->name('suppliers.pay')->middleware('can:suppliers.manage');
     Route::get('/suppliers/{id}/statement', SupplierStatement::class)->name('suppliers.statement')->middleware('can:suppliers.statement');
     Route::get('/purchases', PurchaseIndex::class)->name('purchases.index')->middleware('can:purchases.view');
     Route::get('/purchases/create', PurchaseCreate::class)->name('purchases.create')->middleware('can:purchases.create');
@@ -213,11 +225,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/expenses', App\Livewire\ExpenseIndex::class)->name('expenses.index')->middleware('can:expenses.manage');
 
     // Coffee Blending Master & Roastery Recipe
-    Route::get('/coffee-blender', App\Livewire\CoffeeBlender::class)->name('coffee.blender')->middleware('can:items.create');
+    Route::get('/coffee-blender', [\App\Http\Controllers\CoffeeBlenderController::class, 'index'])->name('coffee.blender')->middleware('can:items.create');
+    Route::post('/coffee-blender/invoice', [\App\Http\Controllers\CoffeeBlenderController::class, 'createInvoice'])->name('coffee.blender.invoice')->middleware('can:items.create');
 
     // Daily Journal & Cashier Shifts (يوم بيوم)
-    Route::get('/daily-journal', App\Livewire\DailyJournalIndex::class)->name('daily.journal')->middleware('can:daily_journal.view');
-    Route::get('/shifts', App\Livewire\DailyJournalIndex::class)->name('shifts.index')->middleware('can:daily_journal.view');
+    Route::get('/daily-journal', [\App\Http\Controllers\DailyJournalController::class, 'index'])->name('daily.journal')->middleware('can:daily_journal.view');
+    Route::get('/shifts', [\App\Http\Controllers\DailyJournalController::class, 'index'])->name('shifts.index')->middleware('can:daily_journal.view');
+    Route::post('/daily-journal/open-shift', [\App\Http\Controllers\DailyJournalController::class, 'openShift'])->name('daily.journal.open_shift')->middleware('can:daily_journal.view');
+    Route::post('/daily-journal/close-shift/{id}', [\App\Http\Controllers\DailyJournalController::class, 'closeShift'])->name('daily.journal.close_shift')->middleware('can:daily_journal.view');
+    Route::post('/daily-journal/expense', [\App\Http\Controllers\DailyJournalController::class, 'storeExpense'])->name('daily.journal.expense')->middleware('can:daily_journal.view');
 
     // Auth, Profile, Settings, Trash, Activity Logs & User Management
     Route::get('/activity-logs', App\Livewire\ActivityLogIndex::class)->name('activity-logs.index')->middleware('can:logs.view');
@@ -258,14 +274,27 @@ Route::middleware('auth')->group(function () {
     })->name('store.switch');
 });
 
+// 4. Central Platform Super Admin Management Routes (Multi-Tenant Hub)
+Route::prefix('admin/super')->name('super.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\SuperAdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/tenants', [\App\Http\Controllers\SuperAdminController::class, 'tenants'])->name('tenants.index');
+    Route::get('/tenants/create', [\App\Http\Controllers\SuperAdminController::class, 'createTenant'])->name('tenants.create');
+    Route::post('/tenants', [\App\Http\Controllers\SuperAdminController::class, 'storeTenant'])->name('tenants.store');
+    Route::get('/tenants/{id}', [\App\Http\Controllers\SuperAdminController::class, 'showTenant'])->name('tenants.show');
+    Route::post('/tenants/{id}/override-feature', [\App\Http\Controllers\SuperAdminController::class, 'overrideFeature'])->name('tenants.override_feature');
+    Route::post('/tenants/{id}/toggle-status', [\App\Http\Controllers\SuperAdminController::class, 'toggleStatus'])->name('tenants.toggle_status');
+    Route::get('/plans', [\App\Http\Controllers\SuperAdminController::class, 'plans'])->name('plans.index');
+    Route::put('/plans/{id}', [\App\Http\Controllers\SuperAdminController::class, 'updatePlan'])->name('plans.update');
+});
+
 // PWA Assets Routing with dynamic canonical URLs and proper headers
 Route::get('/manifest.json', function () {
     $baseUrl = url('/');
     $manifest = [
-        'id' => 'sroor-coffee-pos-app',
-        'name' => 'سرور كوفي | نظام إدارة الفواتير والمخزون',
-        'short_name' => 'سرور POS',
-        'description' => 'تطبيق سرور لإدارة مبيعات وفواتير ومخزون مطاحن البن',
+        'id' => 'makhzani-erp-pos-app',
+        'name' => 'مخزني ERP | منصة إدارة الفواتير والمخزون',
+        'short_name' => 'مخزني POS',
+        'description' => 'منصة مخزني السحابية لإدارة مبيعات وفواتير ومخزون المؤسسات والمطاحن',
         'start_url' => $baseUrl . '/',
         'scope' => $baseUrl . '/',
         'display' => 'standalone',
