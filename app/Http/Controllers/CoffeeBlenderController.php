@@ -58,12 +58,17 @@ final class CoffeeBlenderController extends Controller
             }
         }
 
-        $invoice = $invoiceService->createInvoice([
+        $notesStr = "خلطة وتوليفة مخصوصة: {$validated['blend_name']}" . (!empty($validated['notes']) ? " - {$validated['notes']}" : '');
+
+        $invoice = $invoiceService->confirmInvoice([
             'customer_id' => (int)$validated['customer_id'],
             'invoice_date' => now()->toDateString(),
             'items' => $itemsForInvoice,
             'payment_method' => 'cash',
-            'notes' => "خلطة وتوليفة مخصوصة: {$validated['blend_name']}" . ($validated['notes'] ? " - {$validated['notes']}" : ''),
+            'paid_amount' => '0.000',
+            'discount_type' => 'fixed',
+            'discount_value' => '0.000',
+            'notes' => $notesStr,
         ]);
 
         return redirect()->route('invoices.show', $invoice->id)->with('success', 'تم إنشاء وتأكيد فاتورة التوليفة بنجاح');
