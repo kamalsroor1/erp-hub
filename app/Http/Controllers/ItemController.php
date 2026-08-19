@@ -163,4 +163,68 @@ final class ItemController extends Controller
 
         return redirect()->back()->with('success', 'تم حذف الصنف بنجاح');
     }
+
+    public function movements(int $id, Request $request): Response
+    {
+        $item = Item::withTrashed()->findOrFail($id);
+        $dateFrom = $request->input('from', now()->startOfMonth()->toDateString());
+        $dateTo = $request->input('to', now()->toDateString());
+        $storeId = $request->input('store_id', 'all');
+        $movementType = $request->input('type', 'all');
+
+        $query = \App\Models\StockMovement::with(['user', 'store'])
+            ->where('item_id', $item->id);
+
+        if ($dateFrom) {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        }
+
+        if ($dateTo) {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+
+        if ($storeId !== 'all') {
+            $query->where('store_id', (int)$storeId);
+        }
+
+        if ($movementType !== 'all') {
+            $query->where('movement_type', $movementType);
+        }
+
+        $movements = $query->latest('id')->paginate(20)->withQueryString();
+        $stores = Store::where('is_active', true)->select('id', 'name')->get();
+
+        return Inertia::render('Items/Movements', [
+            'item' => [
+                'id' => $item->id,
+                'name' => $item->name,
+                'code' => $item->code,
+                'category' => $item->category,
+                'unit' => $item->unit,
+                'current_stock' => (float)$item->current_stock,
+                'cost_price' => (float)$item->cost_price,
+                'selling_price' => (float)$item->selling_price,
+            ],
+            'movements' => $movements->through(fn($m) => [
+                'id' => $m->id,
+                'movement_type' => $m->movement_type,
+                'quantity' => (float)$m->quantity,
+                'stock_before' => (float)$m->stock_before,
+                'stock_after' => (float)$m->stock_after,
+                'unit_cost' => (float)$m->unit_cost,
+                'document_number' => $m->document_number,
+                'user_name' => $m->user?->name ?: 'النظام',
+                'store_name' => $m->store?->name,
+                'notes' => $m->notes,
+                'created_at' => $m->created_at->format('Y-m-d H:i:s'),
+            ]),
+            'stores' => $stores,
+            'filters' => [
+                'from' => $dateFrom,
+                'to' => $dateTo,
+                'store_id' => $storeId,
+                'type' => $movementType,
+            ],
+        ]);
+    }
 }
