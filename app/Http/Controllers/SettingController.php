@@ -4,15 +4,22 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Setting;
+use App\Services\TelegramService;
+use App\Services\DatabaseBackupService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
 final class SettingController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $tab = $request->input('tab', 'branding');
+
         return Inertia::render('Settings/Index', [
+            'active_tab' => $tab,
             'settings' => [
                 'company_name' => Setting::get('company_name', 'سرور كوفي'),
                 'company_subtitle' => Setting::get('company_subtitle', 'لتوريدات خامات مطاحن البن'),
@@ -24,9 +31,17 @@ final class SettingController extends Controller
                 'show_print_logo' => Setting::getBool('show_print_logo', true),
                 'thermal_show_customer_balance' => Setting::getBool('thermal_show_customer_balance', true),
                 'print_show_qr' => Setting::getBool('print_show_qr', true),
-                'telegram_bot_token' => Setting::get('telegram_bot_token', ''),
-                'telegram_chat_id' => Setting::get('telegram_chat_id', ''),
-                'telegram_notifications_enabled' => Setting::getBool('telegram_notifications_enabled', false),
+                'invoice_primary_color' => Setting::get('invoice_primary_color', 'amber'),
+                'telegram_bot_token' => Setting::get('telegram_bot_token', config('services.telegram.bot_token', '')),
+                'telegram_chat_id' => Setting::get('telegram_chat_id', config('services.telegram.chat_id', '')),
+                'telegram_notifications_enabled' => Setting::getBool('telegram_notifications_enabled', true),
+            ],
+            'system_info' => [
+                'php_version' => PHP_VERSION,
+                'laravel_version' => app()->version(),
+                'environment' => app()->environment(),
+                'db_driver' => config('database.default'),
+                'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Local/Laragon',
             ],
         ]);
     }
@@ -44,12 +59,20 @@ final class SettingController extends Controller
             'show_print_logo' => 'boolean',
             'thermal_show_customer_balance' => 'boolean',
             'print_show_qr' => 'boolean',
+            'invoice_primary_color' => 'nullable|string|in:amber,emerald,blue,slate',
             'telegram_bot_token' => 'nullable|string|max:255',
             'telegram_chat_id' => 'nullable|string|max:255',
             'telegram_notifications_enabled' => 'boolean',
+            'logo_file' => 'nullable|image|max:3072',
         ]);
 
+        if ($request->hasFile('logo_file')) {
+            $file = $request->file('logo_file');
+            @copy($file->getRealPath(), public_path('logo.png'));
+        }
+
         foreach ($validated as $key => $value) {
+            if ($key === 'logo_file') continue;
             if (is_bool($value)) {
                 Setting::set($key, $value ? '1' : '0');
             } else {
@@ -59,6 +82,81 @@ final class SettingController extends Controller
 
         Setting::clearCache();
 
-        return redirect()->back()->with('success', 'تم حفظ وتحديث إعدادات النظام بنجاح');
+        return redirect()->back()->with('success', 'تم حفظ إعدادات النظام والهوية والطباعة بنجاح');
+    }
+
+    public function sendTestTelegram(Request $request, TelegramService $telegramService)
+    {
+        $token = $request->input('bot_token');
+        $chatId = $request->input('chat_id');
+
+        if ($token) Setting::set('telegram_bot_token', trim($token));
+        if ($chatId) Setting::set('telegram_chat_id', trim($chatId));
+
+        $res = $telegramService->sendTestNotification(trim((string)$chatId));
+
+        if ($res['success']) {
+            return redirect()->back()->with('success', $res['message']);
+        }
+        return redirect()->back()->with('error', $res['message']);
+    }
+
+    public function sendDailySummaryTelegram(TelegramService $telegramService)
+    {
+        $res = $telegramService->sendDailySummaryNotification();
+        if ($res['success']) {
+            return redirect()->back()->with('success', 'تم إرسال تقرير اليومية الشامل إلى تيليجرام بنجاح');
+        }
+        return redirect()->back()->with('error', $res['message']);
+    }
+
+    public function sendLowStockTelegram(TelegramService $telegramService)
+    {
+        $res = $telegramService->sendLowStockNotification(previewSample: true);
+        if ($res['success']) {
+            return redirect()->back()->with('success', 'تم إرسال إنذار النواقص إلى تيليجرام بنجاح');
+        }
+        return redirect()->back()->with('error', $res['message']);
+    }
+
+    public function sendOverdueShiftTelegram(TelegramService $telegramService)
+    {
+        $res = $telegramService->sendOverdueShiftNotification(previewSample: true);
+        if ($res['success']) {
+            return redirect()->back()->with('success', 'تم إرسال إنذار الشفتات المفتوحة إلى تيليجرام بنجاح');
+        }
+        return redirect()->back()->with('error', $res['message']);
+    }
+
+    public function sendBackupTelegram(TelegramService $telegramService)
+    {
+        $res = $telegramService->sendDatabaseBackupNotification();
+        if ($res['success']) {
+            return redirect()->back()->with('success', 'تم إرسال النسخة الاحتياطية لقاعدة البيانات إلى تيليجرام بنجاح');
+        }
+        return redirect()->back()->with('error', $res['message']);
+    }
+
+    public function downloadBackup(DatabaseBackupService $backupService)
+    {
+        $gzPath = $backupService->createSqlGzBackup();
+        $fileName = basename($gzPath);
+
+        return response()->download($gzPath, $fileName)->deleteFileAfterSend(true);
+    }
+
+    public function clearCache()
+    {
+        try {
+            Artisan::call('optimize:clear');
+            Artisan::call('config:cache');
+            Artisan::call('route:cache');
+            Artisan::call('view:cache');
+            Setting::clearCache();
+
+            return redirect()->back()->with('success', 'تم تنظيف وتسريع وإعادة بناء الكاش بنجاح');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء تنظيف الكاش: ' . $e->getMessage());
+        }
     }
 }
