@@ -47,8 +47,10 @@ class DatabaseSeeder extends Seeder
                 'type'      => 'main_warehouse',
                 'is_main'   => true,
                 'is_active' => true,
-                'address'   => 'المركز الرئيسي - سرور كوفي',
             ]
         );
+
+        // 5. Rich Multi-Store Demo Data (Branches, Coffee Items, Shifts, Customers, Suppliers, Ledgers)
+        $this->call(RichDemoDataSeeder::class);
     }
 }
