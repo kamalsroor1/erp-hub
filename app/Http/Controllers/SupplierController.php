@@ -154,4 +154,73 @@ final class SupplierController extends Controller
 
         return redirect()->back()->with('success', 'تم حذف المورد بنجاح');
     }
+
+    public function statement(int $id, Request $request): Response
+    {
+        $supplier = Supplier::findOrFail($id);
+        $dateFrom = $request->input('from', now()->startOfYear()->toDateString());
+        $dateTo = $request->input('to', now()->toDateString());
+
+        // Purchases (Credits)
+        $purchases = Purchase::where('supplier_id', $supplier->id)
+            ->where('status', 'confirmed')
+            ->whereDate('purchase_date', '>=', $dateFrom)
+            ->whereDate('purchase_date', '<=', $dateTo)
+            ->get()
+            ->map(fn($p) => [
+                'id' => 'PUR-' . $p->id,
+                'date' => $p->purchase_date->toDateString(),
+                'type' => 'purchase',
+                'description' => 'فاتورة مشتريات وتوريد خامات رقم ' . $p->purchase_number,
+                'debit' => 0.0,
+                'credit' => (float)$p->net_total,
+                'paid' => (float)$p->paid_amount,
+            ]);
+
+        // Payments (Debits)
+        $payments = Payment::where('supplier_id', $supplier->id)
+            ->whereDate('payment_date', '>=', $dateFrom)
+            ->whereDate('payment_date', '<=', $dateTo)
+            ->get()
+            ->map(fn($pm) => [
+                'id' => 'PAY-' . $pm->id,
+                'date' => $pm->payment_date ? $pm->payment_date->toDateString() : $pm->created_at->toDateString(),
+                'type' => 'payment',
+                'description' => 'سند صرف وسداد دفعة نقدية للمورد (' . $pm->payment_method . ')' . ($pm->notes ? ' - ' . $pm->notes : ''),
+                'debit' => (float)$pm->amount,
+                'credit' => 0.0,
+                'paid' => 0.0,
+            ]);
+
+        $ledger = $purchases->concat($payments)->sortBy('date')->values();
+
+        $runningBalance = (float)$supplier->initial_balance;
+        $ledgerWithRunning = $ledger->map(function ($row) use (&$runningBalance) {
+            $runningBalance += ($row['credit'] - $row['debit']);
+            $row['running_balance'] = $runningBalance;
+            return $row;
+        });
+
+        return Inertia::render('Suppliers/Statement', [
+            'supplier' => [
+                'id' => $supplier->id,
+                'name' => $supplier->name,
+                'company_name' => $supplier->company_name,
+                'phone' => $supplier->phone,
+                'address' => $supplier->address,
+                'current_balance' => (float)$supplier->current_balance,
+                'initial_balance' => (float)$supplier->initial_balance,
+            ],
+            'ledger' => $ledgerWithRunning,
+            'summary' => [
+                'total_purchases' => (float)$purchases->sum('credit'),
+                'total_payments' => (float)$payments->sum('debit'),
+                'net_balance' => (float)$supplier->current_balance,
+            ],
+            'filters' => [
+                'from' => $dateFrom,
+                'to' => $dateTo,
+            ],
+        ]);
+    }
 }
