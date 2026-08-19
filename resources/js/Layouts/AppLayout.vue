@@ -57,14 +57,23 @@ const handleKeydown = (e) => {
     }
 };
 
+const layoutProps = defineProps({
+    defaultCollapsed: { type: Boolean, default: false },
+});
+
 onMounted(() => {
     initTheme();
-    try {
-        const savedCollapsed = localStorage.getItem('sidebar_collapsed');
-        if (savedCollapsed !== null) {
-            isSidebarCollapsed.value = savedCollapsed === 'true';
-        }
-    } catch (e) {}
+    const isPos = window.location.pathname.startsWith('/pos') || window.location.pathname.startsWith('/invoices/create') || layoutProps.defaultCollapsed;
+    if (isPos) {
+        isSidebarCollapsed.value = true;
+    } else {
+        try {
+            const savedCollapsed = localStorage.getItem('sidebar_collapsed');
+            if (savedCollapsed !== null) {
+                isSidebarCollapsed.value = savedCollapsed === 'true';
+            }
+        } catch (e) {}
+    }
 
     updateClock();
     timerInterval = setInterval(updateClock, 1000);

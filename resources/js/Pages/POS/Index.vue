@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import { useMoney } from '@/Composables/useMoney';
 import { usePOSCart } from '@/Composables/usePOSCart';
 import { useKeyboardShortcuts } from '@/Composables/useKeyboardShortcuts';
@@ -64,6 +65,8 @@ const {
 
 // UI States & Modals
 const showExpensesSection = ref(false);
+const showNumpad = ref(false);
+const numpadTarget = ref('paid_amount');
 const isSubmitting = ref(false);
 const errorMessage = ref('');
 
@@ -94,7 +97,7 @@ const fetchCustomerLastPrice = async (itemId) => {
     );
 };
 
-// Item Click Handler
+// Item Click Handler (Open weight modal for bulk, or add 1 unit)
 const handleItemClick = async (item) => {
     const isWeightBased = item.unit === 'كجم' || item.unit === 'جم' || item.unit?.includes('كيلو');
     if (isWeightBased) {
@@ -104,6 +107,12 @@ const handleItemClick = async (item) => {
         const lastPrice = await fetchCustomerLastPrice(item.id);
         addItem(item, 1, lastPrice);
     }
+};
+
+// 1-Tap Direct Weight Stepper on Card
+const handleDirectWeightAdd = async ({ item, quantity }) => {
+    const lastPrice = await fetchCustomerLastPrice(item.id);
+    addItem(item, quantity, lastPrice);
 };
 
 // Weight Confirmation from Modal
@@ -144,6 +153,41 @@ const handleCustomerCreated = (created) => {
     showNewCustomerModal.value = false;
 };
 
+// Quick Payment & Discount Helpers
+const quickSetPaidExact = () => {
+    paymentType.value = 'cash';
+    paidAmount.value = netTotal.value;
+};
+
+const quickSetPaidAmount = (amt) => {
+    paidAmount.value = amt;
+    if (amt >= netTotal.value) {
+        paymentType.value = 'cash';
+    } else {
+        paymentType.value = 'partial';
+    }
+};
+
+const pressNumpad = (val) => {
+    let currentVal = String(numpadTarget.value === 'paid_amount' ? paidAmount.value : discountValue.value || '0');
+    if (currentVal === '0') currentVal = '';
+
+    if (val === 'C') {
+        currentVal = '0';
+    } else if (val === 'backspace') {
+        currentVal = currentVal.slice(0, -1) || '0';
+    } else {
+        if (val === '.' && currentVal.includes('.')) return;
+        currentVal += val;
+    }
+
+    if (numpadTarget.value === 'paid_amount') {
+        paidAmount.value = Number(currentVal);
+    } else {
+        discountValue.value = Number(currentVal);
+    }
+};
+
 // Expenses Rows
 const addExpenseRow = () => {
     additionalExpenses.value.push({ title: 'شحن وتوصيل', amount: 0 });
@@ -160,7 +204,7 @@ const handleClearCart = () => {
     }
 };
 
-// POS Checkout via Service Layer (DIP)
+// POS Checkout via Service Layer
 const submitCheckout = async () => {
     if (cart.value.length === 0) {
         errorMessage.value = 'يرجى إضافة أصناف إلى السلة أولاً!';
@@ -210,17 +254,33 @@ const submitCheckout = async () => {
     }
 };
 
-// Keyboard Shortcuts (SRP Composable)
+// Keyboard Shortcuts (F2 search, F4 cash, F8 partial, F9 credit, Enter confirm)
 useKeyboardShortcuts({
     'F2': (e) => {
         e.preventDefault();
         searchInputRef.value?.focus();
+    },
+    'F4': (e) => {
+        e.preventDefault();
+        quickSetPaidExact();
+    },
+    'F8': (e) => {
+        e.preventDefault();
+        paymentType.value = 'partial';
+    },
+    'F9': (e) => {
+        e.preventDefault();
+        paymentType.value = 'credit';
+        paidAmount.value = 0;
     },
     'Enter': (e) => {
         if (searchQuery.value && filteredItems.value.length === 1) {
             e.preventDefault();
             handleItemClick(filteredItems.value[0]);
             searchQuery.value = '';
+        } else if (cart.value.length > 0 && !isSubmitting.value) {
+            e.preventDefault();
+            submitCheckout();
         }
     }
 });
@@ -229,340 +289,383 @@ useKeyboardShortcuts({
 <template>
     <Head :title="$t('pos.title')" />
 
-    <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col antialiased selection:bg-emerald-500 selection:text-white select-none">
-        <!-- Top Cashier Header Bar -->
-        <header class="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between z-30 shrink-0">
-            <div class="flex items-center gap-3">
-                <Link href="/" class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 font-black text-sm flex items-center justify-center shadow-md">
+    <AppLayout :default-collapsed="true">
+        <div class="h-[calc(100vh-6.5rem)] flex flex-col font-tajawal select-none">
+            <!-- Top POS Status & Touch Toolbar -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 mb-3 flex flex-wrap items-center justify-between gap-3 shrink-0 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 font-black text-lg flex items-center justify-center">
                         ⚡
                     </div>
-                    <span class="font-black text-sm text-white hidden sm:inline">
-                        {{ $t('pos.title') }} • {{ tenant?.name || 'مخزني ERP' }}
-                    </span>
-                </Link>
-
-                <span class="px-2.5 py-0.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                    <span>🏬</span>
-                    <span>{{ active_store?.name || $t('common.main_store_default') }}</span>
-                </span>
-
-                <span
-                    class="px-2.5 py-0.5 rounded-lg text-xs font-black flex items-center gap-1"
-                    :class="active_shift ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'"
-                >
-                    <span class="w-2 h-2 rounded-full animate-pulse" :class="active_shift ? 'bg-emerald-400' : 'bg-rose-400'"></span>
-                    <span>{{ active_shift ? $t('dashboard.shift_number', { number: active_shift.shift_number }) : $t('dashboard.closed_shift') }}</span>
-                </span>
-            </div>
-
-            <div class="flex items-center gap-2">
-                <Link
-                    href="/invoices"
-                    class="h-8 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold flex items-center gap-1 transition"
-                >
-                    <span>🧾</span>
-                    <span>{{ $t('nav.invoices_log') }}</span>
-                </Link>
-
-                <Link
-                    href="/"
-                    class="h-8 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold flex items-center gap-1 transition"
-                >
-                    <span>📊</span>
-                    <span>{{ $t('nav.dashboard') }}</span>
-                </Link>
-            </div>
-        </header>
-
-        <!-- POS Main Body Split Screen -->
-        <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
-            <!-- Left & Center: Items Catalog & Categories (65% width) -->
-            <div class="flex-1 flex flex-col p-4 space-y-3 overflow-hidden border-l border-slate-800/80">
-                <!-- Search & Category Filters Bar -->
-                <div class="space-y-2.5 shrink-0">
-                    <div class="relative flex items-center">
-                        <input
-                            ref="searchInputRef"
-                            v-model="searchQuery"
-                            type="text"
-                            :placeholder="$t('pos.search_placeholder')"
-                            class="w-full h-11 bg-slate-900 border border-slate-800 rounded-2xl pl-10 pr-4 text-xs font-bold text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 transition shadow-inner"
-                        />
-                        <button
-                            v-if="searchQuery"
-                            @click="searchQuery = ''"
-                            type="button"
-                            class="absolute left-3 w-6 h-6 rounded-lg bg-slate-800 text-slate-400 text-xs font-bold flex items-center justify-center"
-                        >
-                            ✕
-                        </button>
-                    </div>
-
-                    <!-- Category Chips Scrollbar -->
-                    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
-                        <button
-                            @click="selectedCategory = 'all'"
-                            type="button"
-                            class="px-3.5 py-1.5 rounded-xl font-bold transition shrink-0"
-                            :class="selectedCategory === 'all' ? 'bg-emerald-500 text-slate-950 font-black shadow-md shadow-emerald-500/20' : 'bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-white border border-slate-800'"
-                        >
-                            {{ $t('common.all') }} ({{ items.length }})
-                        </button>
-
-                        <button
-                            v-for="cat in categories"
-                            :key="cat"
-                            @click="selectedCategory = cat"
-                            type="button"
-                            class="px-3.5 py-1.5 rounded-xl font-bold transition shrink-0"
-                            :class="selectedCategory === cat ? 'bg-emerald-500 text-slate-950 font-black shadow-md shadow-emerald-500/20' : 'bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-white border border-slate-800'"
-                        >
-                            {{ cat }}
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Items Grid (SRP: Rendering with POSItemCard Component) -->
-                <div class="flex-1 overflow-y-auto pr-1">
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-2.5">
-                        <POSItemCard
-                            v-for="item in filteredItems"
-                            :key="item.id"
-                            :item="item"
-                            :customer-price-tier="selectedCustomer?.price_tier || 'retail'"
-                            @select="handleItemClick"
-                        />
-                    </div>
-
-                    <div v-if="filteredItems.length === 0" class="py-16 text-center text-slate-500 text-xs font-bold">
-                        {{ $t('common.no_data') }}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Panel: Smart Cart & Checkout Engine (35% width) -->
-            <div class="w-full lg:w-[420px] bg-slate-900/95 flex flex-col h-full border-t lg:border-t-0 shrink-0">
-                <!-- Customer Selector Bar -->
-                <div class="p-3 border-b border-slate-800 flex items-center justify-between gap-2 bg-slate-900">
-                    <div
-                        @click="showCustomerModal = true"
-                        class="flex-1 flex items-center gap-2 p-2 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 cursor-pointer transition"
-                    >
-                        <span class="text-base">👤</span>
-                        <div class="flex-1 truncate">
-                            <div class="text-xs font-black text-white truncate">{{ selectedCustomer?.name || $t('pos.cash_customer') }}</div>
-                            <div class="text-[10px] text-slate-400 font-mono">
-                                {{ selectedCustomer?.phone || $t('pos.cash_customer') }} • {{ $t('common.remaining') }}: {{ formatMoney(selectedCustomer?.current_balance) }} {{ $t('common.currency') }}
-                            </div>
+                    <div>
+                        <h1 class="text-sm font-black text-white flex items-center gap-2">
+                            <span>نقطة البيع والكاشير السريع (Touch POS)</span>
+                        </h1>
+                        <div class="flex items-center gap-2 mt-0.5 text-[11px] text-slate-400">
+                            <span>الفرع:</span>
+                            <span class="text-amber-400 font-bold font-mono">{{ active_store?.name || 'المخزن الرئيسي' }}</span>
+                            <span>•</span>
+                            <span
+                                class="px-2 py-0.2 rounded-md font-mono font-bold"
+                                :class="active_shift ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'"
+                            >
+                                {{ active_shift ? `شفت مفتوح #${active_shift.shift_number || active_shift.id}` : 'الشفت مغلق' }}
+                            </span>
                         </div>
-                        <span class="text-slate-400 text-xs">▼</span>
                     </div>
+                </div>
 
+                <div class="flex items-center gap-2">
                     <button
-                        @click="showNewCustomerModal = true"
+                        @click="showNumpad = !showNumpad"
                         type="button"
-                        class="h-9 px-3 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 text-indigo-300 font-bold text-xs flex items-center gap-1 transition"
-                        :title="$t('pos.add_new_customer')"
+                        class="h-9 px-3 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                        :class="showNumpad ? 'bg-amber-500 text-slate-950 font-black border-amber-400 shadow-md' : 'bg-slate-950 border-slate-800 text-slate-300 hover:text-white'"
                     >
-                        <span>➕</span>
+                        <span>🔢</span>
+                        <span>لوحة أرقام اللمس</span>
                     </button>
+
+                    <Link
+                        href="/invoices"
+                        class="h-9 px-3 rounded-xl bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-bold flex items-center gap-1.5 transition"
+                    >
+                        <span>🧾</span>
+                        <span>سجل الفواتير</span>
+                    </Link>
                 </div>
+            </div>
 
-                <!-- Cart Line Items List (SRP: Rendering with POSCartItem Component) -->
-                <div class="flex-1 overflow-y-auto p-3 space-y-2">
-                    <POSCartItem
-                        v-for="(line, idx) in cart"
-                        :key="line.item_id"
-                        :line="line"
-                        :index="idx"
-                        @remove="removeItem"
-                        @apply-last-price="applyLastSoldPrice"
-                        @change="autoSetCashPaid"
-                    />
+            <!-- Error Banner -->
+            <div v-if="errorMessage" class="p-3 mb-3 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold flex items-center justify-between shrink-0">
+                <span>⚠️ {{ errorMessage }}</span>
+                <button @click="errorMessage = ''" class="text-rose-400 font-bold text-sm">✕</button>
+            </div>
 
-                    <div v-if="cart.length === 0" class="py-16 text-center text-slate-500 text-xs font-bold space-y-1">
-                        <div class="text-2xl">🛒</div>
-                        <div>{{ $t('pos.empty_cart') }}</div>
-                    </div>
-                </div>
-
-                <!-- Financials & Payment Section (Fixed Bottom) -->
-                <div class="p-3.5 bg-slate-900 border-t border-slate-800 space-y-3 shrink-0">
-                    <!-- Subtotal & Discount -->
-                    <div class="space-y-1.5 text-xs text-slate-400">
-                        <div class="flex items-center justify-between">
-                            <span>{{ $t('common.subtotal') }}:</span>
-                            <span class="font-mono font-bold text-slate-200">{{ formatMoney(subtotal) }} {{ $t('common.currency') }}</span>
-                        </div>
-
-                        <div class="flex items-center justify-between gap-2">
-                            <span>{{ $t('common.discount') }}:</span>
-                            <div class="flex items-center gap-1.5">
-                                <button
-                                    @click="discountType = discountType === 'fixed' ? 'percentage' : 'fixed'"
-                                    type="button"
-                                    class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px] font-black text-slate-300"
-                                >
-                                    {{ discountType === 'fixed' ? $t('common.currency') : '%' }}
-                                </button>
-                                <input
-                                    v-model.number="discountValue"
-                                    type="number"
-                                    min="0"
-                                    class="w-16 h-6 bg-slate-800 border border-slate-700 rounded text-center text-xs font-mono font-bold text-white"
-                                />
-                                <span class="font-mono font-bold text-rose-400">-{{ formatMoney(discountAmount) }}</span>
-                            </div>
-                        </div>
-
-                        <!-- Optional Additional Expenses Toggle -->
-                        <div class="flex items-center justify-between">
-                            <button
-                                @click="showExpensesSection = !showExpensesSection"
-                                type="button"
-                                class="text-[11px] text-indigo-400 hover:underline font-bold flex items-center gap-1"
-                            >
-                                <span>🚚 {{ $t('pos.shipping_cost') }}:</span>
-                                <span>{{ showExpensesSection ? '▲' : '▼' }}</span>
-                            </button>
-                            <span v-if="expensesTotal > 0" class="font-mono font-bold text-white">+{{ formatMoney(expensesTotal) }} {{ $t('common.currency') }}</span>
-                        </div>
-
-                        <!-- Expenses List Dropdown -->
-                        <div v-if="showExpensesSection" class="p-2.5 rounded-xl bg-slate-800/60 space-y-2 border border-slate-700/60">
-                            <div v-for="(exp, eIdx) in additionalExpenses" :key="eIdx" class="flex items-center gap-2">
-                                <input
-                                    v-model="exp.title"
-                                    type="text"
-                                    placeholder="البيان (مثال: شحن)"
-                                    class="flex-1 h-7 bg-slate-900 border border-slate-700 rounded-lg px-2 text-[10px] text-white"
-                                />
-                                <input
-                                    v-model.number="exp.amount"
-                                    type="number"
-                                    placeholder="المبلغ"
-                                    class="w-20 h-7 bg-slate-900 border border-slate-700 rounded-lg px-2 text-[10px] font-mono text-white text-center"
-                                />
-                                <button @click="removeExpenseRow(eIdx)" type="button" class="text-rose-400 text-xs">✕</button>
-                            </div>
-                            <button
-                                @click="addExpenseRow"
-                                type="button"
-                                class="text-[10px] font-bold text-indigo-400 hover:text-indigo-300"
-                            >
-                                + إضافة بند مصروف آخر
-                            </button>
-                        </div>
-
-                        <div class="flex items-center justify-between pt-1 border-t border-slate-800 text-sm">
-                            <span class="font-black text-white">{{ $t('common.net') }}:</span>
-                            <span class="font-mono font-black text-lg text-emerald-400">{{ formatMoney(netTotal) }} {{ $t('common.currency') }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Payment Type Selection Chips -->
-                    <div class="grid grid-cols-3 gap-1.5 text-xs">
-                        <button
-                            @click="paymentType = 'cash'; autoSetCashPaid()"
-                            type="button"
-                            class="py-1.5 rounded-xl font-black transition text-center"
-                            :class="paymentType === 'cash' ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'"
-                        >
-                            {{ $t('pos.payment_cash') }}
-                        </button>
-                        <button
-                            @click="paymentType = 'credit'; autoSetCashPaid()"
-                            type="button"
-                            class="py-1.5 rounded-xl font-black transition text-center"
-                            :class="paymentType === 'credit' ? 'bg-rose-500 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'"
-                        >
-                            {{ $t('pos.payment_credit') }}
-                        </button>
-                        <button
-                            @click="paymentType = 'partial'; autoSetCashPaid()"
-                            type="button"
-                            class="py-1.5 rounded-xl font-black transition text-center"
-                            :class="paymentType === 'partial' ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'"
-                        >
-                            {{ $t('pos.payment_partial') }}
-                        </button>
-                    </div>
-
-                    <!-- Paid Amount & Change Indicator -->
-                    <div v-if="paymentType !== 'credit'" class="flex items-center justify-between gap-2 text-xs">
-                        <div class="flex items-center gap-1.5 flex-1">
-                            <span class="text-slate-400">{{ $t('common.paid') }}:</span>
+            <!-- Main POS Split Workspace -->
+            <div class="flex-1 flex flex-col lg:flex-row gap-4 overflow-hidden">
+                <!-- Left Section: Catalog & Categories Grid (65% width) -->
+                <div class="flex-1 flex flex-col bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-3 overflow-hidden shadow-sm">
+                    <!-- Search Bar & Category Chips -->
+                    <div class="space-y-2.5 shrink-0">
+                        <div class="relative flex items-center">
                             <input
-                                v-model.number="paidAmount"
-                                type="number"
-                                min="0"
-                                class="w-full h-8 bg-slate-800 border border-slate-700 rounded-xl px-2 text-center text-xs font-mono font-black text-white focus:outline-none focus:border-emerald-500"
+                                ref="searchInputRef"
+                                v-model="searchQuery"
+                                type="text"
+                                placeholder="🔍 ابحث باسم الصنف أو الباركود... (F2)"
+                                class="w-full h-11 bg-slate-950 border border-slate-800 rounded-2xl pl-10 pr-4 text-xs font-bold text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500 transition shadow-inner font-tajawal"
+                            />
+                            <button
+                                v-if="searchQuery"
+                                @click="searchQuery = ''"
+                                type="button"
+                                class="absolute left-3 w-6 h-6 rounded-lg bg-slate-800 text-slate-400 text-xs font-bold flex items-center justify-center"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <!-- Category Chips -->
+                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+                            <button
+                                @click="selectedCategory = 'all'"
+                                type="button"
+                                class="px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 cursor-pointer"
+                                :class="selectedCategory === 'all' ? 'bg-amber-500 text-slate-950 font-black shadow-md' : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'"
+                            >
+                                الكل ({{ items.length }})
+                            </button>
+
+                            <button
+                                v-for="cat in categories"
+                                :key="cat"
+                                @click="selectedCategory = cat"
+                                type="button"
+                                class="px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 cursor-pointer"
+                                :class="selectedCategory === cat ? 'bg-amber-500 text-slate-950 font-black shadow-md' : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'"
+                            >
+                                {{ cat }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Items Grid -->
+                    <div class="flex-1 overflow-y-auto pr-1">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-2.5">
+                            <POSItemCard
+                                v-for="item in filteredItems"
+                                :key="item.id"
+                                :item="item"
+                                :customer-price-tier="selectedCustomer?.price_tier || 'retail'"
+                                @select="handleItemClick"
+                                @add-qty="handleDirectWeightAdd"
                             />
                         </div>
 
-                        <div v-if="changeDue > 0" class="px-2 py-1 rounded-xl bg-amber-500/15 text-amber-300 font-mono font-black text-xs">
-                            {{ $t('pos.change_due') }}: {{ formatMoney(changeDue) }} {{ $t('common.currency') }}
+                        <div v-if="filteredItems.length === 0" class="py-20 text-center text-slate-500 text-xs font-bold">
+                            لا توجد أصناف تطابق البحث
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section: Smart Cart & Payment Engine (35% width) -->
+                <div class="w-full lg:w-[420px] bg-slate-900 border border-slate-800 rounded-3xl flex flex-col h-full overflow-hidden shrink-0 shadow-sm">
+                    <!-- Customer Selector Bar -->
+                    <div class="p-3 border-b border-slate-800 flex items-center justify-between gap-2 bg-slate-950/60 shrink-0">
+                        <div
+                            @click="showCustomerModal = true"
+                            class="flex-1 flex items-center gap-2 p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 cursor-pointer transition"
+                        >
+                            <span class="text-base">👤</span>
+                            <div class="flex-1 truncate">
+                                <div class="text-xs font-black text-white truncate">{{ selectedCustomer?.name || 'عميل نقدي افتراضي' }}</div>
+                                <div class="text-[10px] text-slate-400 font-mono">
+                                    {{ selectedCustomer?.phone || '-' }} • المتبقي: {{ formatMoney(selectedCustomer?.current_balance) }} ج.م
+                                </div>
+                            </div>
+                            <span class="text-slate-400 text-xs">▼</span>
+                        </div>
+
+                        <button
+                            @click="showNewCustomerModal = true"
+                            type="button"
+                            class="h-9 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-amber-400 font-bold text-xs flex items-center gap-1 transition cursor-pointer"
+                            title="إضافة عميل جديد"
+                        >
+                            <span>➕</span>
+                        </button>
+                    </div>
+
+                    <!-- Cart Lines -->
+                    <div class="flex-1 overflow-y-auto p-3 space-y-2">
+                        <POSCartItem
+                            v-for="(line, idx) in cart"
+                            :key="line.item_id"
+                            :line="line"
+                            :index="idx"
+                            @remove="removeItem"
+                            @apply-last-price="applyLastSoldPrice"
+                            @change="autoSetCashPaid"
+                        />
+
+                        <div v-if="cart.length === 0" class="py-16 text-center text-slate-500 text-xs font-bold space-y-2">
+                            <div class="text-3xl">🛒</div>
+                            <div>السلة فارغة، اختر أصنافاً للبدء</div>
                         </div>
                     </div>
 
-                    <!-- Error Alert -->
-                    <div v-if="errorMessage" class="p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-bold">
-                        ⚠️ {{ errorMessage }}
+                    <!-- Touch Numpad Popup / Panel -->
+                    <div v-if="showNumpad" class="p-3 bg-slate-950 border-t border-slate-800 shrink-0 space-y-2">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-400 font-bold">إدخال الأرقام باللمس:</span>
+                            <div class="flex items-center gap-2">
+                                <button
+                                    @click="numpadTarget = 'paid_amount'"
+                                    type="button"
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer"
+                                    :class="numpadTarget === 'paid_amount' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400'"
+                                >
+                                    المدفوع
+                                </button>
+                                <button
+                                    @click="numpadTarget = 'discount_value'"
+                                    type="button"
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer"
+                                    :class="numpadTarget === 'discount_value' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400'"
+                                >
+                                    الخصم
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-4 gap-1.5 font-mono font-bold text-xs">
+                            <button v-for="num in ['7','8','9','C']" :key="num" @click="pressNumpad(num)" type="button" class="h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center cursor-pointer">{{ num }}</button>
+                            <button v-for="num in ['4','5','6','backspace']" :key="num" @click="pressNumpad(num)" type="button" class="h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center cursor-pointer">{{ num === 'backspace' ? '⌫' : num }}</button>
+                            <button v-for="num in ['1','2','3','0']" :key="num" @click="pressNumpad(num)" type="button" class="h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center cursor-pointer">{{ num }}</button>
+                            <button @click="pressNumpad('.')" type="button" class="h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center cursor-pointer">.</button>
+                            <button @click="pressNumpad('00')" type="button" class="h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center cursor-pointer">00</button>
+                            <button @click="quickSetPaidExact" type="button" class="col-span-2 h-9 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-tajawal font-black flex items-center justify-center cursor-pointer">كامل المبلغ 💵</button>
+                        </div>
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="flex items-center gap-2">
-                        <button
-                            @click="handleClearCart"
-                            type="button"
-                            class="w-11 h-11 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-rose-400 font-black text-sm flex items-center justify-center transition shrink-0"
-                            :title="$t('pos.clear_cart')"
-                        >
-                            🗑️
-                        </button>
+                    <!-- Financial Totals & Payment (Fixed Bottom Area) -->
+                    <div class="p-3.5 bg-slate-950 border-t border-slate-800 space-y-2.5 shrink-0">
+                        <!-- Subtotal & Discount -->
+                        <div class="space-y-1 text-xs text-slate-400">
+                            <div class="flex items-center justify-between">
+                                <span>الإجمالي الفرعي:</span>
+                                <span class="font-mono font-bold text-white">{{ formatMoney(subtotal) }} ج.م</span>
+                            </div>
 
-                        <button
-                            :disabled="isSubmitting || cart.length === 0"
-                            @click="submitCheckout"
-                            type="button"
-                            class="flex-1 h-11 rounded-2xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition transform active:scale-95"
-                        >
-                            <span>⚡</span>
-                            <span>{{ isSubmitting ? 'جاري الحفظ...' : `${$t('pos.confirm_invoice')} (Enter)` }}</span>
-                        </button>
+                            <div class="flex items-center justify-between gap-2">
+                                <span>الخصم الممنوح:</span>
+                                <div class="flex items-center gap-1.5">
+                                    <button
+                                        @click="discountType = discountType === 'fixed' ? 'percentage' : 'fixed'"
+                                        type="button"
+                                        class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px] font-black text-amber-400"
+                                    >
+                                        {{ discountType === 'fixed' ? 'ج.م' : '%' }}
+                                    </button>
+                                    <input
+                                        v-model.number="discountValue"
+                                        type="number"
+                                        min="0"
+                                        class="w-16 h-6 bg-slate-900 border border-slate-700 rounded text-center text-xs font-mono font-bold text-white"
+                                    />
+                                    <span class="font-mono font-bold text-rose-400">-{{ formatMoney(discountAmount) }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Net Total -->
+                            <div class="flex items-center justify-between pt-1 border-t border-slate-800 text-sm">
+                                <span class="font-black text-white">الصافي النهائي:</span>
+                                <span class="font-mono font-black text-lg text-emerald-400">{{ formatMoney(netTotal) }} ج.م</span>
+                            </div>
+                        </div>
+
+                        <!-- Payment Type Selector -->
+                        <div class="grid grid-cols-3 gap-1.5 text-xs">
+                            <button
+                                @click="paymentType = 'cash'; autoSetCashPaid()"
+                                type="button"
+                                class="py-1.5 rounded-xl font-black transition text-center cursor-pointer"
+                                :class="paymentType === 'cash' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'"
+                            >
+                                نقدي (F4)
+                            </button>
+                            <button
+                                @click="paymentType = 'partial'; autoSetCashPaid()"
+                                type="button"
+                                class="py-1.5 rounded-xl font-black transition text-center cursor-pointer"
+                                :class="paymentType === 'partial' ? 'bg-amber-500 text-slate-950 shadow-md' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'"
+                            >
+                                جزئي (F8)
+                            </button>
+                            <button
+                                @click="paymentType = 'credit'; paidAmount = 0"
+                                type="button"
+                                class="py-1.5 rounded-xl font-black transition text-center cursor-pointer"
+                                :class="paymentType === 'credit' ? 'bg-rose-500 text-white shadow-md' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'"
+                            >
+                                آجل (F9)
+                            </button>
+                        </div>
+
+                        <!-- Payment Method Selector (Cash, InstaPay, Visa, Wallet) -->
+                        <div class="grid grid-cols-4 gap-1 text-[10px] font-bold">
+                            <button
+                                @click="paymentMethod = 'cash'"
+                                type="button"
+                                class="py-1 rounded-lg border transition text-center cursor-pointer"
+                                :class="paymentMethod === 'cash' ? 'bg-slate-800 border-amber-500 text-amber-400 font-black' : 'bg-slate-900 border-slate-800 text-slate-400'"
+                            >
+                                💵 كاش
+                            </button>
+                            <button
+                                @click="paymentMethod = 'instapay'"
+                                type="button"
+                                class="py-1 rounded-lg border transition text-center cursor-pointer"
+                                :class="paymentMethod === 'instapay' ? 'bg-slate-800 border-purple-500 text-purple-400 font-black' : 'bg-slate-900 border-slate-800 text-slate-400'"
+                            >
+                                ⚡ انستاباي
+                            </button>
+                            <button
+                                @click="paymentMethod = 'visa'"
+                                type="button"
+                                class="py-1 rounded-lg border transition text-center cursor-pointer"
+                                :class="paymentMethod === 'visa' ? 'bg-slate-800 border-cyan-500 text-cyan-400 font-black' : 'bg-slate-900 border-slate-800 text-slate-400'"
+                            >
+                                💳 فيزا
+                            </button>
+                            <button
+                                @click="paymentMethod = 'e_wallet'"
+                                type="button"
+                                class="py-1 rounded-lg border transition text-center cursor-pointer"
+                                :class="paymentMethod === 'e_wallet' ? 'bg-slate-800 border-rose-500 text-rose-400 font-black' : 'bg-slate-900 border-slate-800 text-slate-400'"
+                            >
+                                📱 محفظة
+                            </button>
+                        </div>
+
+                        <!-- Paid Amount & Change Due -->
+                        <div v-if="paymentType !== 'credit'" class="flex items-center justify-between gap-2 text-xs">
+                            <div class="flex items-center gap-1.5 flex-1">
+                                <span class="text-slate-400">المدفوع:</span>
+                                <input
+                                    v-model.number="paidAmount"
+                                    type="number"
+                                    min="0"
+                                    class="w-full h-8 bg-slate-900 border border-slate-700 rounded-xl px-2 text-center text-xs font-mono font-black text-white focus:outline-none focus:border-amber-500"
+                                />
+                            </div>
+
+                            <div v-if="changeDue > 0" class="px-2.5 py-1 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono font-black text-xs">
+                                الباقي: {{ formatMoney(changeDue) }} ج.م
+                            </div>
+                        </div>
+
+                        <!-- Quick Cash Amount Chips -->
+                        <div v-if="paymentType !== 'credit'" class="flex items-center gap-1 overflow-x-auto text-[10px] font-mono">
+                            <span class="text-slate-500 text-[9px] px-1 font-tajawal">سداد:</span>
+                            <button @click="quickSetPaidExact" type="button" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-amber-400 font-bold transition">الصافي</button>
+                            <button v-for="amt in [50, 100, 200, 500]" :key="amt" @click="quickSetPaidAmount(amt)" type="button" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 transition">{{ amt }}</button>
+                        </div>
+
+                        <!-- Checkout & Clear Buttons -->
+                        <div class="flex items-center gap-2 pt-1">
+                            <button
+                                @click="handleClearCart"
+                                type="button"
+                                class="w-11 h-11 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-rose-400 font-black text-sm flex items-center justify-center transition border border-slate-800 shrink-0 cursor-pointer"
+                                title="تفريغ السلة"
+                            >
+                                🗑️
+                            </button>
+
+                            <button
+                                :disabled="isSubmitting || cart.length === 0"
+                                @click="submitCheckout"
+                                type="button"
+                                class="flex-1 h-11 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 disabled:opacity-50 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 transition transform active:scale-95 cursor-pointer"
+                            >
+                                <span>⚡</span>
+                                <span>{{ isSubmitting ? 'جاري الاعتماد...' : 'اعتماد وحفظ الفاتورة (Enter)' }}</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Modals -->
+            <POSWeightPickerModal
+                :show="showWeightModal"
+                :item="activeWeightItem"
+                :customer-price-tier="selectedCustomer?.price_tier || 'retail'"
+                @close="showWeightModal = false"
+                @confirm="handleWeightConfirm"
+            />
+
+            <POSCustomerPickerModal
+                :show="showCustomerModal"
+                :customers="customers"
+                :selected-customer-id="selectedCustomer?.id"
+                @close="showCustomerModal = false"
+                @select="selectCustomer"
+            />
+
+            <POSQuickCustomerModal
+                :show="showNewCustomerModal"
+                @close="showNewCustomerModal = false"
+                @created="handleCustomerCreated"
+            />
+
+            <POSSuccessModal
+                :show="showSuccessModal"
+                :invoice="completedInvoice"
+                @close="showSuccessModal = false"
+            />
         </div>
-
-        <!-- Atomic Modals (SRP) -->
-        <POSWeightPickerModal
-            :show="showWeightModal"
-            :item="activeWeightItem"
-            :customer-price-tier="selectedCustomer?.price_tier || 'retail'"
-            @close="showWeightModal = false"
-            @confirm="handleWeightConfirm"
-        />
-
-        <POSCustomerPickerModal
-            :show="showCustomerModal"
-            :customers="customers"
-            :selected-customer-id="selectedCustomer?.id"
-            @close="showCustomerModal = false"
-            @select="selectCustomer"
-        />
-
-        <POSQuickCustomerModal
-            :show="showNewCustomerModal"
-            @close="showNewCustomerModal = false"
-            @created="handleCustomerCreated"
-        />
-
-        <POSSuccessModal
-            :show="showSuccessModal"
-            :invoice="completedInvoice"
-            @close="showSuccessModal = false"
-        />
-    </div>
+    </AppLayout>
 </template>
