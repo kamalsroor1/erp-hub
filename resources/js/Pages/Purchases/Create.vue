@@ -9,9 +9,20 @@ import { useMoney } from '@/Composables/useMoney';
 const props = defineProps({
     suppliers: { type: Array, default: () => [] },
     items: { type: Array, default: () => [] },
+    prefill_items: { type: Array, default: () => [] },
 });
 
 const { formatMoney } = useMoney();
+
+const initialItems = (props.prefill_items && props.prefill_items.length > 0)
+    ? props.prefill_items.map(p => ({
+        item_id: p.item_id,
+        name: p.name,
+        unit: p.unit || 'كجم',
+        quantity: p.quantity || 10,
+        unit_cost: Number(p.unit_cost) || 0,
+    }))
+    : [];
 
 const form = useForm({
     supplier_id: props.suppliers[0]?.id || null,
@@ -20,7 +31,7 @@ const form = useForm({
     paid_amount: '0.00',
     discount_amount: '0.00',
     notes: '',
-    items: [],
+    items: initialItems,
 });
 
 const availableItemOptions = computed(() => {

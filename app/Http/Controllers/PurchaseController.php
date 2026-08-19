@@ -97,7 +97,7 @@ final class PurchaseController extends Controller
         ]);
     }
 
-    public function create(): Response
+    public function create(Request $request): Response
     {
         $suppliers = Supplier::where('is_active', true)
             ->select('id', 'name', 'company_name', 'phone')
@@ -109,12 +109,31 @@ final class PurchaseController extends Controller
             ->orderBy('name')
             ->get();
 
+        $prefillItems = [];
+        if ($request->has('prefill')) {
+            $rawPrefill = json_decode($request->query('prefill', '[]'), true) ?: [];
+            foreach ($rawPrefill as $p) {
+                $itemId = $p['item_id'] ?? $p['id'] ?? null;
+                $item = $items->firstWhere('id', $itemId);
+                if ($item) {
+                    $prefillItems[] = [
+                        'item_id' => $item->id,
+                        'name' => $item->name,
+                        'unit' => $item->unit ?: 'كجم',
+                        'quantity' => (float)($p['quantity'] ?? $p['suggested_quantity'] ?? 10),
+                        'unit_cost' => (float)$item->cost_price,
+                    ];
+                }
+            }
+        }
+
         return Inertia::render('Purchases/Create', [
             'suppliers' => $suppliers->map(fn($s) => [
                 'id' => $s->id,
                 'name' => $s->company_name ? "{$s->name} - {$s->company_name}" : $s->name,
             ]),
             'items' => $items,
+            'prefill_items' => $prefillItems,
         ]);
     }
 
@@ -131,6 +150,11 @@ final class PurchaseController extends Controller
             'items.*.item_id' => 'required|exists:items,id',
             'items.*.quantity' => 'required|numeric|min:0.001',
             'items.*.unit_cost' => 'required|numeric|min:0',
+            'additional_expenses' => 'nullable|array',
+            'additional_expenses.*.title' => 'nullable|string|max:150',
+            'additional_expenses.*.amount' => 'nullable|numeric|min:0',
+            'additional_expenses.*.allocation_method' => 'nullable|string|in:by_quantity,by_value,equal',
+            'additional_expenses.*.paid_by' => 'nullable|string|in:supplier_account,treasury_cash',
         ]);
 
         $purchase = $purchaseService->createPurchase($validated);
@@ -147,26 +171,52 @@ final class PurchaseController extends Controller
         return redirect()->back()->with('success', "تم إلغاء فاتورة الشراء رقم {$purchase->purchase_number} وعكس أثرها المالي والمخزني بنجاح");
     }
 
-    public function smartReorder(): Response
+    public function smartReorder(Request $request, \App\Services\ReorderAssistantService $reorderService): Response
     {
-        // Items where current stock is less than or equal to minimum safety stock
-        $criticalItems = Item::where('is_active', true)
-            ->whereColumn('current_stock', '<=', 'min_stock_level')
-            ->orderBy('current_stock', 'asc')
-            ->get();
+        $storeId = $request->input('store_id');
+        $storeFilter = ($storeId && $storeId !== 'all') ? (int)$storeId : null;
+        $analysisDays = (int)$request->input('analysis_days', 14);
+        $targetCoverDays = (int)$request->input('target_cover_days', 15);
+        $urgency = $request->input('urgency', 'all');
+        $search = trim((string)$request->input('search', ''));
+
+        $data = $reorderService->getReorderSuggestions(
+            storeId: $storeFilter,
+            analysisDays: $analysisDays,
+            targetCoverDays: $targetCoverDays
+        );
+
+        $suggestions = collect($data['suggestions']);
+
+        if ($search !== '') {
+            $suggestions = $suggestions->filter(fn($it) => 
+                str_contains(mb_strtolower($it['name']), mb_strtolower($search)) ||
+                str_contains(mb_strtolower($it['code']), mb_strtolower($search))
+            );
+        }
+
+        if ($urgency !== 'all') {
+            $suggestions = $suggestions->where('urgency', $urgency);
+        }
+
+        $stores = \App\Models\Store::where('is_active', true)->select('id', 'name')->get();
 
         return Inertia::render('Purchases/SmartReorder', [
-            'items' => $criticalItems->map(fn($item) => [
-                'id' => $item->id,
-                'name' => $item->name,
-                'code' => $item->code,
-                'category' => $item->category,
-                'unit' => $item->unit,
-                'current_stock' => (float)$item->current_stock,
-                'min_stock_level' => (float)$item->min_stock_level,
-                'suggested_reorder_qty' => max((float)($item->min_stock_level * 2 - $item->current_stock), 10.0),
-                'cost_price' => (float)$item->cost_price,
-            ]),
+            'suggestions' => $suggestions->values(),
+            'metrics' => [
+                'critical_count' => $data['critical_count'] ?? 0,
+                'warning_count' => $data['warning_count'] ?? 0,
+                'safe_count' => $data['safe_count'] ?? 0,
+                'total_estimated_cost' => (float)$data['total_estimated_cost'],
+            ],
+            'stores' => $stores,
+            'filters' => [
+                'store_id' => $storeId ?: 'all',
+                'analysis_days' => $analysisDays,
+                'target_cover_days' => $targetCoverDays,
+                'urgency' => $urgency,
+                'search' => $search,
+            ],
         ]);
     }
 }

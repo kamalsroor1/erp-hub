@@ -58,7 +58,7 @@ class PurchaseService
 
             foreach ($data['items'] as $line) {
                 $qty = (string)($line['quantity'] ?? '0.000');
-                $baseCost = (string)($line['cost_price'] ?? '0.000');
+                $baseCost = (string)($line['cost_price'] ?? $line['unit_cost'] ?? '0.000');
                 $totalQuantity = bcadd($totalQuantity, $qty, 3);
                 $totalBaseValuation = bcadd($totalBaseValuation, bcmul($qty, $baseCost, 3), 3);
             }
@@ -68,7 +68,7 @@ class PurchaseService
                 $item = Item::where('id', $line['item_id'])->lockForUpdate()->firstOrFail();
 
                 $quantity = (string)$line['quantity'];
-                $baseCostPrice = (string)$line['cost_price'];
+                $baseCostPrice = (string)($line['cost_price'] ?? $line['unit_cost'] ?? '0.000');
                 $lineBaseTotal = bcmul($quantity, $baseCostPrice, 3);
                 $baseSubtotal = bcadd($baseSubtotal, $lineBaseTotal, 3);
 

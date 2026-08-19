@@ -46,6 +46,7 @@ class ReorderAssistantService
         $criticalCount = 0;
         $warningCount = 0;
         $safeCount = 0;
+        $totalEstimatedCost = '0.000';
 
         foreach ($items as $item) {
             $salesRecord = $salesPerItem->get($item->id);
@@ -87,6 +88,7 @@ class ReorderAssistantService
             }
 
             $estimatedCost = bcmul($suggestedQty, $unitCost, 3);
+            $totalEstimatedCost = bcadd($totalEstimatedCost, $estimatedCost, 3);
 
             $suggestions[] = [
                 'id'                 => $item->id,
@@ -118,12 +120,13 @@ class ReorderAssistantService
         });
 
         return [
-            'suggestions'        => $suggestions,
-            'critical_count'     => $criticalCount,
-            'warning_count'      => $warningCount,
-            'safe_count'         => $safeCount,
-            'analysis_days'      => $analysisDays,
-            'target_cover_days'  => $targetCoverDays,
+            'suggestions'          => $suggestions,
+            'critical_count'       => $criticalCount,
+            'warning_count'        => $warningCount,
+            'safe_count'           => $safeCount,
+            'total_estimated_cost' => $totalEstimatedCost,
+            'analysis_days'        => $analysisDays,
+            'target_cover_days'    => $targetCoverDays,
         ];
     }
 }

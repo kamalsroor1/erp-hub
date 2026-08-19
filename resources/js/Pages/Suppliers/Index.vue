@@ -157,6 +157,12 @@ const deleteSupplier = (s) => {
         });
     }
 };
+
+const toggleActive = (s) => {
+    router.post(`/suppliers/${s.id}/toggle-active`, {}, {
+        preserveScroll: true,
+    });
+};
 </script>
 
 <template>
@@ -325,6 +331,15 @@ const deleteSupplier = (s) => {
                                             <span>سداد</span>
                                         </button>
 
+                                        <!-- Statement -->
+                                        <Link
+                                            :href="`/suppliers/${s.id}/statement`"
+                                            class="p-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-400 transition"
+                                            title="كشف حساب تفصيلي بالمشتريات والمدفوعات"
+                                        >
+                                            📜
+                                        </Link>
+
                                         <!-- Edit -->
                                         <button
                                             @click="openEditModal(s)"
@@ -333,6 +348,17 @@ const deleteSupplier = (s) => {
                                             title="تعديل بيانات المورد"
                                         >
                                             ✏️
+                                        </button>
+
+                                        <!-- Toggle Active -->
+                                        <button
+                                            @click="toggleActive(s)"
+                                            type="button"
+                                            class="p-1.5 rounded-xl transition cursor-pointer"
+                                            :class="s.is_active ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 hover:bg-slate-700 text-slate-500'"
+                                            :title="s.is_active ? 'الحساب نشط (اضغط للتعطيل)' : 'الحساب معطل (اضغط للتفعيل)'"
+                                        >
+                                            {{ s.is_active ? '🟢' : '⚪' }}
                                         </button>
 
                                         <!-- Delete -->

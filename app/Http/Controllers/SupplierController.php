@@ -111,7 +111,7 @@ final class SupplierController extends Controller
         return redirect()->back()->with('success', 'تم تعديل بيانات المورد بنجاح');
     }
 
-    public function pay(Request $request, int $id)
+    public function pay(Request $request, int $id, \App\Services\PaymentService $paymentService)
     {
         $supplier = Supplier::findOrFail($id);
 
@@ -122,22 +122,25 @@ final class SupplierController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
-        DB::transaction(function () use ($supplier, $validated) {
-            Payment::create([
-                'supplier_id' => $supplier->id,
-                'amount' => $validated['amount'],
-                'payment_method' => $validated['payment_method'],
-                'payment_date' => $validated['payment_date'],
-                'user_id' => auth()->id(),
-                'notes' => $validated['notes'] ?? 'سداد دفعة نقدية للمورد',
-            ]);
-
-            // Deduct from supplier balance
-            $supplier->current_balance = bcsub((string)$supplier->current_balance, (string)$validated['amount'], 3);
-            $supplier->save();
-        });
+        $paymentService->recordSupplierPayment([
+            'supplier_id'    => $supplier->id,
+            'amount'         => (string)$validated['amount'],
+            'payment_method' => $validated['payment_method'],
+            'payment_date'   => $validated['payment_date'],
+            'notes'          => $validated['notes'] ?? 'سداد دفعة نقدية للمورد',
+        ]);
 
         return redirect()->back()->with('success', 'تم تسجيل سند الصرف وسداد الدفعة بنجاح');
+    }
+
+    public function toggleActive(int $id)
+    {
+        $supplier = Supplier::findOrFail($id);
+        $supplier->is_active = !$supplier->is_active;
+        $supplier->save();
+
+        $status = $supplier->is_active ? 'تفعيل' : 'تعطيل';
+        return redirect()->back()->with('success', "تم {$status} حساب المورد بنجاح");
     }
 
     public function destroy(int $id)
@@ -155,51 +158,13 @@ final class SupplierController extends Controller
         return redirect()->back()->with('success', 'تم حذف المورد بنجاح');
     }
 
-    public function statement(int $id, Request $request): Response
+    public function statement(int $id, Request $request, \App\Services\SupplierBalanceService $balanceService): Response
     {
         $supplier = Supplier::findOrFail($id);
-        $dateFrom = $request->input('from', now()->startOfYear()->toDateString());
-        $dateTo = $request->input('to', now()->toDateString());
+        $dateFrom = $request->input('from');
+        $dateTo = $request->input('to');
 
-        // Purchases (Credits)
-        $purchases = Purchase::where('supplier_id', $supplier->id)
-            ->where('status', 'confirmed')
-            ->whereDate('purchase_date', '>=', $dateFrom)
-            ->whereDate('purchase_date', '<=', $dateTo)
-            ->get()
-            ->map(fn($p) => [
-                'id' => 'PUR-' . $p->id,
-                'date' => $p->purchase_date->toDateString(),
-                'type' => 'purchase',
-                'description' => 'فاتورة مشتريات وتوريد خامات رقم ' . $p->purchase_number,
-                'debit' => 0.0,
-                'credit' => (float)$p->net_total,
-                'paid' => (float)$p->paid_amount,
-            ]);
-
-        // Payments (Debits)
-        $payments = Payment::where('supplier_id', $supplier->id)
-            ->whereDate('payment_date', '>=', $dateFrom)
-            ->whereDate('payment_date', '<=', $dateTo)
-            ->get()
-            ->map(fn($pm) => [
-                'id' => 'PAY-' . $pm->id,
-                'date' => $pm->payment_date ? $pm->payment_date->toDateString() : $pm->created_at->toDateString(),
-                'type' => 'payment',
-                'description' => 'سند صرف وسداد دفعة نقدية للمورد (' . $pm->payment_method . ')' . ($pm->notes ? ' - ' . $pm->notes : ''),
-                'debit' => (float)$pm->amount,
-                'credit' => 0.0,
-                'paid' => 0.0,
-            ]);
-
-        $ledger = $purchases->concat($payments)->sortBy('date')->values();
-
-        $runningBalance = (float)$supplier->initial_balance;
-        $ledgerWithRunning = $ledger->map(function ($row) use (&$runningBalance) {
-            $runningBalance += ($row['credit'] - $row['debit']);
-            $row['running_balance'] = $runningBalance;
-            return $row;
-        });
+        $ledgerData = $balanceService->getSupplierLedger($supplier, $dateFrom, $dateTo);
 
         return Inertia::render('Suppliers/Statement', [
             'supplier' => [
@@ -211,12 +176,8 @@ final class SupplierController extends Controller
                 'current_balance' => (float)$supplier->current_balance,
                 'initial_balance' => (float)$supplier->initial_balance,
             ],
-            'ledger' => $ledgerWithRunning,
-            'summary' => [
-                'total_purchases' => (float)$purchases->sum('credit'),
-                'total_payments' => (float)$payments->sum('debit'),
-                'net_balance' => (float)$supplier->current_balance,
-            ],
+            'ledger' => $ledgerData['ledger'],
+            'summary' => $ledgerData['summary'],
             'filters' => [
                 'from' => $dateFrom,
                 'to' => $dateTo,

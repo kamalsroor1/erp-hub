@@ -201,6 +201,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/suppliers/{id}', [\App\Http\Controllers\SupplierController::class, 'update'])->name('suppliers.update')->middleware('can:suppliers.manage');
     Route::delete('/suppliers/{id}', [\App\Http\Controllers\SupplierController::class, 'destroy'])->name('suppliers.destroy')->middleware('can:suppliers.manage');
     Route::post('/suppliers/{id}/pay', [\App\Http\Controllers\SupplierController::class, 'pay'])->name('suppliers.pay')->middleware('can:suppliers.manage');
+    Route::post('/suppliers/{id}/toggle-active', [\App\Http\Controllers\SupplierController::class, 'toggleActive'])->name('suppliers.toggle_active')->middleware('can:suppliers.manage');
     Route::get('/suppliers/{id}/statement', [\App\Http\Controllers\SupplierController::class, 'statement'])->name('suppliers.statement')->middleware('can:suppliers.statement');
     Route::get('/purchases', [\App\Http\Controllers\PurchaseController::class, 'index'])->name('purchases.index')->middleware('can:purchases.view');
     Route::get('/purchases/create', [\App\Http\Controllers\PurchaseController::class, 'create'])->name('purchases.create')->middleware('can:purchases.create');

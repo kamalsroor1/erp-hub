@@ -28,6 +28,27 @@ const applyFilters = () => {
     });
 };
 
+const setQuickDate = (range) => {
+    const today = new Date();
+    if (range === 'today') {
+        const str = today.toISOString().split('T')[0];
+        dateFrom.value = str;
+        dateTo.value = str;
+    } else if (range === 'this_month') {
+        const start = new Date(today.getFullYear(), today.getMonth(), 1);
+        dateFrom.value = start.toISOString().split('T')[0];
+        dateTo.value = today.toISOString().split('T')[0];
+    } else if (range === 'this_year') {
+        const start = new Date(today.getFullYear(), 0, 1);
+        dateFrom.value = start.toISOString().split('T')[0];
+        dateTo.value = today.toISOString().split('T')[0];
+    } else if (range === 'all') {
+        dateFrom.value = '';
+        dateTo.value = '';
+    }
+    applyFilters();
+};
+
 const printStatement = () => {
     window.print();
 };
@@ -101,20 +122,76 @@ const savePayment = () => {
             <div class="hidden print:block text-center border-b pb-4 mb-6">
                 <h1 class="text-2xl font-black">سرور كوفي - كشف حساب مورد تفصيلي</h1>
                 <div class="text-sm font-bold mt-1">المورد: {{ supplier.name }} {{ supplier.company_name ? '(' + supplier.company_name + ')' : '' }}</div>
-                <div class="text-xs text-gray-600">الفترة من: {{ filters.from }} إلى: {{ filters.to }}</div>
+                <div class="text-xs text-gray-600">الفترة من: {{ filters.from || 'البداية' }} إلى: {{ filters.to || 'اليوم' }}</div>
+            </div>
+
+            <!-- Filter Controls (Hidden on print) -->
+            <div class="print:hidden bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs font-bold text-slate-400">فترة التقرير:</span>
+                        <div class="flex items-center gap-1.5 bg-slate-950 p-1 rounded-2xl border border-slate-800 text-xs font-bold">
+                            <button
+                                @click="setQuickDate('today')"
+                                type="button"
+                                class="px-2.5 py-1 rounded-xl transition cursor-pointer text-slate-400 hover:text-white"
+                            >
+                                اليوم
+                            </button>
+                            <button
+                                @click="setQuickDate('this_month')"
+                                type="button"
+                                class="px-2.5 py-1 rounded-xl transition cursor-pointer text-slate-400 hover:text-white"
+                            >
+                                هذا الشهر
+                            </button>
+                            <button
+                                @click="setQuickDate('this_year')"
+                                type="button"
+                                class="px-2.5 py-1 rounded-xl transition cursor-pointer text-slate-400 hover:text-white"
+                            >
+                                هذه السنة
+                            </button>
+                            <button
+                                @click="setQuickDate('all')"
+                                type="button"
+                                class="px-2.5 py-1 rounded-xl transition cursor-pointer text-slate-400 hover:text-white"
+                            >
+                                كافة الحركات
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="w-36">
+                            <DatePicker v-model="dateFrom" placeholder="من تاريخ..." />
+                        </div>
+                        <span class="text-slate-500 text-xs">←</span>
+                        <div class="w-36">
+                            <DatePicker v-model="dateTo" placeholder="إلى تاريخ..." />
+                        </div>
+                        <button
+                            @click="applyFilters"
+                            type="button"
+                            class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer"
+                        >
+                            تطبيق
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Financial Summary Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">إجمالي المشتريات والتوريدات (دائن)</span>
+                    <span class="text-xs text-slate-400 font-bold">إجمالي المشتريات والتوريدات / دائن (+)</span>
                     <div class="text-2xl font-black font-mono text-white">
                         {{ formatMoney(summary.total_purchases) }} <span class="text-xs text-amber-400">ج.م</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">إجمالي المدفوعات وسندات الصرف (مدين)</span>
+                    <span class="text-xs text-slate-400 font-bold">إجمالي المدفوعات وسندات الصرف / مدين (-)</span>
                     <div class="text-2xl font-black font-mono text-emerald-400">
                         {{ formatMoney(summary.total_payments) }} <span class="text-xs text-white">ج.م</span>
                     </div>
@@ -123,28 +200,8 @@ const savePayment = () => {
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
                     <span class="text-xs text-slate-400 font-bold">الرصيد المتبقي مستحق للمورد (صافي المديونية)</span>
                     <div class="text-2xl font-black font-mono text-rose-400">
-                        {{ formatMoney(summary.net_balance) }} <span class="text-xs text-white">ج.م</span>
+                        {{ formatMoney(summary.current_balance) }} <span class="text-xs text-white">ج.م</span>
                     </div>
-                </div>
-            </div>
-
-            <!-- Filter Controls (Hidden on print) -->
-            <div class="print:hidden bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
-                <div class="flex items-center gap-2">
-                    <div class="w-36">
-                        <DatePicker v-model="dateFrom" placeholder="من تاريخ..." />
-                    </div>
-                    <span class="text-slate-500 text-xs">←</span>
-                    <div class="w-36">
-                        <DatePicker v-model="dateTo" placeholder="إلى تاريخ..." />
-                    </div>
-                    <button
-                        @click="applyFilters"
-                        type="button"
-                        class="h-10 px-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer"
-                    >
-                        تصفية التاريخ
-                    </button>
                 </div>
             </div>
 
@@ -155,34 +212,44 @@ const savePayment = () => {
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
                                 <th class="pb-3">التاريخ</th>
-                                <th class="pb-3">البيان والحركة</th>
-                                <th class="pb-3 font-mono">مدين (سداد للمورد)</th>
-                                <th class="pb-3 font-mono">دائن (شراء بضاعة)</th>
-                                <th class="pb-3 font-mono">الرصيد التراكمي</th>
+                                <th class="pb-3">نوع العملية</th>
+                                <th class="pb-3">رقم السند / الفاتورة</th>
+                                <th class="pb-3 font-mono text-white">دائن (+) [شراء]</th>
+                                <th class="pb-3 font-mono text-emerald-400">مدين (-) [سداد]</th>
+                                <th class="pb-3 font-mono text-amber-400">الرصيد بعد الحركة</th>
+                                <th class="pb-3">ملاحظات</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">
                             <tr v-for="(row, rIdx) in ledger" :key="rIdx" class="hover:bg-slate-800/30 transition">
-                                <td class="py-3.5 font-mono text-slate-400 text-[11px]">
+                                <td class="py-3 font-mono text-slate-400 text-[11px]">
                                     {{ row.date }}
                                 </td>
 
-                                <td class="py-3.5 font-tajawal font-bold text-white">
-                                    <span v-if="row.type === 'payment'" class="text-emerald-400 ml-1">💸</span>
+                                <td class="py-3 font-tajawal font-bold text-white">
+                                    <span v-if="row.type && row.type.includes('صرف')" class="text-emerald-400 ml-1">💸</span>
                                     <span v-else class="text-amber-400 ml-1">📦</span>
-                                    {{ row.description }}
+                                    {{ row.type }}
                                 </td>
 
-                                <td class="py-3.5 font-mono font-bold text-emerald-400">
-                                    {{ row.debit > 0 ? formatMoney(row.debit) + ' ج.م' : '—' }}
+                                <td class="py-3 font-mono text-slate-300 font-bold">
+                                    {{ row.ref_number || '—' }}
                                 </td>
 
-                                <td class="py-3.5 font-mono font-bold text-white">
+                                <td class="py-3 font-mono font-bold text-white">
                                     {{ row.credit > 0 ? formatMoney(row.credit) + ' ج.م' : '—' }}
                                 </td>
 
-                                <td class="py-3.5 font-mono font-black text-rose-400 text-sm">
-                                    {{ formatMoney(row.running_balance) }} ج.م
+                                <td class="py-3 font-mono font-bold text-emerald-400">
+                                    {{ row.debit > 0 ? formatMoney(row.debit) + ' ج.م' : '—' }}
+                                </td>
+
+                                <td class="py-3 font-mono font-black text-rose-400 text-sm">
+                                    {{ formatMoney(row.balance_after) }} ج.م
+                                </td>
+
+                                <td class="py-3 font-tajawal text-slate-400 text-[11px]">
+                                    {{ row.notes || '—' }}
                                 </td>
                             </tr>
                         </tbody>
