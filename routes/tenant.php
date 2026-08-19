@@ -7,20 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
-use App\Livewire\Auth\Login;
-use App\Livewire\InvoiceCreate;
-use App\Livewire\InvoiceIndex;
-use App\Livewire\InvoiceShow;
-use App\Livewire\ItemIndex;
-use App\Livewire\CustomerIndex;
-use App\Livewire\CustomerStatement;
-use App\Livewire\SupplierIndex;
-use App\Livewire\SupplierStatement;
-use App\Livewire\PurchaseCreate;
-use App\Livewire\PurchaseIndex;
-use App\Livewire\ReturnCreate;
-use App\Livewire\ReturnIndex;
-use App\Livewire\ReportsIndex;
 use App\Models\Invoice;
 
 /*
@@ -60,7 +46,8 @@ Route::middleware([
 
         Route::get('/invoices', [\App\Http\Controllers\InvoiceController::class, 'index'])->name('invoices.index')->middleware('can:invoices.view');
         Route::get('/invoices/{id}', [\App\Http\Controllers\InvoiceController::class, 'show'])->name('invoices.show')->middleware('can:invoices.view');
-        Route::get('/invoices/{id}/edit', App\Livewire\InvoiceEdit::class)->name('invoices.edit')->middleware('can:invoices.edit');
+        Route::get('/invoices/{id}/edit', [\App\Http\Controllers\InvoiceController::class, 'edit'])->name('invoices.edit')->middleware('can:invoices.edit');
+        Route::put('/invoices/{id}', [\App\Http\Controllers\InvoiceController::class, 'update'])->name('invoices.update')->middleware('can:invoices.edit');
 
         // Printing Routes
         Route::get('/invoices/{id}/print/thermal', function ($id) {
@@ -141,7 +128,7 @@ Route::middleware([
         Route::post('/items', [\App\Http\Controllers\ItemController::class, 'store'])->name('items.store')->middleware('can:items.manage');
         Route::put('/items/{id}', [\App\Http\Controllers\ItemController::class, 'update'])->name('items.update')->middleware('can:items.manage');
         Route::delete('/items/{id}', [\App\Http\Controllers\ItemController::class, 'destroy'])->name('items.destroy')->middleware('can:items.manage');
-        Route::get('/items/{id}/movements', App\Livewire\ItemMovements::class)->name('items.movements')->middleware('can:items.view');
+        Route::get('/items/{id}/movements', [\App\Http\Controllers\ItemController::class, 'movements'])->name('items.movements')->middleware('can:items.view');
         Route::get('/items/{id}/movements/print', function ($id, \Illuminate\Http\Request $request) {
             $item = \App\Models\Item::withTrashed()->findOrFail($id);
             $storeId = ($request->query('store_id') && $request->query('store_id') !== 'all') ? (int)$request->query('store_id') : null;
@@ -224,7 +211,7 @@ Route::middleware([
         Route::put('/suppliers/{id}', [\App\Http\Controllers\SupplierController::class, 'update'])->name('suppliers.update')->middleware('can:suppliers.manage');
         Route::delete('/suppliers/{id}', [\App\Http\Controllers\SupplierController::class, 'destroy'])->name('suppliers.destroy')->middleware('can:suppliers.manage');
         Route::post('/suppliers/{id}/pay', [\App\Http\Controllers\SupplierController::class, 'pay'])->name('suppliers.pay')->middleware('can:suppliers.manage');
-        Route::get('/suppliers/{id}/statement', SupplierStatement::class)->name('suppliers.statement')->middleware('can:suppliers.statement');
+        Route::get('/suppliers/{id}/statement', [\App\Http\Controllers\SupplierController::class, 'statement'])->name('suppliers.statement')->middleware('can:suppliers.statement');
         Route::get('/purchases', [\App\Http\Controllers\PurchaseController::class, 'index'])->name('purchases.index')->middleware('can:purchases.view');
         Route::get('/purchases/create', [\App\Http\Controllers\PurchaseController::class, 'create'])->name('purchases.create')->middleware('can:purchases.create');
         Route::post('/purchases', [\App\Http\Controllers\PurchaseController::class, 'store'])->name('purchases.store')->middleware('can:purchases.create');
