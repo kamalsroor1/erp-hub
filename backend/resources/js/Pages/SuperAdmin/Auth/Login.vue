@@ -91,9 +91,9 @@ const fillDemoCredentials = () => {
                             <button
                                 @click="showPassword = !showPassword"
                                 type="button"
-                                class="absolute end-3 top-2.5 p-1 text-slate-500 hover:text-slate-300 transition"
+                                class="w-9 h-9 absolute end-1.5 inset-y-0 my-auto flex items-center justify-center text-slate-400 hover:text-purple-400 transition active:scale-90 cursor-pointer"
                             >
-                                <span class="text-xs">{{ showPassword ? '🙈' : '👁️' }}</span>
+                                <span class="text-sm">{{ showPassword ? '🙈' : '👁️' }}</span>
                             </button>
                         </div>
                         <p v-if="form.errors.password" class="text-[11px] text-rose-400 font-bold mt-1">{{ form.errors.password }}</p>
@@ -101,11 +101,11 @@ const fillDemoCredentials = () => {
 
                     <!-- Remember Me Checkbox -->
                     <div class="flex items-center justify-between pt-1">
-                        <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-400 font-bold">
+                        <label class="min-h-[40px] flex items-center gap-2 cursor-pointer text-xs text-slate-400 font-bold select-none">
                             <input
                                 v-model="form.remember"
                                 type="checkbox"
-                                class="w-4 h-4 rounded-md bg-slate-950 border-slate-800 text-purple-600 focus:ring-purple-500/30"
+                                class="w-4 h-4 rounded-md bg-slate-950 border-slate-800 text-purple-600 focus:ring-purple-500/30 cursor-pointer"
                             />
                             <span>تذكر جلسة الدخول</span>
                         </label>
@@ -113,7 +113,7 @@ const fillDemoCredentials = () => {
                         <button
                             @click="fillDemoCredentials"
                             type="button"
-                            class="text-[11px] text-purple-400 hover:text-purple-300 font-bold transition"
+                            class="min-h-[40px] px-2 text-[11px] text-purple-400 hover:text-purple-300 font-bold transition active:scale-95 cursor-pointer flex items-center"
                         >
                             ⚡ تعبئة حساب السوبر أدمن
                         </button>
@@ -123,7 +123,7 @@ const fillDemoCredentials = () => {
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="w-full h-12 rounded-2xl bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30 transition transform active:scale-98 disabled:opacity-50 cursor-pointer"
+                        class="w-full h-12 rounded-2xl bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30 transition transform active:scale-95 disabled:opacity-50 cursor-pointer"
                     >
                         <span v-if="form.processing" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                         <span v-else>👑 تسجيل الدخول للوحة المركزية</span>

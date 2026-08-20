@@ -199,24 +199,24 @@ const getPaymentTypeBadge = (type) => {
                     </div>
 
                     <!-- Bar Chart -->
-                    <div class="grid grid-cols-7 gap-3 items-end h-48 pt-4 pb-2">
+                    <div class="grid grid-cols-7 gap-1 sm:gap-3 items-end h-48 pt-4 pb-2">
                         <div
                             v-for="(day, dIdx) in analytics.daily_trend"
                             :key="dIdx"
-                            class="flex flex-col items-center gap-2 h-full justify-end group relative"
+                            class="flex flex-col items-center gap-1.5 sm:gap-2 h-full justify-end group relative"
                         >
-                            <span class="text-xs font-mono font-bold text-slate-700 dark:text-slate-200">
+                            <span class="text-[10px] sm:text-xs font-mono font-bold text-slate-700 dark:text-slate-200">
                                 {{ day.sales > 0 ? Number(day.sales).toFixed(0) : '0' }}
                             </span>
 
-                            <div class="w-full bg-slate-100 dark:bg-slate-800/80 rounded-2xl overflow-hidden flex items-end h-32">
+                            <div class="w-full bg-slate-100 dark:bg-slate-800/80 rounded-xl sm:rounded-2xl overflow-hidden flex items-end h-32">
                                 <div
                                     :style="{ height: `${Math.max(8, Math.round((day.sales / maxDailySales) * 100))}%` }"
-                                    class="w-full rounded-2xl transition-all duration-500 bg-theme-gradient shadow-theme-sm"
+                                    class="w-full rounded-xl sm:rounded-2xl transition-all duration-500 bg-theme-gradient shadow-theme-sm"
                                 ></div>
                             </div>
 
-                            <span class="text-xs font-bold text-slate-600 dark:text-slate-300 truncate w-full text-center">
+                            <span class="text-[10px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 truncate w-full text-center">
                                 {{ day.label }}
                             </span>
                         </div>
@@ -224,7 +224,7 @@ const getPaymentTypeBadge = (type) => {
                 </div>
 
                 <!-- Peak Hours & Payment Split (1 Col) -->
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-5 flex flex-col justify-between">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-5 flex flex-col justify-between">
                     <div class="space-y-4">
                         <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                             <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
@@ -237,16 +237,16 @@ const getPaymentTypeBadge = (type) => {
                         </div>
 
                         <!-- 24-Hour Micro Heatmap -->
-                        <div class="grid grid-cols-12 gap-1.5 pt-1">
+                        <div class="grid grid-cols-12 gap-1 sm:gap-1.5 pt-1">
                             <div
                                 v-for="(h, hIdx) in (analytics.hourly_sales || [])"
                                 :key="hIdx"
-                                class="h-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-end overflow-hidden border border-slate-200 dark:border-slate-700/50"
+                                class="h-8 sm:h-9 rounded-md sm:rounded-lg bg-slate-100 dark:bg-slate-800 flex items-end overflow-hidden border border-slate-200 dark:border-slate-700/50"
                                 :title="`${h.label}: ${h.sales_formatted}`"
                             >
                                 <div
                                     v-if="h.intensity > 0"
-                                    class="w-full bg-theme-primary rounded-b-lg"
+                                    class="w-full bg-theme-primary rounded-b-md sm:rounded-b-lg"
                                     :style="{ height: `${Math.max(20, h.intensity)}%` }"
                                 ></div>
                             </div>
@@ -255,7 +255,7 @@ const getPaymentTypeBadge = (type) => {
 
                     <!-- Payment Split -->
                     <div class="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-800">
-                        <span class="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                        <span class="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
                             <CreditCard class="w-4 h-4 text-slate-500 dark:text-slate-400" />
                             <span>{{ $t('dashboard.collection_methods') }}</span>
                         </span>
@@ -282,21 +282,22 @@ const getPaymentTypeBadge = (type) => {
             <!-- Two-Column Section: Recent Invoices & Low Stock Radar -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Left: Recent Sales Invoices (2 Columns) -->
-                <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-5">
+                <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 space-y-4 sm:space-y-5 shadow-xs">
                     <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                         <div class="flex items-center gap-2.5">
                             <Receipt class="w-5 h-5 text-theme-primary" />
                             <h2 class="text-base lg:text-lg font-black text-slate-900 dark:text-white">{{ $t('dashboard.recent_invoices_title') }}</h2>
                         </div>
-                        <Link href="/invoices" class="text-xs font-black text-theme-primary hover:underline transition">
+                        <Link href="/invoices" class="text-xs font-black text-theme-primary hover:underline transition active:scale-95">
                             {{ $t('dashboard.view_all') }}
                         </Link>
                     </div>
 
-                    <div class="overflow-x-auto">
+                    <!-- Desktop Table -->
+                    <div class="hidden md:block overflow-x-auto">
                         <table class="w-full text-right text-sm">
                             <thead>
-                                <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
+                                <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold text-xs">
                                     <th class="pb-3">{{ $t('dashboard.invoice_number_col') }}</th>
                                     <th class="pb-3">{{ $t('dashboard.customer_col') }}</th>
                                     <th class="pb-3">{{ $t('dashboard.payment_method_col') }}</th>
@@ -305,7 +306,7 @@ const getPaymentTypeBadge = (type) => {
                                     <th class="pb-3 text-left">{{ $t('dashboard.time_col') }}</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans text-xs">
                                 <tr v-for="inv in recent_invoices" :key="inv.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
                                     <td class="py-3.5 font-mono font-black text-theme-primary">
                                         <Link :href="`/invoices/${inv.id}`" class="hover:underline">
@@ -324,21 +325,55 @@ const getPaymentTypeBadge = (type) => {
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
 
-                        <div v-if="recent_invoices.length === 0" class="py-12 text-center text-slate-400 font-bold">
-                            {{ $t('dashboard.no_invoices_today') }}
+                    <!-- Mobile Cards -->
+                    <div class="md:hidden space-y-3">
+                        <div
+                            v-for="inv in recent_invoices"
+                            :key="inv.id"
+                            class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-2.5 shadow-xs"
+                        >
+                            <div class="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+                                <Link :href="`/invoices/${inv.id}`" class="font-mono font-black text-sm text-theme-primary hover:underline">
+                                    #{{ inv.invoice_number }}
+                                </Link>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-black" :class="getPaymentTypeBadge(inv.payment_type).class">
+                                    {{ getPaymentTypeBadge(inv.payment_type).label }}
+                                </span>
+                            </div>
+
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="font-bold text-slate-800 dark:text-slate-200 font-tajawal">{{ inv.customer_name }}</span>
+                                <span class="font-mono text-slate-400 text-[10px]">{{ inv.created_at }}</span>
+                            </div>
+
+                            <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-200 dark:border-slate-800">
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block font-tajawal">الإجمالي</span>
+                                    <span class="font-mono font-black text-slate-900 dark:text-white">{{ formatMoney(inv.net_total) }} {{ $t('common.currency') }}</span>
+                                </div>
+                                <div class="text-left">
+                                    <span class="text-[10px] text-slate-400 block font-tajawal">المدفوع</span>
+                                    <span class="font-mono font-black text-emerald-600 dark:text-emerald-400">{{ formatMoney(inv.paid_amount) }} {{ $t('common.currency') }}</span>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+
+                    <div v-if="recent_invoices.length === 0" class="py-12 text-center text-slate-400 font-bold text-xs">
+                        {{ $t('dashboard.no_invoices_today') }}
                     </div>
                 </div>
 
                 <!-- Right: Low Stock Radar -->
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-5">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 space-y-4 sm:space-y-5 shadow-xs">
                     <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                         <div class="flex items-center gap-2.5">
                             <AlertTriangle class="w-5 h-5 text-rose-500" />
-                            <h2 class="text-base font-black text-slate-900 dark:text-white">{{ $t('dashboard.low_stock_radar_title') }}</h2>
+                            <h2 class="text-base lg:text-lg font-black text-slate-900 dark:text-white">{{ $t('dashboard.low_stock_radar_title') }}</h2>
                         </div>
-                        <Link href="/purchases/smart-reorder" class="text-xs font-black text-theme-primary hover:underline transition">
+                        <Link href="/purchases/smart-reorder" class="text-xs font-black text-theme-primary hover:underline transition active:scale-95">
                             {{ $t('dashboard.purchases_assistant') }}
                         </Link>
                     </div>

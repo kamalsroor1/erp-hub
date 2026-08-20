@@ -53,13 +53,13 @@ const isAllowed = computed(() => {
     </template>
     <template v-else-if="showFallback">
         <slot name="fallback">
-            <div class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-between text-xs text-amber-500">
+            <div class="p-3.5 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs text-amber-500 font-tajawal shadow-xs">
                 <div class="flex items-center gap-2">
-                    <span>🔒</span>
-                    <span class="font-bold">هذه الميزة تتطلب ترقية الباقة</span>
+                    <span class="text-sm">🔒</span>
+                    <span class="font-bold">{{ $t('super.plan_upgrade_required') || 'هذه الميزة تتطلب ترقية الباقة' }}</span>
                 </div>
-                <a href="/pricing" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-lg text-[10px] transition">
-                    ترقية الآن
+                <a href="/pricing" class="h-8 px-3.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center transition active:scale-95 shadow-xs">
+                    {{ $t('super.upgrade_now') || 'ترقية الآن' }}
                 </a>
             </div>
         </slot>

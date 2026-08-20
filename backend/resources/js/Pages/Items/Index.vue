@@ -586,10 +586,10 @@ const deleteItem = (item) => {
         <div
             v-if="showItemModal"
             @click="showItemModal = false"
-            class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
+            class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 font-tajawal"
             dir="rtl"
         >
-            <div @click.stop class="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div @click.stop class="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
                 <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                     <div class="flex items-center gap-2">
                         <Package class="w-5 h-5 text-theme-primary" />
@@ -597,7 +597,10 @@ const deleteItem = (item) => {
                             {{ editingItem ? $t('inventory.item_updated') : $t('inventory.add_new_item') }}
                         </h3>
                     </div>
-                    <button @click="showItemModal = false" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-400 text-xs hover:text-slate-900 dark:hover:text-white cursor-pointer flex items-center justify-center">
+                    <button
+                        @click="showItemModal = false"
+                        class="w-9 h-9 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-400 text-xs hover:text-slate-900 dark:hover:text-white cursor-pointer flex items-center justify-center transition active:scale-90 shadow-xs"
+                    >
                         <X class="w-4 h-4" />
                     </button>
                 </div>
@@ -610,19 +613,19 @@ const deleteItem = (item) => {
                             type="text"
                             required
                             :placeholder="$t('inventory.item_name')"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none"
+                            class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner"
                         >
                         <p v-if="itemForm.errors.name" class="text-rose-400 text-[10px]">{{ itemForm.errors.name }}</p>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="space-y-1.5">
                             <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('inventory.item_code') }} / {{ $t('inventory.barcode') }}</label>
                             <input
                                 v-model="itemForm.code"
                                 type="text"
                                 :placeholder="$t('inventory.barcode_placeholder')"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono focus:border-amber-500 focus:outline-none"
+                                class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono focus:border-amber-500 focus:outline-none shadow-inner"
                             >
                         </div>
 
@@ -632,17 +635,17 @@ const deleteItem = (item) => {
                                 v-model="itemForm.category"
                                 type="text"
                                 :placeholder="$t('inventory.category_placeholder')"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none"
+                                class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner"
                             >
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div class="space-y-1.5">
                             <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('inventory.unit') }} *</label>
                             <select
                                 v-model="itemForm.unit"
-                                class="w-full px-3 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none"
+                                class="w-full h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner font-bold"
                             >
                                 <option value="كجم">{{ $t('inventory.unit_weight_short') }} (كجم)</option>
                                 <option value="جرام">جرام</option>
@@ -658,7 +661,7 @@ const deleteItem = (item) => {
                                 type="number"
                                 step="0.001"
                                 required
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono focus:border-amber-500 focus:outline-none"
+                                class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono focus:border-amber-500 focus:outline-none shadow-inner"
                             >
                         </div>
 
@@ -669,7 +672,7 @@ const deleteItem = (item) => {
                                 type="number"
                                 step="0.001"
                                 required
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono focus:border-amber-500 focus:outline-none"
+                                class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono focus:border-amber-500 focus:outline-none shadow-inner"
                             >
                         </div>
                     </div>
@@ -680,7 +683,7 @@ const deleteItem = (item) => {
                             v-model="itemForm.min_stock_level"
                             type="number"
                             step="0.001"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono focus:border-amber-500 focus:outline-none"
+                            class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono focus:border-amber-500 focus:outline-none shadow-inner"
                         >
                     </div>
 
@@ -689,22 +692,22 @@ const deleteItem = (item) => {
                         <textarea
                             v-model="itemForm.notes"
                             rows="2"
-                            class="w-full px-3.5 py-2 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none"
+                            class="w-full p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner"
                         ></textarea>
                     </div>
 
-                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
+                    <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200 dark:border-slate-800">
                         <button
                             @click="showItemModal = false"
                             type="button"
-                            class="px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                            class="h-11 px-5 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95 cursor-pointer shadow-xs"
                         >
                             {{ $t('common.cancel') }}
                         </button>
                         <button
                             type="submit"
                             :disabled="itemForm.processing"
-                            class="px-5 py-2.5 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                            class="h-11 px-6 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50 shadow-theme-primary"
                         >
                             {{ itemForm.processing ? '...' : (editingItem ? $t('common.save') : $t('inventory.add_new_item')) }}
                         </button>

@@ -86,7 +86,7 @@ const fillAccount = (phone, password) => {
                             autofocus
                             dir="ltr"
                             :placeholder="$t('auth.phone_placeholder')"
-                            class="w-full pr-10 pl-4 py-3 bg-slate-950/80 border border-slate-700 rounded-2xl text-white text-sm font-mono focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-none transition-all placeholder:text-slate-500"
+                            class="w-full h-11 pr-10 pl-4 bg-slate-950/80 border border-slate-700 rounded-2xl text-white text-xs sm:text-sm font-mono focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-none transition-all placeholder:text-slate-500 shadow-inner"
                             :class="{ 'border-rose-500 focus:ring-rose-500': form.errors.phone }"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 pointer-events-none">
@@ -108,7 +108,7 @@ const fillAccount = (phone, password) => {
                             required
                             dir="ltr"
                             :placeholder="$t('auth.password_placeholder')"
-                            class="w-full pr-10 pl-11 py-3 bg-slate-950/80 border border-slate-700 rounded-2xl text-white text-sm font-mono focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-none transition-all placeholder:text-slate-500"
+                            class="w-full h-11 pr-10 pl-11 bg-slate-950/80 border border-slate-700 rounded-2xl text-white text-xs sm:text-sm font-mono focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-none transition-all placeholder:text-slate-500 shadow-inner"
                             :class="{ 'border-rose-500 focus:ring-rose-500': form.errors.password }"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 pointer-events-none">
@@ -117,7 +117,7 @@ const fillAccount = (phone, password) => {
                         <button
                             type="button"
                             @click="showPassword = !showPassword"
-                            class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"
+                            class="w-9 h-9 absolute inset-y-0 left-1 my-auto flex items-center justify-center text-slate-400 hover:text-amber-400 transition-colors cursor-pointer active:scale-90"
                         >
                             <Eye v-if="!showPassword" class="w-4 h-4" />
                             <EyeOff v-else class="w-4 h-4" />
@@ -130,7 +130,7 @@ const fillAccount = (phone, password) => {
 
                 <!-- Remember Me Checkbox -->
                 <div class="flex items-center justify-between pt-1">
-                    <label class="flex items-center gap-2 cursor-pointer select-none">
+                    <label class="min-h-[40px] flex items-center gap-2 cursor-pointer select-none">
                         <input
                             v-model="form.remember"
                             type="checkbox"
@@ -147,7 +147,7 @@ const fillAccount = (phone, password) => {
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="w-full py-3.5 px-6 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-black rounded-2xl shadow-lg shadow-amber-600/30 hover:shadow-amber-500/40 transition-all font-tajawal flex items-center justify-center gap-2 cursor-pointer text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="w-full h-12 px-6 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-black rounded-2xl shadow-lg shadow-amber-600/30 hover:shadow-amber-500/40 transition-all font-tajawal flex items-center justify-center gap-2 cursor-pointer text-xs sm:text-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <template v-if="!form.processing">
                             <LogIn class="w-4 h-4" />
@@ -177,7 +177,7 @@ const fillAccount = (phone, password) => {
                     <button
                         type="button"
                         @click="fillAccount('01012316954', 'password')"
-                        class="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/60 text-right transition-colors cursor-pointer group shadow-xs"
+                        class="min-h-[50px] w-full flex items-center justify-between p-3 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700/60 text-right transition-colors active:scale-98 cursor-pointer group shadow-xs"
                     >
                         <div>
                             <p class="font-bold text-white group-hover:text-amber-400 transition-colors flex items-center gap-1.5">
@@ -194,7 +194,7 @@ const fillAccount = (phone, password) => {
                     <button
                         type="button"
                         @click="fillAccount('01558088841', '123456789')"
-                        class="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/60 text-right transition-colors cursor-pointer group shadow-xs"
+                        class="min-h-[50px] w-full flex items-center justify-between p-3 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700/60 text-right transition-colors active:scale-98 cursor-pointer group shadow-xs"
                     >
                         <div>
                             <p class="font-bold text-white group-hover:text-amber-400 transition-colors flex items-center gap-1.5">

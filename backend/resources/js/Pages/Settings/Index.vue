@@ -193,9 +193,9 @@ const clearCache = () => {
     <AppLayout>
         <div class="space-y-6 font-tajawal">
             <!-- Header Banner -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-theme-light border border-theme-light text-theme-primary flex items-center justify-center text-2xl font-bold shadow-xs">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-theme-light border border-theme-light text-theme-primary flex items-center justify-center text-2xl font-bold shadow-xs shrink-0">
                         <Settings class="w-6 h-6" />
                     </div>
                     <div>
@@ -208,11 +208,11 @@ const clearCache = () => {
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 w-full sm:w-auto">
                     <button
                         @click="clearCache"
                         type="button"
-                        class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-xs"
+                        class="w-full sm:w-auto h-11 px-5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
                     >
                         <RefreshCw class="w-3.5 h-3.5" />
                         <span>{{ $t('settings.clear_cache_btn') }}</span>
@@ -221,11 +221,11 @@ const clearCache = () => {
             </div>
 
             <!-- Navigation Tabs (5 Tabs) -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 bg-slate-100 dark:bg-slate-950 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2 bg-slate-100 dark:bg-slate-950 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 font-tajawal">
                 <button
                     @click="currentTab = 'branding'"
                     type="button"
-                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
+                    class="min-h-[44px] py-2.5 px-3 rounded-xl font-bold text-xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-center"
                     :class="currentTab === 'branding' ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
                     <Building2 class="w-4 h-4" />
@@ -235,7 +235,7 @@ const clearCache = () => {
                 <button
                     @click="currentTab = 'theme'"
                     type="button"
-                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
+                    class="min-h-[44px] py-2.5 px-3 rounded-xl font-bold text-xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-center"
                     :class="currentTab === 'theme' ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
                     <Palette class="w-4 h-4" />
@@ -245,7 +245,7 @@ const clearCache = () => {
                 <button
                     @click="currentTab = 'telegram'"
                     type="button"
-                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
+                    class="min-h-[44px] py-2.5 px-3 rounded-xl font-bold text-xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-center"
                     :class="currentTab === 'telegram' ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
                     <Send class="w-4 h-4" />
@@ -255,7 +255,7 @@ const clearCache = () => {
                 <button
                     @click="currentTab = 'backup'"
                     type="button"
-                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
+                    class="min-h-[44px] py-2.5 px-3 rounded-xl font-bold text-xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-center"
                     :class="currentTab === 'backup' ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
                     <HardDrive class="w-4 h-4" />
@@ -265,7 +265,7 @@ const clearCache = () => {
                 <button
                     @click="currentTab = 'system'"
                     type="button"
-                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
+                    class="min-h-[44px] py-2.5 px-3 rounded-xl font-bold text-xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-center col-span-2 sm:col-span-1"
                     :class="currentTab === 'system' ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
                     <Cpu class="w-4 h-4" />
@@ -509,7 +509,7 @@ const clearCache = () => {
                                     v-model="form.company_name"
                                     type="text"
                                     required
-                                    class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
                                 >
                             </div>
 
@@ -518,7 +518,7 @@ const clearCache = () => {
                                 <input
                                     v-model="form.company_subtitle"
                                     type="text"
-                                    class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
                                 >
                             </div>
 
@@ -527,7 +527,7 @@ const clearCache = () => {
                                 <input
                                     v-model="form.company_phone"
                                     type="text"
-                                    class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
                                 >
                             </div>
 
@@ -536,7 +536,7 @@ const clearCache = () => {
                                 <input
                                     v-model="form.company_address"
                                     type="text"
-                                    class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
                                 >
                             </div>
 
@@ -545,7 +545,7 @@ const clearCache = () => {
                                 <textarea
                                     v-model="form.invoice_footer_note"
                                     rows="2"
-                                    class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
+                                    class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
                                 ></textarea>
                             </div>
                         </div>
@@ -554,23 +554,23 @@ const clearCache = () => {
                         <div class="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-800">
                             <h3 class="text-xs font-black text-theme-primary">{{ $t('settings.print_options_title') }}</h3>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <label class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary cursor-pointer transition">
-                                    <input type="checkbox" v-model="form.show_print_logo" class="rounded accent-theme-primary focus:ring-0">
+                                <label class="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary cursor-pointer transition active:scale-98 min-h-[48px]">
+                                    <input type="checkbox" v-model="form.show_print_logo" class="w-4 h-4 rounded accent-theme-primary focus:ring-0">
                                     <span class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('settings.show_print_logo') }}</span>
                                 </label>
 
-                                <label class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary cursor-pointer transition">
-                                    <input type="checkbox" v-model="form.show_print_company_name" class="rounded accent-theme-primary focus:ring-0">
+                                <label class="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary cursor-pointer transition active:scale-98 min-h-[48px]">
+                                    <input type="checkbox" v-model="form.show_print_company_name" class="w-4 h-4 rounded accent-theme-primary focus:ring-0">
                                     <span class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('settings.show_print_name') }}</span>
                                 </label>
 
-                                <label class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary cursor-pointer transition">
-                                    <input type="checkbox" v-model="form.thermal_show_customer_balance" class="rounded accent-theme-primary focus:ring-0">
+                                <label class="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary cursor-pointer transition active:scale-98 min-h-[48px]">
+                                    <input type="checkbox" v-model="form.thermal_show_customer_balance" class="w-4 h-4 rounded accent-theme-primary focus:ring-0">
                                     <span class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('settings.show_thermal_balance') }}</span>
                                 </label>
 
-                                <label class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary cursor-pointer transition">
-                                    <input type="checkbox" v-model="form.print_show_qr" class="rounded accent-theme-primary focus:ring-0">
+                                <label class="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary cursor-pointer transition active:scale-98 min-h-[48px]">
+                                    <input type="checkbox" v-model="form.print_show_qr" class="w-4 h-4 rounded accent-theme-primary focus:ring-0">
                                     <span class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('settings.show_qr') }}</span>
                                 </label>
                             </div>
@@ -581,7 +581,7 @@ const clearCache = () => {
                             <button
                                 type="submit"
                                 :disabled="form.processing"
-                                class="h-12 px-8 rounded-2xl btn-primary-theme font-black text-xs transition transform active:scale-95 cursor-pointer disabled:opacity-50 flex items-center gap-2"
+                                class="w-full sm:w-auto h-12 px-8 rounded-2xl btn-primary-theme font-black text-xs sm:text-sm transition transform active:scale-95 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-theme-primary"
                             >
                                 <Save class="w-4 h-4" />
                                 <span>{{ form.processing ? $t('common.save') : $t('settings.save_branding_btn') }}</span>
@@ -594,8 +594,8 @@ const clearCache = () => {
             <!-- Tab 2: Telegram Notifications -->
             <div v-if="currentTab === 'telegram'" class="space-y-6">
                 <form @submit.prevent="saveSettings" class="space-y-6">
-                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-6">
-                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 gap-3">
                             <div>
                                 <h2 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
                                     <Send class="w-4 h-4 text-theme-primary" />
@@ -604,8 +604,8 @@ const clearCache = () => {
                                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ $t('settings.telegram_sub') }}</p>
                             </div>
 
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" v-model="form.telegram_notifications_enabled" class="rounded accent-theme-primary focus:ring-0">
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" v-model="form.telegram_notifications_enabled" class="w-4 h-4 rounded accent-theme-primary focus:ring-0">
                                 <span class="text-xs font-bold text-slate-900 dark:text-white">{{ $t('settings.enable_bot') }}</span>
                             </label>
                         </div>
@@ -617,7 +617,7 @@ const clearCache = () => {
                                     v-model="form.telegram_bot_token"
                                     type="text"
                                     placeholder="123456789:ABCdef..."
-                                    class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
                                 >
                             </div>
 
@@ -627,7 +627,7 @@ const clearCache = () => {
                                     v-model="form.telegram_chat_id"
                                     type="text"
                                     placeholder="-100xxxxxxxxx أو 12345678"
-                                    class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
                                 >
                             </div>
                         </div>
@@ -635,11 +635,11 @@ const clearCache = () => {
                         <!-- Live Action Testing Triggers -->
                         <div class="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-800">
                             <h3 class="text-xs font-black text-theme-primary">{{ $t('settings.telegram_actions_title') }}</h3>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
                                 <button
                                     @click="sendTelegramTest"
                                     type="button"
-                                    class="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                                    class="min-h-[48px] p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                                 >
                                     <Send class="w-4 h-4 text-theme-primary" />
                                     <span>{{ $t('settings.send_test_msg') }}</span>
@@ -648,7 +648,7 @@ const clearCache = () => {
                                 <button
                                     @click="sendDailySummary"
                                     type="button"
-                                    class="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                                    class="min-h-[48px] p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                                 >
                                     <BarChart3 class="w-4 h-4 text-emerald-500" />
                                     <span>{{ $t('settings.send_daily_summary') }}</span>
@@ -657,7 +657,7 @@ const clearCache = () => {
                                 <button
                                     @click="sendLowStock"
                                     type="button"
-                                    class="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                                    class="min-h-[48px] p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                                 >
                                     <AlertTriangle class="w-4 h-4 text-rose-500" />
                                     <span>{{ $t('settings.send_low_stock') }}</span>
@@ -666,7 +666,7 @@ const clearCache = () => {
                                 <button
                                     @click="sendOverdueShift"
                                     type="button"
-                                    class="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                                    class="min-h-[48px] p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                                 >
                                     <RotateCcw class="w-4 h-4 text-amber-500" />
                                     <span>{{ $t('settings.send_overdue_shifts') }}</span>
@@ -675,7 +675,7 @@ const clearCache = () => {
                                 <button
                                     @click="sendBackupTelegram"
                                     type="button"
-                                    class="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                                    class="min-h-[48px] p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                                 >
                                     <HardDrive class="w-4 h-4 text-indigo-500" />
                                     <span>{{ $t('settings.send_backup_telegram') }}</span>
@@ -687,7 +687,7 @@ const clearCache = () => {
                             <button
                                 type="submit"
                                 :disabled="form.processing"
-                                class="h-12 px-8 rounded-2xl btn-primary-theme font-black text-xs transition transform active:scale-95 cursor-pointer disabled:opacity-50 flex items-center gap-2"
+                                class="w-full sm:w-auto h-12 px-8 rounded-2xl btn-primary-theme font-black text-xs sm:text-sm transition transform active:scale-95 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-theme-primary"
                             >
                                 <Save class="w-4 h-4" />
                                 <span>{{ $t('settings.save_telegram_btn') }}</span>
@@ -699,17 +699,17 @@ const clearCache = () => {
 
             <!-- Tab 3: Backups -->
             <div v-if="currentTab === 'backup'" class="space-y-6">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-6">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-6">
                     <div class="border-b border-slate-200 dark:border-slate-800 pb-4">
-                        <h2 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        <h2 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
                             <HardDrive class="w-4 h-4 text-theme-primary" />
                             <span>{{ $t('settings.backup_title') }}</span>
                         </h2>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ $t('settings.backup_sub') }}</p>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-3 flex flex-col justify-between">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                        <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3 flex flex-col justify-between shadow-xs">
                             <div class="space-y-2">
                                 <h3 class="text-xs font-black text-slate-900 dark:text-white flex items-center gap-2">
                                     <HardDrive class="w-4 h-4 text-indigo-500" />
@@ -722,14 +722,14 @@ const clearCache = () => {
 
                             <a
                                 href="/settings/backup/download"
-                                class="h-11 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-indigo-600/30 transition cursor-pointer"
+                                class="w-full h-11 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-indigo-600/30 transition active:scale-95 cursor-pointer mt-2"
                             >
                                 <HardDrive class="w-4 h-4" />
                                 <span>{{ $t('settings.download_sql_btn') }}</span>
                             </a>
                         </div>
 
-                        <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-3 flex flex-col justify-between">
+                        <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3 flex flex-col justify-between shadow-xs">
                             <div class="space-y-2">
                                 <h3 class="text-xs font-black text-slate-900 dark:text-white flex items-center gap-2">
                                     <Send class="w-4 h-4 text-sky-500" />
@@ -743,7 +743,7 @@ const clearCache = () => {
                             <button
                                 @click="sendBackupTelegram"
                                 type="button"
-                                class="h-11 px-6 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer"
+                                class="w-full h-11 px-6 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-xs mt-2"
                             >
                                 <Send class="w-4 h-4 text-sky-500" />
                                 <span>{{ $t('settings.send_to_telegram_btn') }}</span>
@@ -755,43 +755,44 @@ const clearCache = () => {
 
             <!-- Tab 4: System Performance & Maintenance -->
             <div v-if="currentTab === 'system'" class="space-y-6">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-6">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-6">
                     <div class="border-b border-slate-200 dark:border-slate-800 pb-4">
-                        <h2 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        <h2 class="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
                             <Cpu class="w-4 h-4 text-theme-primary" />
                             <span>{{ $t('settings.system_perf_title') }}</span>
                         </h2>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ $t('settings.system_perf_sub') }}</p>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
-                        <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-1">
-                            <span class="text-[10px] text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('settings.php_version') }}</span>
-                            <div class="text-sm font-black text-theme-primary">{{ system_info.php_version }}</div>
+                    <!-- 2x2 Bento Matrix for System Specs on Mobile -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 font-mono">
+                        <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 sm:p-4 space-y-1 shadow-xs">
+                            <span class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('settings.php_version') }}</span>
+                            <div class="text-xs sm:text-sm font-black text-theme-primary truncate">{{ system_info.php_version }}</div>
                         </div>
 
-                        <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-1">
-                            <span class="text-[10px] text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('settings.laravel_version') }}</span>
-                            <div class="text-sm font-black text-slate-900 dark:text-white">{{ system_info.laravel_version }}</div>
+                        <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 sm:p-4 space-y-1 shadow-xs">
+                            <span class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('settings.laravel_version') }}</span>
+                            <div class="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">{{ system_info.laravel_version }}</div>
                         </div>
 
-                        <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-1">
-                            <span class="text-[10px] text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('settings.db_engine') }}</span>
-                            <div class="text-sm font-black text-emerald-600 dark:text-emerald-400">{{ system_info.db_driver }}</div>
+                        <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 sm:p-4 space-y-1 shadow-xs">
+                            <span class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('settings.db_engine') }}</span>
+                            <div class="text-xs sm:text-sm font-black text-emerald-600 dark:text-emerald-400 truncate">{{ system_info.db_driver }}</div>
                         </div>
 
-                        <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-1">
-                            <span class="text-[10px] text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('settings.environment') }}</span>
-                            <div class="text-sm font-black text-indigo-600 dark:text-indigo-400">{{ system_info.environment }}</div>
+                        <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 sm:p-4 space-y-1 shadow-xs">
+                            <span class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('settings.environment') }}</span>
+                            <div class="text-xs sm:text-sm font-black text-indigo-600 dark:text-indigo-400 truncate">{{ system_info.environment }}</div>
                         </div>
                     </div>
 
-                    <div class="pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
-                        <div class="flex items-center gap-3">
+                    <div class="pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div class="flex items-center gap-2.5 w-full sm:w-auto">
                             <a
                                 href="/pulse"
                                 target="_blank"
-                                class="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-purple-600 dark:text-purple-400 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
+                                class="flex-1 sm:flex-none h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-purple-600 dark:text-purple-400 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-xs"
                             >
                                 <BarChart3 class="w-4 h-4" />
                                 <span>{{ $t('settings.pulse_monitoring') }}</span>
@@ -800,7 +801,7 @@ const clearCache = () => {
                             <a
                                 href="/telescope"
                                 target="_blank"
-                                class="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-teal-600 dark:text-teal-400 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
+                                class="flex-1 sm:flex-none h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-teal-600 dark:text-teal-400 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-xs"
                             >
                                 <Cpu class="w-4 h-4" />
                                 <span>{{ $t('settings.telescope') }}</span>
@@ -810,7 +811,7 @@ const clearCache = () => {
                         <button
                             @click="clearCache"
                             type="button"
-                            class="h-11 px-6 rounded-2xl btn-primary-theme font-black text-xs transition transform active:scale-95 cursor-pointer flex items-center gap-2"
+                            class="w-full sm:w-auto h-11 px-6 rounded-2xl btn-primary-theme font-black text-xs transition transform active:scale-95 cursor-pointer flex items-center justify-center gap-2 shadow-theme-primary"
                         >
                             <RefreshCw class="w-4 h-4" />
                             <span>{{ $t('settings.clear_cache_now') }}</span>
