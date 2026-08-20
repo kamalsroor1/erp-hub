@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { MoreVertical, X } from 'lucide-vue-next';
+import { useNativeBridge } from '@/Composables/useNativeBridge';
 
 const props = defineProps({
     items: {
@@ -20,13 +21,19 @@ const props = defineProps({
     align: {
         type: String,
         default: 'end' // 'start' | 'end'
+    },
+    mode: {
+        type: String,
+        default: 'dropdown' // 'dropdown' | 'sheet'
     }
 });
 
 const isOpen = ref(false);
 const menuRef = ref(null);
+const { triggerHaptic } = useNativeBridge();
 
 const toggleMenu = () => {
+    triggerHaptic('light');
     isOpen.value = !isOpen.value;
 };
 
@@ -35,6 +42,7 @@ const closeMenu = () => {
 };
 
 const handleItemClick = (item) => {
+    triggerHaptic('light');
     closeMenu();
     if (item.onClick) {
         item.onClick();
@@ -70,10 +78,10 @@ onUnmounted(() => {
             <slot name="trigger" />
         </button>
 
-        <!-- Desktop Dropdown (md and up) -->
+        <!-- Dropdown Menu (Opens directly below the button on all devices) -->
         <div
-            v-if="isOpen"
-            class="hidden md:block absolute z-50 mt-1.5 w-56 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-1.5 space-y-1 select-none animate-in fade-in zoom-in-95 duration-100"
+            v-if="isOpen && mode === 'dropdown'"
+            class="absolute z-50 mt-1.5 w-60 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-1.5 space-y-1 select-none animate-in fade-in zoom-in-95 duration-100"
             :class="align === 'start' ? 'left-0' : 'right-0'"
         >
             <div v-if="title" class="px-3 py-1.5 text-[11px] font-black text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800/80 truncate">
@@ -133,11 +141,10 @@ onUnmounted(() => {
             </template>
         </div>
 
-        <!-- Mobile Bottom Action Sheet (Screens < md) -->
-        <Teleport to="body">
+        <!-- Optional Bottom Action Sheet mode (if explicitly requested) -->
+        <Teleport to="body" v-if="isOpen && mode === 'sheet'">
             <div
-                v-if="isOpen"
-                class="md:hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-end justify-center font-tajawal select-none"
+                class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-end justify-center font-tajawal select-none"
                 @click="closeMenu"
             >
                 <div
@@ -166,7 +173,6 @@ onUnmounted(() => {
                     <div class="overflow-y-auto space-y-2 py-1">
                         <template v-for="(item, idx) in items" :key="idx">
                             <template v-if="item.show !== false">
-                                <!-- Link Item -->
                                 <Link
                                     v-if="item.href"
                                     :href="item.href"
@@ -191,7 +197,6 @@ onUnmounted(() => {
                                     <span class="text-slate-400 text-xs">←</span>
                                 </Link>
 
-                                <!-- Button Action Item -->
                                 <button
                                     v-else
                                     @click="handleItemClick(item)"
