@@ -197,32 +197,32 @@ const deleteItem = (item) => {
                 </div>
             </div>
 
-            <!-- KPI Summary Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+            <!-- KPI Summary Cards (Bento style on mobile) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('inventory.total_items_count') }}</span>
-                    <div class="text-2xl font-black font-mono text-slate-900 dark:text-white flex items-center gap-2">
-                        <Package class="w-5 h-5 text-theme-primary" />
+                    <div class="text-lg sm:text-2xl font-black font-mono text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <Package class="w-4 sm:w-5 h-4 sm:h-5 text-theme-primary" />
                         <span>{{ metrics.total_items || 0 }}</span>
-                        <span class="text-xs text-slate-400 font-tajawal">{{ $t('inventory.item_unit') }}</span>
+                        <span class="text-[11px] text-slate-400 font-tajawal">{{ $t('inventory.item_unit') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('inventory.low_stock_count') }}</span>
-                    <div class="text-2xl font-black font-mono text-rose-600 dark:text-rose-400 flex items-center gap-2">
-                        <AlertTriangle class="w-5 h-5 text-rose-500" />
+                    <div class="text-lg sm:text-2xl font-black font-mono text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
+                        <AlertTriangle class="w-4 sm:w-5 h-4 sm:h-5 text-rose-500" />
                         <span>{{ metrics.low_stock_count || 0 }}</span>
-                        <span v-if="metrics.low_stock_count > 0" class="text-xs px-2 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 font-tajawal">
+                        <span v-if="metrics.low_stock_count > 0" class="text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 font-tajawal">
                             {{ $t('inventory.low_stock_warning') }}
                         </span>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                <div class="col-span-2 sm:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('inventory.total_inventory_value') }}</span>
-                    <div class="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
-                        <Boxes class="w-5 h-5 text-emerald-500" />
+                    <div class="text-lg sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                        <Boxes class="w-4 sm:w-5 h-4 sm:h-5 text-emerald-500" />
                         <span>{{ formatMoney(metrics.total_stock_value) }}</span>
                         <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
@@ -230,14 +230,14 @@ const deleteItem = (item) => {
             </div>
 
             <!-- Filter & Search Quick Bar -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-xs space-y-3">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 shadow-xs space-y-3">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-3">
                     <div class="w-full md:w-96 relative">
                         <input
                             v-model="search"
                             type="text"
                             :placeholder="$t('inventory.search_item_placeholder')"
-                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner"
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner font-tajawal"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 pointer-events-none">
                             <Search class="w-4 h-4" />
@@ -250,16 +250,16 @@ const deleteItem = (item) => {
                             <button
                                 @click="stockStatus = 'all'; applyFilters();"
                                 type="button"
-                                class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                                :class="stockStatus === 'all' ? 'tab-theme-active' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                                class="h-9 px-3 rounded-xl font-bold transition cursor-pointer flex items-center justify-center active:scale-95"
+                                :class="stockStatus === 'all' ? 'tab-theme-active shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('common.all') }}
                             </button>
                             <button
                                 @click="stockStatus = 'low'; applyFilters();"
                                 type="button"
-                                class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                                :class="stockStatus === 'low' ? 'bg-rose-500 text-white font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                                class="h-9 px-3 rounded-xl font-bold transition cursor-pointer flex items-center justify-center active:scale-95"
+                                :class="stockStatus === 'low' ? 'bg-rose-500 text-white font-black shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('inventory.low_stock_only') }}
                             </button>
@@ -269,7 +269,7 @@ const deleteItem = (item) => {
                         <button
                             @click="isDrawerOpen = true"
                             type="button"
-                            class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer shadow-xs"
+                            class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer shadow-xs active:scale-95"
                         >
                             <Filter class="w-4 h-4" />
                             <span>{{ $t('common.filter') }}</span>
@@ -458,32 +458,32 @@ const deleteItem = (item) => {
                                 {{ $t('inventory.min_stock_level') }}: {{ item.min_stock_level }} {{ item.unit }}
                             </span>
 
-                            <div class="flex items-center gap-1.5">
+                            <div class="flex items-center gap-2">
                                 <Link
                                     :href="`/items/${item.id}/movements`"
-                                    class="p-2 rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30"
+                                    class="w-10 h-10 rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
                                     :title="$t('inventory.view_movements')"
                                 >
-                                    <History class="w-4 h-4" />
+                                    <History class="w-4.5 h-4.5" />
                                 </Link>
 
                                 <button
                                     @click="openEditModal(item)"
                                     type="button"
-                                    class="p-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 cursor-pointer"
+                                    class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
                                     :title="$t('common.edit')"
                                 >
-                                    <Pencil class="w-4 h-4" />
+                                    <Pencil class="w-4.5 h-4.5" />
                                 </button>
 
                                 <button
                                     @click="deleteItem(item)"
                                     type="button"
-                                    class="p-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 cursor-pointer"
+                                    class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
                                     :class="!item.can_be_deleted ? 'opacity-40 cursor-not-allowed' : ''"
                                     :title="item.can_be_deleted ? $t('common.delete') : item.deletion_blockers.join(', ')"
                                 >
-                                    <Trash2 class="w-4 h-4" />
+                                    <Trash2 class="w-4.5 h-4.5" />
                                 </button>
                             </div>
                         </div>

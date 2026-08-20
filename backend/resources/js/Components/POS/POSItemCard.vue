@@ -64,11 +64,11 @@ const stockBadgeClass = computed(() => {
         </div>
 
         <!-- Direct Quick Weight Steppers Bar (For Coffee & Bulk items) -->
-        <div v-if="isWeightBased" class="p-1.5 bg-slate-50 dark:bg-slate-950/80 border-t border-slate-200 dark:border-slate-800/80 grid grid-cols-4 gap-1">
+        <div v-if="isWeightBased" class="p-2 bg-slate-50 dark:bg-slate-950/80 border-t border-slate-200 dark:border-slate-800/80 grid grid-cols-4 gap-1.5">
             <button
                 @click.stop="emit('add-qty', { item, quantity: 0.125 })"
                 type="button"
-                class="h-7 rounded-lg bg-slate-200/80 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer"
+                class="h-8 sm:h-7 rounded-xl bg-slate-200/90 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-800 dark:hover:bg-amber-500 text-slate-800 dark:text-slate-200 font-black text-[11px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer shadow-xs"
                 :title="$t('inventory.weight_eighth')"
             >
                 1/8
@@ -76,7 +76,7 @@ const stockBadgeClass = computed(() => {
             <button
                 @click.stop="emit('add-qty', { item, quantity: 0.250 })"
                 type="button"
-                class="h-7 rounded-lg bg-slate-200/80 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer"
+                class="h-8 sm:h-7 rounded-xl bg-slate-200/90 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-800 dark:hover:bg-amber-500 text-slate-800 dark:text-slate-200 font-black text-[11px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer shadow-xs"
                 :title="$t('inventory.weight_quarter')"
             >
                 1/4
@@ -84,7 +84,7 @@ const stockBadgeClass = computed(() => {
             <button
                 @click.stop="emit('add-qty', { item, quantity: 0.500 })"
                 type="button"
-                class="h-7 rounded-lg bg-slate-200/80 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer"
+                class="h-8 sm:h-7 rounded-xl bg-slate-200/90 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-800 dark:hover:bg-amber-500 text-slate-800 dark:text-slate-200 font-black text-[11px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer shadow-xs"
                 :title="$t('inventory.weight_half')"
             >
                 1/2
@@ -92,7 +92,7 @@ const stockBadgeClass = computed(() => {
             <button
                 @click.stop="emit('add-qty', { item, quantity: 1.000 })"
                 type="button"
-                class="h-7 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[10px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer"
+                class="h-8 sm:h-7 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[11px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer shadow-xs"
                 :title="$t('inventory.weight_kilo')"
             >
                 1ك

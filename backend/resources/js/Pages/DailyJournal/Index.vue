@@ -135,7 +135,7 @@ const printJournal = () => {
                     <button
                         @click="showExpenseModal = true"
                         type="button"
-                        class="h-10 px-4 rounded-2xl bg-rose-600/90 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-rose-600/20 transition cursor-pointer"
+                        class="h-11 px-4 rounded-2xl bg-rose-600/90 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-rose-600/20 transition active:scale-95 cursor-pointer"
                     >
                         <span>💸</span>
                         <span>{{ $t('treasury.record_expense_modal') }}</span>
@@ -146,7 +146,7 @@ const printJournal = () => {
                         v-if="!active_shift"
                         @click="showOpenShiftModal = true"
                         type="button"
-                        class="h-10 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition cursor-pointer"
+                        class="h-11 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition active:scale-95 cursor-pointer"
                     >
                         <span>🟢</span>
                         <span>{{ $t('treasury.open_shift') }}</span>
@@ -155,7 +155,7 @@ const printJournal = () => {
                         v-else
                         @click="showCloseShiftModal = true"
                         type="button"
-                        class="h-10 px-4 rounded-2xl btn-primary-theme font-black text-xs flex items-center gap-1.5 transition transform active:scale-95 cursor-pointer"
+                        class="h-11 px-4 rounded-2xl btn-primary-theme font-black text-xs flex items-center gap-1.5 transition transform active:scale-95 cursor-pointer"
                     >
                         <span>🔒</span>
                         <span>{{ $t('treasury.close_shift') }}</span>
@@ -164,7 +164,7 @@ const printJournal = () => {
                     <button
                         @click="printJournal"
                         type="button"
-                        class="h-10 px-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1 transition cursor-pointer border border-slate-200 dark:border-transparent"
+                        class="h-11 px-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1 transition active:scale-95 cursor-pointer border border-slate-200 dark:border-transparent"
                     >
                         <span>🖨️</span>
                         <span>{{ $t('reports.print_report') }}</span>
@@ -174,19 +174,19 @@ const printJournal = () => {
 
             <!-- Active Shift Card -->
             <div
-                class="rounded-3xl p-5 border flex flex-col md:flex-row items-center justify-between gap-4 shadow-xs"
+                class="rounded-3xl p-3.5 sm:p-5 border flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4 shadow-xs font-tajawal"
                 :class="active_shift ? 'bg-white dark:bg-slate-900 border-emerald-500/30' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'"
             >
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3 sm:gap-4">
                     <div
-                        class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl font-black"
+                        class="w-11 sm:w-12 h-11 sm:h-12 rounded-2xl flex items-center justify-center text-xl sm:text-2xl font-black shrink-0"
                         :class="active_shift ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'"
                     >
                         {{ active_shift ? '🟢' : '🔒' }}
                     </div>
                     <div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-black text-slate-900 dark:text-white text-base">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="font-black text-slate-900 dark:text-white text-sm sm:text-base">
                                 {{ active_shift ? `${$t('nav.active_shift')}: #${active_shift.shift_number || active_shift.id}` : $t('treasury.shift_closed_now') }}
                             </span>
                             <span
@@ -203,50 +203,50 @@ const printJournal = () => {
                 </div>
 
                 <div v-if="active_shift" class="text-left font-mono">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('treasury.opening_cash') }}</span>
-                    <div class="text-lg font-black text-emerald-600 dark:text-emerald-400">
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('treasury.opening_cash') }}</span>
+                    <div class="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400">
                         {{ formatMoney(active_shift.opening_cash_balance) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Financial Summary Matrix Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Financial Summary Matrix Cards (2x2 Bento on mobile) -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 font-tajawal">
                 <!-- Total Inflow -->
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
                     <span class="text-xs text-emerald-600 dark:text-emerald-400 font-bold">{{ $t('treasury.inflow_cash') }}</span>
-                    <div class="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
-                        {{ formatMoney(summary.total_cash_in) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                        {{ formatMoney(summary.total_cash_in) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
-                    <div class="text-[11px] text-slate-500 dark:text-slate-400 font-bold space-y-0.5 pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                    <div class="text-[10.5px] text-slate-500 dark:text-slate-400 font-bold space-y-0.5 pt-1 border-t border-slate-100 dark:border-slate-800/80 hidden sm:block">
                         <div>{{ $t('treasury.cash_sales') }}: <span class="font-mono text-slate-900 dark:text-white">{{ formatMoney(summary.cash_sales) }}</span></div>
                         <div>{{ $t('treasury.customer_collections') }}: <span class="font-mono text-slate-900 dark:text-white">{{ formatMoney(summary.customer_payments) }}</span></div>
                     </div>
                 </div>
 
                 <!-- Total Outflow -->
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
                     <span class="text-xs text-rose-600 dark:text-rose-400 font-bold">{{ $t('treasury.outflow_cash') }}</span>
-                    <div class="text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
-                        {{ formatMoney(summary.total_cash_out) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
+                        {{ formatMoney(summary.total_cash_out) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
-                    <div class="text-[11px] text-slate-500 dark:text-slate-400 font-bold space-y-0.5 pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                    <div class="text-[10.5px] text-slate-500 dark:text-slate-400 font-bold space-y-0.5 pt-1 border-t border-slate-100 dark:border-slate-800/80 hidden sm:block">
                         <div>{{ $t('treasury.supplier_payments') }}: <span class="font-mono text-slate-900 dark:text-white">{{ formatMoney(summary.supplier_payments) }}</span></div>
                         <div>{{ $t('treasury.operating_expenses') }}: <span class="font-mono text-slate-900 dark:text-white">{{ formatMoney(summary.total_expenses) }}</span></div>
                     </div>
                 </div>
 
                 <!-- Net Day Cash -->
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('treasury.net_cash_today') }}</span>
                     <div
-                        class="text-2xl font-black font-mono"
+                        class="text-lg sm:text-2xl font-black font-mono"
                         :class="summary.net_cash_today >= 0 ? 'text-theme-primary' : 'text-rose-600 dark:text-rose-400'"
                     >
-                        {{ formatMoney(summary.net_cash_today) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
+                        {{ formatMoney(summary.net_cash_today) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
-                    <div class="text-[11px] text-slate-500 dark:text-slate-400 font-bold pt-1 border-t border-slate-100 dark:border-slate-800/80">
-                        {{ $t('treasury.recorded_credit_sales') }}: <span class="font-mono text-theme-primary font-bold">{{ formatMoney(summary.credit_sales) }} {{ $t('common.currency') }}</span>
+                    <div class="text-[10.5px] text-slate-500 dark:text-slate-400 font-bold pt-1 border-t border-slate-100 dark:border-slate-800/80 hidden sm:block">
+                        {{ $t('treasury.recorded_credit_sales') }}: <span class="font-mono text-theme-primary font-bold">{{ formatMoney(summary.credit_sales) }}</span>
                     </div>
                 </div>
 

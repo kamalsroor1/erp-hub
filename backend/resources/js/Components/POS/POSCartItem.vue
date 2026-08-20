@@ -39,29 +39,29 @@ const increaseQty = () => {
 </script>
 
 <template>
-    <div class="p-2.5 rounded-2xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 space-y-2 group hover:border-slate-300 dark:hover:border-slate-700 transition shadow-xs">
+    <div class="p-3 rounded-2xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 space-y-2.5 group hover:border-slate-300 dark:hover:border-slate-700 transition shadow-xs font-tajawal">
         <div class="flex items-center justify-between gap-2">
             <div class="flex-1 truncate">
-                <div class="font-black text-xs text-slate-900 dark:text-white truncate">{{ line.name }}</div>
-                <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
+                <div class="font-black text-xs sm:text-sm text-slate-900 dark:text-white truncate">{{ line.name }}</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1.5 mt-1">
                     <span>{{ $t('invoices.unit_price') }}:</span>
                     <input
                         v-model.number="line.unit_price"
                         @input="emit('change')"
                         type="number"
                         min="0"
-                        class="w-16 h-5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-1 text-center font-mono font-bold text-slate-900 dark:text-white text-[11px] focus:outline-none focus:border-amber-500"
+                        class="w-18 h-7 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-1.5 text-center font-mono font-bold text-slate-900 dark:text-white text-xs focus:outline-none focus:border-amber-500"
                     />
                     <span>{{ $t('common.currency') }}</span>
                 </div>
             </div>
 
-            <!-- Qty Steppers -->
-            <div class="flex items-center gap-1 shrink-0">
+            <!-- Qty Steppers (Finger-friendly min 36px) -->
+            <div class="flex items-center gap-1.5 shrink-0">
                 <button
                     @click="decreaseQty"
                     type="button"
-                    class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-white font-bold text-xs flex items-center justify-center transition cursor-pointer border border-slate-200 dark:border-transparent"
+                    class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white font-black text-sm flex items-center justify-center transition active:scale-90 cursor-pointer border border-slate-200 dark:border-transparent shadow-xs"
                 >
                     -
                 </button>
@@ -71,27 +71,27 @@ const increaseQty = () => {
                     @input="emit('change')"
                     type="number"
                     step="0.001"
-                    class="w-14 h-6 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-center text-xs font-mono font-black text-amber-600 dark:text-amber-400 focus:outline-none focus:border-amber-500"
+                    class="w-16 h-8 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-center text-xs font-mono font-black text-amber-600 dark:text-amber-400 focus:outline-none focus:border-amber-500"
                 />
 
                 <button
                     @click="increaseQty"
                     type="button"
-                    class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-white font-bold text-xs flex items-center justify-center transition cursor-pointer border border-slate-200 dark:border-transparent"
+                    class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white font-black text-sm flex items-center justify-center transition active:scale-90 cursor-pointer border border-slate-200 dark:border-transparent shadow-xs"
                 >
                     +
                 </button>
             </div>
 
             <!-- Line Total & Delete -->
-            <div class="text-left shrink-0 pl-1">
-                <div class="font-mono font-black text-xs text-emerald-600 dark:text-emerald-400">
+            <div class="flex items-center gap-2 shrink-0 pl-1">
+                <div class="font-mono font-black text-xs sm:text-sm text-emerald-600 dark:text-emerald-400 text-left">
                     {{ formatMoney(line.unit_price * line.quantity) }}
                 </div>
                 <button
                     @click="emit('remove', index)"
                     type="button"
-                    class="text-slate-400 hover:text-rose-600 dark:text-slate-500 dark:hover:text-rose-400 text-xs mt-0.5 cursor-pointer"
+                    class="w-8 h-8 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
                     :title="$t('common.delete')"
                 >
                     ✕
@@ -100,47 +100,47 @@ const increaseQty = () => {
         </div>
 
         <!-- Quick Weight Chips for Bulk / Coffee -->
-        <div v-if="isWeightBased" class="flex items-center gap-1 pt-1 border-t border-slate-100 dark:border-slate-900 text-[10px]">
-            <span class="text-slate-500 text-[9px] px-1">{{ $t('common.quantity') }}:</span>
+        <div v-if="isWeightBased" class="flex items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-900 text-xs">
+            <span class="text-slate-500 text-[10px] px-1">{{ $t('common.quantity') }}:</span>
             <button
                 @click="setExactWeight(0.125)"
                 type="button"
-                class="px-2 py-0.5 rounded bg-slate-100 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-mono font-bold transition"
+                class="h-7 px-2.5 rounded-lg bg-slate-100 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-mono font-black text-xs transition active:scale-90"
             >
                 1/8
             </button>
             <button
                 @click="setExactWeight(0.250)"
                 type="button"
-                class="px-2 py-0.5 rounded bg-slate-100 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-mono font-bold transition"
+                class="h-7 px-2.5 rounded-lg bg-slate-100 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-mono font-black text-xs transition active:scale-90"
             >
                 1/4
             </button>
             <button
                 @click="setExactWeight(0.500)"
                 type="button"
-                class="px-2 py-0.5 rounded bg-slate-100 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-mono font-bold transition"
+                class="h-7 px-2.5 rounded-lg bg-slate-100 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-mono font-black text-xs transition active:scale-90"
             >
                 1/2
             </button>
             <button
                 @click="setExactWeight(1.000)"
                 type="button"
-                class="px-2 py-0.5 rounded bg-emerald-600/20 hover:bg-emerald-500 hover:text-slate-950 text-emerald-700 dark:text-emerald-300 font-mono font-bold transition"
+                class="h-7 px-2.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-500 hover:text-white text-emerald-700 dark:text-emerald-300 font-mono font-black text-xs transition active:scale-90"
             >
                 1ك
             </button>
         </div>
 
         <!-- Last Customer Price Tag (if available) -->
-        <div v-if="line.last_sold_price" class="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-900 text-[10px]">
+        <div v-if="line.last_sold_price" class="flex items-center justify-between pt-1.5 border-t border-slate-100 dark:border-slate-900 text-[11px]">
             <span class="text-amber-600 dark:text-amber-400 font-mono">
                 🏷️ {{ $t('pos.last_customer_price') }}: {{ formatMoney(line.last_sold_price.unit_price) }} {{ $t('common.currency') }}
             </span>
             <button
                 @click="emit('apply-last-price', line)"
                 type="button"
-                class="px-2 py-0.5 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-700 dark:text-amber-300 font-black text-[9px] transition cursor-pointer"
+                class="h-7 px-3 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-700 dark:text-amber-300 font-black text-[10px] transition cursor-pointer"
             >
                 {{ $t('pos.apply_btn') }}
             </button>

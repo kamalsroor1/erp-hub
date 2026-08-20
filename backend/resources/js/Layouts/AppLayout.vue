@@ -272,7 +272,13 @@ const getUserRoleLabel = computed(() => {
                     </div>
                 </div>
 
-                <button @click="isSidebarOpen = false" class="lg:hidden p-2 text-slate-400 hover:text-slate-700 dark:hover:text-white">✕</button>
+                <button
+                    @click="isSidebarOpen = false"
+                    type="button"
+                    class="lg:hidden w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center font-black text-sm transition active:scale-90 cursor-pointer shadow-xs"
+                >
+                    ✕
+                </button>
             </div>
 
             <!-- Primary Action: + New Sale Invoice (F2) -->
@@ -283,7 +289,7 @@ const getUserRoleLabel = computed(() => {
                         class="w-full flex items-center justify-center gap-2 py-3 px-3.5 btn-primary-theme font-black rounded-2xl shadow-theme-primary transition-all duration-200 active:scale-95 font-tajawal cursor-pointer group"
                         :title="$t('nav.new_sale_invoice_btn')"
                     >
-                        <Plus class="w-4 h-4 shrink-0 transition-transform group-hover:rotate-90 duration-300" />
+                        <Plus class="w-4.5 h-4.5 shrink-0 transition-transform group-hover:rotate-90 duration-300" />
                         <span v-if="!isSidebarCollapsed" class="truncate text-xs font-black">{{ $t('nav.new_sale_invoice_btn') }}</span>
                     </Link>
                 </div>
@@ -308,7 +314,7 @@ const getUserRoleLabel = computed(() => {
                                 <Link
                                     :href="item.href"
                                     @click="isSidebarOpen = false"
-                                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 group"
+                                    class="flex items-center gap-3 px-3.5 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-150 group min-h-[44px] active:scale-98"
                                     :class="[
                                         item.active
                                             ? 'bg-theme-light text-theme-primary border border-theme-light shadow-xs font-black'
@@ -317,7 +323,7 @@ const getUserRoleLabel = computed(() => {
                                     ]"
                                     :title="item.name"
                                 >
-                                    <component :is="item.icon" class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" />
+                                    <component :is="item.icon" class="w-4.5 h-4.5 shrink-0 transition-transform group-hover:scale-110" />
                                     <span v-if="!isSidebarCollapsed" class="truncate flex-1">{{ item.name }}</span>
                                 </Link>
                             </FeatureGate>

@@ -190,39 +190,39 @@ const deleteExpense = (e) => {
                 </button>
             </div>
 
-            <!-- KPI Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('expenses.total_month') }}</span>
-                    <div class="text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
-                        {{ formatMoney(metrics.total_month) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
+            <!-- KPI Summary Cards (Bento Style on mobile) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('expenses.total_today') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
+                        {{ formatMoney(metrics.total_today) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('expenses.total_cash') }}</span>
-                    <div class="text-2xl font-black font-mono text-theme-primary">
-                        {{ formatMoney(metrics.total_cash) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-theme-primary">
+                        {{ formatMoney(metrics.total_cash) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                <div class="col-span-2 sm:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('expenses.total_filtered') }}</span>
-                    <div class="text-2xl font-black font-mono text-theme-primary">
-                        {{ formatMoney(metrics.total_filtered) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-theme-primary">
+                        {{ formatMoney(metrics.total_filtered) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- Quick Filter Bar -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-xs space-y-3">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 shadow-xs space-y-3">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-3">
                     <div class="w-full md:w-96 relative">
                         <input
                             v-model="search"
                             type="text"
                             :placeholder="$t('expenses.search_placeholder')"
-                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner"
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner font-tajawal"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
                             🔍
@@ -233,7 +233,7 @@ const deleteExpense = (e) => {
                         <button
                             @click="isDrawerOpen = true"
                             type="button"
-                            class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+                            class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer active:scale-95 shadow-xs"
                         >
                             <span>⚙️</span>
                             <span>{{ $t('common.advanced_filter') }}</span>
@@ -245,9 +245,10 @@ const deleteExpense = (e) => {
                 </div>
             </div>
 
-            <!-- Expenses Table -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4 overflow-hidden">
-                <div class="overflow-x-auto">
+            <!-- Expenses Table & Mobile Cards -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-4 overflow-hidden font-tajawal">
+                <!-- Desktop Table (Hidden on Mobile) -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
@@ -314,11 +315,67 @@ const deleteExpense = (e) => {
                             </tr>
                         </tbody>
                     </table>
+                </div>
 
-                    <div v-if="!expenses.data || expenses.data.length === 0" class="py-16 text-center space-y-2">
-                        <span class="text-3xl">💸</span>
-                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('expenses.no_expenses') }}</p>
+                <!-- Mobile Cards View (Visible on Small Screens) -->
+                <div class="md:hidden space-y-3">
+                    <div
+                        v-for="e in expenses.data"
+                        :key="e.id"
+                        class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-3 shadow-xs font-tajawal"
+                    >
+                        <!-- Top Row: Title + Amount -->
+                        <div class="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-800/80 pb-2.5">
+                            <div class="space-y-0.5">
+                                <div class="font-black text-sm text-slate-900 dark:text-white">{{ e.title }}</div>
+                                <p class="text-[11px] text-slate-400 font-mono">{{ e.expense_number }} • {{ e.expense_date }}</p>
+                            </div>
+
+                            <span class="font-mono font-black text-sm text-rose-600 dark:text-rose-400">
+                                {{ formatMoney(e.amount) }} {{ $t('common.currency') }}
+                            </span>
+                        </div>
+
+                        <!-- Category & Payment Info -->
+                        <div class="flex items-center justify-between text-xs">
+                            <div class="flex items-center gap-1.5">
+                                <span class="px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold">
+                                    {{ e.cost_center_label }}
+                                </span>
+                                <span class="text-theme-primary font-bold text-[11px]">{{ e.category }}</span>
+                            </div>
+
+                            <span class="text-[10px] font-bold text-slate-500">
+                                {{ e.payment_method === 'cash' ? '💵 كاش' : e.payment_method }}
+                            </span>
+                        </div>
+
+                        <!-- Mobile Action Bar -->
+                        <div class="flex items-center justify-end gap-2 pt-1">
+                            <button
+                                @click="openEditModal(e)"
+                                type="button"
+                                class="h-10 px-4 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-xs font-bold transition active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-xs"
+                            >
+                                <span>✏️</span>
+                                <span>{{ $t('common.edit') }}</span>
+                            </button>
+
+                            <button
+                                @click="deleteExpense(e)"
+                                type="button"
+                                class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
+                                :title="$t('common.delete')"
+                            >
+                                🗑️
+                            </button>
+                        </div>
                     </div>
+                </div>
+
+                <div v-if="!expenses.data || expenses.data.length === 0" class="py-16 text-center space-y-2">
+                    <span class="text-3xl">💸</span>
+                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('expenses.no_expenses') }}</p>
                 </div>
 
                 <!-- Pagination -->

@@ -296,24 +296,24 @@ const printA4 = (id) => {
                             <button
                                 @click="paymentType = 'all'; applyFilters();"
                                 type="button"
-                                class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                                :class="paymentType === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                                class="h-9 px-3 rounded-xl font-bold transition cursor-pointer flex items-center justify-center active:scale-95"
+                                :class="paymentType === 'all' ? 'bg-amber-500 text-slate-950 font-black shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('common.all') }}
                             </button>
                             <button
                                 @click="paymentType = 'cash'; applyFilters();"
                                 type="button"
-                                class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer flex items-center gap-1"
-                                :class="paymentType === 'cash' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                                class="h-9 px-3 rounded-xl font-bold transition cursor-pointer flex items-center gap-1 active:scale-95"
+                                :class="paymentType === 'cash' ? 'bg-emerald-500 text-slate-950 font-black shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 <span>{{ $t('invoices.payment_cash') }}</span>
                             </button>
                             <button
                                 @click="paymentType = 'credit'; applyFilters();"
                                 type="button"
-                                class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                                :class="paymentType === 'credit' ? 'bg-rose-500 text-white font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                                class="h-9 px-3 rounded-xl font-bold transition cursor-pointer flex items-center gap-1 active:scale-95"
+                                :class="paymentType === 'credit' ? 'bg-rose-500 text-white font-black shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('invoices.payment_credit') }}
                             </button>
@@ -323,7 +323,7 @@ const printA4 = (id) => {
                         <button
                             @click="isDrawerOpen = true"
                             type="button"
-                            class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer shadow-xs"
+                            class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer shadow-xs active:scale-95"
                         >
                             <Filter class="w-4 h-4" />
                             <span>{{ $t('common.filter') }}</span>
@@ -578,50 +578,50 @@ const printA4 = (id) => {
                                 {{ getPaymentBadge(inv).label }}
                             </span>
 
-                            <div class="flex items-center gap-1.5">
+                            <div class="flex items-center gap-2">
                                 <Link
                                     :href="`/invoices/${inv.id}`"
-                                    class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                                    class="w-9.5 h-9.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
                                     :title="$t('invoices.view_invoice')"
                                 >
-                                    <Eye class="w-4 h-4" />
+                                    <Eye class="w-4.5 h-4.5" />
                                 </Link>
 
                                 <button
                                     @click="printThermal(inv.id)"
                                     type="button"
-                                    class="p-2 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+                                    class="w-9.5 h-9.5 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
                                     :title="$t('invoices.print_thermal')"
                                 >
-                                    <Printer class="w-4 h-4" />
+                                    <Printer class="w-4.5 h-4.5" />
                                 </button>
 
                                 <button
                                     @click="printA4(inv.id)"
                                     type="button"
-                                    class="p-2 rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30"
+                                    class="w-9.5 h-9.5 rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
                                     :title="$t('invoices.print_a4')"
                                 >
-                                    <FileText class="w-4 h-4" />
+                                    <FileText class="w-4.5 h-4.5" />
                                 </button>
 
                                 <Link
                                     v-if="inv.status !== 'cancelled' && status !== 'trash'"
                                     :href="`/invoices/${inv.id}/edit`"
-                                    class="p-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30"
+                                    class="w-9.5 h-9.5 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
                                     :title="$t('invoices.edit_invoice')"
                                 >
-                                    <Pencil class="w-4 h-4" />
+                                    <Pencil class="w-4.5 h-4.5" />
                                 </Link>
 
                                 <button
                                     v-if="inv.status !== 'cancelled' && status !== 'trash'"
                                     @click="openCancelModal(inv)"
                                     type="button"
-                                    class="p-2 rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30"
+                                    class="w-9.5 h-9.5 rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
                                     :title="$t('invoices.cancel_invoice')"
                                 >
-                                    <Ban class="w-4 h-4" />
+                                    <Ban class="w-4.5 h-4.5" />
                                 </button>
                             </div>
                         </div>

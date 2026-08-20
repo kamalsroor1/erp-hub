@@ -65,6 +65,7 @@ const {
 } = usePOSCart(selectedCustomer);
 
 // UI States & Modals
+const mobileTab = ref('catalog'); // 'catalog' | 'cart'
 const showExpensesSection = ref(false);
 const showNumpad = ref(false);
 const numpadTarget = ref('paid_amount');
@@ -343,10 +344,39 @@ useKeyboardShortcuts({
                 <button @click="errorMessage = ''" class="text-rose-500 font-bold text-sm">✕</button>
             </div>
 
+            <!-- Mobile View Tab Switcher (Visible on small screens < lg) -->
+            <div class="lg:hidden grid grid-cols-2 gap-2 mb-2.5 shrink-0">
+                <button
+                    @click="mobileTab = 'catalog'"
+                    type="button"
+                    class="h-11 rounded-2xl font-black text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-xs"
+                    :class="mobileTab === 'catalog' ? 'btn-primary-theme shadow-theme-primary' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'"
+                >
+                    <span>🛍️</span>
+                    <span>{{ $t('inventory.items_catalog') || 'الأصناف' }} ({{ filteredItems.length }})</span>
+                </button>
+
+                <button
+                    @click="mobileTab = 'cart'"
+                    type="button"
+                    class="h-11 rounded-2xl font-black text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-xs relative"
+                    :class="mobileTab === 'cart' ? 'btn-primary-theme shadow-theme-primary' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'"
+                >
+                    <span>🛒</span>
+                    <span>{{ $t('invoices.invoices_log') || 'السلة' }} ({{ cart.length }})</span>
+                    <span v-if="cart.length > 0" class="font-mono text-emerald-600 dark:text-emerald-400 font-black mr-1">
+                        {{ formatMoney(netTotal) }}
+                    </span>
+                </button>
+            </div>
+
             <!-- Main POS Split Workspace -->
-            <div class="flex-1 flex flex-col lg:flex-row gap-4 overflow-hidden">
+            <div class="flex-1 flex flex-col lg:flex-row gap-4 overflow-hidden relative">
                 <!-- Left Section: Catalog & Categories Grid (65% width) -->
-                <div class="flex-1 flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-3 overflow-hidden shadow-xs">
+                <div
+                    class="flex-1 flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 space-y-3 overflow-hidden shadow-xs"
+                    :class="mobileTab === 'catalog' ? 'flex' : 'hidden lg:flex'"
+                >
                     <!-- Search Bar & Category Chips -->
                     <div class="space-y-2.5 shrink-0">
                         <div class="relative flex items-center">
@@ -355,13 +385,13 @@ useKeyboardShortcuts({
                                 v-model="searchQuery"
                                 type="text"
                                 :placeholder="$t('pos.search_placeholder')"
-                                class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl pl-10 pr-4 text-xs font-bold text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-amber-500 transition shadow-inner font-tajawal"
+                                class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl pl-10 pr-4 text-xs sm:text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-amber-500 transition shadow-inner font-tajawal"
                             />
                             <button
                                 v-if="searchQuery"
                                 @click="searchQuery = ''"
                                 type="button"
-                                class="absolute left-3 w-6 h-6 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-bold flex items-center justify-center"
+                                class="absolute left-3 w-7 h-7 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-bold flex items-center justify-center cursor-pointer"
                             >
                                 ✕
                             </button>
@@ -372,7 +402,7 @@ useKeyboardShortcuts({
                             <button
                                 @click="selectedCategory = 'all'"
                                 type="button"
-                                class="px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 cursor-pointer"
+                                class="h-9 px-3.5 rounded-xl font-black transition shrink-0 cursor-pointer flex items-center justify-center"
                                 :class="selectedCategory === 'all' ? 'tab-theme-active' : 'bg-slate-100 text-slate-600 hover:text-slate-900 dark:bg-slate-950 dark:text-slate-400 dark:hover:text-white border border-slate-200 dark:border-slate-800'"
                             >
                                 {{ $t('common.all') }} ({{ items.length }})
@@ -383,7 +413,7 @@ useKeyboardShortcuts({
                                 :key="cat"
                                 @click="selectedCategory = cat"
                                 type="button"
-                                class="px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 cursor-pointer"
+                                class="h-9 px-3.5 rounded-xl font-black transition shrink-0 cursor-pointer flex items-center justify-center"
                                 :class="selectedCategory === cat ? 'tab-theme-active' : 'bg-slate-100 text-slate-600 hover:text-slate-900 dark:bg-slate-950 dark:text-slate-400 dark:hover:text-white border border-slate-200 dark:border-slate-800'"
                             >
                                 {{ cat }}
@@ -392,8 +422,8 @@ useKeyboardShortcuts({
                     </div>
 
                     <!-- Items Grid -->
-                    <div class="flex-1 overflow-y-auto pr-1">
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-2.5">
+                    <div class="flex-1 overflow-y-auto pr-0.5 pb-16 lg:pb-0">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-2.5">
                             <POSItemCard
                                 v-for="item in filteredItems"
                                 :key="item.id"
@@ -408,15 +438,34 @@ useKeyboardShortcuts({
                             {{ $t('inventory.no_items_found') }}
                         </div>
                     </div>
+
+                    <!-- Floating Mobile Quick-Cart Bar (on Catalog tab) -->
+                    <div v-if="mobileTab === 'catalog' && cart.length > 0" class="lg:hidden fixed bottom-24 inset-x-4 z-30">
+                        <button
+                            @click="mobileTab = 'cart'"
+                            type="button"
+                            class="w-full h-12 rounded-2xl btn-primary-theme shadow-2xl flex items-center justify-between px-4 font-black text-xs cursor-pointer border-2 border-white dark:border-slate-900 active:scale-95 transition-transform"
+                        >
+                            <span class="flex items-center gap-2">
+                                <span>🛒</span>
+                                <span class="bg-black/20 px-2 py-0.5 rounded-lg">{{ cart.length }} أصناف</span>
+                            </span>
+                            <span class="font-mono text-sm font-black">{{ formatMoney(netTotal) }} {{ $t('common.currency') }}</span>
+                            <span>إتمام الدفع ←</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Right Section: Smart Cart & Payment Engine (35% width) -->
-                <div class="w-full lg:w-[420px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl flex flex-col h-full overflow-hidden shrink-0 shadow-xs">
+                <div
+                    class="w-full lg:w-[420px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl flex-col h-full overflow-hidden shrink-0 shadow-xs"
+                    :class="mobileTab === 'cart' ? 'flex' : 'hidden lg:flex'"
+                >
                     <!-- Customer Selector Bar -->
                     <div class="p-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 bg-slate-50 dark:bg-slate-950/60 shrink-0">
                         <div
                             @click="showCustomerModal = true"
-                            class="flex-1 flex items-center gap-2 p-2 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 cursor-pointer transition"
+                            class="flex-1 flex items-center gap-2 p-2.5 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 cursor-pointer transition shadow-xs"
                         >
                             <span class="text-base">👤</span>
                             <div class="flex-1 truncate">
@@ -431,7 +480,7 @@ useKeyboardShortcuts({
                         <button
                             @click="showNewCustomerModal = true"
                             type="button"
-                            class="h-9 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-bold text-xs flex items-center gap-1 transition cursor-pointer"
+                            class="h-10 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-black text-xs flex items-center gap-1 transition cursor-pointer active:scale-95 shadow-xs shrink-0"
                             :title="$t('pos.add_new_customer')"
                         >
                             <span>➕</span>
@@ -481,19 +530,19 @@ useKeyboardShortcuts({
                         </div>
 
                         <div class="grid grid-cols-4 gap-1.5 font-mono font-bold text-xs">
-                            <button v-for="num in ['7','8','9','C']" :key="num" @click="pressNumpad(num)" type="button" class="h-9 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-transparent flex items-center justify-center cursor-pointer shadow-xs">{{ num }}</button>
-                            <button v-for="num in ['4','5','6','backspace']" :key="num" @click="pressNumpad(num)" type="button" class="h-9 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-transparent flex items-center justify-center cursor-pointer shadow-xs">{{ num === 'backspace' ? '⌫' : num }}</button>
-                            <button v-for="num in ['1','2','3','0']" :key="num" @click="pressNumpad(num)" type="button" class="h-9 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-transparent flex items-center justify-center cursor-pointer shadow-xs">{{ num }}</button>
-                            <button @click="pressNumpad('.')" type="button" class="h-9 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-transparent flex items-center justify-center cursor-pointer shadow-xs">.</button>
-                            <button @click="pressNumpad('00')" type="button" class="h-9 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-transparent flex items-center justify-center cursor-pointer shadow-xs">00</button>
-                            <button @click="quickSetPaidExact" type="button" class="col-span-2 h-9 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-tajawal font-black flex items-center justify-center cursor-pointer">{{ $t('pos.quick_amount_full') }}</button>
+                            <button v-for="num in ['7','8','9','C']" :key="num" @click="pressNumpad(num)" type="button" class="h-11 sm:h-9 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-transparent flex items-center justify-center cursor-pointer shadow-xs active:scale-95 text-sm font-black">{{ num }}</button>
+                            <button v-for="num in ['4','5','6','backspace']" :key="num" @click="pressNumpad(num)" type="button" class="h-11 sm:h-9 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-transparent flex items-center justify-center cursor-pointer shadow-xs active:scale-95 text-sm font-black">{{ num === 'backspace' ? '⌫' : num }}</button>
+                            <button v-for="num in ['1','2','3','0']" :key="num" @click="pressNumpad(num)" type="button" class="h-11 sm:h-9 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-transparent flex items-center justify-center cursor-pointer shadow-xs active:scale-95 text-sm font-black">{{ num }}</button>
+                            <button @click="pressNumpad('.')" type="button" class="h-11 sm:h-9 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-transparent flex items-center justify-center cursor-pointer shadow-xs active:scale-95 text-sm font-black">.</button>
+                            <button @click="pressNumpad('00')" type="button" class="h-11 sm:h-9 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-transparent flex items-center justify-center cursor-pointer shadow-xs active:scale-95 text-sm font-black">00</button>
+                            <button @click="quickSetPaidExact" type="button" class="col-span-2 h-11 sm:h-9 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-tajawal font-black flex items-center justify-center cursor-pointer active:scale-95 text-xs shadow-xs">{{ $t('pos.quick_amount_full') }}</button>
                         </div>
                     </div>
 
                     <!-- Financial Totals & Payment (Fixed Bottom Area) -->
-                    <div class="p-3.5 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 space-y-2.5 shrink-0">
+                    <div class="p-3.5 sm:p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 space-y-2.5 shrink-0">
                         <!-- Subtotal & Discount -->
-                        <div class="space-y-1 text-xs text-slate-500 dark:text-slate-400">
+                        <div class="space-y-1.5 text-xs text-slate-500 dark:text-slate-400 font-tajawal">
                             <div class="flex items-center justify-between">
                                 <span>{{ $t('common.subtotal') }}:</span>
                                 <span class="font-mono font-bold text-slate-900 dark:text-white">{{ formatMoney(subtotal) }} {{ $t('common.currency') }}</span>
@@ -505,7 +554,7 @@ useKeyboardShortcuts({
                                     <button
                                         @click="discountType = discountType === 'fixed' ? 'percentage' : 'fixed'"
                                         type="button"
-                                        class="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-[10px] font-black text-amber-600 dark:text-amber-400"
+                                        class="h-7 px-2 rounded-lg bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-black text-amber-600 dark:text-amber-400 cursor-pointer"
                                     >
                                         {{ discountType === 'fixed' ? $t('common.currency') : '%' }}
                                     </button>
@@ -513,25 +562,25 @@ useKeyboardShortcuts({
                                         v-model.number="discountValue"
                                         type="number"
                                         min="0"
-                                        class="w-16 h-6 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-center text-xs font-mono font-bold text-slate-900 dark:text-white"
+                                        class="w-16 h-7 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-center text-xs font-mono font-bold text-slate-900 dark:text-white"
                                     />
                                     <span class="font-mono font-bold text-rose-600 dark:text-rose-400">-{{ formatMoney(discountAmount) }}</span>
                                 </div>
                             </div>
 
                             <!-- Net Total -->
-                            <div class="flex items-center justify-between pt-1 border-t border-slate-200 dark:border-slate-800 text-sm">
+                            <div class="flex items-center justify-between pt-1.5 border-t border-slate-200 dark:border-slate-800 text-sm">
                                 <span class="font-black text-slate-900 dark:text-white">{{ $t('common.net') }}:</span>
-                                <span class="font-mono font-black text-lg text-emerald-600 dark:text-emerald-400">{{ formatMoney(netTotal) }} {{ $t('common.currency') }}</span>
+                                <span class="font-mono font-black text-lg sm:text-xl text-emerald-600 dark:text-emerald-400">{{ formatMoney(netTotal) }} {{ $t('common.currency') }}</span>
                             </div>
                         </div>
 
-                        <!-- Payment Type Selector -->
+                        <!-- Payment Type Selector (Finger Friendly Min 40px) -->
                         <div class="grid grid-cols-3 gap-1.5 text-xs">
                             <button
                                 @click="paymentType = 'cash'; autoSetCashPaid()"
                                 type="button"
-                                class="py-1.5 rounded-xl font-black transition text-center cursor-pointer"
+                                class="h-10 sm:h-9 rounded-xl font-black transition text-center cursor-pointer flex items-center justify-center active:scale-95 shadow-xs"
                                 :class="paymentType === 'cash' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'bg-slate-200 dark:bg-slate-900 text-slate-700 dark:text-slate-400 hover:bg-slate-300 dark:hover:bg-slate-800'"
                             >
                                 {{ $t('pos.payment_cash') }} (F4)
@@ -539,7 +588,7 @@ useKeyboardShortcuts({
                             <button
                                 @click="paymentType = 'partial'; autoSetCashPaid()"
                                 type="button"
-                                class="py-1.5 rounded-xl font-black transition text-center cursor-pointer"
+                                class="h-10 sm:h-9 rounded-xl font-black transition text-center cursor-pointer flex items-center justify-center active:scale-95 shadow-xs"
                                 :class="paymentType === 'partial' ? 'bg-amber-500 text-slate-950 shadow-md' : 'bg-slate-200 dark:bg-slate-900 text-slate-700 dark:text-slate-400 hover:bg-slate-300 dark:hover:bg-slate-800'"
                             >
                                 {{ $t('pos.payment_partial') }} (F8)
@@ -547,7 +596,7 @@ useKeyboardShortcuts({
                             <button
                                 @click="paymentType = 'credit'; paidAmount = 0"
                                 type="button"
-                                class="py-1.5 rounded-xl font-black transition text-center cursor-pointer"
+                                class="h-10 sm:h-9 rounded-xl font-black transition text-center cursor-pointer flex items-center justify-center active:scale-95 shadow-xs"
                                 :class="paymentType === 'credit' ? 'bg-rose-500 text-white shadow-md' : 'bg-slate-200 dark:bg-slate-900 text-slate-700 dark:text-slate-400 hover:bg-slate-300 dark:hover:bg-slate-800'"
                             >
                                 {{ $t('pos.payment_credit') }} (F9)
@@ -555,11 +604,11 @@ useKeyboardShortcuts({
                         </div>
 
                         <!-- Payment Method Selector (Cash, InstaPay, Visa, Wallet) -->
-                        <div class="grid grid-cols-4 gap-1 text-[10px] font-bold">
+                        <div class="grid grid-cols-4 gap-1 text-[11px] font-bold">
                             <button
                                 @click="paymentMethod = 'cash'"
                                 type="button"
-                                class="py-1 rounded-lg border transition text-center cursor-pointer"
+                                class="h-8.5 rounded-xl border transition text-center cursor-pointer flex items-center justify-center active:scale-95"
                                 :class="paymentMethod === 'cash' ? 'bg-theme-light border-theme-primary text-theme-primary font-black' : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'"
                             >
                                 {{ $t('treasury.cash_drawer') }}
@@ -567,7 +616,7 @@ useKeyboardShortcuts({
                             <button
                                 @click="paymentMethod = 'instapay'"
                                 type="button"
-                                class="py-1 rounded-lg border transition text-center cursor-pointer"
+                                class="h-8.5 rounded-xl border transition text-center cursor-pointer flex items-center justify-center active:scale-95"
                                 :class="paymentMethod === 'instapay' ? 'bg-purple-500/15 border-purple-500 text-purple-600 dark:text-purple-400 font-black' : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'"
                             >
                                 {{ $t('treasury.instapay') }}
@@ -575,7 +624,7 @@ useKeyboardShortcuts({
                             <button
                                 @click="paymentMethod = 'visa'"
                                 type="button"
-                                class="py-1 rounded-lg border transition text-center cursor-pointer"
+                                class="h-8.5 rounded-xl border transition text-center cursor-pointer flex items-center justify-center active:scale-95"
                                 :class="paymentMethod === 'visa' ? 'bg-cyan-500/15 border-cyan-500 text-cyan-600 dark:text-cyan-400 font-black' : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'"
                             >
                                 {{ $t('treasury.visa') }}
@@ -583,7 +632,7 @@ useKeyboardShortcuts({
                             <button
                                 @click="paymentMethod = 'e_wallet'"
                                 type="button"
-                                class="py-1 rounded-lg border transition text-center cursor-pointer"
+                                class="h-8.5 rounded-xl border transition text-center cursor-pointer flex items-center justify-center active:scale-95"
                                 :class="paymentMethod === 'e_wallet' ? 'bg-rose-500/15 border-rose-500 text-rose-600 dark:text-rose-400 font-black' : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'"
                             >
                                 {{ $t('treasury.e_wallet') }}
@@ -593,25 +642,25 @@ useKeyboardShortcuts({
                         <!-- Paid Amount & Change Due -->
                         <div v-if="paymentType !== 'credit'" class="flex items-center justify-between gap-2 text-xs">
                             <div class="flex items-center gap-1.5 flex-1">
-                                <span class="text-slate-600 dark:text-slate-400">{{ $t('common.paid') }}:</span>
+                                <span class="text-slate-600 dark:text-slate-400 shrink-0">{{ $t('common.paid') }}:</span>
                                 <input
                                     v-model.number="paidAmount"
                                     type="number"
                                     min="0"
-                                    class="w-full h-8 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-2 text-center text-xs font-mono font-black text-slate-900 dark:text-white focus:outline-none focus:border-theme-primary"
+                                    class="w-full h-10 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-2 text-center text-sm font-mono font-black text-slate-900 dark:text-white focus:outline-none focus:border-theme-primary"
                                 />
                             </div>
 
-                            <div v-if="changeDue > 0" class="px-2.5 py-1 rounded-xl bg-theme-light border border-theme-light text-theme-primary font-mono font-black text-xs">
+                            <div v-if="changeDue > 0" class="px-3 py-1.5 rounded-xl bg-theme-light border border-theme-light text-theme-primary font-mono font-black text-xs shrink-0">
                                 {{ $t('pos.change_due') }}: {{ formatMoney(changeDue) }} {{ $t('common.currency') }}
                             </div>
                         </div>
 
                         <!-- Quick Cash Amount Chips -->
-                        <div v-if="paymentType !== 'credit'" class="flex items-center gap-1 overflow-x-auto text-[10px] font-mono">
-                            <span class="text-slate-500 text-[9px] px-1 font-tajawal">{{ $t('contacts.voucher_amount') }}:</span>
-                            <button @click="quickSetPaidExact" type="button" class="px-2 py-0.5 rounded bg-slate-200 hover:bg-theme-primary hover:text-white dark:bg-slate-800 text-theme-primary font-bold transition">{{ $t('common.net') }}</button>
-                            <button v-for="amt in [50, 100, 200, 500]" :key="amt" @click="quickSetPaidAmount(amt)" type="button" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition">{{ amt }}</button>
+                        <div v-if="paymentType !== 'credit'" class="flex items-center gap-1.5 overflow-x-auto text-xs font-mono">
+                            <span class="text-slate-500 text-[10px] px-1 font-tajawal shrink-0">{{ $t('contacts.voucher_amount') }}:</span>
+                            <button @click="quickSetPaidExact" type="button" class="h-7.5 px-2.5 rounded-lg bg-slate-200 hover:bg-theme-primary hover:text-white dark:bg-slate-800 text-theme-primary font-black transition active:scale-95 shrink-0">{{ $t('common.net') }}</button>
+                            <button v-for="amt in [50, 100, 200, 500]" :key="amt" @click="quickSetPaidAmount(amt)" type="button" class="h-7.5 px-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition active:scale-95 shrink-0">{{ amt }}</button>
                         </div>
 
                         <!-- Checkout & Clear Buttons -->
@@ -619,7 +668,7 @@ useKeyboardShortcuts({
                             <button
                                 @click="handleClearCart"
                                 type="button"
-                                class="w-11 h-11 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 font-black text-sm flex items-center justify-center transition border border-slate-200 dark:border-slate-800 shrink-0 cursor-pointer"
+                                class="w-12 h-12 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 font-black text-base flex items-center justify-center transition border border-slate-200 dark:border-slate-800 shrink-0 cursor-pointer active:scale-95 shadow-xs"
                                 :title="$t('pos.clear_cart')"
                             >
                                 🗑️
@@ -629,7 +678,7 @@ useKeyboardShortcuts({
                                 :disabled="isSubmitting || cart.length === 0"
                                 @click="submitCheckout"
                                 type="button"
-                                class="flex-1 h-11 rounded-2xl btn-primary-theme disabled:opacity-50 font-black text-sm flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
+                                class="flex-1 h-12 rounded-2xl btn-primary-theme disabled:opacity-50 font-black text-sm flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer shadow-theme-primary"
                             >
                                 <span>⚡</span>
                                 <span>{{ isSubmitting ? $t('common.save') + '...' : $t('pos.confirm_invoice') + ' (Enter)' }}</span>

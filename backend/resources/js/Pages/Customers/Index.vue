@@ -271,9 +271,10 @@ const toggleActive = (c) => {
                 </div>
             </div>
 
-            <!-- Customers Table -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4 overflow-hidden">
-                <div class="overflow-x-auto">
+            <!-- Customers Table & Mobile Cards -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-4 overflow-hidden font-tajawal">
+                <!-- Desktop Table (Hidden on Mobile) -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
@@ -374,11 +375,87 @@ const toggleActive = (c) => {
                             </tr>
                         </tbody>
                     </table>
+                </div>
 
-                    <div v-if="!customers.data || customers.data.length === 0" class="py-16 text-center space-y-2">
-                        <span class="text-3xl">👥</span>
-                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('contacts.no_customers_found') }}</p>
+                <!-- Mobile Cards View (Visible on Small Screens) -->
+                <div class="md:hidden space-y-3">
+                    <div
+                        v-for="c in customers.data"
+                        :key="c.id"
+                        class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-3 shadow-xs font-tajawal"
+                    >
+                        <!-- Top Row: Name + Phone -->
+                        <div class="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-800/80 pb-2.5">
+                            <div class="space-y-0.5">
+                                <div class="font-black text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                                    <span>{{ c.name }}</span>
+                                    <span :class="c.is_active ? 'text-emerald-500' : 'text-slate-400'" class="text-xs">●</span>
+                                </div>
+                                <p v-if="c.phone" class="text-xs text-slate-400 font-mono" dir="ltr">{{ c.phone }}</p>
+                            </div>
+
+                            <span
+                                class="px-2.5 py-1 rounded-xl border font-mono font-black text-xs"
+                                :class="[
+                                    c.current_balance > 0 ? 'bg-rose-500/15 border-rose-500/30 text-rose-600 dark:text-rose-400' :
+                                    (c.current_balance < 0 ? 'bg-indigo-500/15 border-indigo-500/30 text-indigo-600 dark:text-indigo-400' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400')
+                                ]"
+                            >
+                                {{ formatMoney(c.current_balance) }} {{ $t('common.currency') }}
+                            </span>
+                        </div>
+
+                        <!-- Address if present -->
+                        <div v-if="c.address" class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                            <span>📍</span>
+                            <span>{{ c.address }}</span>
+                        </div>
+
+                        <!-- Mobile Action Bar -->
+                        <div class="flex items-center justify-between pt-1 gap-2">
+                            <!-- Quick Payment Button -->
+                            <button
+                                @click="openPaymentModal(c)"
+                                type="button"
+                                class="flex-1 h-10 px-3 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-black transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+                            >
+                                <span>💵</span>
+                                <span>{{ $t('contacts.record_receipt_voucher') }}</span>
+                            </button>
+
+                            <Link
+                                :href="`/customers/${c.id}/statement`"
+                                class="w-10 h-10 rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
+                                :title="$t('contacts.statement_title')"
+                            >
+                                📜
+                            </Link>
+
+                            <button
+                                @click="openEditModal(c)"
+                                type="button"
+                                class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
+                                :title="$t('common.edit')"
+                            >
+                                ✏️
+                            </button>
+
+                            <button
+                                @click="deleteCustomer(c)"
+                                type="button"
+                                class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
+                                :class="!c.can_be_deleted ? 'opacity-40 cursor-not-allowed' : ''"
+                                :title="c.can_be_deleted ? $t('common.delete') : c.deletion_blockers.join(', ')"
+                            >
+                                🗑️
+                            </button>
+                        </div>
                     </div>
+                </div>
+
+                <div v-if="!customers.data || customers.data.length === 0" class="py-16 text-center space-y-2">
+                    <span class="text-3xl">👥</span>
+                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('contacts.no_customers_found') }}</p>
                 </div>
 
                 <!-- Pagination -->
