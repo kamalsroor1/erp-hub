@@ -1,9 +1,10 @@
-﻿<script setup>
+<script setup>
 import { ref, computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import SearchableSelect from '@/Components/SearchableSelect.vue';
 import DatePicker from '@/Components/DatePicker.vue';
+import { trans } from '@/helpers/trans';
 
 const props = defineProps({
     stores: { type: Array, default: () => [] },
@@ -23,7 +24,7 @@ const selectedItemIdToAdd = ref(null);
 const availableItemOptions = computed(() => {
     return props.items.map(item => ({
         id: item.id,
-        name: `${item.name} (${item.code}) - الرصيد العام: ${item.current_stock} ${item.unit || 'كجم'}`,
+        name: `${item.name} (${item.code}) - ${trans('inventory.current_stock') || 'الرصيد'}: ${item.current_stock} ${item.unit || 'كجم'}`,
     }));
 });
 
@@ -33,7 +34,7 @@ const addItemRow = () => {
     if (!item) return;
 
     if (form.items.some(it => it.item_id === item.id)) {
-        alert('هذا الصنف مضاف بالفعل في إذن التحويل');
+        alert(trans('inventory.item_already_added') || 'هذا الصنف مضاف بالفعل في إذن التحويل');
         return;
     }
 
@@ -54,11 +55,11 @@ const removeItemRow = (index) => {
 
 const submitTransfer = () => {
     if (form.from_store_id === form.to_store_id) {
-        alert('لا يمكن إجراء تحويل مخزني لنفس الفرع أو المخزن!');
+        alert(trans('inventory.same_store_transfer_error') || 'لا يمكن إجراء تحويل مخزني لنفس الفرع أو المخزن!');
         return;
     }
     if (form.items.length === 0) {
-        alert('يرجى إضافة صنف واحد على الأقل لإجراء التحويل.');
+        alert(trans('inventory.add_at_least_one_item') || 'يرجى إضافة صنف واحد على الأقل لإجراء التحويل.');
         return;
     }
 
@@ -69,7 +70,7 @@ const submitTransfer = () => {
 </script>
 
 <template>
-    <Head title="إنشاء إذن تحويل مخزني جديد" />
+    <Head :title="$t('inventory.new_transfer')" />
 
     <AppLayout>
         <div class="max-w-4xl mx-auto space-y-6 font-tajawal">
@@ -82,10 +83,10 @@ const submitTransfer = () => {
                         </Link>
                         <div>
                             <h1 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-                                <span>🚚 إنشاء إذن تحويل وشحن بضاعة بين الفروع</span>
+                                <span>🚚 {{ $t('inventory.new_transfer') }}</span>
                             </h1>
                             <p class="text-xs text-slate-400 font-bold mt-0.5">
-                                نقل كميات البضاعة من المخزن الرئيسي إلى الفروع أو عربيات التوزيع مع الخصم والإيداع الفوري
+                                {{ $t('inventory.transfers_subtitle') }}
                             </p>
                         </div>
                     </div>
@@ -97,12 +98,12 @@ const submitTransfer = () => {
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm space-y-5">
                     <h2 class="text-sm font-black text-white border-b border-slate-800 pb-3 flex items-center gap-2">
                         <span>🏢</span>
-                        <span>بيانات مسار التحويل والمخازن</span>
+                        <span>{{ $t('inventory.stores_title') }}</span>
                     </h2>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">من مخزن / فرع (المصدر) *</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.from_store') }} *</label>
                             <select
                                 v-model="form.from_store_id"
                                 required
@@ -115,7 +116,7 @@ const submitTransfer = () => {
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">إلى مخزن / عربية (الوجهة) *</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.to_store') }} *</label>
                             <select
                                 v-model="form.to_store_id"
                                 required
@@ -128,17 +129,17 @@ const submitTransfer = () => {
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">تاريخ إذن التحويل *</label>
-                            <DatePicker v-model="form.transfer_date" placeholder="تاريخ التحويل..." />
+                            <label class="text-xs font-bold text-slate-300">{{ $t('common.date') }} *</label>
+                            <DatePicker v-model="form.transfer_date" :placeholder="$t('common.date')" />
                         </div>
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">ملاحظات التحويل والشحن</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('common.notes') }}</label>
                         <input
                             v-model="form.notes"
                             type="text"
-                            placeholder="مثال: شحنة صباحية لعربية خط الجيزة..."
+                            :placeholder="$t('common.notes')"
                             class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                         >
                     </div>
@@ -148,7 +149,7 @@ const submitTransfer = () => {
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm space-y-5">
                     <h2 class="text-sm font-black text-white border-b border-slate-800 pb-3 flex items-center gap-2">
                         <span>📦</span>
-                        <span>أصناف وخامات البن المراد تحويلها</span>
+                        <span>{{ $t('inventory.transfer_items') }}</span>
                     </h2>
 
                     <div class="flex items-center gap-3">
@@ -156,7 +157,7 @@ const submitTransfer = () => {
                             <SearchableSelect
                                 v-model="selectedItemIdToAdd"
                                 :options="availableItemOptions"
-                                placeholder="ابحث واختر الصنف لإضافته للتحويل..."
+                                :placeholder="$t('inventory.search_item_placeholder')"
                             />
                         </div>
                         <button
@@ -164,7 +165,7 @@ const submitTransfer = () => {
                             type="button"
                             class="h-11 px-5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition cursor-pointer"
                         >
-                            + إضافة الصنف
+                            + {{ $t('inventory.add_new_item') }}
                         </button>
                     </div>
 
@@ -173,10 +174,10 @@ const submitTransfer = () => {
                         <table class="w-full text-right text-xs">
                             <thead>
                                 <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                    <th class="pb-3">الصنف</th>
-                                    <th class="pb-3 font-mono">الكمية المحولة</th>
-                                    <th class="pb-3">الوحدة</th>
-                                    <th class="pb-3 text-center w-16">إجراء</th>
+                                    <th class="pb-3">{{ $t('inventory.item_name') }}</th>
+                                    <th class="pb-3 font-mono">{{ $t('inventory.transferred_quantity') }}</th>
+                                    <th class="pb-3">{{ $t('inventory.unit') }}</th>
+                                    <th class="pb-3 text-center w-16">{{ $t('common.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-800/60 font-sans">
@@ -216,7 +217,7 @@ const submitTransfer = () => {
 
                         <div v-if="form.items.length === 0" class="py-12 text-center space-y-2 border border-dashed border-slate-800 rounded-2xl">
                             <span class="text-2xl">📦</span>
-                            <p class="text-xs font-bold text-slate-400 font-tajawal">لم يتم إضافة أي أصناف بعد. اختر صنفاً واضغط "إضافة".</p>
+                            <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_items_found') }}</p>
                         </div>
                     </div>
                 </div>
@@ -227,7 +228,7 @@ const submitTransfer = () => {
                         href="/stock-transfers"
                         class="px-5 py-3 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition"
                     >
-                        إلغاء
+                        {{ $t('common.cancel') }}
                     </Link>
 
                     <button
@@ -236,7 +237,7 @@ const submitTransfer = () => {
                         class="h-12 px-8 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <span>🚚</span>
-                        <span>{{ form.processing ? 'جاري تنفيذ التحويل المخزني...' : 'تنفيذ واعتماد إذن التحويل المخزني' }}</span>
+                        <span>{{ form.processing ? '...' : $t('inventory.new_transfer') }}</span>
                     </button>
                 </div>
             </form>

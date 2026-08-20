@@ -44,7 +44,7 @@ const openCancelModal = (inv) => {
 
 const confirmCancel = () => {
     if (!cancelReason.value || cancelReason.value.trim().length < 3) {
-        alert('يرجى كتابة سبب الإلغاء (3 أحرف على الأقل)');
+        alert(trans('invoices.cancel_reason_label') || 'يرجى كتابة سبب الإلغاء (3 أحرف على الأقل)');
         return;
     }
     isCancelling.value = true;
@@ -63,7 +63,7 @@ const confirmCancel = () => {
 };
 
 const confirmDelete = (inv) => {
-    if (confirm(`هل أنت متأكد من حذف الفاتورة رقم #${inv.invoice_number} ونقلها لسلة المحذوفات؟ سيتم إرجاع البضاعة للمخزن فورياً.`)) {
+    if (confirm(trans('common.confirm_delete') || `هل أنت متأكد من حذف الفاتورة رقم #${inv.invoice_number}؟`)) {
         router.delete(`/invoices/${inv.id}`, {
             preserveScroll: true,
         });
@@ -71,7 +71,7 @@ const confirmDelete = (inv) => {
 };
 
 const restoreInvoice = (inv) => {
-    if (confirm(`هل ترغب في استعادة الفاتورة رقم #${inv.invoice_number} من سلة المحذوفات؟`)) {
+    if (confirm(trans('trash.restore_confirm') || `هل ترغب في استعادة الفاتورة رقم #${inv.invoice_number} من سلة المحذوفات؟`)) {
         router.post(`/invoices/${inv.id}/restore`, {}, {
             preserveScroll: true,
         });
@@ -93,7 +93,7 @@ const activeFiltersCount = computed(() => {
 
 // Store Options formatted for SearchableSelect
 const storeOptions = computed(() => [
-    { id: 'all', name: '🏬 كافة الفروع ونقاط البيع' },
+    { id: 'all', name: `🏬 ${trans('common.all') || 'كافة الفروع ونقاط البيع'}` },
     ...props.stores.map(s => ({
         id: s.id,
         name: `${s.type === 'van' ? '🚐' : '🏬'} ${s.name}`,
@@ -102,27 +102,27 @@ const storeOptions = computed(() => [
 ]);
 
 // Payment Types formatted for SearchableSelect
-const paymentTypeOptions = [
-    { id: 'all', name: 'الكل (كافة أنواع السداد)' },
-    { id: 'cash', name: 'كاش 💵' },
-    { id: 'credit', name: 'آجل ⏳' },
-    { id: 'partial', name: 'جزئي 📊' },
-];
+const paymentTypeOptions = computed(() => [
+    { id: 'all', name: trans('invoices.all_payment_types') || 'الكل (كافة أنواع السداد)' },
+    { id: 'cash', name: `💵 ${trans('invoices.payment_cash') || 'كاش'}` },
+    { id: 'credit', name: `⏳ ${trans('invoices.payment_credit') || 'آجل'}` },
+    { id: 'partial', name: `📊 ${trans('invoices.payment_partial') || 'جزئي'}` },
+]);
 
-const paymentMethodOptions = [
-    { id: 'all', name: 'كافة وسائل التحصيل' },
-    { id: 'cash', name: 'نقدي (كاش)' },
-    { id: 'instapay', name: 'إستاباي ⚡' },
-    { id: 'wallet', name: 'محفظة إلكترونية 📱' },
-    { id: 'bank', name: 'تحويل بنكي 🏦' },
-];
+const paymentMethodOptions = computed(() => [
+    { id: 'all', name: trans('invoices.all_payment_methods') || 'كافة وسائل التحصيل' },
+    { id: 'cash', name: trans('invoices.payment_cash') || 'نقدي (كاش)' },
+    { id: 'instapay', name: `⚡ ${trans('invoices.payment_instapay') || 'إستاباي'}` },
+    { id: 'wallet', name: `📱 ${trans('invoices.payment_wallet') || 'محفظة إلكترونية'}` },
+    { id: 'bank', name: `🏦 ${trans('invoices.payment_bank') || 'تحويل بنكي'}` },
+]);
 
-const statusOptions = [
-    { id: 'active', name: 'الفواتير النشطة (غير المحذوفة)' },
-    { id: 'confirmed', name: 'الفواتير المعتمدة فقط' },
-    { id: 'cancelled', name: 'الفواتير الملغاة' },
-    { id: 'trash', name: 'سلة المحذوفات' },
-];
+const statusOptions = computed(() => [
+    { id: 'active', name: trans('invoices.active_invoices_only') || 'الفواتير النشطة' },
+    { id: 'confirmed', name: trans('invoices.confirmed_only') || 'الفواتير المعتمدة فقط' },
+    { id: 'cancelled', name: trans('invoices.cancelled_only') || 'الفواتير الملغاة' },
+    { id: 'trash', name: trans('invoices.trash_invoices') || 'سلة المحذوفات' },
+]);
 
 // Apply Filters to Inertia
 const applyFilters = () => {
@@ -168,16 +168,16 @@ const getPaymentBadge = (inv) => {
     if (inv.payment_type === 'cash') {
         if (inv.payment_method === 'instapay') return { label: 'إستاباي ⚡', class: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30' };
         if (inv.payment_method === 'wallet') return { label: 'محفظة 📱', class: 'bg-teal-500/15 text-teal-400 border-teal-500/30' };
-        return { label: 'كاش 💵', class: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' };
+        return { label: trans('invoices.payment_cash') || 'كاش 💵', class: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' };
     }
-    if (inv.payment_type === 'credit') return { label: 'آجل', class: 'bg-rose-500/15 text-rose-400 border-rose-500/30' };
-    if (inv.payment_type === 'partial') return { label: 'جزئي', class: 'bg-amber-500/15 text-amber-400 border-amber-500/30' };
+    if (inv.payment_type === 'credit') return { label: trans('invoices.payment_credit') || 'آجل', class: 'bg-rose-500/15 text-rose-400 border-rose-500/30' };
+    if (inv.payment_type === 'partial') return { label: trans('invoices.payment_partial') || 'جزئي', class: 'bg-amber-500/15 text-amber-400 border-amber-500/30' };
     return { label: inv.payment_type, class: 'bg-slate-800 text-slate-400 border-slate-700' };
 };
 
 const getStatusBadge = (st) => {
-    if (st === 'confirmed') return { label: 'معتمدة', class: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' };
-    if (st === 'cancelled') return { label: 'ملغاة', class: 'bg-rose-500/10 text-rose-400 border-rose-500/20' };
+    if (st === 'confirmed') return { label: trans('invoices.status_confirmed') || 'معتمدة', class: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' };
+    if (st === 'cancelled') return { label: trans('invoices.status_cancelled') || 'ملغاة', class: 'bg-rose-500/10 text-rose-400 border-rose-500/20' };
     return { label: st, class: 'bg-slate-800 text-slate-400 border-slate-700' };
 };
 
@@ -191,7 +191,7 @@ const printA4 = (id) => {
 </script>
 
 <template>
-    <Head :title="$t('nav.invoices_log')" />
+    <Head :title="$t('invoices.title')" />
 
     <AppLayout>
         <div class="space-y-6">
@@ -201,11 +201,11 @@ const printA4 = (id) => {
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">🧾</span>
                         <h1 class="text-xl sm:text-2xl font-black text-white font-tajawal">
-                            {{ $t('nav.invoices_log') }}
+                            {{ $t('invoices.title') }}
                         </h1>
                     </div>
                     <p class="text-xs text-slate-400 font-bold">
-                        متابعة الفواتير المعتمدة، حالات السداد والتحصيل، وإلغاء الفواتير وفق الأصول المحاسبية
+                        {{ $t('invoices.subtitle') }}
                     </p>
                 </div>
 
@@ -214,45 +214,45 @@ const printA4 = (id) => {
                     class="h-11 px-5 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition transform active:scale-95 font-tajawal cursor-pointer"
                 >
                     <span class="text-base font-black">+</span>
-                    <span>فاتورة بيع جديدة (F2)</span>
+                    <span>{{ $t('invoices.new_sale_invoice') }}</span>
                 </Link>
             </div>
 
             <!-- 4 Top KPI Summary Cards -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 font-tajawal">
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">إجمالي الفواتير</span>
+                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('invoices.total_invoices_count') }}</span>
                     <div class="text-xl font-black font-mono text-white flex items-center gap-1.5">
                         <span>🧾</span>
                         <span>{{ stats.total_count }}</span>
-                        <span class="text-xs font-tajawal text-slate-400 font-normal">فاتورة</span>
+                        <span class="text-xs font-tajawal text-slate-400 font-normal">{{ $t('invoices.invoice_unit') }}</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">إجمالي المبيعات (الصافي)</span>
+                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('invoices.total_sales_net') }}</span>
                     <div class="text-xl font-black font-mono text-emerald-400 flex items-center gap-1.5">
                         <span>💰</span>
                         <span>{{ formatMoney(stats.total_net) }}</span>
-                        <span class="text-xs font-tajawal text-slate-400 font-normal">ج.م</span>
+                        <span class="text-xs font-tajawal text-slate-400 font-normal">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">المحصل فعلياً</span>
+                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('invoices.total_paid_actual') }}</span>
                     <div class="text-xl font-black font-mono text-amber-400 flex items-center gap-1.5">
                         <span>💵</span>
                         <span>{{ formatMoney(stats.total_paid) }}</span>
-                        <span class="text-xs font-tajawal text-slate-400 font-normal">ج.م</span>
+                        <span class="text-xs font-tajawal text-slate-400 font-normal">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">المتبقي الآجل (مديونيات)</span>
+                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('invoices.total_remaining_credit') }}</span>
                     <div class="text-xl font-black font-mono text-rose-400 flex items-center gap-1.5">
                         <span>⏳</span>
                         <span>{{ formatMoney(stats.total_remaining) }}</span>
-                        <span class="text-xs font-tajawal text-slate-400 font-normal">ج.م</span>
+                        <span class="text-xs font-tajawal text-slate-400 font-normal">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
             </div>
@@ -265,7 +265,7 @@ const printA4 = (id) => {
                         <input
                             v-model="search"
                             type="text"
-                            placeholder="... بحث سريع برقم الفاتورة أو اسم العميل"
+                            :placeholder="$t('invoices.search_invoices_placeholder')"
                             class="w-full pr-10 pl-4 py-2.5 bg-slate-950/80 border border-slate-800 rounded-2xl text-xs text-white placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-none transition"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
@@ -283,7 +283,7 @@ const printA4 = (id) => {
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
                                 :class="paymentType === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'"
                             >
-                                الكل
+                                {{ $t('common.all') }}
                             </button>
                             <button
                                 @click="paymentType = 'cash'; applyFilters();"
@@ -291,7 +291,7 @@ const printA4 = (id) => {
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
                                 :class="paymentType === 'cash' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'"
                             >
-                                كاش 💵
+                                {{ $t('invoices.payment_cash') }} 💵
                             </button>
                             <button
                                 @click="paymentType = 'credit'; applyFilters();"
@@ -299,7 +299,7 @@ const printA4 = (id) => {
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
                                 :class="paymentType === 'credit' ? 'bg-rose-500 text-white font-black' : 'text-slate-400 hover:text-white'"
                             >
-                                آجل
+                                {{ $t('invoices.payment_credit') }}
                             </button>
                         </div>
 
@@ -310,7 +310,7 @@ const printA4 = (id) => {
                             class="h-10 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
                         >
                             <span>⚙️</span>
-                            <span>تصفية وفلاتر متقدمة</span>
+                            <span>{{ $t('common.filter') }}</span>
                             <span
                                 v-if="activeFiltersCount > 0"
                                 class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-mono font-black text-[11px] flex items-center justify-center"
@@ -323,25 +323,25 @@ const printA4 = (id) => {
 
                 <!-- Active Filters Chips List (Removable) -->
                 <div v-if="activeFiltersCount > 0" class="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800/80 text-xs">
-                    <span class="text-slate-500 text-[11px] font-bold">الفلاتر النشطة:</span>
+                    <span class="text-slate-500 text-[11px] font-bold">{{ $t('dashboard.quick_filter') || 'الفلاتر النشطة' }}:</span>
 
                     <span v-if="storeId !== 'all'" class="px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center gap-1.5 font-bold">
-                        <span>الفرع: {{ storeOptions.find(s => s.id == storeId)?.name }}</span>
+                        <span>{{ $t('common.store') }}: {{ storeOptions.find(s => s.id == storeId)?.name }}</span>
                         <button @click="storeId = 'all'; applyFilters();" class="hover:text-rose-400">✕</button>
                     </span>
 
                     <span v-if="dateFrom || dateTo" class="px-2.5 py-1 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center gap-1.5 font-mono font-bold">
-                        <span>التاريخ: {{ dateFrom || '...' }} إلى {{ dateTo || '...' }}</span>
+                        <span>{{ $t('common.date') }}: {{ dateFrom || '...' }} إلى {{ dateTo || '...' }}</span>
                         <button @click="dateFrom = ''; dateTo = ''; applyFilters();" class="hover:text-rose-400">✕</button>
                     </span>
 
                     <span v-if="status !== 'active'" class="px-2.5 py-1 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center gap-1.5 font-bold">
-                        <span>الحالة: {{ statusOptions.find(s => s.id === status)?.name }}</span>
+                        <span>{{ $t('common.status') }}: {{ statusOptions.find(s => s.id === status)?.name }}</span>
                         <button @click="status = 'active'; applyFilters();" class="hover:text-rose-400">✕</button>
                     </span>
 
                     <button @click="resetFilters" class="text-slate-400 hover:text-rose-400 text-xs underline font-bold mr-1">
-                        مسح كافة الفلاتر
+                        {{ $t('common.clear_all') || 'مسح كافة الفلاتر' }}
                     </button>
                 </div>
             </div>
@@ -352,16 +352,16 @@ const printA4 = (id) => {
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-3">رقم الفاتورة</th>
-                                <th class="pb-3">العميل</th>
-                                <th class="pb-3">الفرع / نقطة البيع</th>
-                                <th class="pb-3">التاريخ</th>
-                                <th class="pb-3">نوع الدفع</th>
-                                <th class="pb-3 font-mono">الصافي المطلوب</th>
-                                <th class="pb-3 font-mono">المدفوع</th>
-                                <th class="pb-3 font-mono">المتبقي</th>
-                                <th class="pb-3">الحالة</th>
-                                <th class="pb-3 text-center">الإجراءات</th>
+                                <th class="pb-3">{{ $t('invoices.invoice_number') }}</th>
+                                <th class="pb-3">{{ $t('invoices.customer') }}</th>
+                                <th class="pb-3">{{ $t('invoices.store') }}</th>
+                                <th class="pb-3">{{ $t('common.date') }}</th>
+                                <th class="pb-3">{{ $t('invoices.payment_type') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('invoices.net_total') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('invoices.paid') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('invoices.remaining') }}</th>
+                                <th class="pb-3">{{ $t('common.status') }}</th>
+                                <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">
@@ -429,7 +429,7 @@ const printA4 = (id) => {
                                         <Link
                                             :href="`/invoices/${inv.id}`"
                                             class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer"
-                                            title="عرض تفاصيل الفاتورة"
+                                            :title="$t('invoices.view_invoice')"
                                         >
                                             👁️
                                         </Link>
@@ -439,7 +439,7 @@ const printA4 = (id) => {
                                             v-if="inv.status !== 'cancelled' && status !== 'trash'"
                                             :href="`/invoices/${inv.id}/edit`"
                                             class="p-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-400 transition cursor-pointer"
-                                            title="تعديل الفاتورة"
+                                            :title="$t('invoices.edit_invoice')"
                                         >
                                             ✏️
                                         </Link>
@@ -449,7 +449,7 @@ const printA4 = (id) => {
                                             @click="printThermal(inv.id)"
                                             type="button"
                                             class="p-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 transition cursor-pointer"
-                                            title="طباعة إيصال كاشير حراري (80mm)"
+                                            :title="$t('invoices.print_thermal')"
                                         >
                                             🖨️
                                         </button>
@@ -459,7 +459,7 @@ const printA4 = (id) => {
                                             @click="printA4(inv.id)"
                                             type="button"
                                             class="p-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-400 transition cursor-pointer"
-                                            title="طباعة فاتورة رسمية A4"
+                                            :title="$t('invoices.print_a4')"
                                         >
                                             📄
                                         </button>
@@ -470,7 +470,7 @@ const printA4 = (id) => {
                                             @click="openCancelModal(inv)"
                                             type="button"
                                             class="p-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 transition cursor-pointer"
-                                            title="إلغاء الفاتورة وعكس المخزون"
+                                            :title="$t('invoices.cancel_invoice')"
                                         >
                                             🚫
                                         </button>
@@ -481,7 +481,7 @@ const printA4 = (id) => {
                                             @click="restoreInvoice(inv)"
                                             type="button"
                                             class="p-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 transition cursor-pointer"
-                                            title="استعادة الفاتورة من سلة المحذوفات"
+                                            :title="$t('trash.restore_btn') || 'استعادة الفاتورة'"
                                         >
                                             ♻️
                                         </button>
@@ -492,7 +492,7 @@ const printA4 = (id) => {
                                             @click="confirmDelete(inv)"
                                             type="button"
                                             class="p-1.5 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition cursor-pointer"
-                                            title="حذف / أرشفة الفاتورة"
+                                            :title="$t('common.delete')"
                                         >
                                             🗑️
                                         </button>
@@ -505,14 +505,14 @@ const printA4 = (id) => {
                     <!-- Empty State -->
                     <div v-if="!invoices.data || invoices.data.length === 0" class="py-16 text-center space-y-2">
                         <span class="text-3xl">🧾</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">لا توجد فواتير مسجلة مطابقة للفلاتر المحددة</p>
+                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('invoices.no_invoices_found') }}</p>
                     </div>
                 </div>
 
                 <!-- Pagination Links -->
                 <div v-if="invoices.links && invoices.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
                     <span class="text-xs text-slate-400 font-tajawal">
-                        عرض {{ invoices.from || 0 }} إلى {{ invoices.to || 0 }} من إجمالي {{ invoices.total || 0 }} فاتورة
+                        {{ $t('common.actions') ? `عرض ${invoices.from || 0} إلى ${invoices.to || 0} من إجمالي ${invoices.total || 0}` : `Showing ${invoices.from || 0} to ${invoices.to || 0} of ${invoices.total || 0}` }}
                     </span>
 
                     <div class="flex items-center gap-1">
@@ -546,42 +546,41 @@ const printA4 = (id) => {
             <div class="space-y-5">
                 <!-- 1. Search Box -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🔍 البحث بالرقم أو العميل أو الهاتف</label>
+                    <label class="text-xs font-black text-slate-300">🔍 {{ $t('invoices.search_invoices_placeholder') }}</label>
                     <input
                         v-model="search"
                         type="text"
-                        placeholder="... اكتب للبحث"
+                        :placeholder="$t('common.search')"
                         class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-white placeholder:text-slate-500 focus:border-amber-500 focus:outline-none transition"
                     >
                 </div>
 
                 <!-- 2. Store Selection (Searchable) -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🏬 الفرع أو نقطة البيع أو عربة التوزيع</label>
+                    <label class="text-xs font-black text-slate-300">🏬 {{ $t('invoices.store') }}</label>
                     <SearchableSelect
                         v-model="storeId"
                         :options="storeOptions"
-                        placeholder="اختر الفرع..."
-                        search-placeholder="... ابحث في الفروع"
+                        :placeholder="$t('common.store')"
                     />
                 </div>
 
                 <!-- 3. Date Range Calendar (Flatpickr) -->
                 <div class="space-y-2">
-                    <label class="text-xs font-black text-slate-300">📅 المدى الزمني للفواتير</label>
+                    <label class="text-xs font-black text-slate-300">📅 {{ $t('contacts.report_period') }}</label>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <span class="text-[11px] text-slate-500 block mb-1">من تاريخ:</span>
+                            <span class="text-[11px] text-slate-500 block mb-1">{{ $t('contacts.from_date') }}:</span>
                             <DatePicker
                                 v-model="dateFrom"
-                                placeholder="من..."
+                                :placeholder="$t('contacts.from_date')"
                             />
                         </div>
                         <div>
-                            <span class="text-[11px] text-slate-500 block mb-1">إلى تاريخ:</span>
+                            <span class="text-[11px] text-slate-500 block mb-1">{{ $t('contacts.to_date') }}:</span>
                             <DatePicker
                                 v-model="dateTo"
-                                placeholder="إلى..."
+                                :placeholder="$t('contacts.to_date')"
                             />
                         </div>
                     </div>
@@ -589,31 +588,31 @@ const printA4 = (id) => {
 
                 <!-- 4. Payment Type -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">💳 نوع السداد والحساب</label>
+                    <label class="text-xs font-black text-slate-300">💳 {{ $t('invoices.payment_type') }}</label>
                     <SearchableSelect
                         v-model="paymentType"
                         :options="paymentTypeOptions"
-                        placeholder="اختر نوع السداد..."
+                        :placeholder="$t('invoices.payment_type')"
                     />
                 </div>
 
                 <!-- 5. Payment Method -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">⚡ وسيلة التحصيل (كاش / إستاباي / محفظة)</label>
+                    <label class="text-xs font-black text-slate-300">⚡ {{ $t('invoices.payment_method') }}</label>
                     <SearchableSelect
                         v-model="paymentMethod"
                         :options="paymentMethodOptions"
-                        placeholder="اختر وسيلة التحصيل..."
+                        :placeholder="$t('invoices.payment_method')"
                     />
                 </div>
 
                 <!-- 6. Invoice Status -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">📋 حالة الفاتورة والأرشيف</label>
+                    <label class="text-xs font-black text-slate-300">📋 {{ $t('common.status') }}</label>
                     <SearchableSelect
                         v-model="status"
                         :options="statusOptions"
-                        placeholder="اختر الحالة..."
+                        :placeholder="$t('common.status')"
                     />
                 </div>
             </div>
@@ -624,21 +623,21 @@ const printA4 = (id) => {
             <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl font-tajawal animate-in fade-in zoom-in-95 duration-150">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <h3 class="text-base font-black text-white flex items-center gap-2">
-                        <span>⚠️ إلغاء الفاتورة وعكس المخزون</span>
+                        <span>⚠️ {{ $t('invoices.cancel_modal_title') }}</span>
                     </h3>
                     <button @click="showCancelModal = false" class="text-slate-400 hover:text-white font-bold cursor-pointer">✕</button>
                 </div>
 
                 <p class="text-xs text-slate-300">
-                    أنت على وشك إلغاء الفاتورة رقم <b class="font-mono text-amber-400">#{{ cancelTargetInvoice?.invoice_number }}</b>. سيتم إرجاع كافة البضائع إلى رصيد الفرع/المخزن فورياً، وإلغاء أثرها المالي.
+                    {{ $t('invoices.cancel_modal_desc', { number: cancelTargetInvoice?.invoice_number }) }}
                 </p>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-slate-300">سبب الإلغاء الإلزامي *</label>
+                    <label class="text-xs font-bold text-slate-300">{{ $t('invoices.cancel_reason_label') }}</label>
                     <textarea
                         v-model="cancelReason"
                         rows="3"
-                        placeholder="اكتب سبب إلغاء الفاتورة هنا (مثال: طلب العميل إرجاع البضاعة، خطأ في السعر...)"
+                        :placeholder="$t('invoices.cancel_reason_placeholder')"
                         class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white placeholder:text-slate-500 focus:border-rose-500 focus:outline-none"
                     ></textarea>
                 </div>
@@ -649,7 +648,7 @@ const printA4 = (id) => {
                         type="button"
                         class="flex-1 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
                     >
-                        تراجع
+                        {{ $t('common.cancel') }}
                     </button>
                     <button
                         :disabled="isCancelling || !cancelReason || cancelReason.trim().length < 3"
@@ -657,7 +656,7 @@ const printA4 = (id) => {
                         type="button"
                         class="flex-1 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-black transition shadow-lg shadow-rose-600/30 cursor-pointer"
                     >
-                        {{ isCancelling ? 'جاري الإلغاء...' : 'تأكيد الإلغاء وعكس الأثر' }}
+                        {{ isCancelling ? '...' : $t('invoices.confirm_cancel_btn') }}
                     </button>
                 </div>
             </div>

@@ -81,7 +81,7 @@ const clearCache = () => {
 </script>
 
 <template>
-    <Head title="إعدادات النظام والتحكم الشامل" />
+    <Head :title="$t('settings.title')" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -93,10 +93,10 @@ const clearCache = () => {
                     </div>
                     <div>
                         <h1 class="text-xl sm:text-2xl font-black text-white">
-                            إعدادات النظام والتحكم الشامل
+                            {{ $t('settings.title') }}
                         </h1>
                         <p class="text-xs text-slate-400 font-bold mt-0.5">
-                            تخصيص الهوية واللوجو، إشعارات تيليجرام التلقائية، النسخ الاحتياطي، وصيانة السيرفر
+                            {{ $t('settings.subtitle') }}
                         </p>
                     </div>
                 </div>
@@ -108,7 +108,7 @@ const clearCache = () => {
                         class="h-10 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold transition cursor-pointer flex items-center gap-1.5"
                     >
                         <span>⚡</span>
-                        <span>تنظيف وتسريع الكاش</span>
+                        <span>{{ $t('settings.clear_cache_btn') }}</span>
                     </button>
                 </div>
             </div>
@@ -122,7 +122,7 @@ const clearCache = () => {
                     :class="currentTab === 'branding' ? 'bg-amber-500 text-slate-950 font-black shadow-md' : 'text-slate-400 hover:text-white'"
                 >
                     <span>🏢</span>
-                    <span>الهوية والطباعة</span>
+                    <span>{{ $t('settings.tab_branding') }}</span>
                 </button>
 
                 <button
@@ -132,7 +132,7 @@ const clearCache = () => {
                     :class="currentTab === 'telegram' ? 'bg-amber-500 text-slate-950 font-black shadow-md' : 'text-slate-400 hover:text-white'"
                 >
                     <span>✈️</span>
-                    <span>إشعارات تيليجرام</span>
+                    <span>{{ $t('settings.tab_telegram') }}</span>
                 </button>
 
                 <button
@@ -142,7 +142,7 @@ const clearCache = () => {
                     :class="currentTab === 'backup' ? 'bg-amber-500 text-slate-950 font-black shadow-md' : 'text-slate-400 hover:text-white'"
                 >
                     <span>💾</span>
-                    <span>النسخ الاحتياطي</span>
+                    <span>{{ $t('settings.tab_backup') }}</span>
                 </button>
 
                 <button
@@ -152,7 +152,7 @@ const clearCache = () => {
                     :class="currentTab === 'system' ? 'bg-amber-500 text-slate-950 font-black shadow-md' : 'text-slate-400 hover:text-white'"
                 >
                     <span>⚡</span>
-                    <span>الأداء والصيانة</span>
+                    <span>{{ $t('settings.tab_system') }}</span>
                 </button>
             </div>
 
@@ -171,11 +171,11 @@ const clearCache = () => {
                             </div>
 
                             <div class="space-y-2 text-center sm:text-right">
-                                <h3 class="text-sm font-black text-white">شعار المؤسسة المطبوع على الفواتير (Logo)</h3>
-                                <p class="text-xs text-slate-400">يُفضل رفع صورة بخلفية شفافة PNG بحجم لا يتجاوز 3 ميجابايت</p>
+                                <h3 class="text-sm font-black text-white">{{ $t('settings.company_logo') }}</h3>
+                                <p class="text-xs text-slate-400">{{ $t('settings.logo_hint') }}</p>
                                 <div>
                                     <label class="inline-block px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold border border-slate-700 cursor-pointer transition">
-                                        <span>📁 اختيار شعار جديد...</span>
+                                        <span>{{ $t('settings.choose_logo') }}</span>
                                         <input type="file" accept="image/*" @change="handleLogoChange" class="hidden">
                                     </label>
                                 </div>
@@ -185,7 +185,7 @@ const clearCache = () => {
                         <!-- Basic Information -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">اسم النشاط أو المنشأة *</label>
+                                <label class="text-xs font-bold text-slate-300">{{ $t('settings.company_name') }}</label>
                                 <input
                                     v-model="form.company_name"
                                     type="text"
@@ -195,7 +195,7 @@ const clearCache = () => {
                             </div>
 
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">الوصف الفرعي (تحت الاسم)</label>
+                                <label class="text-xs font-bold text-slate-300">{{ $t('settings.company_subtitle') }}</label>
                                 <input
                                     v-model="form.company_subtitle"
                                     type="text"
@@ -204,7 +204,7 @@ const clearCache = () => {
                             </div>
 
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">رقم الهاتف الرسمي</label>
+                                <label class="text-xs font-bold text-slate-300">{{ $t('settings.company_phone') }}</label>
                                 <input
                                     v-model="form.company_phone"
                                     type="text"
@@ -213,7 +213,7 @@ const clearCache = () => {
                             </div>
 
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">العنوان الرسمي</label>
+                                <label class="text-xs font-bold text-slate-300">{{ $t('settings.company_address') }}</label>
                                 <input
                                     v-model="form.company_address"
                                     type="text"
@@ -222,7 +222,7 @@ const clearCache = () => {
                             </div>
 
                             <div class="sm:col-span-2 space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">عبارة تذييل الفاتورة (Footer Note)</label>
+                                <label class="text-xs font-bold text-slate-300">{{ $t('settings.invoice_footer') }}</label>
                                 <textarea
                                     v-model="form.invoice_footer_note"
                                     rows="2"
@@ -233,26 +233,26 @@ const clearCache = () => {
 
                         <!-- Printing Toggles Matrix -->
                         <div class="space-y-3 pt-4 border-t border-slate-800">
-                            <h3 class="text-xs font-black text-amber-400">خيارات تخصيص الإيصالات والطباعة:</h3>
+                            <h3 class="text-xs font-black text-amber-400">{{ $t('settings.print_options_title') }}</h3>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <label class="flex items-center gap-3 p-3 rounded-2xl bg-slate-950 border border-slate-800 hover:border-slate-700 cursor-pointer">
                                     <input type="checkbox" v-model="form.show_print_logo" class="rounded text-amber-500 focus:ring-0">
-                                    <span class="text-xs font-bold text-slate-300">إظهار الشعار (Logo) على الفواتير والإيصالات</span>
+                                    <span class="text-xs font-bold text-slate-300">{{ $t('settings.show_print_logo') }}</span>
                                 </label>
 
                                 <label class="flex items-center gap-3 p-3 rounded-2xl bg-slate-950 border border-slate-800 hover:border-slate-700 cursor-pointer">
                                     <input type="checkbox" v-model="form.show_print_company_name" class="rounded text-amber-500 focus:ring-0">
-                                    <span class="text-xs font-bold text-slate-300">إظهار اسم المنشأة أعلى الفاتورة</span>
+                                    <span class="text-xs font-bold text-slate-300">{{ $t('settings.show_print_name') }}</span>
                                 </label>
 
                                 <label class="flex items-center gap-3 p-3 rounded-2xl bg-slate-950 border border-slate-800 hover:border-slate-700 cursor-pointer">
                                     <input type="checkbox" v-model="form.thermal_show_customer_balance" class="rounded text-amber-500 focus:ring-0">
-                                    <span class="text-xs font-bold text-slate-300">إظهار رصيد العميل المتبقي على الإيصال الحراري</span>
+                                    <span class="text-xs font-bold text-slate-300">{{ $t('settings.show_thermal_balance') }}</span>
                                 </label>
 
                                 <label class="flex items-center gap-3 p-3 rounded-2xl bg-slate-950 border border-slate-800 hover:border-slate-700 cursor-pointer">
                                     <input type="checkbox" v-model="form.print_show_qr" class="rounded text-amber-500 focus:ring-0">
-                                    <span class="text-xs font-bold text-slate-300">تضمين رمز الاستجابة السريع (QR Code) الذكي</span>
+                                    <span class="text-xs font-bold text-slate-300">{{ $t('settings.show_qr') }}</span>
                                 </label>
                             </div>
                         </div>
@@ -264,7 +264,7 @@ const clearCache = () => {
                                 :disabled="form.processing"
                                 class="h-12 px-8 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                             >
-                                {{ form.processing ? 'جاري الحفظ...' : 'حفظ إعدادات الهوية والطباعة 💾' }}
+                                {{ form.processing ? $t('common.save') : $t('settings.save_branding_btn') }}
                             </button>
                         </div>
                     </div>
@@ -279,20 +279,20 @@ const clearCache = () => {
                             <div>
                                 <h2 class="text-sm font-black text-white flex items-center gap-2">
                                     <span>✈️</span>
-                                    <span>إعدادات وتنبيهات بوت تيليجرام</span>
+                                    <span>{{ $t('settings.telegram_title') }}</span>
                                 </h2>
-                                <p class="text-xs text-slate-400 mt-0.5">إرسال تقارير المبيعات، إنذار النواقص، وإغلاق الورديات فورياً لهاتفك</p>
+                                <p class="text-xs text-slate-400 mt-0.5">{{ $t('settings.telegram_sub') }}</p>
                             </div>
 
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" v-model="form.telegram_notifications_enabled" class="rounded text-amber-500 focus:ring-0">
-                                <span class="text-xs font-bold text-white">تفعيل البوت</span>
+                                <span class="text-xs font-bold text-white">{{ $t('settings.enable_bot') }}</span>
                             </label>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">رمز توكن البوت (Bot Token) *</label>
+                                <label class="text-xs font-bold text-slate-300">{{ $t('settings.bot_token') }}</label>
                                 <input
                                     v-model="form.telegram_bot_token"
                                     type="text"
@@ -302,7 +302,7 @@ const clearCache = () => {
                             </div>
 
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">معرف المحادثة أو الجروب (Chat ID) *</label>
+                                <label class="text-xs font-bold text-slate-300">{{ $t('settings.chat_id') }}</label>
                                 <input
                                     v-model="form.telegram_chat_id"
                                     type="text"
@@ -314,7 +314,7 @@ const clearCache = () => {
 
                         <!-- Live Action Testing Triggers -->
                         <div class="space-y-3 pt-4 border-t border-slate-800">
-                            <h3 class="text-xs font-black text-amber-400">إجراءات واختبارات الإرسال الفوري لتيليجرام:</h3>
+                            <h3 class="text-xs font-black text-amber-400">{{ $t('settings.telegram_actions_title') }}</h3>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <button
                                     @click="sendTelegramTest"
@@ -322,7 +322,7 @@ const clearCache = () => {
                                     class="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 hover:border-amber-500/50 text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
                                 >
                                     <span>✉️</span>
-                                    <span>إرسال رسالة تجريبية</span>
+                                    <span>{{ $t('settings.send_test_msg') }}</span>
                                 </button>
 
                                 <button
@@ -331,7 +331,7 @@ const clearCache = () => {
                                     class="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 hover:border-amber-500/50 text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
                                 >
                                     <span>📊</span>
-                                    <span>إرسال تقرير اليومية الشامل</span>
+                                    <span>{{ $t('settings.send_daily_summary') }}</span>
                                 </button>
 
                                 <button
@@ -340,7 +340,7 @@ const clearCache = () => {
                                     class="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 hover:border-amber-500/50 text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
                                 >
                                     <span>🚨</span>
-                                    <span>إرسال إنذار النواقص</span>
+                                    <span>{{ $t('settings.send_low_stock') }}</span>
                                 </button>
 
                                 <button
@@ -349,7 +349,7 @@ const clearCache = () => {
                                     class="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 hover:border-amber-500/50 text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
                                 >
                                     <span>⏰</span>
-                                    <span>إنذار الشفتات المفتوحة</span>
+                                    <span>{{ $t('settings.send_overdue_shifts') }}</span>
                                 </button>
 
                                 <button
@@ -358,7 +358,7 @@ const clearCache = () => {
                                     class="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 hover:border-amber-500/50 text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
                                 >
                                     <span>💾</span>
-                                    <span>إرسال نسخة احتياطية لتيليجرام</span>
+                                    <span>{{ $t('settings.send_backup_telegram') }}</span>
                                 </button>
                             </div>
                         </div>
@@ -369,7 +369,7 @@ const clearCache = () => {
                                 :disabled="form.processing"
                                 class="h-12 px-8 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                             >
-                                حفظ إعدادات تيليجرام 💾
+                                {{ $t('settings.save_telegram_btn') }}
                             </button>
                         </div>
                     </div>
@@ -382,9 +382,9 @@ const clearCache = () => {
                     <div class="border-b border-slate-800 pb-4">
                         <h2 class="text-sm font-black text-white flex items-center gap-2">
                             <span>💾</span>
-                            <span>النسخ الاحتياطي السحابي وقاعدة البيانات</span>
+                            <span>{{ $t('settings.backup_title') }}</span>
                         </h2>
-                        <p class="text-xs text-slate-400 mt-0.5">توليد وتنزيل ملفات النسخ الاحتياطي المضغوطة SQL.gz لحفظ بياناتك بأمان تام</p>
+                        <p class="text-xs text-slate-400 mt-0.5">{{ $t('settings.backup_sub') }}</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -392,10 +392,10 @@ const clearCache = () => {
                             <div class="space-y-2">
                                 <h3 class="text-xs font-black text-white flex items-center gap-2">
                                     <span>💻</span>
-                                    <span>تنزيل نسخة احتياطية مباشرة لجهازك</span>
+                                    <span>{{ $t('settings.direct_download_title') }}</span>
                                 </h3>
                                 <p class="text-xs text-slate-400 leading-relaxed">
-                                    يتم توليد ملف SQL مضغوط GZIP يحتوي على كامل بيانات الفواتير، الأصناف، العملاء، والمخزون.
+                                    {{ $t('settings.direct_download_desc') }}
                                 </p>
                             </div>
 
@@ -404,7 +404,7 @@ const clearCache = () => {
                                 class="h-11 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition cursor-pointer"
                             >
                                 <span>📥</span>
-                                <span>تحميل ملف SQL.gz الآن</span>
+                                <span>{{ $t('settings.download_sql_btn') }}</span>
                             </a>
                         </div>
 
@@ -412,10 +412,10 @@ const clearCache = () => {
                             <div class="space-y-2">
                                 <h3 class="text-xs font-black text-white flex items-center gap-2">
                                     <span>☁️</span>
-                                    <span>إرسال النسخة الاحتياطية لتيليجرام</span>
+                                    <span>{{ $t('settings.backup_to_telegram_title') }}</span>
                                 </h3>
                                 <p class="text-xs text-slate-400 leading-relaxed">
-                                    يتم ضغط قاعدة البيانات وإرسالها فورياً لجروب أو محادثة تيليجرام الخاصة بالإدارة.
+                                    {{ $t('settings.backup_to_telegram_desc') }}
                                 </p>
                             </div>
 
@@ -425,7 +425,7 @@ const clearCache = () => {
                                 class="h-11 px-6 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer"
                             >
                                 <span>✈️</span>
-                                <span>إرسال لقناة تيليجرام</span>
+                                <span>{{ $t('settings.send_to_telegram_btn') }}</span>
                             </button>
                         </div>
                     </div>
@@ -438,29 +438,29 @@ const clearCache = () => {
                     <div class="border-b border-slate-800 pb-4">
                         <h2 class="text-sm font-black text-white flex items-center gap-2">
                             <span>⚡</span>
-                            <span>أداء النظام، الكاش، وبيئة التشغيل</span>
+                            <span>{{ $t('settings.system_perf_title') }}</span>
                         </h2>
-                        <p class="text-xs text-slate-400 mt-0.5">صيانة سريعة وتسريع الأداء وإعادة تهيئة مسارات التوجيه والتخزين المؤقت</p>
+                        <p class="text-xs text-slate-400 mt-0.5">{{ $t('settings.system_perf_sub') }}</p>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
                         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-1">
-                            <span class="text-[10px] text-slate-400 font-tajawal">إصدار PHP:</span>
+                            <span class="text-[10px] text-slate-400 font-tajawal">{{ $t('settings.php_version') }}</span>
                             <div class="text-sm font-black text-amber-400">{{ system_info.php_version }}</div>
                         </div>
 
                         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-1">
-                            <span class="text-[10px] text-slate-400 font-tajawal">إصدار Laravel:</span>
+                            <span class="text-[10px] text-slate-400 font-tajawal">{{ $t('settings.laravel_version') }}</span>
                             <div class="text-sm font-black text-white">{{ system_info.laravel_version }}</div>
                         </div>
 
                         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-1">
-                            <span class="text-[10px] text-slate-400 font-tajawal">محرك قاعدة البيانات:</span>
+                            <span class="text-[10px] text-slate-400 font-tajawal">{{ $t('settings.db_engine') }}</span>
                             <div class="text-sm font-black text-emerald-400">{{ system_info.db_driver }}</div>
                         </div>
 
                         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-1">
-                            <span class="text-[10px] text-slate-400 font-tajawal">بيئة التشغيل:</span>
+                            <span class="text-[10px] text-slate-400 font-tajawal">{{ $t('settings.environment') }}</span>
                             <div class="text-sm font-black text-indigo-400">{{ system_info.environment }}</div>
                         </div>
                     </div>
@@ -473,7 +473,7 @@ const clearCache = () => {
                                 class="px-4 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-purple-400 border border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
                             >
                                 <span>📊</span>
-                                <span>مراقبة Pulse</span>
+                                <span>{{ $t('settings.pulse_monitoring') }}</span>
                             </a>
 
                             <a
@@ -482,7 +482,7 @@ const clearCache = () => {
                                 class="px-4 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-teal-400 border border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
                             >
                                 <span>🔭</span>
-                                <span>تليسكوب Telescope</span>
+                                <span>{{ $t('settings.telescope') }}</span>
                             </a>
                         </div>
 
@@ -491,7 +491,7 @@ const clearCache = () => {
                             type="button"
                             class="h-11 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 transition transform active:scale-95 cursor-pointer"
                         >
-                            ⚡ تنظيف وتسريع الكاش الآن
+                            {{ $t('settings.clear_cache_now') }}
                         </button>
                     </div>
                 </div>

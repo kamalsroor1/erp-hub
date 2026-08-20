@@ -43,7 +43,7 @@ const stockBadgeClass = computed(() => {
         >
             <div>
                 <div class="flex items-center justify-between text-[10px] text-slate-400 font-bold mb-1">
-                    <span class="truncate">{{ item.category || 'عام' }}</span>
+                    <span class="truncate">{{ item.category || $t('common.all') }}</span>
                     <span class="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold" :class="stockBadgeClass">
                         {{ formatQty(item.current_stock, 1) }} {{ item.unit }}
                     </span>
@@ -55,7 +55,7 @@ const stockBadgeClass = computed(() => {
 
             <div class="mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between">
                 <span class="text-xs font-black font-mono text-emerald-400">
-                    {{ formatMoney(effectivePrice) }} <span class="text-[9px] text-slate-400">ج.م</span>
+                    {{ formatMoney(effectivePrice) }} <span class="text-[9px] text-slate-400">{{ $t('common.currency') }}</span>
                 </span>
                 <span class="text-[10px] text-slate-400 font-mono">
                     {{ item.code }}
@@ -69,7 +69,7 @@ const stockBadgeClass = computed(() => {
                 @click.stop="emit('add-qty', { item, quantity: 0.125 })"
                 type="button"
                 class="h-7 rounded-lg bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-300 font-bold text-[10px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer"
-                title="تمن كيلو (125 جم)"
+                :title="$t('inventory.weight_eighth')"
             >
                 1/8
             </button>
@@ -77,7 +77,7 @@ const stockBadgeClass = computed(() => {
                 @click.stop="emit('add-qty', { item, quantity: 0.250 })"
                 type="button"
                 class="h-7 rounded-lg bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-300 font-bold text-[10px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer"
-                title="ربع كيلو (250 جم)"
+                :title="$t('inventory.weight_quarter')"
             >
                 1/4
             </button>
@@ -85,7 +85,7 @@ const stockBadgeClass = computed(() => {
                 @click.stop="emit('add-qty', { item, quantity: 0.500 })"
                 type="button"
                 class="h-7 rounded-lg bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-300 font-bold text-[10px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer"
-                title="نصف كيلو (500 جم)"
+                :title="$t('inventory.weight_half')"
             >
                 1/2
             </button>
@@ -93,7 +93,7 @@ const stockBadgeClass = computed(() => {
                 @click.stop="emit('add-qty', { item, quantity: 1.000 })"
                 type="button"
                 class="h-7 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[10px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer"
-                title="كيلو كامل"
+                :title="$t('inventory.weight_kilo')"
             >
                 1ك
             </button>

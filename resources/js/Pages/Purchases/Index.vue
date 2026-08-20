@@ -6,6 +6,7 @@ import SearchableSelect from '@/Components/SearchableSelect.vue';
 import DatePicker from '@/Components/DatePicker.vue';
 import FilterDrawer from '@/Components/FilterDrawer.vue';
 import { useMoney } from '@/Composables/useMoney';
+import { trans } from '@/helpers/trans';
 
 const props = defineProps({
     purchases: { type: Object, required: true },
@@ -23,15 +24,15 @@ const dateFrom = ref(props.filters.from || '');
 const dateTo = ref(props.filters.to || '');
 const isDrawerOpen = ref(false);
 
-const statusOptions = [
-    { id: 'all', name: 'كافة الحالات' },
-    { id: 'confirmed', name: 'مؤكدة ومستلمة بالمخزن 🟢' },
-    { id: 'cancelled', name: 'ملغاة 🔴' },
-];
+const statusOptions = computed(() => [
+    { id: 'all', name: trans('common.all') || 'كافة الحالات' },
+    { id: 'confirmed', name: `${trans('invoices.status_confirmed') || 'مؤكدة ومستلمة بالمخزن'} 🟢` },
+    { id: 'cancelled', name: `${trans('invoices.status_cancelled') || 'ملغاة'} 🔴` },
+]);
 
 const supplierOptions = computed(() => {
     return [
-        { id: 'all', name: 'كافة الموردين' },
+        { id: 'all', name: trans('suppliers.all_suppliers') || 'كافة الموردين' },
         ...props.suppliers
     ];
 });
@@ -89,7 +90,8 @@ const openDetailsModal = (p) => {
 };
 
 const cancelPurchase = (p) => {
-    if (confirm(`هل أنت متأكد من إلغاء فاتورة الشراء (${p.purchase_number})؟\nسيتم خصم الكميات من المخزن وعكس المستحقات المالية للمورد.`)) {
+    const msg = (trans('purchases.cancel_confirm') || 'هل أنت متأكد من إلغاء فاتورة الشراء (:number)؟').replace(':number', p.purchase_number);
+    if (confirm(msg)) {
         router.post(`/purchases/${p.id}/cancel`, {}, {
             preserveScroll: true,
         });
@@ -98,7 +100,7 @@ const cancelPurchase = (p) => {
 </script>
 
 <template>
-    <Head title="سجل فواتير المشتريات والتوريدات" />
+    <Head :title="$t('purchases.purchases_list')" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -108,11 +110,11 @@ const cancelPurchase = (p) => {
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">📦</span>
                         <h1 class="text-xl sm:text-2xl font-black text-white">
-                            سجل فواتير المشتريات وتوريد خامات البن
+                            {{ $t('purchases.purchases_list') }}
                         </h1>
                     </div>
                     <p class="text-xs text-slate-400 font-bold">
-                        إدارة عمليات الشراء من الموردين، حساب تكاليف الإنزال والنقل، وزيادة المخزون
+                        {{ $t('purchases.purchases_list_sub') }}
                     </p>
                 </div>
 
@@ -122,7 +124,7 @@ const cancelPurchase = (p) => {
                         class="h-11 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
                     >
                         <span>🧠</span>
-                        <span>اقتراح إعادة الطلب الذكي</span>
+                        <span>{{ $t('purchases.smart_reorder') }}</span>
                     </Link>
 
                     <Link
@@ -130,7 +132,7 @@ const cancelPurchase = (p) => {
                         class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
                     >
                         <span class="text-base font-black">+</span>
-                        <span>فاتورة شراء جديدة</span>
+                        <span>{{ $t('purchases.create_po_title') }}</span>
                     </Link>
                 </div>
             </div>
@@ -138,23 +140,23 @@ const cancelPurchase = (p) => {
             <!-- KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">إجمالي المشتريات المؤكدة</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('purchases.kpi_total_purchases') }}</span>
                     <div class="text-2xl font-black font-mono text-white">
-                        {{ formatMoney(metrics.total_purchases) }} <span class="text-xs text-amber-400">ج.م</span>
+                        {{ formatMoney(metrics.total_purchases) }} <span class="text-xs text-amber-400">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">عدد فواتير التوريد المعتمدة</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('purchases.kpi_confirmed_count') }}</span>
                     <div class="text-2xl font-black font-mono text-emerald-400">
-                        {{ metrics.confirmed_count || 0 }} <span class="text-xs text-slate-500 font-tajawal">فاتورة</span>
+                        {{ metrics.confirmed_count || 0 }} <span class="text-xs text-slate-500 font-tajawal">{{ $t('invoices.title') }}</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">مستحقات آجلة للموردين (متبقي سداده)</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('purchases.kpi_unpaid_total') }}</span>
                     <div class="text-2xl font-black font-mono text-rose-400">
-                        {{ formatMoney(metrics.unpaid_total) }} <span class="text-xs text-white">ج.م</span>
+                        {{ formatMoney(metrics.unpaid_total) }} <span class="text-xs text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
             </div>
@@ -166,7 +168,7 @@ const cancelPurchase = (p) => {
                         <input
                             v-model="search"
                             type="text"
-                            placeholder="... بحث برقم الفاتورة أو اسم المورد"
+                            :placeholder="$t('purchases.search_placeholder')"
                             class="w-full pr-10 pl-4 py-2.5 bg-slate-950/80 border border-slate-800 rounded-2xl text-xs text-white placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
@@ -182,7 +184,7 @@ const cancelPurchase = (p) => {
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
                                 :class="status === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'"
                             >
-                                الكل
+                                {{ $t('common.all') }}
                             </button>
                             <button
                                 @click="status = 'confirmed'; applyFilters();"
@@ -190,7 +192,7 @@ const cancelPurchase = (p) => {
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
                                 :class="status === 'confirmed' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'"
                             >
-                                معتمدة 🟢
+                                {{ $t('invoices.status_confirmed') }} 🟢
                             </button>
                             <button
                                 @click="status = 'cancelled'; applyFilters();"
@@ -198,7 +200,7 @@ const cancelPurchase = (p) => {
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
                                 :class="status === 'cancelled' ? 'bg-rose-500 text-white font-black' : 'text-slate-400 hover:text-white'"
                             >
-                                ملغاة 🔴
+                                {{ $t('invoices.status_cancelled') }} 🔴
                             </button>
                         </div>
 
@@ -208,7 +210,7 @@ const cancelPurchase = (p) => {
                             class="h-10 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
                         >
                             <span>⚙️</span>
-                            <span>تصفية متقدمة</span>
+                            <span>{{ $t('invoices.advanced_filters') }}</span>
                             <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-mono font-black text-[11px] flex items-center justify-center">
                                 {{ activeFiltersCount }}
                             </span>
@@ -253,7 +255,7 @@ const cancelPurchase = (p) => {
 
                                 <!-- Net Total -->
                                 <td class="py-3.5 font-mono font-black text-white">
-                                    {{ formatMoney(p.net_total) }} ج.م
+                                    {{ formatMoney(p.net_total) }} {{ $t('common.currency') }}
                                 </td>
 
                                 <!-- Paid -->
@@ -272,7 +274,7 @@ const cancelPurchase = (p) => {
                                         class="px-2 py-0.5 rounded-full text-[10px] font-bold font-tajawal"
                                         :class="p.status === 'confirmed' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'"
                                     >
-                                        {{ p.status === 'confirmed' ? 'مؤكدة ومستلمة' : 'ملغاة' }}
+                                        {{ p.status === 'confirmed' ? $t('invoices.status_confirmed') : $t('invoices.status_cancelled') }}
                                     </span>
                                 </td>
 
@@ -285,7 +287,7 @@ const cancelPurchase = (p) => {
                                             type="button"
                                             class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition cursor-pointer"
                                         >
-                                            تفاصيل ({{ p.items_count }})
+                                            {{ $t('common.details') }} ({{ p.items_count }})
                                         </button>
 
                                         <!-- Cancel -->
@@ -294,7 +296,7 @@ const cancelPurchase = (p) => {
                                             @click="cancelPurchase(p)"
                                             type="button"
                                             class="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition cursor-pointer"
-                                            title="إلغاء فاتورة الشراء وعكس المخزون"
+                                            :title="$t('purchases.cancel_btn_title')"
                                         >
                                             ✕
                                         </button>
@@ -306,14 +308,14 @@ const cancelPurchase = (p) => {
 
                     <div v-if="!purchases.data || purchases.data.length === 0" class="py-16 text-center space-y-2">
                         <span class="text-3xl">📦</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">لا توجد فواتير مشتريات مسجلة مطابقة للبحث</p>
+                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('purchases.empty_purchases_search') }}</p>
                     </div>
                 </div>
 
                 <!-- Pagination -->
                 <div v-if="purchases.links && purchases.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
                     <span class="text-xs text-slate-400 font-tajawal">
-                        عرض {{ purchases.from || 0 }} إلى {{ purchases.to || 0 }} من إجمالي {{ purchases.total || 0 }} فاتورة
+                        {{ purchases.from || 0 }} - {{ purchases.to || 0 }} / {{ purchases.total || 0 }}
                     </span>
 
                     <div class="flex items-center gap-1">
@@ -346,41 +348,41 @@ const cancelPurchase = (p) => {
         >
             <div class="space-y-5">
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🔍 البحث بالرقم أو المورد</label>
+                    <label class="text-xs font-black text-slate-300">🔍 {{ $t('purchases.search_placeholder') }}</label>
                     <input
                         v-model="search"
                         type="text"
-                        placeholder="... اكتب للبحث"
+                        :placeholder="$t('invoices.filter_by_search')"
                         class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none transition"
                     >
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🏭 تصفية حسب المورد</label>
+                    <label class="text-xs font-black text-slate-300">🏭 {{ $t('purchases.supplier') }}</label>
                     <SearchableSelect
                         v-model="supplierId"
                         :options="supplierOptions"
-                        placeholder="اختر المورد..."
+                        :placeholder="$t('purchases.select_supplier')"
                     />
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🟢 حالة الفاتورة</label>
+                    <label class="text-xs font-black text-slate-300">🟢 {{ $t('common.status') }}</label>
                     <SearchableSelect
                         v-model="status"
                         :options="statusOptions"
-                        placeholder="اختر الحالة..."
+                        :placeholder="$t('common.status')"
                     />
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <div class="space-y-1.5">
-                        <label class="text-xs font-black text-slate-300">من تاريخ</label>
-                        <DatePicker v-model="dateFrom" placeholder="من..." />
+                        <label class="text-xs font-black text-slate-300">{{ $t('invoices.date_from') }}</label>
+                        <DatePicker v-model="dateFrom" :placeholder="$t('invoices.date_from')" />
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-xs font-black text-slate-300">إلى تاريخ</label>
-                        <DatePicker v-model="dateTo" placeholder="إلى..." />
+                        <label class="text-xs font-black text-slate-300">{{ $t('invoices.date_to') }}</label>
+                        <DatePicker v-model="dateTo" :placeholder="$t('invoices.date_to')" />
                     </div>
                 </div>
             </div>
@@ -396,8 +398,8 @@ const cancelPurchase = (p) => {
             <div @click.stop class="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <div>
-                        <h3 class="font-black text-base text-white">تفاصيل فاتورة المشتريات: {{ selectedPurchase.purchase_number }}</h3>
-                        <p class="text-xs text-amber-400 font-bold mt-0.5">المورد: {{ selectedPurchase.supplier_name }} | التاريخ: {{ selectedPurchase.purchase_date }}</p>
+                        <h3 class="font-black text-base text-white">{{ $t('purchases.details_title') }}: {{ selectedPurchase.purchase_number }}</h3>
+                        <p class="text-xs text-amber-400 font-bold mt-0.5">{{ $t('purchases.supplier') }}: {{ selectedPurchase.supplier_name }} | {{ $t('common.date') }}: {{ selectedPurchase.purchase_date }}</p>
                     </div>
                     <button @click="showDetailsModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
                 </div>
@@ -407,10 +409,10 @@ const cancelPurchase = (p) => {
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-2">الصنف المستلم</th>
-                                <th class="pb-2 font-mono">الكمية</th>
-                                <th class="pb-2 font-mono">سعر الوحدة</th>
-                                <th class="pb-2 font-mono">الإجمالي</th>
+                                <th class="pb-2">{{ $t('purchases.supplied_item') }}</th>
+                                <th class="pb-2 font-mono">{{ $t('common.quantity') }}</th>
+                                <th class="pb-2 font-mono">{{ $t('invoices.unit_price') }}</th>
+                                <th class="pb-2 font-mono">{{ $t('common.total') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">
@@ -418,15 +420,15 @@ const cancelPurchase = (p) => {
                                 <td class="py-2.5 font-bold text-white font-tajawal">{{ it.item_name }}</td>
                                 <td class="py-2.5 font-mono font-bold text-amber-400">{{ it.quantity }}</td>
                                 <td class="py-2.5 font-mono text-slate-300">{{ formatMoney(it.unit_cost) }}</td>
-                                <td class="py-2.5 font-mono font-black text-emerald-400">{{ formatMoney(it.subtotal) }} ج.م</td>
+                                <td class="py-2.5 font-mono font-black text-emerald-400">{{ formatMoney(it.subtotal) }} {{ $t('common.currency') }}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
                 <div class="p-4 bg-slate-950/80 rounded-2xl border border-slate-800 flex items-center justify-between font-mono">
-                    <span class="text-xs text-slate-400 font-tajawal">صافي إجمالي الفاتورة:</span>
-                    <span class="text-lg font-black text-amber-400">{{ formatMoney(selectedPurchase.net_total) }} ج.م</span>
+                    <span class="text-xs text-slate-400 font-tajawal">{{ $t('purchases.net_invoice_total') }}:</span>
+                    <span class="text-lg font-black text-amber-400">{{ formatMoney(selectedPurchase.net_total) }} {{ $t('common.currency') }}</span>
                 </div>
             </div>
         </div>

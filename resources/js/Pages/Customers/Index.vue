@@ -15,17 +15,19 @@ const props = defineProps({
 
 const { formatMoney } = useMoney();
 
+import { trans } from '@/helpers/trans';
+
 // Search & Filter state
 const search = ref(props.filters.search || '');
 const debtStatus = ref(props.filters.debt_status || 'all');
 const isDrawerOpen = ref(false);
 
-const debtStatusOptions = [
-    { id: 'all', name: 'كافة العملاء والحسابات' },
-    { id: 'debtor', name: 'العملاء المدينون (عليهم مديونية) 🚨' },
-    { id: 'zero', name: 'الحسابات المسواة (رصيد 0) ✅' },
-    { id: 'creditor', name: 'العملاء الدائنون (لهم رصيد دائن)' },
-];
+const debtStatusOptions = computed(() => [
+    { id: 'all', name: trans('contacts.all_customers') || 'كافة العملاء والحسابات' },
+    { id: 'debtor', name: trans('contacts.debtors_only') || 'العملاء المدينون (عليهم مديونية) 🚨' },
+    { id: 'zero', name: trans('contacts.settled_only') || 'الحسابات المسواة (رصيد 0) ✅' },
+    { id: 'creditor', name: trans('contacts.creditors_only') || 'العملاء الدائنون (لهم رصيد دائن)' },
+]);
 
 const activeFiltersCount = computed(() => {
     let count = 0;
@@ -167,7 +169,7 @@ const toggleActive = (c) => {
 </script>
 
 <template>
-    <Head title="دليل العملاء والحسابات" />
+    <Head :title="$t('contacts.customers_title')" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -177,11 +179,11 @@ const toggleActive = (c) => {
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">👥</span>
                         <h1 class="text-xl sm:text-2xl font-black text-white">
-                            دليل العملاء وحسابات المديونية
+                            {{ $t('contacts.customers_title') }}
                         </h1>
                     </div>
                     <p class="text-xs text-slate-400 font-bold">
-                        متابعة أرصدة العملاء، سندات التحصيل والقبض، واستخراج كشوف الحسابات
+                        {{ $t('contacts.customers_subtitle') }}
                     </p>
                 </div>
 
@@ -191,30 +193,30 @@ const toggleActive = (c) => {
                     class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
                 >
                     <span class="text-base font-black">+</span>
-                    <span>إضافة عميل جديد</span>
+                    <span>{{ $t('contacts.add_new_customer') }}</span>
                 </button>
             </div>
 
             <!-- KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">إجمالي مديونيات العملاء المطلوبة</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('contacts.total_customer_debts') }}</span>
                     <div class="text-2xl font-black font-mono text-rose-400">
-                        {{ formatMoney(metrics.total_debt) }} <span class="text-xs text-white">ج.م</span>
+                        {{ formatMoney(metrics.total_debt) }} <span class="text-xs text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">عدد العملاء المدينين</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('contacts.debtors_count') }}</span>
                     <div class="text-2xl font-black font-mono text-amber-400">
-                        {{ metrics.debtors_count || 0 }} <span class="text-xs text-slate-500 font-tajawal">عميل</span>
+                        {{ metrics.debtors_count || 0 }} <span class="text-xs text-slate-500 font-tajawal">{{ $t('contacts.customer_unit') }}</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">إجمالي قاعدة العملاء</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('contacts.total_customers_count') }}</span>
                     <div class="text-2xl font-black font-mono text-emerald-400">
-                        {{ metrics.total_customers || 0 }} <span class="text-xs text-slate-500 font-tajawal">عميل</span>
+                        {{ metrics.total_customers || 0 }} <span class="text-xs text-slate-500 font-tajawal">{{ $t('contacts.customer_unit') }}</span>
                     </div>
                 </div>
             </div>
@@ -226,7 +228,7 @@ const toggleActive = (c) => {
                         <input
                             v-model="search"
                             type="text"
-                            placeholder="... بحث باسم العميل أو رقم الهاتف"
+                            :placeholder="$t('contacts.search_customer_placeholder')"
                             class="w-full pr-10 pl-4 py-2.5 bg-slate-950/80 border border-slate-800 rounded-2xl text-xs text-white placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
@@ -242,7 +244,7 @@ const toggleActive = (c) => {
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
                                 :class="debtStatus === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'"
                             >
-                                الكل
+                                {{ $t('common.all') }}
                             </button>
                             <button
                                 @click="debtStatus = 'debtor'; applyFilters();"
@@ -250,7 +252,7 @@ const toggleActive = (c) => {
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
                                 :class="debtStatus === 'debtor' ? 'bg-rose-500 text-white font-black' : 'text-slate-400 hover:text-white'"
                             >
-                                عليهم مديونية 🚨
+                                {{ $t('contacts.debtors_only') }}
                             </button>
                         </div>
 
@@ -260,7 +262,7 @@ const toggleActive = (c) => {
                             class="h-10 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
                         >
                             <span>⚙️</span>
-                            <span>تصفية وفلاتر متقدمة</span>
+                            <span>{{ $t('common.filter') }}</span>
                             <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-mono font-black text-[11px] flex items-center justify-center">
                                 {{ activeFiltersCount }}
                             </span>
@@ -309,7 +311,7 @@ const toggleActive = (c) => {
                                             (c.current_balance < 0 ? 'bg-indigo-500/15 border-indigo-500/30 text-indigo-400' : 'bg-slate-800 border-slate-700 text-slate-400')
                                         ]"
                                     >
-                                        {{ formatMoney(c.current_balance) }} ج.م
+                                        {{ formatMoney(c.current_balance) }} {{ $t('common.currency') }}
                                     </span>
                                 </td>
 
@@ -321,17 +323,17 @@ const toggleActive = (c) => {
                                             @click="openPaymentModal(c)"
                                             type="button"
                                             class="px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 text-xs font-bold transition cursor-pointer flex items-center gap-1"
-                                            title="تسجيل سند تحصيل وقبض نقدي"
+                                            :title="$t('contacts.record_receipt_voucher')"
                                         >
                                             <span>💵</span>
-                                            <span>تحصيل</span>
+                                            <span>{{ $t('contacts.record_receipt_voucher') }}</span>
                                         </button>
 
                                         <!-- Statement -->
                                         <Link
                                             :href="`/customers/${c.id}/statement`"
                                             class="p-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-400 transition"
-                                            title="كشف حساب تفصيلي"
+                                            :title="$t('contacts.statement_title')"
                                         >
                                             📜
                                         </Link>
@@ -341,7 +343,7 @@ const toggleActive = (c) => {
                                             @click="openEditModal(c)"
                                             type="button"
                                             class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 transition cursor-pointer"
-                                            title="تعديل بيانات العميل"
+                                            :title="$t('common.edit')"
                                         >
                                             ✏️
                                         </button>
@@ -352,7 +354,7 @@ const toggleActive = (c) => {
                                             type="button"
                                             class="p-1.5 rounded-xl transition cursor-pointer"
                                             :class="c.is_active ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 hover:bg-slate-700 text-slate-500'"
-                                            :title="c.is_active ? 'الحساب نشط (اضغط للتعطيل)' : 'الحساب معطل (اضغط للتفعيل)'"
+                                            :title="c.is_active ? $t('common.active') : $t('common.inactive')"
                                         >
                                             {{ c.is_active ? '🟢' : '⚪' }}
                                         </button>
@@ -363,7 +365,7 @@ const toggleActive = (c) => {
                                             type="button"
                                             class="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition cursor-pointer"
                                             :class="!c.can_be_deleted ? 'opacity-40 cursor-not-allowed' : ''"
-                                            :title="c.can_be_deleted ? 'حذف العميل' : c.deletion_blockers.join(', ')"
+                                            :title="c.can_be_deleted ? $t('common.delete') : c.deletion_blockers.join(', ')"
                                         >
                                             🗑️
                                         </button>
@@ -375,14 +377,14 @@ const toggleActive = (c) => {
 
                     <div v-if="!customers.data || customers.data.length === 0" class="py-16 text-center space-y-2">
                         <span class="text-3xl">👥</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">لا يوجد عملاء مسجلين مطابقين للبحث</p>
+                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('contacts.no_customers_found') }}</p>
                     </div>
                 </div>
 
                 <!-- Pagination -->
                 <div v-if="customers.links && customers.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
                     <span class="text-xs text-slate-400 font-tajawal">
-                        عرض {{ customers.from || 0 }} إلى {{ customers.to || 0 }} من إجمالي {{ customers.total || 0 }} عميل
+                        {{ $t('common.actions') ? `عرض ${customers.from || 0} إلى ${customers.to || 0} من إجمالي ${customers.total || 0}` : `Showing ${customers.from || 0} to ${customers.to || 0} of ${customers.total || 0}` }}
                     </span>
 
                     <div class="flex items-center gap-1">
@@ -415,21 +417,21 @@ const toggleActive = (c) => {
         >
             <div class="space-y-5">
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🔍 البحث بالاسم أو الموبايل أو العنوان</label>
+                    <label class="text-xs font-black text-slate-300">🔍 {{ $t('contacts.search_customer_placeholder') }}</label>
                     <input
                         v-model="search"
                         type="text"
-                        placeholder="... اكتب للبحث"
+                        :placeholder="$t('common.search')"
                         class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none transition"
                     >
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">💳 حالة الرصيد والمديونية</label>
+                    <label class="text-xs font-black text-slate-300">💳 {{ $t('contacts.current_balance_status') }}</label>
                     <SearchableSelect
                         v-model="debtStatus"
                         :options="debtStatusOptions"
-                        placeholder="اختر حالة الرصيد..."
+                        :placeholder="$t('contacts.all_customers')"
                     />
                 </div>
             </div>
@@ -445,26 +447,26 @@ const toggleActive = (c) => {
             <div @click.stop class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <h3 class="font-black text-base text-white">
-                        {{ editingCustomer ? 'تعديل بيانات العميل' : 'إضافة عميل جديد' }}
+                        {{ editingCustomer ? $t('contacts.customer_updated') : $t('contacts.add_new_customer') }}
                     </h3>
                     <button @click="showCustomerModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
                 </div>
 
                 <form @submit.prevent="saveCustomer" class="space-y-4">
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">اسم العميل / الشركة *</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('contacts.customer_name') }} *</label>
                         <input
                             v-model="customerForm.name"
                             type="text"
                             required
-                            placeholder="مثال: كافيه السلطان..."
+                            :placeholder="$t('contacts.customer_name')"
                             class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                         >
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">رقم الهاتف / الموبايل</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('common.phone') }}</label>
                             <input
                                 v-model="customerForm.phone"
                                 type="text"
@@ -474,7 +476,7 @@ const toggleActive = (c) => {
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">الرقم الضريبي (إن وجد)</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('invoices.tax_number') || 'الرقم الضريبي' }}</label>
                             <input
                                 v-model="customerForm.tax_number"
                                 type="text"
@@ -484,17 +486,17 @@ const toggleActive = (c) => {
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">العنوان / المنطقة</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('common.address') }}</label>
                         <input
                             v-model="customerForm.address"
                             type="text"
-                            placeholder="مثال: القاهرة - المعادي"
+                            :placeholder="$t('common.address')"
                             class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                         >
                     </div>
 
                     <div v-if="!editingCustomer" class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">رصيد أول المدة الافتتاحي (ج.م)</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('contacts.opening_balance') }} ({{ $t('common.currency') }})</label>
                         <input
                             v-model="customerForm.opening_balance"
                             type="number"
@@ -505,7 +507,7 @@ const toggleActive = (c) => {
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">ملاحظات</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('common.notes') }}</label>
                         <textarea
                             v-model="customerForm.notes"
                             rows="2"
@@ -519,14 +521,14 @@ const toggleActive = (c) => {
                             type="button"
                             class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
                         >
-                            إلغاء
+                            {{ $t('common.cancel') }}
                         </button>
                         <button
                             type="submit"
                             :disabled="customerForm.processing"
                             class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
-                            {{ customerForm.processing ? 'جاري الحفظ...' : (editingCustomer ? 'حفظ التعديلات' : 'إضافة العميل') }}
+                            {{ customerForm.processing ? '...' : (editingCustomer ? $t('common.save') : $t('contacts.add_new_customer')) }}
                         </button>
                     </div>
                 </form>
@@ -543,7 +545,7 @@ const toggleActive = (c) => {
             <div @click.stop class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <div>
-                        <h3 class="font-black text-base text-white">سند قبض وتحصيل نقدي</h3>
+                        <h3 class="font-black text-base text-white">{{ $t('contacts.record_receipt_voucher') }}</h3>
                         <p class="text-xs text-emerald-400 font-bold mt-0.5">{{ selectedCustomerForPayment?.name }}</p>
                     </div>
                     <button @click="showPaymentModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
@@ -551,7 +553,7 @@ const toggleActive = (c) => {
 
                 <form @submit.prevent="submitPayment" class="space-y-4">
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">المبلغ المحصل (ج.م) *</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('contacts.voucher_amount') }} ({{ $t('common.currency') }}) *</label>
                         <input
                             v-model="paymentForm.amount"
                             type="number"
@@ -563,28 +565,28 @@ const toggleActive = (c) => {
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">وسيلة التحصيل *</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('contacts.payment_method') }} *</label>
                         <SearchableSelect
                             v-model="paymentForm.payment_method"
                             :options="paymentMethodOptions"
-                            placeholder="اختر وسيلة التحصيل..."
+                            :placeholder="$t('contacts.payment_method')"
                         />
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">تاريخ السند *</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('common.date') }} *</label>
                         <DatePicker
                             v-model="paymentForm.payment_date"
-                            placeholder="تاريخ السند..."
+                            :placeholder="$t('common.date')"
                         />
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">ملاحظات التحصيل</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('common.notes') }}</label>
                         <input
                             v-model="paymentForm.notes"
                             type="text"
-                            placeholder="مثال: دفعة تحت الحساب / شيك..."
+                            :placeholder="$t('common.notes')"
                             class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                         >
                     </div>
@@ -595,14 +597,14 @@ const toggleActive = (c) => {
                             type="button"
                             class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
                         >
-                            إلغاء
+                            {{ $t('common.cancel') }}
                         </button>
                         <button
                             type="submit"
                             :disabled="paymentForm.processing"
                             class="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black shadow-lg shadow-emerald-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
-                            {{ paymentForm.processing ? 'جاري التسجيل...' : 'تسجيل سند القبض 💵' }}
+                            {{ paymentForm.processing ? '...' : $t('contacts.record_receipt_voucher') }}
                         </button>
                     </div>
                 </form>

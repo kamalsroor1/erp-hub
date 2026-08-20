@@ -1,9 +1,10 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import SearchableSelect from '@/Components/SearchableSelect.vue';
 import { useMoney } from '@/Composables/useMoney';
+import { trans } from '@/helpers/trans';
 
 const props = defineProps({
     items: { type: Array, default: () => [] },
@@ -21,12 +22,12 @@ const grindLevel = ref('تركي ناعم');
 const cardamomGrams = ref(0);
 const notes = ref('');
 
-const presetWeights = [
-    { label: 'ثمن كيلو (125 جم)', value: 125 },
-    { label: 'ربع كيلو (250 جم)', value: 250 },
-    { label: 'نصف كيلو (500 جم)', value: 500 },
-    { label: 'كيلو كامل (1000 جم)', value: 1000 },
-];
+const presetWeights = computed(() => [
+    { label: trans('inventory.weight_125') || 'ثمن كيلو (125 جم)', value: 125 },
+    { label: trans('inventory.weight_250') || 'ربع كيلو (250 جم)', value: 250 },
+    { label: trans('inventory.weight_500') || 'نصف كيلو (500 جم)', value: 500 },
+    { label: trans('inventory.weight_1000') || 'كيلو كامل (1000 جم)', value: 1000 },
+]);
 
 const customerOptions = computed(() => {
     return props.customers.map(c => ({
@@ -38,7 +39,7 @@ const customerOptions = computed(() => {
 const availableItemOptions = computed(() => {
     return props.items.map(item => ({
         id: item.id,
-        name: `${item.name} - سعر الكيلو: ${item.selling_price} ج.م (المتوفر: ${item.current_stock} كجم)`,
+        name: `${item.name} - ${trans('inventory.retail_price') || 'السعر'}: ${item.selling_price} (${trans('inventory.current_stock') || 'المتوفر'}: ${item.current_stock} ${item.unit || 'كجم'})`,
     }));
 });
 
@@ -81,7 +82,7 @@ const addComponent = () => {
     if (!item) return;
 
     if (components.value.some(c => c.item_id === item.id)) {
-        alert('هذا الصنف مضاف بالفعل في التوليفة');
+        alert(trans('inventory.item_already_added') || 'هذا الصنف مضاف بالفعل في التوليفة');
         return;
     }
 
@@ -157,7 +158,7 @@ const form = useForm({
 
 const submitBlendInvoice = () => {
     if (components.value.length === 0) {
-        alert('يرجى إضافة مكونات التوليفة أولاً');
+        alert(trans('inventory.add_at_least_one_item') || 'يرجى إضافة مكونات التوليفة أولاً');
         return;
     }
     if (totalPercentage.value !== 100) {
@@ -182,7 +183,7 @@ const submitBlendInvoice = () => {
 </script>
 
 <template>
-    <Head title="حاسبة وتوليفات البن والمطحنة" />
+    <Head :title="$t('inventory.blender_title')" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -192,11 +193,11 @@ const submitBlendInvoice = () => {
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">☕</span>
                         <h1 class="text-xl sm:text-2xl font-black text-white">
-                            أداة وحاسبة توليفات البن الاحترافية
+                            {{ $t('inventory.blender_title') }}
                         </h1>
                     </div>
                     <p class="text-xs text-slate-400 font-bold">
-                        توليف حبوب البن بالنسب المئوية والجرامات، حساب التكلفة، وإصدار الفاتورة للعميل مباشرة
+                        {{ $t('inventory.blender_subtitle') }}
                     </p>
                 </div>
             </div>
@@ -208,12 +209,12 @@ const submitBlendInvoice = () => {
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
                         <h2 class="text-sm font-black text-white border-b border-slate-800 pb-2.5 flex items-center gap-2">
                             <span>⚙️</span>
-                            <span>إعدادات التوليفة والوزن المستهدف</span>
+                            <span>{{ $t('inventory.blend_recipe') }}</span>
                         </h2>
 
                         <div class="space-y-3">
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">اسم التوليفة / كود الخلطة</label>
+                                <label class="text-xs font-bold text-slate-300">{{ $t('inventory.blend_name') }}</label>
                                 <input
                                     v-model="blendName"
                                     type="text"
@@ -223,7 +224,7 @@ const submitBlendInvoice = () => {
 
                             <!-- Target Weight Buttons -->
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">الوزن الإجمالي المطلوب (بالجرام)</label>
+                                <label class="text-xs font-bold text-slate-300">{{ $t('inventory.target_weight') }}</label>
                                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                     <button
                                         v-for="w in presetWeights"
@@ -241,7 +242,7 @@ const submitBlendInvoice = () => {
                             <!-- Custom Weight Input -->
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
                                 <div class="space-y-1">
-                                    <label class="text-xs font-bold text-slate-400">وزن مخصص (جرام)</label>
+                                    <label class="text-xs font-bold text-slate-400">{{ $t('inventory.custom_weight') }}</label>
                                     <input
                                         v-model.number="targetWeightGrams"
                                         type="number"
@@ -251,28 +252,28 @@ const submitBlendInvoice = () => {
                                 </div>
 
                                 <div class="space-y-1">
-                                    <label class="text-xs font-bold text-slate-400">درجة التحميص</label>
+                                    <label class="text-xs font-bold text-slate-400">{{ $t('inventory.roast_type') }}</label>
                                     <select
                                         v-model="roastType"
                                         class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                                     >
-                                        <option value="فاتح">تحميص فاتح 🟡</option>
-                                        <option value="وسط">تحميص وسط (الأكثر طلباً) 🟤</option>
-                                        <option value="غامق">تحميص غامق ⚫</option>
-                                        <option value="محروق">تحميص دبل روست / محروق 🔥</option>
+                                        <option value="فاتح">{{ $t('inventory.roast_light') }}</option>
+                                        <option value="وسط">{{ $t('inventory.roast_medium') }}</option>
+                                        <option value="غامق">{{ $t('inventory.roast_dark') }}</option>
+                                        <option value="محروق">{{ $t('inventory.roast_double') }}</option>
                                     </select>
                                 </div>
 
                                 <div class="space-y-1">
-                                    <label class="text-xs font-bold text-slate-400">درجة الطحن</label>
+                                    <label class="text-xs font-bold text-slate-400">{{ $t('inventory.grind_level') }}</label>
                                     <select
                                         v-model="grindLevel"
                                         class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                                     >
-                                        <option value="تركي ناعم">تركي ناعم (وش قهوة) ☕</option>
-                                        <option value="إسبريسو">إسبريسو متوسط النعومة ⚡</option>
-                                        <option value="فرينش بريس">فرينش بريس / فلتر خشن 🫖</option>
-                                        <option value="حبوب بدون طحن">حبوب سليمة بدون طحن 🫘</option>
+                                        <option value="تركي ناعم">{{ $t('inventory.grind_turkish') }}</option>
+                                        <option value="إسبريسو">{{ $t('inventory.grind_espresso') }}</option>
+                                        <option value="فرينش بريس">{{ $t('inventory.grind_french_press') }}</option>
+                                        <option value="حبوب بدون طحن">{{ $t('inventory.grind_beans') }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -284,13 +285,13 @@ const submitBlendInvoice = () => {
                         <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
                             <h2 class="text-sm font-black text-white flex items-center gap-2">
                                 <span>🫘</span>
-                                <span>مكونات وأصناف البن في التوليفة</span>
+                                <span>{{ $t('inventory.raw_beans_components') }}</span>
                             </h2>
                             <span
                                 class="px-2.5 py-1 rounded-xl text-xs font-mono font-black"
                                 :class="totalPercentage === 100 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'"
                             >
-                                إجمالي النسبة: {{ totalPercentage }}%
+                                {{ $t('inventory.total_percentage') }}: {{ totalPercentage }}%
                             </span>
                         </div>
 
@@ -300,7 +301,7 @@ const submitBlendInvoice = () => {
                                 <SearchableSelect
                                     v-model="selectedItemIdToAdd"
                                     :options="availableItemOptions"
-                                    placeholder="اختر صنف بن لإضافته للخلطة..."
+                                    :placeholder="$t('inventory.search_item_placeholder')"
                                 />
                             </div>
                             <button
@@ -308,7 +309,7 @@ const submitBlendInvoice = () => {
                                 type="button"
                                 class="h-10 px-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer"
                             >
-                                + إضافة
+                                + {{ $t('inventory.add_new_item') }}
                             </button>
                         </div>
 
@@ -322,7 +323,7 @@ const submitBlendInvoice = () => {
                                 <div class="w-full sm:w-1/3">
                                     <div class="font-black text-white text-xs">{{ comp.name }}</div>
                                     <div class="text-[11px] text-slate-400 font-mono mt-0.5">
-                                        سعر الكيلو: {{ comp.selling_price }} ج.م
+                                        {{ $t('inventory.retail_price') }}: {{ comp.selling_price }} {{ $t('common.currency') }}
                                     </div>
                                 </div>
 
@@ -352,7 +353,7 @@ const submitBlendInvoice = () => {
                                 <div class="w-full sm:w-1/3 flex items-center justify-between sm:justify-end gap-3 font-mono">
                                     <div class="text-left">
                                         <div class="text-xs font-black text-emerald-400">{{ comp.grams }} جم</div>
-                                        <div class="text-[11px] text-slate-400">{{ comp.price }} ج.م</div>
+                                        <div class="text-[11px] text-slate-400">{{ comp.price }} {{ $t('common.currency') }}</div>
                                     </div>
 
                                     <button
@@ -369,7 +370,7 @@ const submitBlendInvoice = () => {
                         <!-- Extra Spices (Cardamom) -->
                         <div class="pt-3 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">إضافة حبهان / هيل أخضر (بالجرام)</label>
+                                <label class="text-xs font-bold text-slate-300">{{ $t('inventory.cardamom_spices') }}</label>
                                 <input
                                     v-model.number="cardamomGrams"
                                     type="number"
@@ -381,11 +382,11 @@ const submitBlendInvoice = () => {
                             </div>
 
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">ملاحظات التحويجة للعميل</label>
+                                <label class="text-xs font-bold text-slate-300">{{ $t('inventory.blend_notes') }}</label>
                                 <input
                                     v-model="notes"
                                     type="text"
-                                    placeholder="مثال: تحويجة دوبل حبهان ومستكة..."
+                                    :placeholder="$t('inventory.blend_notes')"
                                     class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                                 >
                             </div>
@@ -397,34 +398,34 @@ const submitBlendInvoice = () => {
                 <div class="space-y-5">
                     <div class="bg-slate-900 border border-amber-500/30 rounded-3xl p-5 shadow-xl space-y-5 bg-gradient-to-br from-slate-900 to-amber-950/20 sticky top-20">
                         <div class="border-b border-slate-800 pb-3">
-                            <h2 class="text-base font-black text-white">ملخص تكلفة وسعر التوليفة</h2>
-                            <p class="text-xs text-amber-400 font-mono mt-0.5">{{ targetWeightGrams }} جرام ({{ (targetWeightGrams / 1000).toFixed(3) }} كجم)</p>
+                            <h2 class="text-base font-black text-white">{{ $t('inventory.blend_cost_summary') }}</h2>
+                            <p class="text-xs text-amber-400 font-mono mt-0.5">{{ targetWeightGrams }} جرام ({{ (targetWeightGrams / 1000).toFixed(3) }} {{ $t('inventory.unit_weight_short') }})</p>
                         </div>
 
                         <div class="space-y-3 font-mono">
                             <div class="flex items-center justify-between text-xs">
-                                <span class="text-slate-400 font-tajawal">إجمالي تكلفة الخامات:</span>
-                                <span class="text-rose-400 font-bold">{{ formatMoney(totalCalculatedCost) }} ج.م</span>
+                                <span class="text-slate-400 font-tajawal">{{ $t('inventory.total_raw_cost') }}:</span>
+                                <span class="text-rose-400 font-bold">{{ formatMoney(totalCalculatedCost) }} {{ $t('common.currency') }}</span>
                             </div>
 
                             <div class="flex items-center justify-between text-xs">
-                                <span class="text-slate-400 font-tajawal">سعر البيع المقترح:</span>
-                                <span class="text-emerald-400 font-black text-base">{{ formatMoney(totalCalculatedPrice) }} ج.م</span>
+                                <span class="text-slate-400 font-tajawal">{{ $t('inventory.suggested_retail_price') }}:</span>
+                                <span class="text-emerald-400 font-black text-base">{{ formatMoney(totalCalculatedPrice) }} {{ $t('common.currency') }}</span>
                             </div>
 
                             <div class="flex items-center justify-between text-xs">
-                                <span class="text-slate-400 font-tajawal">هامش الربح في هذه التوليفة:</span>
-                                <span class="text-amber-400 font-bold">{{ profitMargin }}% ({{ formatMoney(totalCalculatedPrice - totalCalculatedCost) }} ج.م)</span>
+                                <span class="text-slate-400 font-tajawal">{{ $t('inventory.profit_margin') }}:</span>
+                                <span class="text-amber-400 font-bold">{{ profitMargin }}% ({{ formatMoney(totalCalculatedPrice - totalCalculatedCost) }} {{ $t('common.currency') }})</span>
                             </div>
                         </div>
 
                         <!-- Customer Selection for POS Order -->
                         <div class="space-y-2 pt-3 border-t border-slate-800">
-                            <label class="text-xs font-black text-slate-200">العميل المستلم للطلب *</label>
+                            <label class="text-xs font-black text-slate-200">{{ $t('invoices.customer') }} *</label>
                             <SearchableSelect
                                 v-model="selectedCustomerId"
                                 :options="customerOptions"
-                                placeholder="اختر العميل..."
+                                :placeholder="$t('invoices.select_customer')"
                             />
                         </div>
 

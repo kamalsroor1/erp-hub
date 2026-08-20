@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { trans } from '@/helpers/trans';
 
 const props = defineProps({
     stores: { type: Array, default: () => [] },
@@ -65,7 +66,7 @@ const saveStore = () => {
 
 const toggleActive = (s) => {
     if (s.is_main && s.is_active) {
-        alert('لا يمكن تعطيل الفرع والمخزن الرئيسي للمنشأة');
+        alert(trans('inventory.cannot_disable_main_store') || 'لا يمكن تعطيل الفرع والمخزن الرئيسي للمنشأة');
         return;
     }
     router.post(`/stores/${s.id}/toggle-active`, {}, {
@@ -75,10 +76,10 @@ const toggleActive = (s) => {
 
 const deleteStore = (s) => {
     if (!s.can_be_deleted) {
-        alert('لا يمكن حذف الفرع/المخزن:\n- ' + s.deletion_blockers.join('\n- '));
+        alert((trans('inventory.cannot_delete_store') || 'لا يمكن حذف الفرع/المخزن') + ':\n- ' + s.deletion_blockers.join('\n- '));
         return;
     }
-    if (confirm(`هل أنت متأكد من نقل الفرع (${s.name}) إلى سلة المحذوفات؟`)) {
+    if (confirm(trans('common.confirm_delete') || `هل أنت متأكد من حذف (${s.name})؟`)) {
         router.delete(`/stores/${s.id}`, {
             preserveScroll: true,
         });
@@ -110,7 +111,7 @@ const saveUserAssignment = () => {
 </script>
 
 <template>
-    <Head title="إدارة الفروع والمخازن وعربيات التوزيع" />
+    <Head :title="$t('inventory.stores_title')" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -120,11 +121,11 @@ const saveUserAssignment = () => {
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">🏬</span>
                         <h1 class="text-xl sm:text-2xl font-black text-white">
-                            إدارة الفروع والمخازن المركزية وعربيات التوزيع
+                            {{ $t('inventory.stores_title') }}
                         </h1>
                     </div>
                     <p class="text-xs text-slate-400 font-bold">
-                        إدارة منافذ البيع المتعددة، خطوط سير عربيات التوزيع الجملة، والتحويلات المخزنية
+                        {{ $t('inventory.stores_subtitle') }}
                     </p>
                 </div>
 
@@ -134,7 +135,7 @@ const saveUserAssignment = () => {
                         class="h-11 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
                     >
                         <span>📊</span>
-                        <span>أرصدة المخازن والفروع</span>
+                        <span>{{ $t('inventory.store_stocks') }}</span>
                     </Link>
 
                     <button
@@ -143,7 +144,7 @@ const saveUserAssignment = () => {
                         class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
                     >
                         <span class="text-base font-black">+</span>
-                        <span>إضافة فرع / عربية توزيع</span>
+                        <span>{{ $t('inventory.add_new_store') }}</span>
                     </button>
                 </div>
             </div>
@@ -167,12 +168,12 @@ const saveUserAssignment = () => {
                                 <div>
                                     <h3 class="font-black text-white text-sm flex items-center gap-2">
                                         <span>{{ s.name }}</span>
-                                        <span v-if="s.is_main" class="px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 text-[10px] font-black">الرئيسي 👑</span>
+                                        <span v-if="s.is_main" class="px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 text-[10px] font-black">{{ $t('inventory.store_type_main') }} 👑</span>
                                     </h3>
                                     <div class="flex items-center gap-2 mt-0.5">
                                         <span class="text-xs text-slate-500 font-mono font-bold">{{ s.code }}</span>
                                         <span class="text-[10px] text-slate-400 font-tajawal">
-                                            ({{ s.type === 'wholesale_van' || s.type === 'van' ? 'عربية توزيع جملة' : (s.type === 'main_warehouse' || s.type === 'warehouse' ? 'مخزن رئيسي' : 'محل قطاعي') }})
+                                            ({{ s.type === 'wholesale_van' || s.type === 'van' ? 'عربية توزيع جملة' : (s.type === 'main_warehouse' || s.type === 'warehouse' ? $t('inventory.store_type_main') : $t('inventory.store_type_branch')) }})
                                         </span>
                                     </div>
                                 </div>
@@ -183,9 +184,9 @@ const saveUserAssignment = () => {
                                 type="button"
                                 class="px-2 py-0.5 rounded-full text-[10px] font-bold transition cursor-pointer"
                                 :class="s.is_active ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' : 'bg-rose-500/20 text-rose-400 hover:bg-rose-500/30'"
-                                :title="s.is_active ? 'الفرع نشط (اضغط للتعطيل)' : 'الفرع معطل (اضغط للتفعيل)'"
+                                :title="s.is_active ? $t('common.active') : $t('common.inactive')"
                             >
-                                {{ s.is_active ? '🟢 نشط' : '⚪ معطل' }}
+                                {{ s.is_active ? '🟢 ' + $t('common.active') : '⚪ ' + $t('common.inactive') }}
                             </button>
                         </div>
 
@@ -199,25 +200,25 @@ const saveUserAssignment = () => {
                                 <span>{{ s.phone }}</span>
                             </div>
                             <div class="flex items-center justify-between pt-1">
-                                <span>📦 عدد الأصناف بالمخزن:</span>
-                                <strong class="text-white font-mono text-xs">{{ s.stocks_count }} صنف</strong>
+                                <span>📦 {{ $t('inventory.total_items_count') }}:</span>
+                                <strong class="text-white font-mono text-xs">{{ s.stocks_count }} {{ $t('inventory.item_unit') }}</strong>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span>🧾 فواتير المبيعات:</span>
-                                <span class="text-slate-300 font-mono">{{ s.invoices_count || 0 }} فاتورة</span>
+                                <span>🧾 {{ $t('dashboard.invoices_today') || 'الفواتير' }}:</span>
+                                <span class="text-slate-300 font-mono">{{ s.invoices_count || 0 }}</span>
                             </div>
                         </div>
 
                         <!-- Assigned Staff -->
                         <div class="pt-2 border-t border-slate-800/80 space-y-1.5">
                             <div class="flex items-center justify-between text-[11px]">
-                                <span class="text-slate-400 font-bold">الموظفون المعينون:</span>
+                                <span class="text-slate-400 font-bold">{{ $t('users.title') || 'الموظفون المعينون' }}:</span>
                                 <button
                                     @click="openUserAssignmentModal(s)"
                                     type="button"
                                     class="text-amber-400 hover:text-amber-300 text-[10px] font-black cursor-pointer"
                                 >
-                                    + إدارة الموظفين
+                                    + {{ $t('common.edit') || 'إدارة الموظفين' }}
                                 </button>
                             </div>
                             <div class="flex flex-wrap gap-1">
@@ -229,7 +230,7 @@ const saveUserAssignment = () => {
                                     👤 {{ u.name }}
                                 </span>
                                 <span v-if="!s.assigned_users || s.assigned_users.length === 0" class="text-[10px] text-slate-500 italic">
-                                    لا يوجد موظفون مخصصون
+                                    {{ $t('common.no_records') || 'لا يوجد موظفون مخصصون' }}
                                 </span>
                             </div>
                         </div>
@@ -242,7 +243,7 @@ const saveUserAssignment = () => {
                             class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition flex items-center gap-1"
                         >
                             <span>📦</span>
-                            <span>الأرصدة</span>
+                            <span>{{ $t('inventory.store_stocks') }}</span>
                         </Link>
 
                         <div class="flex items-center gap-1.5">
@@ -250,7 +251,7 @@ const saveUserAssignment = () => {
                                 @click="openEditModal(s)"
                                 type="button"
                                 class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold transition cursor-pointer"
-                                title="تعديل بيانات الفرع"
+                                :title="$t('common.edit')"
                             >
                                 ✏️
                             </button>
@@ -260,7 +261,7 @@ const saveUserAssignment = () => {
                                 type="button"
                                 class="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs transition cursor-pointer"
                                 :class="!s.can_be_deleted ? 'opacity-40 cursor-not-allowed' : ''"
-                                :title="s.can_be_deleted ? 'حذف الفرع' : s.deletion_blockers.join(', ')"
+                                :title="s.can_be_deleted ? $t('common.delete') : s.deletion_blockers.join(', ')"
                             >
                                 🗑️
                             </button>
@@ -280,38 +281,38 @@ const saveUserAssignment = () => {
             <div @click.stop class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <h3 class="font-black text-base text-white">
-                        {{ editingStore ? 'تعديل بيانات الفرع / المخزن' : 'إضافة فرع / مخزن / عربية توزيع' }}
+                        {{ editingStore ? $t('inventory.store_updated') : $t('inventory.add_new_store') }}
                     </h3>
                     <button @click="showStoreModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
                 </div>
 
                 <form @submit.prevent="saveStore" class="space-y-4">
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">اسم الفرع / العربية *</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('inventory.store_name') }} *</label>
                         <input
                             v-model="storeForm.name"
                             type="text"
                             required
-                            placeholder="مثال: فرع مدينة نصر / عربية توزيع 1..."
+                            :placeholder="$t('inventory.store_name')"
                             class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                         >
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">النوع *</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.store_type') }} *</label>
                             <select
                                 v-model="storeForm.type"
                                 class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                             >
-                                <option value="retail_shop">محل بيع قطاعي 🏬</option>
+                                <option value="retail_shop">{{ $t('inventory.store_type_branch') }} 🏬</option>
                                 <option value="wholesale_van">عربية توزيع جملة 🚚</option>
-                                <option value="main_warehouse">مخزن رئيسي 🏭</option>
+                                <option value="main_warehouse">{{ $t('inventory.store_type_main') }} 🏭</option>
                             </select>
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">الكود التعريفي</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.store_code') }}</label>
                             <input
                                 v-model="storeForm.code"
                                 type="text"
@@ -322,17 +323,17 @@ const saveUserAssignment = () => {
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">العنوان / منطقة السير</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('common.address') }}</label>
                         <input
                             v-model="storeForm.address"
                             type="text"
-                            placeholder="مثال: شارع عباس العقاد..."
+                            :placeholder="$t('common.address')"
                             class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                         >
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">رقم الهاتف / تليفون المسؤول</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('common.phone') }}</label>
                         <input
                             v-model="storeForm.phone"
                             type="text"
@@ -349,7 +350,7 @@ const saveUserAssignment = () => {
                             class="rounded accent-amber-500 w-4 h-4 cursor-pointer"
                         >
                         <label for="is_main_check" class="text-xs font-bold text-amber-400 cursor-pointer">
-                            تعيين كمقر رئيسي للمنشأة 👑
+                            {{ $t('inventory.store_type_main') }} 👑
                         </label>
                     </div>
 
@@ -359,14 +360,14 @@ const saveUserAssignment = () => {
                             type="button"
                             class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
                         >
-                            إلغاء
+                            {{ $t('common.cancel') }}
                         </button>
                         <button
                             type="submit"
                             :disabled="storeForm.processing"
                             class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
-                            {{ storeForm.processing ? 'جاري الحفظ...' : 'حفظ البيانات' }}
+                            {{ storeForm.processing ? '...' : $t('common.save') }}
                         </button>
                     </div>
                 </form>
@@ -383,7 +384,7 @@ const saveUserAssignment = () => {
             <div @click.stop class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <h3 class="font-black text-base text-white flex items-center gap-2">
-                        <span>👥 تعيين موظفي الفرع:</span>
+                        <span>👥 {{ $t('users.title') || 'تعيين موظفي الفرع' }}:</span>
                         <span class="text-amber-400">{{ targetStore?.name }}</span>
                     </h3>
                     <button @click="showUserModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
@@ -417,14 +418,14 @@ const saveUserAssignment = () => {
                             type="button"
                             class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
                         >
-                            إلغاء
+                            {{ $t('common.cancel') }}
                         </button>
                         <button
                             type="submit"
                             :disabled="userAssignmentForm.processing"
                             class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
-                            {{ userAssignmentForm.processing ? 'جاري الحفظ...' : 'حفظ التعيينات' }}
+                            {{ userAssignmentForm.processing ? '...' : $t('common.save') }}
                         </button>
                     </div>
                 </form>

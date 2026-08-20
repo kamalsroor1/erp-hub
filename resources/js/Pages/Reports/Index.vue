@@ -1,9 +1,10 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import DatePicker from '@/Components/DatePicker.vue';
 import { useMoney } from '@/Composables/useMoney';
+import { trans } from '@/helpers/trans';
 
 const props = defineProps({
     active_tab: { type: String, default: 'sales' },
@@ -99,7 +100,7 @@ const printReport = () => {
 </script>
 
 <template>
-    <Head title="التقارير المالية والأرباح والمبيعات" />
+    <Head :title="$t('reports.title')" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -111,10 +112,10 @@ const printReport = () => {
                     </div>
                     <div>
                         <h1 class="text-xl sm:text-2xl font-black text-white">
-                            التقارير المالية والأرباح والمبيعات
+                            {{ $t('reports.title') }}
                         </h1>
                         <p class="text-xs text-slate-400 font-bold mt-0.5">
-                            قائمة الدخل P&L، ربحية الأصناف، جرد وتقييم المخزون، وتحليل الخزينة
+                            {{ $t('reports.subtitle') }}
                         </p>
                     </div>
                 </div>
@@ -126,7 +127,7 @@ const printReport = () => {
                         class="h-11 px-5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold text-xs flex items-center gap-2 transition cursor-pointer"
                     >
                         <span>🖨️</span>
-                        <span>طباعة التقرير الشامل A4</span>
+                        <span>{{ $t('reports.print_full_report') }}</span>
                     </button>
                 </div>
             </div>
@@ -136,14 +137,14 @@ const printReport = () => {
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <!-- Period Buttons -->
                     <div class="flex flex-wrap items-center gap-1.5 text-xs">
-                        <span class="text-slate-400 font-bold text-[11px] px-1">الفترة الزمنية:</span>
+                        <span class="text-slate-400 font-bold text-[11px] px-1">{{ $t('common.date') }}:</span>
                         <button
                             v-for="p in [
-                                { id: 'today', label: 'اليوم' },
-                                { id: 'yesterday', label: 'أمس' },
-                                { id: 'this_week', label: 'هذا الأسبوع' },
-                                { id: 'this_month', label: 'هذا الشهر' },
-                                { id: 'this_year', label: 'هذا العام' },
+                                { id: 'today', label: $t('common.today') || 'اليوم' },
+                                { id: 'yesterday', label: $t('common.yesterday') || 'أمس' },
+                                { id: 'this_week', label: $t('common.this_week') || 'هذا الأسبوع' },
+                                { id: 'this_month', label: $t('common.this_month') || 'هذا الشهر' },
+                                { id: 'this_year', label: $t('common.this_year') || 'هذا العام' },
                             ]"
                             :key="p.id"
                             @click="setPeriod(p.id)"
@@ -157,13 +158,13 @@ const printReport = () => {
 
                     <!-- Store Filter -->
                     <div class="flex items-center gap-2">
-                        <span class="text-slate-400 font-bold text-xs hidden sm:inline">الفرع:</span>
+                        <span class="text-slate-400 font-bold text-xs hidden sm:inline">{{ $t('inventory.store') }}:</span>
                         <select
                             v-model="filterForm.store_id"
                             @change="applyFilters"
                             class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                         >
-                            <option value="all">جميع الفروع والمخازن</option>
+                            <option value="all">{{ $t('common.all_stores') }}</option>
                             <option v-for="s in stores" :key="s.id" :value="s.id">{{ s.name }}</option>
                         </select>
                     </div>
@@ -171,15 +172,15 @@ const printReport = () => {
 
                 <!-- Custom Date Range Pickers -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-slate-800/80 items-end">
-                    <DatePicker v-model="filterForm.from" label="من تاريخ" />
-                    <DatePicker v-model="filterForm.to" label="إلى تاريخ" />
+                    <DatePicker v-model="filterForm.from" :label="$t('common.date_from')" />
+                    <DatePicker v-model="filterForm.to" :label="$t('common.date_to')" />
                     <div>
                         <button
                             @click="applyFilters"
                             type="button"
                             class="w-full h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition cursor-pointer"
                         >
-                            تحديث التقرير 🔄
+                            {{ $t('reports.refresh_report') }}
                         </button>
                     </div>
                 </div>
@@ -189,13 +190,13 @@ const printReport = () => {
             <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 bg-slate-950 p-1.5 rounded-2xl border border-slate-800 text-xs">
                 <button
                     v-for="tab in [
-                        { id: 'sales', label: 'المبيعات والأرباح', icon: '💵' },
-                        { id: 'items', label: 'ربحية الأصناف', icon: '📦' },
-                        { id: 'stores', label: 'مقارنة الفروع', icon: '🏢' },
-                        { id: 'customers', label: 'مسحوبات العملاء', icon: '👥' },
-                        { id: 'expenses', label: 'المصروفات', icon: '💸' },
-                        { id: 'inventory', label: 'تقييم المخزون', icon: '📈' },
-                        { id: 'treasury', label: 'الخزينة والتحصيل', icon: '💰' },
+                        { id: 'sales', label: $t('reports.tab_sales'), icon: '💵' },
+                        { id: 'items', label: $t('reports.tab_items'), icon: '📦' },
+                        { id: 'stores', label: $t('reports.tab_stores'), icon: '🏢' },
+                        { id: 'customers', label: $t('reports.tab_customers'), icon: '👥' },
+                        { id: 'expenses', label: $t('reports.tab_expenses'), icon: '💸' },
+                        { id: 'inventory', label: $t('reports.tab_inventory'), icon: '📈' },
+                        { id: 'treasury', label: $t('reports.tab_treasury'), icon: '💰' },
                     ]"
                     :key="tab.id"
                     @click="switchTab(tab.id)"
@@ -213,42 +214,42 @@ const printReport = () => {
                 <!-- 4 Top KPI Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
-                        <span class="text-xs font-bold text-slate-400">إجمالي المبيعات الصادرة</span>
+                        <span class="text-xs font-bold text-slate-400">{{ $t('reports.total_issued_sales') }}</span>
                         <div class="text-2xl font-black font-mono text-white">
-                            {{ formatMoney(summary.total_sales) }} <span class="text-xs font-bold text-amber-400">ج.م</span>
+                            {{ formatMoney(summary.total_sales) }} <span class="text-xs font-bold text-amber-400">{{ $t('common.currency') }}</span>
                         </div>
                         <div class="text-[11px] text-slate-400 font-bold">
-                            {{ summary.invoices_count }} فاتورة معتمدة
+                            {{ $t('reports.approved_invoices_count', { count: summary.invoices_count }) }}
                         </div>
                     </div>
 
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
-                        <span class="text-xs font-bold text-slate-400">تكلفة البضاعة المباعة (COGS)</span>
+                        <span class="text-xs font-bold text-slate-400">{{ $t('reports.cogs') }}</span>
                         <div class="text-2xl font-black font-mono text-indigo-300">
-                            {{ formatMoney(summary.total_cogs) }} <span class="text-xs font-bold text-white">ج.م</span>
+                            {{ formatMoney(summary.total_cogs) }} <span class="text-xs font-bold text-white">{{ $t('common.currency') }}</span>
                         </div>
                         <div class="text-[11px] text-slate-400 font-bold">
-                            متوسط الفاتورة: {{ formatMoney(summary.avg_invoice) }} ج.م
+                            {{ $t('reports.avg_invoice', { amount: formatMoney(summary.avg_invoice) }) }}
                         </div>
                     </div>
 
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
-                        <span class="text-xs font-bold text-slate-400">مجمل أرباح النشاط (Gross Profit)</span>
+                        <span class="text-xs font-bold text-slate-400">{{ $t('reports.gross_profit_trade') }}</span>
                         <div class="text-2xl font-black font-mono text-emerald-400">
-                            {{ formatMoney(summary.gross_profit) }} <span class="text-xs font-bold text-white">ج.م</span>
+                            {{ formatMoney(summary.gross_profit) }} <span class="text-xs font-bold text-white">{{ $t('common.currency') }}</span>
                         </div>
                         <div class="text-[11px] text-slate-400 font-bold">
-                            هامش الربح الإجمالي: <strong class="text-white">{{ summary.margin_percentage }}%</strong>
+                            {{ $t('reports.gross_margin') }}: <strong class="text-white">{{ summary.margin_percentage }}%</strong>
                         </div>
                     </div>
 
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
-                        <span class="text-xs font-bold text-slate-400">صافي الربح بعد المصروفات (Net)</span>
+                        <span class="text-xs font-bold text-slate-400">{{ $t('reports.net_profit_after_expenses') }}</span>
                         <div class="text-2xl font-black font-mono" :class="summary.net_profit >= 0 ? 'text-emerald-400' : 'text-rose-400'">
-                            {{ formatMoney(summary.net_profit) }} <span class="text-xs font-bold text-white">ج.م</span>
+                            {{ formatMoney(summary.net_profit) }} <span class="text-xs font-bold text-white">{{ $t('common.currency') }}</span>
                         </div>
                         <div class="text-[11px] text-slate-400 font-bold">
-                            المصروفات: {{ formatMoney(summary.total_expenses) }} ج.م
+                            {{ $t('reports.tab_expenses') }}: {{ formatMoney(summary.total_expenses) }} {{ $t('common.currency') }}
                         </div>
                     </div>
                 </div>
@@ -257,31 +258,31 @@ const printReport = () => {
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
                     <h3 class="text-sm font-black text-white flex items-center gap-2">
                         <span>📑</span>
-                        <span>قائمة الدخل والأرباح التشغيلية (P&L Breakdown)</span>
+                        <span>{{ $t('reports.pnl_breakdown') }}</span>
                     </h3>
 
                     <div class="overflow-x-auto">
                         <table class="w-full text-right text-xs">
                             <tbody class="divide-y divide-slate-800">
                                 <tr class="py-2.5">
-                                    <td class="py-3 font-bold text-slate-300">إجمالي المبيعات الصادرة (Gross Sales)</td>
-                                    <td class="py-3 font-mono font-bold text-white text-left">{{ formatMoney(summary.total_sales) }} ج.م</td>
+                                    <td class="py-3 font-bold text-slate-300">{{ $t('reports.gross_sales') }}</td>
+                                    <td class="py-3 font-mono font-bold text-white text-left">{{ formatMoney(summary.total_sales) }} {{ $t('common.currency') }}</td>
                                 </tr>
                                 <tr class="py-2.5">
-                                    <td class="py-3 font-bold text-slate-300">يُخصم: تكلفة البضاعة المباعة (Cost of Goods Sold)</td>
-                                    <td class="py-3 font-mono font-bold text-rose-400 text-left">- {{ formatMoney(summary.total_cogs) }} ج.م</td>
+                                    <td class="py-3 font-bold text-slate-300">{{ $t('reports.cogs_deducted') }}</td>
+                                    <td class="py-3 font-mono font-bold text-rose-400 text-left">- {{ formatMoney(summary.total_cogs) }} {{ $t('common.currency') }}</td>
                                 </tr>
                                 <tr class="py-2.5 bg-slate-950/50">
-                                    <td class="py-3 font-black text-amber-400">مجمل الربح التجاري (Gross Profit)</td>
-                                    <td class="py-3 font-mono font-black text-amber-400 text-left">{{ formatMoney(summary.gross_profit) }} ج.م</td>
+                                    <td class="py-3 font-black text-amber-400">{{ $t('reports.gross_profit_trade') }}</td>
+                                    <td class="py-3 font-mono font-black text-amber-400 text-left">{{ formatMoney(summary.gross_profit) }} {{ $t('common.currency') }}</td>
                                 </tr>
                                 <tr class="py-2.5">
-                                    <td class="py-3 font-bold text-slate-300">يُخصم: المصروفات التشغيلية والنثريات (Operating Expenses)</td>
-                                    <td class="py-3 font-mono font-bold text-rose-400 text-left">- {{ formatMoney(summary.total_expenses) }} ج.م</td>
+                                    <td class="py-3 font-bold text-slate-300">{{ $t('reports.operating_expenses_deducted') }}</td>
+                                    <td class="py-3 font-mono font-bold text-rose-400 text-left">- {{ formatMoney(summary.total_expenses) }} {{ $t('common.currency') }}</td>
                                 </tr>
                                 <tr class="py-2.5 bg-emerald-500/10 border-t-2 border-emerald-500/30">
-                                    <td class="py-3 font-black text-emerald-400 text-sm">صافي الربح النهائي (Net Operating Profit)</td>
-                                    <td class="py-3 font-mono font-black text-emerald-400 text-sm text-left">{{ formatMoney(summary.net_profit) }} ج.م</td>
+                                    <td class="py-3 font-black text-emerald-400 text-sm">{{ $t('reports.net_operating_profit') }}</td>
+                                    <td class="py-3 font-mono font-black text-emerald-400 text-sm text-left">{{ formatMoney(summary.net_profit) }} {{ $t('common.currency') }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -292,31 +293,31 @@ const printReport = () => {
             <!-- TAB 2: ITEM PROFITS -->
             <div v-if="currentTab === 'items'" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="text-sm font-black text-white">ربحية ومبيعات الأصناف بالتفصيل</h3>
-                    <span class="text-xs font-mono text-slate-400">{{ item_profits.length }} صنف تم بيعه</span>
+                    <h3 class="text-sm font-black text-white">{{ $t('reports.items_profit_detail') }}</h3>
+                    <span class="text-xs font-mono text-slate-400">{{ $t('reports.items_sold_count', { count: item_profits.length }) }}</span>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-3">الصنف</th>
-                                <th class="pb-3">القسم</th>
-                                <th class="pb-3">الكمية المباعة</th>
-                                <th class="pb-3">إجمالي الإيراد</th>
-                                <th class="pb-3">تكلفة البضاعة</th>
-                                <th class="pb-3">مجمل الربح</th>
-                                <th class="pb-3 text-left">هامش الربح</th>
+                                <th class="pb-3">{{ $t('inventory.item_name') }}</th>
+                                <th class="pb-3">{{ $t('expenses.category') }}</th>
+                                <th class="pb-3">{{ $t('invoices.quantity') }}</th>
+                                <th class="pb-3">{{ $t('reports.sales_summary') }}</th>
+                                <th class="pb-3">{{ $t('reports.cogs') }}</th>
+                                <th class="pb-3">{{ $t('reports.gross_profit_trade') }}</th>
+                                <th class="pb-3 text-left">{{ $t('reports.profit_margin') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">
                             <tr v-for="item in item_profits" :key="item.item_id" class="hover:bg-slate-800/40 transition">
                                 <td class="py-3 font-bold text-white font-tajawal">{{ item.name }}</td>
-                                <td class="py-3 text-slate-400 font-tajawal">{{ item.category || 'عام' }}</td>
+                                <td class="py-3 text-slate-400 font-tajawal">{{ item.category || $t('common.all') }}</td>
                                 <td class="py-3 font-mono text-amber-400">{{ item.total_qty }} {{ item.unit }}</td>
-                                <td class="py-3 font-mono font-bold text-white">{{ formatMoney(item.total_revenue) }} ج.م</td>
-                                <td class="py-3 font-mono text-slate-400">{{ formatMoney(item.total_cogs) }} ج.م</td>
-                                <td class="py-3 font-mono font-bold text-emerald-400">{{ formatMoney(item.profit) }} ج.م</td>
+                                <td class="py-3 font-mono font-bold text-white">{{ formatMoney(item.total_revenue) }} {{ $t('common.currency') }}</td>
+                                <td class="py-3 font-mono text-slate-400">{{ formatMoney(item.total_cogs) }} {{ $t('common.currency') }}</td>
+                                <td class="py-3 font-mono font-bold text-emerald-400">{{ formatMoney(item.profit) }} {{ $t('common.currency') }}</td>
                                 <td class="py-3 font-mono text-left font-bold text-amber-400">{{ item.margin }}%</td>
                             </tr>
                         </tbody>
@@ -326,30 +327,30 @@ const printReport = () => {
 
             <!-- TAB 3: STORE COMPARISON -->
             <div v-if="currentTab === 'stores'" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
-                <h3 class="text-sm font-black text-white border-b border-slate-800 pb-3">مقارنة أداء الفروع والمخازن وعربيات التوزيع</h3>
+                <h3 class="text-sm font-black text-white border-b border-slate-800 pb-3">{{ $t('reports.stores_comparison_title') }}</h3>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-3">الفرع / المخزن</th>
-                                <th class="pb-3">الفواتير</th>
-                                <th class="pb-3">إجمالي المبيعات</th>
-                                <th class="pb-3">المحصل نقدياً</th>
-                                <th class="pb-3">المتبقي (آجل)</th>
-                                <th class="pb-3">مجمل الربح</th>
-                                <th class="pb-3">هامش الربح</th>
-                                <th class="pb-3 text-left">الحصة من المبيعات</th>
+                                <th class="pb-3">{{ $t('inventory.store') }}</th>
+                                <th class="pb-3">{{ $t('reports.invoices_count') }}</th>
+                                <th class="pb-3">{{ $t('reports.total_issued_sales') }}</th>
+                                <th class="pb-3">{{ $t('contacts.paid_amount') }}</th>
+                                <th class="pb-3">{{ $t('contacts.remaining_amount') }}</th>
+                                <th class="pb-3">{{ $t('reports.gross_profit_trade') }}</th>
+                                <th class="pb-3">{{ $t('reports.profit_margin') }}</th>
+                                <th class="pb-3 text-left">{{ $t('reports.revenue_share') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">
                             <tr v-for="st in store_breakdown" :key="st.id" class="hover:bg-slate-800/40 transition">
                                 <td class="py-3 font-bold text-white font-tajawal">{{ st.name }}</td>
                                 <td class="py-3 font-mono text-slate-300">{{ st.invoice_count }}</td>
-                                <td class="py-3 font-mono font-bold text-white">{{ formatMoney(st.total_sales) }} ج.م</td>
-                                <td class="py-3 font-mono text-emerald-400">{{ formatMoney(st.total_paid) }} ج.م</td>
-                                <td class="py-3 font-mono text-rose-400">{{ formatMoney(st.total_remaining) }} ج.م</td>
-                                <td class="py-3 font-mono font-bold text-amber-400">{{ formatMoney(st.gross_profit) }} ج.م</td>
+                                <td class="py-3 font-mono font-bold text-white">{{ formatMoney(st.total_sales) }} {{ $t('common.currency') }}</td>
+                                <td class="py-3 font-mono text-emerald-400">{{ formatMoney(st.total_paid) }} {{ $t('common.currency') }}</td>
+                                <td class="py-3 font-mono text-rose-400">{{ formatMoney(st.total_remaining) }} {{ $t('common.currency') }}</td>
+                                <td class="py-3 font-mono font-bold text-amber-400">{{ formatMoney(st.gross_profit) }} {{ $t('common.currency') }}</td>
                                 <td class="py-3 font-mono text-slate-300">{{ st.margin }}%</td>
                                 <td class="py-3 font-mono text-left font-black text-amber-400">{{ st.share_pct }}%</td>
                             </tr>
@@ -361,9 +362,9 @@ const printReport = () => {
             <!-- TAB 4: CUSTOMER SALES -->
             <div v-if="currentTab === 'customers'" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="text-sm font-black text-white">مبيعات ومسحوبات كبار العملاء</h3>
+                    <h3 class="text-sm font-black text-white">{{ $t('reports.top_customers_sales') }}</h3>
                     <div class="text-xs text-rose-400 font-bold">
-                        إجمالي ديون كل العملاء: <span class="font-mono font-black">{{ formatMoney(summary.total_customers_debt) }} ج.م</span>
+                        {{ $t('reports.all_customers_debt') }}: <span class="font-mono font-black">{{ formatMoney(summary.total_customers_debt) }} {{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
@@ -371,13 +372,13 @@ const printReport = () => {
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-3">العميل</th>
-                                <th class="pb-3">رقم الهاتف</th>
-                                <th class="pb-3">الفواتير</th>
-                                <th class="pb-3">إجمالي المسحوبات</th>
-                                <th class="pb-3">المدفوع بالفترة</th>
-                                <th class="pb-3">المتبقي بالفترة</th>
-                                <th class="pb-3 text-left">الرصيد التراكمي الحالي</th>
+                                <th class="pb-3">{{ $t('invoices.customer') }}</th>
+                                <th class="pb-3">{{ $t('contacts.phone') }}</th>
+                                <th class="pb-3">{{ $t('reports.invoices_count') }}</th>
+                                <th class="pb-3">{{ $t('reports.total_bought') }}</th>
+                                <th class="pb-3">{{ $t('reports.paid_in_period') }}</th>
+                                <th class="pb-3">{{ $t('reports.remaining_in_period') }}</th>
+                                <th class="pb-3 text-left">{{ $t('reports.cumulative_balance') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">
@@ -385,11 +386,11 @@ const printReport = () => {
                                 <td class="py-3 font-bold text-white font-tajawal">{{ c.name }}</td>
                                 <td class="py-3 font-mono text-slate-400">{{ c.phone || '-' }}</td>
                                 <td class="py-3 font-mono text-slate-300">{{ c.total_invoices }}</td>
-                                <td class="py-3 font-mono font-bold text-white">{{ formatMoney(c.total_bought) }} ج.م</td>
-                                <td class="py-3 font-mono text-emerald-400">{{ formatMoney(c.total_paid) }} ج.م</td>
-                                <td class="py-3 font-mono text-rose-400">{{ formatMoney(c.total_debt_in_period) }} ج.م</td>
+                                <td class="py-3 font-mono font-bold text-white">{{ formatMoney(c.total_bought) }} {{ $t('common.currency') }}</td>
+                                <td class="py-3 font-mono text-emerald-400">{{ formatMoney(c.total_paid) }} {{ $t('common.currency') }}</td>
+                                <td class="py-3 font-mono text-rose-400">{{ formatMoney(c.total_debt_in_period) }} {{ $t('common.currency') }}</td>
                                 <td class="py-3 font-mono text-left font-black" :class="c.current_balance > 0 ? 'text-amber-400' : 'text-slate-400'">
-                                    {{ formatMoney(c.current_balance) }} ج.م
+                                    {{ formatMoney(c.current_balance) }} {{ $t('common.currency') }}
                                 </td>
                             </tr>
                         </tbody>
@@ -400,9 +401,9 @@ const printReport = () => {
             <!-- TAB 5: EXPENSES BREAKDOWN -->
             <div v-if="currentTab === 'expenses'" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="text-sm font-black text-white">توزيع المصروفات التشغيلية حسب التصنيف</h3>
+                    <h3 class="text-sm font-black text-white">{{ $t('reports.expenses_by_category') }}</h3>
                     <div class="text-xs text-rose-400 font-bold">
-                        إجمالي المصروفات: <span class="font-mono font-black">{{ formatMoney(summary.total_expenses) }} ج.م</span>
+                        {{ $t('reports.tab_expenses') }}: <span class="font-mono font-black">{{ formatMoney(summary.total_expenses) }} {{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
@@ -413,11 +414,11 @@ const printReport = () => {
                         class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-2"
                     >
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-white">{{ exp.category || 'نثريات عامة' }}</span>
-                            <span class="text-[10px] font-mono text-slate-400">{{ exp.count }} إيصال</span>
+                            <span class="text-xs font-bold text-white">{{ exp.category || $t('expenses.cc_operational') }}</span>
+                            <span class="text-[10px] font-mono text-slate-400">{{ $t('reports.vouchers_count', { count: exp.count }) }}</span>
                         </div>
                         <div class="text-xl font-black font-mono text-rose-400">
-                            {{ formatMoney(exp.amount) }} <span class="text-xs text-slate-400 font-normal">ج.م</span>
+                            {{ formatMoney(exp.amount) }} <span class="text-xs text-slate-400 font-normal">{{ $t('common.currency') }}</span>
                         </div>
                     </div>
                 </div>
@@ -428,23 +429,23 @@ const printReport = () => {
                 <!-- Valuation Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-1">
-                        <span class="text-xs font-bold text-slate-400">تقييم المخزون بسعر التكلفة</span>
+                        <span class="text-xs font-bold text-slate-400">{{ $t('reports.stock_cost_valuation') }}</span>
                         <div class="text-2xl font-black font-mono text-indigo-300">
-                            {{ formatMoney(summary.stock_cost_valuation) }} <span class="text-xs font-bold text-white">ج.م</span>
+                            {{ formatMoney(summary.stock_cost_valuation) }} <span class="text-xs font-bold text-white">{{ $t('common.currency') }}</span>
                         </div>
                     </div>
 
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-1">
-                        <span class="text-xs font-bold text-slate-400">تقييم المخزون بسعر البيع</span>
+                        <span class="text-xs font-bold text-slate-400">{{ $t('reports.stock_selling_valuation') }}</span>
                         <div class="text-2xl font-black font-mono text-white">
-                            {{ formatMoney(summary.stock_selling_valuation) }} <span class="text-xs font-bold text-amber-400">ج.م</span>
+                            {{ formatMoney(summary.stock_selling_valuation) }} <span class="text-xs font-bold text-amber-400">{{ $t('common.currency') }}</span>
                         </div>
                     </div>
 
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-1">
-                        <span class="text-xs font-bold text-slate-400">الربح المتوقع عند بيع المخزون</span>
+                        <span class="text-xs font-bold text-slate-400">{{ $t('reports.expected_stock_profit') }}</span>
                         <div class="text-2xl font-black font-mono text-emerald-400">
-                            {{ formatMoney(summary.expected_stock_profit) }} <span class="text-xs font-bold text-white">ج.م</span>
+                            {{ formatMoney(summary.expected_stock_profit) }} <span class="text-xs font-bold text-white">{{ $t('common.currency') }}</span>
                         </div>
                     </div>
                 </div>
@@ -453,8 +454,8 @@ const printReport = () => {
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
                     <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                         <div>
-                            <h3 class="text-sm font-black text-white">تحليل باريتو لحركة المخزون (ABC Analysis)</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">تصنيف الأصناف حسب المساهمة في الإيرادات الكلية</p>
+                            <h3 class="text-sm font-black text-white">{{ $t('reports.abc_pareto_title') }}</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">{{ $t('reports.abc_pareto_sub') }}</p>
                         </div>
 
                         <button
@@ -463,24 +464,24 @@ const printReport = () => {
                             class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold border border-slate-700 transition cursor-pointer flex items-center gap-1.5"
                         >
                             <span>📥</span>
-                            <span>تصدير تحليل ABC (Excel)</span>
+                            <span>{{ $t('reports.export_abc_excel') }}</span>
                         </button>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-4 space-y-1">
-                            <span class="text-xs font-black text-emerald-400">الفئة A (الأعلى إيراداً - 70% إلى 80%)</span>
-                            <div class="text-lg font-black font-mono text-white">{{ abc_data?.category_a?.length || 0 }} صنف</div>
+                            <span class="text-xs font-black text-emerald-400">{{ $t('reports.abc_class_a_title') }}</span>
+                            <div class="text-lg font-black font-mono text-white">{{ $t('reports.items_count', { count: abc_data?.category_a?.length || 0 }) }}</div>
                         </div>
 
                         <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 space-y-1">
-                            <span class="text-xs font-black text-amber-400">الفئة B (المتوسطة - 15% إلى 20%)</span>
-                            <div class="text-lg font-black font-mono text-white">{{ abc_data?.category_b?.length || 0 }} صنف</div>
+                            <span class="text-xs font-black text-amber-400">{{ $t('reports.abc_class_b_title') }}</span>
+                            <div class="text-lg font-black font-mono text-white">{{ $t('reports.items_count', { count: abc_data?.category_b?.length || 0 }) }}</div>
                         </div>
 
                         <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-4 space-y-1">
-                            <span class="text-xs font-black text-slate-400">الفئة C (الأقل تأثيراً - 5%)</span>
-                            <div class="text-lg font-black font-mono text-white">{{ abc_data?.category_c?.length || 0 }} صنف</div>
+                            <span class="text-xs font-black text-slate-400">{{ $t('reports.abc_class_c_title') }}</span>
+                            <div class="text-lg font-black font-mono text-white">{{ $t('reports.items_count', { count: abc_data?.category_c?.length || 0 }) }}</div>
                         </div>
                     </div>
                 </div>
@@ -490,35 +491,35 @@ const printReport = () => {
             <div v-if="currentTab === 'treasury'" class="space-y-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
                     <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                        <h3 class="text-sm font-black text-white">حركة السيولة والتحصيلات في الخزينة</h3>
+                        <h3 class="text-sm font-black text-white">{{ $t('reports.treasury_liquidity_title') }}</h3>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-1">
-                            <span class="text-xs font-bold text-slate-400">تحصيلات نقدية (Cash)</span>
+                            <span class="text-xs font-bold text-slate-400">{{ $t('reports.cash_collections') }}</span>
                             <div class="text-xl font-black font-mono text-emerald-400">
-                                {{ formatMoney(treasury_data?.inflows?.cash || 0) }} ج.م
+                                {{ formatMoney(treasury_data?.inflows?.cash || 0) }} {{ $t('common.currency') }}
                             </div>
                         </div>
 
                         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-1">
-                            <span class="text-xs font-bold text-slate-400">تحصيلات انستاباي (InstaPay)</span>
+                            <span class="text-xs font-bold text-slate-400">{{ $t('reports.instapay_collections') }}</span>
                             <div class="text-xl font-black font-mono text-purple-400">
-                                {{ formatMoney(treasury_data?.inflows?.instapay || 0) }} ج.م
+                                {{ formatMoney(treasury_data?.inflows?.instapay || 0) }} {{ $t('common.currency') }}
                             </div>
                         </div>
 
                         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-1">
-                            <span class="text-xs font-bold text-slate-400">تحصيلات محفظة (Vodafone Cash)</span>
+                            <span class="text-xs font-bold text-slate-400">{{ $t('reports.wallet_collections') }}</span>
                             <div class="text-xl font-black font-mono text-amber-400">
-                                {{ formatMoney(treasury_data?.inflows?.e_wallet || 0) }} ج.م
+                                {{ formatMoney(treasury_data?.inflows?.e_wallet || 0) }} {{ $t('common.currency') }}
                             </div>
                         </div>
 
                         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-1">
-                            <span class="text-xs font-bold text-slate-400">تحصيلات فيزا / كارت (Visa)</span>
+                            <span class="text-xs font-bold text-slate-400">{{ $t('reports.visa_collections') }}</span>
                             <div class="text-xl font-black font-mono text-cyan-400">
-                                {{ formatMoney(treasury_data?.inflows?.visa || 0) }} ج.م
+                                {{ formatMoney(treasury_data?.inflows?.visa || 0) }} {{ $t('common.currency') }}
                             </div>
                         </div>
                     </div>

@@ -29,7 +29,7 @@ const submitProfile = () => {
 </script>
 
 <template>
-    <Head title="الملف الشخصي وإعدادات الحساب" />
+    <Head :title="$t('profile.title')" />
 
     <AppLayout>
         <div class="max-w-2xl mx-auto space-y-6 font-tajawal">
@@ -38,11 +38,11 @@ const submitProfile = () => {
                 <div class="flex items-center gap-2">
                     <span class="text-2xl">👤</span>
                     <h1 class="text-xl sm:text-2xl font-black text-white">
-                        الملف الشخصي وإعدادات الحساب
+                        {{ $t('profile.title') }}
                     </h1>
                 </div>
                 <p class="text-xs text-slate-400 font-bold">
-                    تعديل بيانات الدخول، رقم الهاتف، كلمة المرور، والمظهر المفضل
+                    {{ $t('profile.subtitle') }}
                 </p>
             </div>
 
@@ -51,12 +51,12 @@ const submitProfile = () => {
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
                     <h2 class="text-sm font-black text-white border-b border-slate-800 pb-3 flex items-center gap-2">
                         <span>📋</span>
-                        <span>البيانات الأساسية</span>
+                        <span>{{ $t('profile.basic_info') }}</span>
                     </h2>
 
                     <div class="space-y-4">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">الاسم الكامل *</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('profile.full_name') }}</label>
                             <input
                                 v-model="form.name"
                                 type="text"
@@ -66,7 +66,7 @@ const submitProfile = () => {
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">رقم الهاتف للدخول *</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('profile.phone_for_login') }}</label>
                             <input
                                 v-model="form.phone"
                                 type="text"
@@ -76,7 +76,7 @@ const submitProfile = () => {
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">البريد الإلكتروني (اختياري)</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('profile.email_optional') }}</label>
                             <input
                                 v-model="form.email"
                                 type="email"
@@ -90,7 +90,7 @@ const submitProfile = () => {
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
                     <h2 class="text-sm font-black text-white border-b border-slate-800 pb-3 flex items-center gap-2">
                         <span>🎨</span>
-                        <span>المظهر المفضل للواجهة</span>
+                        <span>{{ $t('profile.theme_pref') }}</span>
                     </h2>
 
                     <div class="grid grid-cols-2 gap-3">
@@ -101,7 +101,7 @@ const submitProfile = () => {
                             :class="form.theme_preference === 'dark' ? 'bg-amber-500 text-slate-950 font-black border-amber-400' : 'bg-slate-950 border-slate-800 text-slate-400'"
                         >
                             <span>🌙</span>
-                            <span>الوضع الليلي الفاخر (Dark)</span>
+                            <span>{{ $t('profile.dark_mode') }}</span>
                         </button>
 
                         <button
@@ -111,7 +111,7 @@ const submitProfile = () => {
                             :class="form.theme_preference === 'light' ? 'bg-amber-500 text-slate-950 font-black border-amber-400' : 'bg-slate-950 border-slate-800 text-slate-400'"
                         >
                             <span>☀️</span>
-                            <span>الوضع النهاري الفاتح (Light)</span>
+                            <span>{{ $t('profile.light_mode') }}</span>
                         </button>
                     </div>
                 </div>
@@ -120,12 +120,12 @@ const submitProfile = () => {
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
                     <h2 class="text-sm font-black text-white border-b border-slate-800 pb-3 flex items-center gap-2">
                         <span>🔒</span>
-                        <span>تغيير كلمة المرور (اختياري)</span>
+                        <span>{{ $t('profile.change_password') }}</span>
                     </h2>
 
                     <div class="space-y-4">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">كلمة المرور الحالية</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('profile.current_password') }}</label>
                             <input
                                 v-model="form.current_password"
                                 type="password"
@@ -136,7 +136,7 @@ const submitProfile = () => {
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">كلمة المرور الجديدة</label>
+                                <label class="text-xs font-bold text-slate-300">{{ $t('profile.new_password') }}</label>
                                 <input
                                     v-model="form.new_password"
                                     type="password"
@@ -146,7 +146,7 @@ const submitProfile = () => {
                             </div>
 
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">تأكيد كلمة المرور الجديدة</label>
+                                <label class="text-xs font-bold text-slate-300">{{ $t('profile.confirm_new_password') }}</label>
                                 <input
                                     v-model="form.new_password_confirmation"
                                     type="password"
@@ -166,7 +166,7 @@ const submitProfile = () => {
                         class="h-12 px-8 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                     >
                         <span>💾</span>
-                        <span>{{ form.processing ? 'جاري الحفظ...' : 'حفظ بيانات الملف الشخصي' }}</span>
+                        <span>{{ form.processing ? $t('profile.saving_profile') : $t('profile.save_profile_btn') }}</span>
                     </button>
                 </div>
             </form>

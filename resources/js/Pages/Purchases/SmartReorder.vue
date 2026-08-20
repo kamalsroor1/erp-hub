@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { useMoney } from '@/Composables/useMoney';
+import { trans } from '@/helpers/trans';
 
 const props = defineProps({
     suggestions: { type: Array, default: () => [] },
@@ -52,7 +53,7 @@ const toggleSelectAll = (e) => {
 
 const createPurchaseFromSelected = () => {
     if (selectedItemIds.value.length === 0) {
-        alert('يرجى تحديد صنف واحد على الأقل لإنشاء فاتورة الشراء والتوريد');
+        alert(trans('purchases.select_one_item_warning') || 'يرجى تحديد صنف واحد على الأقل لإنشاء فاتورة الشراء والتوريد');
         return;
     }
 
@@ -70,7 +71,7 @@ const createPurchaseFromSelected = () => {
 </script>
 
 <template>
-    <Head title="مساعد المشتريات الذكي والتنبؤ بالنواقص" />
+    <Head :title="$t('purchases.smart_reorder')" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -83,10 +84,10 @@ const createPurchaseFromSelected = () => {
                         </Link>
                         <div>
                             <h1 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-                                <span>🧠 مساعد المشتريات الذكي والتنبؤ بالنواقص</span>
+                                <span>🧠 {{ $t('purchases.smart_reorder') }}</span>
                             </h1>
                             <p class="text-xs text-slate-400 font-bold mt-0.5">
-                                خوارزمية ذكية تحلل معدل السحب اليومي وتتنبأ بموعد نفاد المخزون وتقترح كميات الشراء المثالية
+                                {{ $t('purchases.smart_reorder_sub') }}
                             </p>
                         </div>
                     </div>
@@ -98,7 +99,7 @@ const createPurchaseFromSelected = () => {
                         type="button"
                         class="h-11 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold transition cursor-pointer"
                     >
-                        ⚡ تحديد كل النواقص الحرجة
+                        ⚡ {{ $t('purchases.select_all_critical') }}
                     </button>
 
                     <button
@@ -108,7 +109,7 @@ const createPurchaseFromSelected = () => {
                         class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <span>📥</span>
-                        <span>توليد فاتورة شراء للأصناف المحددة ({{ selectedItemIds.length }})</span>
+                        <span>{{ $t('purchases.generate_po_for_selected', { count: selectedItemIds.length }) }}</span>
                     </button>
                 </div>
             </div>
@@ -117,7 +118,7 @@ const createPurchaseFromSelected = () => {
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-1">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs text-slate-400 font-bold">أصناف حرجة ونافدة</span>
+                        <span class="text-xs text-slate-400 font-bold">{{ $t('purchases.critical_stockouts') }}</span>
                         <span class="text-sm">🚨</span>
                     </div>
                     <div class="text-2xl font-black font-mono text-rose-400">
@@ -127,7 +128,7 @@ const createPurchaseFromSelected = () => {
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-1">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs text-slate-400 font-bold">أصناف تقترب من النفاد</span>
+                        <span class="text-xs text-slate-400 font-bold">{{ $t('purchases.warning_stockouts') }}</span>
                         <span class="text-sm">⚠️</span>
                     </div>
                     <div class="text-2xl font-black font-mono text-amber-400">
@@ -137,7 +138,7 @@ const createPurchaseFromSelected = () => {
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-1">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs text-slate-400 font-bold">أصناف في النطاق الآمن</span>
+                        <span class="text-xs text-slate-400 font-bold">{{ $t('purchases.safe_stockouts') }}</span>
                         <span class="text-sm">✅</span>
                     </div>
                     <div class="text-2xl font-black font-mono text-emerald-400">
@@ -147,11 +148,11 @@ const createPurchaseFromSelected = () => {
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-1">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs text-slate-400 font-bold">إجمالي تكلفة إعادة الطلب</span>
+                        <span class="text-xs text-slate-400 font-bold">{{ $t('purchases.total_reorder_cost') }}</span>
                         <span class="text-sm">💰</span>
                     </div>
                     <div class="text-2xl font-black font-mono text-white">
-                        {{ formatMoney(metrics.total_estimated_cost || 0) }} <span class="text-xs text-amber-400">ج.م</span>
+                        {{ formatMoney(metrics.total_estimated_cost || 0) }} <span class="text-xs text-amber-400">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
             </div>
@@ -167,7 +168,7 @@ const createPurchaseFromSelected = () => {
                             class="px-3 py-1.5 rounded-xl transition cursor-pointer"
                             :class="urgencyFilter === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'"
                         >
-                            الكل ({{ suggestions.length }})
+                            {{ $t('common.all') }} ({{ suggestions.length }})
                         </button>
                         <button
                             @click="urgencyFilter = 'critical'; applyFilters();"
@@ -175,7 +176,7 @@ const createPurchaseFromSelected = () => {
                             class="px-3 py-1.5 rounded-xl transition cursor-pointer"
                             :class="urgencyFilter === 'critical' ? 'bg-rose-500 text-white font-black' : 'text-slate-400 hover:text-white'"
                         >
-                            حرج 🚨
+                            {{ $t('purchases.status_critical') }} 🚨
                         </button>
                         <button
                             @click="urgencyFilter = 'warning'; applyFilters();"
@@ -183,7 +184,7 @@ const createPurchaseFromSelected = () => {
                             class="px-3 py-1.5 rounded-xl transition cursor-pointer"
                             :class="urgencyFilter === 'warning' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white'"
                         >
-                            تحذير ⚠️
+                            {{ $t('purchases.status_warning') }} ⚠️
                         </button>
                         <button
                             @click="urgencyFilter = 'safe'; applyFilters();"
@@ -191,7 +192,7 @@ const createPurchaseFromSelected = () => {
                             class="px-3 py-1.5 rounded-xl transition cursor-pointer"
                             :class="urgencyFilter === 'safe' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'text-slate-400 hover:text-white'"
                         >
-                            آمن ✅
+                            {{ $t('purchases.status_safe') }} ✅
                         </button>
                     </div>
 
@@ -202,33 +203,33 @@ const createPurchaseFromSelected = () => {
                         @change="applyFilters"
                         class="h-10 px-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:border-amber-500 focus:outline-none"
                     >
-                        <option value="all">كافة الفروع والمخازن</option>
+                        <option value="all">{{ $t('common.all_stores') }}</option>
                         <option v-for="st in stores" :key="st.id" :value="st.id">{{ st.name }}</option>
                     </select>
 
                     <!-- Analysis Period & Target Days -->
                     <div class="flex items-center gap-2 text-xs text-slate-300 font-bold">
-                        <span>تحليل مبيعات:</span>
+                        <span>{{ $t('purchases.daily_consumption') }}:</span>
                         <select
                             v-model.number="analysisDays"
                             @change="applyFilters"
                             class="h-10 px-3 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none"
                         >
-                            <option :value="7">آخر 7 أيام</option>
-                            <option :value="14">آخر 14 يوم</option>
-                            <option :value="30">آخر 30 يوم</option>
+                            <option :value="7">{{ $t('purchases.days_count', { count: 7 }) }}</option>
+                            <option :value="14">{{ $t('purchases.days_count', { count: 14 }) }}</option>
+                            <option :value="30">{{ $t('purchases.days_count', { count: 30 }) }}</option>
                         </select>
 
-                        <span>تغطية تكفي:</span>
+                        <span>{{ $t('purchases.target_cover_days') }}:</span>
                         <select
                             v-model.number="targetCoverDays"
                             @change="applyFilters"
                             class="h-10 px-3 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none"
                         >
-                            <option :value="7">7 أيام</option>
-                            <option :value="15">15 يوم (أسبوعين)</option>
-                            <option :value="30">30 يوم (شهر)</option>
-                            <option :value="45">45 يوم</option>
+                            <option :value="7">{{ $t('purchases.days_count', { count: 7 }) }}</option>
+                            <option :value="15">{{ $t('purchases.days_count', { count: 15 }) }}</option>
+                            <option :value="30">{{ $t('purchases.days_count', { count: 30 }) }}</option>
+                            <option :value="45">{{ $t('purchases.days_count', { count: 45 }) }}</option>
                         </select>
                     </div>
                 </div>
@@ -239,7 +240,7 @@ const createPurchaseFromSelected = () => {
                         v-model="search"
                         @input="applyFilters"
                         type="text"
-                        placeholder="بحث باسم أو كود الصنف..."
+                        :placeholder="$t('purchases.search_placeholder')"
                         class="w-full h-10 px-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                     >
                 </div>
@@ -260,9 +261,9 @@ const createPurchaseFromSelected = () => {
                                 </th>
                                 <th class="pb-3">{{ $t('inventory.item_name') }}</th>
                                 <th class="pb-3 font-mono">{{ $t('inventory.current_stock') }}</th>
-                                <th class="pb-3 font-mono">المبيعات ({{ analysisDays }} يوم)</th>
+                                <th class="pb-3 font-mono">{{ $t('purchases.sales_period', { days: analysisDays }) }}</th>
                                 <th class="pb-3 font-mono">{{ $t('purchases.daily_usage') }}</th>
-                                <th class="pb-3 font-mono">أيام كفاية المخزون</th>
+                                <th class="pb-3 font-mono">{{ $t('purchases.days_of_stock') }}</th>
                                 <th class="pb-3 font-mono text-amber-400">{{ $t('purchases.suggested_qty') }}</th>
                                 <th class="pb-3 font-mono">{{ $t('purchases.estimated_cost') }}</th>
                                 <th class="pb-3 text-center">{{ $t('common.status') }}</th>
@@ -293,30 +294,30 @@ const createPurchaseFromSelected = () => {
                                             (it.urgency === 'warning' ? 'bg-amber-500/20 border-amber-500/30 text-amber-400' : 'bg-slate-800 border-slate-700 text-slate-300'))
                                         ]"
                                     >
-                                        {{ it.current_stock }} {{ it.unit || 'كجم' }}
+                                        {{ it.current_stock }} {{ it.unit || $t('inventory.unit_kg') || 'كجم' }}
                                     </span>
                                 </td>
 
                                 <td class="py-3 font-mono text-slate-300 font-bold">
-                                    {{ it.analysis_sales }} {{ it.unit || 'كجم' }}
+                                    {{ it.analysis_sales }} {{ it.unit || $t('inventory.unit_kg') || 'كجم' }}
                                 </td>
 
                                 <td class="py-3 font-mono text-slate-400">
-                                    {{ it.daily_consumption }} / يوم
+                                    {{ it.daily_consumption }} / {{ $t('common.day') || 'يوم' }}
                                 </td>
 
                                 <td class="py-3 font-mono font-bold">
                                     <span :class="it.days_remaining <= 3 ? 'text-rose-400 font-black' : (it.days_remaining <= 7 ? 'text-amber-400' : 'text-emerald-400')">
-                                        {{ it.days_remaining === 999 ? 'غير محدود' : it.days_remaining + ' يوم' }}
+                                        {{ it.days_remaining === 999 ? $t('purchases.unlimited_days') : $t('purchases.days_count', { count: it.days_remaining }) }}
                                     </span>
                                 </td>
 
                                 <td class="py-3 font-mono font-black text-emerald-400 text-sm">
-                                    {{ it.suggested_quantity }} {{ it.unit || 'كجم' }}
+                                    {{ it.suggested_quantity }} {{ it.unit || $t('inventory.unit_kg') || 'كجم' }}
                                 </td>
 
                                 <td class="py-3 font-mono font-bold text-white">
-                                    {{ formatMoney(it.estimated_cost) }} ج.م
+                                    {{ formatMoney(it.estimated_cost) }} {{ $t('common.currency') }}
                                 </td>
 
                                 <td class="py-3 text-center font-tajawal">
@@ -324,19 +325,19 @@ const createPurchaseFromSelected = () => {
                                         v-if="it.urgency === 'critical'"
                                         class="px-2.5 py-1 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold text-[11px]"
                                     >
-                                        حرج 🚨
+                                        {{ $t('purchases.status_critical') }} 🚨
                                     </span>
                                     <span
                                         v-else-if="it.urgency === 'warning'"
                                         class="px-2.5 py-1 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold text-[11px]"
                                     >
-                                        تحذير ⚠️
+                                        {{ $t('purchases.status_warning') }} ⚠️
                                     </span>
                                     <span
                                         v-else
                                         class="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold text-[11px]"
                                     >
-                                        آمن ✅
+                                        {{ $t('purchases.status_safe') }} ✅
                                     </span>
                                 </td>
                             </tr>
@@ -345,7 +346,7 @@ const createPurchaseFromSelected = () => {
 
                     <div v-if="suggestions.length === 0" class="py-16 text-center space-y-2">
                         <span class="text-3xl">🎉</span>
-                        <p class="text-xs font-bold text-emerald-400 font-tajawal">مستويات المخزون ممتازة! لا توجد نواقص مطابقة لمعايير الفلتر المحددة.</p>
+                        <p class="text-xs font-bold text-emerald-400 font-tajawal">{{ $t('purchases.no_reorder_needed') }}</p>
                     </div>
                 </div>
             </div>

@@ -16,15 +16,17 @@ const props = defineProps({
 const { formatMoney } = useMoney();
 
 // Search & Filter state
+import { trans } from '@/helpers/trans';
+
 const search = ref(props.filters.search || '');
 const debtStatus = ref(props.filters.debt_status || 'all');
 const isDrawerOpen = ref(false);
 
-const debtStatusOptions = [
-    { id: 'all', name: 'كافة الموردين والشركات' },
-    { id: 'creditor', name: 'موردين لهم مستحقات مالية (دائنون) 🚨' },
-    { id: 'zero', name: 'الحسابات المسواة (رصيد 0) ✅' },
-];
+const debtStatusOptions = computed(() => [
+    { id: 'all', name: trans('contacts.all_customers') || 'كافة الموردين والشركات' },
+    { id: 'creditor', name: trans('contacts.creditors_only') || 'موردين لهم مستحقات مالية (دائنون) 🚨' },
+    { id: 'zero', name: trans('contacts.settled_only') || 'الحسابات المسواة (رصيد 0) ✅' },
+]);
 
 const activeFiltersCount = computed(() => {
     let count = 0;
@@ -166,7 +168,7 @@ const toggleActive = (s) => {
 </script>
 
 <template>
-    <Head title="دليل الموردين والشركات" />
+    <Head :title="$t('contacts.suppliers_title')" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -176,11 +178,11 @@ const toggleActive = (s) => {
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">🏭</span>
                         <h1 class="text-xl sm:text-2xl font-black text-white">
-                            دليل الموردين وشركات خامات البن
+                            {{ $t('contacts.suppliers_title') }}
                         </h1>
                     </div>
                     <p class="text-xs text-slate-400 font-bold">
-                        متابعة مستحقات الموردين، فواتير التوريد، وسندات الصرف والسداد
+                        {{ $t('contacts.suppliers_subtitle') }}
                     </p>
                 </div>
 
@@ -190,30 +192,30 @@ const toggleActive = (s) => {
                     class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
                 >
                     <span class="text-base font-black">+</span>
-                    <span>إضافة مورد جديد</span>
+                    <span>{{ $t('contacts.add_new_supplier') }}</span>
                 </button>
             </div>
 
             <!-- KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">إجمالي مستحقات الموردين (المطلوب سداده)</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('contacts.total_payable_suppliers') }}</span>
                     <div class="text-2xl font-black font-mono text-amber-400">
-                        {{ formatMoney(metrics.total_payable) }} <span class="text-xs text-white">ج.م</span>
+                        {{ formatMoney(metrics.total_payable) }} <span class="text-xs text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">موردون لهم مستحقات قائمة</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('contacts.creditors_count') }}</span>
                     <div class="text-2xl font-black font-mono text-rose-400">
-                        {{ metrics.creditors_count || 0 }} <span class="text-xs text-slate-500 font-tajawal">مورد</span>
+                        {{ metrics.creditors_count || 0 }} <span class="text-xs text-slate-500 font-tajawal">{{ $t('contacts.supplier_unit') }}</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">إجمالي الشركات والموردين</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('contacts.total_suppliers_count') }}</span>
                     <div class="text-2xl font-black font-mono text-emerald-400">
-                        {{ metrics.total_suppliers || 0 }} <span class="text-xs text-slate-500 font-tajawal">مورد</span>
+                        {{ metrics.total_suppliers || 0 }} <span class="text-xs text-slate-500 font-tajawal">{{ $t('contacts.supplier_unit') }}</span>
                     </div>
                 </div>
             </div>
@@ -225,7 +227,7 @@ const toggleActive = (s) => {
                         <input
                             v-model="search"
                             type="text"
-                            placeholder="... بحث باسم المورد أو الشركة أو الهاتف"
+                            :placeholder="$t('contacts.search_supplier_placeholder')"
                             class="w-full pr-10 pl-4 py-2.5 bg-slate-950/80 border border-slate-800 rounded-2xl text-xs text-white placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
@@ -241,7 +243,7 @@ const toggleActive = (s) => {
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
                                 :class="debtStatus === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'"
                             >
-                                الكل
+                                {{ $t('common.all') }}
                             </button>
                             <button
                                 @click="debtStatus = 'creditor'; applyFilters();"
@@ -249,7 +251,7 @@ const toggleActive = (s) => {
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
                                 :class="debtStatus === 'creditor' ? 'bg-rose-500 text-white font-black' : 'text-slate-400 hover:text-white'"
                             >
-                                لهم مستحقات 🚨
+                                {{ $t('contacts.creditors_only') }}
                             </button>
                         </div>
 
@@ -259,7 +261,7 @@ const toggleActive = (s) => {
                             class="h-10 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
                         >
                             <span>⚙️</span>
-                            <span>تصفية وفلاتر متقدمة</span>
+                            <span>{{ $t('common.filter') }}</span>
                             <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-mono font-black text-[11px] flex items-center justify-center">
                                 {{ activeFiltersCount }}
                             </span>
@@ -313,7 +315,7 @@ const toggleActive = (s) => {
                                             s.current_balance > 0 ? 'bg-amber-500/15 border-amber-500/30 text-amber-400' : 'bg-slate-800 border-slate-700 text-slate-400'
                                         ]"
                                     >
-                                        {{ formatMoney(s.current_balance) }} ج.م
+                                        {{ formatMoney(s.current_balance) }} {{ $t('common.currency') }}
                                     </span>
                                 </td>
 
@@ -325,17 +327,17 @@ const toggleActive = (s) => {
                                             @click="openPaymentModal(s)"
                                             type="button"
                                             class="px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 text-xs font-bold transition cursor-pointer flex items-center gap-1"
-                                            title="تسجيل سند صرف وسداد دفعة"
+                                            :title="$t('contacts.record_disbursement_voucher')"
                                         >
                                             <span>💸</span>
-                                            <span>سداد</span>
+                                            <span>{{ $t('contacts.record_disbursement_voucher') }}</span>
                                         </button>
 
                                         <!-- Statement -->
                                         <Link
                                             :href="`/suppliers/${s.id}/statement`"
                                             class="p-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-400 transition"
-                                            title="كشف حساب تفصيلي بالمشتريات والمدفوعات"
+                                            :title="$t('contacts.statement_title')"
                                         >
                                             📜
                                         </Link>
@@ -345,7 +347,7 @@ const toggleActive = (s) => {
                                             @click="openEditModal(s)"
                                             type="button"
                                             class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 transition cursor-pointer"
-                                            title="تعديل بيانات المورد"
+                                            :title="$t('common.edit')"
                                         >
                                             ✏️
                                         </button>
@@ -356,7 +358,7 @@ const toggleActive = (s) => {
                                             type="button"
                                             class="p-1.5 rounded-xl transition cursor-pointer"
                                             :class="s.is_active ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 hover:bg-slate-700 text-slate-500'"
-                                            :title="s.is_active ? 'الحساب نشط (اضغط للتعطيل)' : 'الحساب معطل (اضغط للتفعيل)'"
+                                            :title="s.is_active ? $t('common.active') : $t('common.inactive')"
                                         >
                                             {{ s.is_active ? '🟢' : '⚪' }}
                                         </button>
@@ -367,7 +369,7 @@ const toggleActive = (s) => {
                                             type="button"
                                             class="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition cursor-pointer"
                                             :class="!s.can_be_deleted ? 'opacity-40 cursor-not-allowed' : ''"
-                                            :title="s.can_be_deleted ? 'حذف المورد' : s.deletion_blockers.join(', ')"
+                                            :title="s.can_be_deleted ? $t('common.delete') : s.deletion_blockers.join(', ')"
                                         >
                                             🗑️
                                         </button>
@@ -379,14 +381,14 @@ const toggleActive = (s) => {
 
                     <div v-if="!suppliers.data || suppliers.data.length === 0" class="py-16 text-center space-y-2">
                         <span class="text-3xl">🏭</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">لا يوجد موردين مسجلين مطابقين للبحث</p>
+                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('contacts.no_suppliers_found') }}</p>
                     </div>
                 </div>
 
                 <!-- Pagination -->
                 <div v-if="suppliers.links && suppliers.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
                     <span class="text-xs text-slate-400 font-tajawal">
-                        عرض {{ suppliers.from || 0 }} إلى {{ suppliers.to || 0 }} من إجمالي {{ suppliers.total || 0 }} مورد
+                        {{ $t('common.actions') ? `عرض ${suppliers.from || 0} إلى ${suppliers.to || 0} من إجمالي ${suppliers.total || 0}` : `Showing ${suppliers.from || 0} to ${suppliers.to || 0} of ${suppliers.total || 0}` }}
                     </span>
 
                     <div class="flex items-center gap-1">
@@ -419,21 +421,21 @@ const toggleActive = (s) => {
         >
             <div class="space-y-5">
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🔍 البحث بالاسم أو الشركة أو الهاتف</label>
+                    <label class="text-xs font-black text-slate-300">🔍 {{ $t('contacts.search_supplier_placeholder') }}</label>
                     <input
                         v-model="search"
                         type="text"
-                        placeholder="... اكتب للبحث"
+                        :placeholder="$t('common.search')"
                         class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none transition"
                     >
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">💳 حالة المستحقات</label>
+                    <label class="text-xs font-black text-slate-300">💳 {{ $t('contacts.current_balance_status') }}</label>
                     <SearchableSelect
                         v-model="debtStatus"
                         :options="debtStatusOptions"
-                        placeholder="اختر حالة المستحقات..."
+                        :placeholder="$t('contacts.all_customers')"
                     />
                 </div>
             </div>
@@ -449,36 +451,36 @@ const toggleActive = (s) => {
             <div @click.stop class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <h3 class="font-black text-base text-white">
-                        {{ editingSupplier ? 'تعديل بيانات المورد' : 'إضافة مورد جديد' }}
+                        {{ editingSupplier ? $t('contacts.supplier_updated') : $t('contacts.add_new_supplier') }}
                     </h3>
                     <button @click="showSupplierModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
                 </div>
 
                 <form @submit.prevent="saveSupplier" class="space-y-4">
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">اسم المسؤول / المورد *</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('contacts.supplier_name') }} *</label>
                         <input
                             v-model="supplierForm.name"
                             type="text"
                             required
-                            placeholder="مثال: الحاج أحمد عبد السلام..."
+                            :placeholder="$t('contacts.supplier_name')"
                             class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                         >
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">اسم الشركة / المؤسسة</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('contacts.company_name') }}</label>
                             <input
                                 v-model="supplierForm.company_name"
                                 type="text"
-                                placeholder="مثال: شركة النيل لاستيراد البن"
+                                :placeholder="$t('contacts.company_placeholder')"
                                 class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                             >
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">رقم الهاتف / الموبايل</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('common.phone') }}</label>
                             <input
                                 v-model="supplierForm.phone"
                                 type="text"
@@ -489,17 +491,17 @@ const toggleActive = (s) => {
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">العنوان / المخزن</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('common.address') }}</label>
                         <input
                             v-model="supplierForm.address"
                             type="text"
-                            placeholder="مثال: ميناء الإسكندرية / مخازن 6 أكتوبر"
+                            :placeholder="$t('common.address')"
                             class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                         >
                     </div>
 
                     <div v-if="!editingSupplier" class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">رصيد أول المدة الافتتاحي (مستحق للمورد ج.م)</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('contacts.opening_balance') }} ({{ $t('common.currency') }})</label>
                         <input
                             v-model="supplierForm.opening_balance"
                             type="number"
@@ -510,7 +512,7 @@ const toggleActive = (s) => {
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">ملاحظات</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('common.notes') }}</label>
                         <textarea
                             v-model="supplierForm.notes"
                             rows="2"
@@ -524,14 +526,14 @@ const toggleActive = (s) => {
                             type="button"
                             class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
                         >
-                            إلغاء
+                            {{ $t('common.cancel') }}
                         </button>
                         <button
                             type="submit"
                             :disabled="supplierForm.processing"
                             class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
-                            {{ supplierForm.processing ? 'جاري الحفظ...' : (editingSupplier ? 'حفظ التعديلات' : 'إضافة المورد') }}
+                            {{ supplierForm.processing ? '...' : (editingSupplier ? $t('common.save') : $t('contacts.add_new_supplier')) }}
                         </button>
                     </div>
                 </form>
@@ -548,7 +550,7 @@ const toggleActive = (s) => {
             <div @click.stop class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <div>
-                        <h3 class="font-black text-base text-white">سند صرف وسداد دفعة للمورد</h3>
+                        <h3 class="font-black text-base text-white">{{ $t('contacts.record_disbursement_voucher') }}</h3>
                         <p class="text-xs text-amber-400 font-bold mt-0.5">{{ selectedSupplierForPayment?.name }}</p>
                     </div>
                     <button @click="showPaymentModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
@@ -556,7 +558,7 @@ const toggleActive = (s) => {
 
                 <form @submit.prevent="submitPayment" class="space-y-4">
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">المبلغ المسدد (ج.م) *</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('contacts.voucher_amount') }} ({{ $t('common.currency') }}) *</label>
                         <input
                             v-model="paymentForm.amount"
                             type="number"
@@ -568,28 +570,28 @@ const toggleActive = (s) => {
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">طريقة السداد *</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('contacts.payment_method') }} *</label>
                         <SearchableSelect
                             v-model="paymentForm.payment_method"
                             :options="paymentMethodOptions"
-                            placeholder="اختر طريقة السداد..."
+                            :placeholder="$t('contacts.payment_method')"
                         />
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">تاريخ السند *</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('common.date') }} *</label>
                         <DatePicker
                             v-model="paymentForm.payment_date"
-                            placeholder="تاريخ السند..."
+                            :placeholder="$t('common.date')"
                         />
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">ملاحظات السداد</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('common.notes') }}</label>
                         <input
                             v-model="paymentForm.notes"
                             type="text"
-                            placeholder="مثال: دفعة تحت الحساب / تحويل..."
+                            :placeholder="$t('common.notes')"
                             class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                         >
                     </div>
@@ -600,14 +602,14 @@ const toggleActive = (s) => {
                             type="button"
                             class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
                         >
-                            إلغاء
+                            {{ $t('common.cancel') }}
                         </button>
                         <button
                             type="submit"
                             :disabled="paymentForm.processing"
                             class="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black shadow-lg shadow-emerald-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
-                            {{ paymentForm.processing ? 'جاري السداد...' : 'تسجيل سند الصرف 💸' }}
+                            {{ paymentForm.processing ? '...' : $t('contacts.record_disbursement_voucher') }}
                         </button>
                     </div>
                 </form>

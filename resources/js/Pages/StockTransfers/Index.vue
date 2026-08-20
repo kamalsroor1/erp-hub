@@ -45,7 +45,7 @@ const openDetailsModal = (t) => {
 </script>
 
 <template>
-    <Head title="سجل التحويلات المخزنية بين الفروع" />
+    <Head :title="$t('inventory.transfers_title')" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -55,11 +55,11 @@ const openDetailsModal = (t) => {
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">🚚</span>
                         <h1 class="text-xl sm:text-2xl font-black text-white">
-                            أذونات وسجل التحويلات المخزنية بين الفروع والعربيات
+                            {{ $t('inventory.transfers_title') }}
                         </h1>
                     </div>
                     <p class="text-xs text-slate-400 font-bold">
-                        تتبع شحنات وتحويلات البضاعة بين المخزن الرئيسي ومنافذ البيع وعربيات التوزيع
+                        {{ $t('inventory.transfers_subtitle') }}
                     </p>
                 </div>
 
@@ -68,7 +68,7 @@ const openDetailsModal = (t) => {
                     class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
                 >
                     <span class="text-base font-black">+</span>
-                    <span>إذن تحويل بضاعة جديد</span>
+                    <span>{{ $t('inventory.new_transfer') }}</span>
                 </Link>
             </div>
 
@@ -78,7 +78,7 @@ const openDetailsModal = (t) => {
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-3">{{ $t('invoices.invoice_number') }}</th>
+                                <th class="pb-3">{{ $t('contacts.reference_no') }}</th>
                                 <th class="pb-3">{{ $t('inventory.from_store') }}</th>
                                 <th class="pb-3">{{ $t('inventory.to_store') }}</th>
                                 <th class="pb-3">{{ $t('common.date') }}</th>
@@ -106,12 +106,12 @@ const openDetailsModal = (t) => {
                                 </td>
 
                                 <td class="py-3.5 text-slate-300 font-tajawal">
-                                    {{ t.items_count }} صنف
+                                    {{ t.items_count }} {{ $t('inventory.item_unit') }}
                                 </td>
 
                                 <td class="py-3.5 text-center">
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                                        تم التحويل بنجاح 🟢
+                                        {{ $t('common.success') }} 🟢
                                     </span>
                                 </td>
 
@@ -121,7 +121,7 @@ const openDetailsModal = (t) => {
                                         type="button"
                                         class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition cursor-pointer"
                                     >
-                                        عرض الأصناف
+                                        {{ $t('inventory.view_items') }}
                                     </button>
                                 </td>
                             </tr>
@@ -130,7 +130,7 @@ const openDetailsModal = (t) => {
 
                     <div v-if="!transfers.data || transfers.data.length === 0" class="py-16 text-center space-y-2">
                         <span class="text-3xl">🚚</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">لا توجد أذونات تحويل مسجلة</p>
+                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_transfers_found') }}</p>
                     </div>
                 </div>
             </div>
@@ -146,7 +146,7 @@ const openDetailsModal = (t) => {
             <div @click.stop class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <div>
-                        <h3 class="font-black text-base text-white">إذن التحويل: {{ selectedTransfer.transfer_number }}</h3>
+                        <h3 class="font-black text-base text-white">{{ $t('inventory.transfers_title') }}: {{ selectedTransfer.transfer_number }}</h3>
                         <p class="text-xs text-amber-400 font-bold mt-0.5">{{ selectedTransfer.from_store_name }} ← {{ selectedTransfer.to_store_name }}</p>
                     </div>
                     <button @click="showDetailsModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
@@ -156,8 +156,8 @@ const openDetailsModal = (t) => {
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-2">الصنف</th>
-                                <th class="pb-2 font-mono">الكمية المحولة</th>
+                                <th class="pb-2">{{ $t('inventory.item_name') }}</th>
+                                <th class="pb-2 font-mono">{{ $t('inventory.transferred_quantity') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">

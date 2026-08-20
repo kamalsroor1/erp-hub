@@ -1,10 +1,11 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import SearchableSelect from '@/Components/SearchableSelect.vue';
 import DatePicker from '@/Components/DatePicker.vue';
 import { useMoney } from '@/Composables/useMoney';
+import { trans } from '@/helpers/trans';
 
 const props = defineProps({
     item: { type: Object, required: true },
@@ -21,24 +22,24 @@ const dateTo = ref(props.filters.to || '');
 const storeId = ref(props.filters.store_id || 'all');
 const movementType = ref(props.filters.type || 'all');
 
-const storeOptions = [
-    { id: 'all', name: '🏬 كافة الفروع والمخازن' },
+const storeOptions = computed(() => [
+    { id: 'all', name: `🏬 ${trans('common.all') || 'كافة الفروع والمخازن'}` },
     ...props.stores.map(s => ({ id: s.id, name: `🏬 ${s.name}` }))
-];
+]);
 
-const movementTypeOptions = [
-    { id: 'all', name: 'كافة أنواع الحركات' },
-    { id: 'purchase_in', name: 'توريد مشتريات 🚛' },
-    { id: 'sales_out', name: 'مبيعات وفواتير POS 🛒' },
-    { id: 'transfer_in', name: 'تحويل وارد من مخزن 📥' },
-    { id: 'transfer_out', name: 'تحويل منصرف إلى مخزن 📤' },
-    { id: 'sales_return_in', name: 'مرتجع مبيعات من عميل ↩️' },
-    { id: 'purchase_return_out', name: 'مرتجع مشتريات إلى مورد ↪️' },
-    { id: 'stock_adjustment_in', name: 'تسوية جردية (إضافة) ⚖️' },
-    { id: 'stock_adjustment_out', name: 'تسوية جردية (خصم) ⚖️' },
-    { id: 'cancellation_in', name: 'إلغاء فاتورة مبيعات 🚫' },
-    { id: 'waste_out', name: 'هالك وتالف 🗑️' },
-];
+const movementTypeOptions = computed(() => [
+    { id: 'all', name: trans('inventory.all_stock') || 'كافة أنواع الحركات' },
+    { id: 'purchase_in', name: `🚛 ${trans('inventory.movement_purchase') || 'توريد مشتريات'}` },
+    { id: 'sales_out', name: `🛒 ${trans('inventory.movement_sale') || 'مبيعات وفواتير POS'}` },
+    { id: 'transfer_in', name: `📥 ${trans('inventory.movement_transfer_in') || 'تحويل وارد من مخزن'}` },
+    { id: 'transfer_out', name: `📤 ${trans('inventory.movement_transfer_out') || 'تحويل منصرف إلى مخزن'}` },
+    { id: 'sales_return_in', name: `↩️ ${trans('inventory.movement_sale_return') || 'مرتجع مبيعات من عميل'}` },
+    { id: 'purchase_return_out', name: `↪️ ${trans('inventory.movement_purchase_return') || 'مرتجع مشتريات إلى مورد'}` },
+    { id: 'stock_adjustment_in', name: `⚖️ ${trans('inventory.movement_adjustment') || 'تسوية جردية (إضافة)'}` },
+    { id: 'stock_adjustment_out', name: `⚖️ ${trans('inventory.movement_adjustment') || 'تسوية جردية (خصم)'}` },
+    { id: 'cancellation_in', name: `🚫 ${trans('invoices.cancelled') || 'إلغاء فاتورة مبيعات'}` },
+    { id: 'waste_out', name: '🗑️ هالك وتالف' },
+]);
 
 const applyDatePreset = (preset) => {
     const now = new Date();
@@ -88,15 +89,15 @@ const printReport = () => {
 
 const getMovementBadge = (type) => {
     const map = {
-        'purchase_in': { label: 'توريد مشتريات', class: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
-        'sales_out': { label: 'مبيعات وفواتير', class: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30' },
-        'transfer_in': { label: 'تحويل وارد', class: 'bg-teal-500/15 text-teal-400 border-teal-500/30' },
-        'transfer_out': { label: 'تحويل منصرف', class: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
-        'sales_return_in': { label: 'مرتجع مبيعات', class: 'bg-blue-500/15 text-blue-400 border-blue-500/30' },
-        'purchase_return_out': { label: 'مرتجع مشتريات', class: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
-        'stock_adjustment_in': { label: 'تسوية (إضافة)', class: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
-        'stock_adjustment_out': { label: 'تسوية (خصم)', class: 'bg-rose-500/15 text-rose-400 border-rose-500/30' },
-        'cancellation_in': { label: 'إلغاء فاتورة', class: 'bg-rose-500/15 text-rose-400 border-rose-500/30' },
+        'purchase_in': { label: trans('inventory.movement_purchase') || 'توريد مشتريات', class: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
+        'sales_out': { label: trans('inventory.movement_sale') || 'مبيعات وفواتير', class: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30' },
+        'transfer_in': { label: trans('inventory.movement_transfer_in') || 'تحويل وارد', class: 'bg-teal-500/15 text-teal-400 border-teal-500/30' },
+        'transfer_out': { label: trans('inventory.movement_transfer_out') || 'تحويل منصرف', class: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
+        'sales_return_in': { label: trans('inventory.movement_sale_return') || 'مرتجع مبيعات', class: 'bg-blue-500/15 text-blue-400 border-blue-500/30' },
+        'purchase_return_out': { label: trans('inventory.movement_purchase_return') || 'مرتجع مشتريات', class: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
+        'stock_adjustment_in': { label: trans('inventory.movement_adjustment') || 'تسوية (إضافة)', class: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
+        'stock_adjustment_out': { label: trans('inventory.movement_adjustment') || 'تسوية (خصم)', class: 'bg-rose-500/15 text-rose-400 border-rose-500/30' },
+        'cancellation_in': { label: trans('invoices.cancelled') || 'إلغاء فاتورة', class: 'bg-rose-500/15 text-rose-400 border-rose-500/30' },
         'waste_out': { label: 'هالك وتالف', class: 'bg-rose-500/15 text-rose-400 border-rose-500/30' },
     };
     return map[type] || { label: type, class: 'bg-slate-800 text-slate-300 border-slate-700' };
@@ -104,7 +105,7 @@ const getMovementBadge = (type) => {
 </script>
 
 <template>
-    <Head :title="`كشف حركة المخزون: ${item.name}`" />
+    <Head :title="`${$t('inventory.movements_title')}: ${item.name}`" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -117,12 +118,12 @@ const getMovementBadge = (type) => {
                         </Link>
                         <div>
                             <h1 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-                                <span>كشف وتتبع حركة الصنف:</span>
+                                <span>{{ $t('inventory.movements_title') }}:</span>
                                 <span class="text-amber-400">{{ item.name }}</span>
                                 <span v-if="item.code" class="text-xs text-slate-400 font-mono font-normal">({{ item.code }})</span>
                             </h1>
                             <p class="text-xs text-slate-400 font-bold mt-0.5">
-                                التصنيف: {{ item.category || 'عام' }} | الوحدة: {{ item.unit }} | التكلفة: {{ formatMoney(item.cost_price) }} ج.م | البيع: {{ formatMoney(item.selling_price) }} ج.م
+                                {{ $t('inventory.category') }}: {{ item.category || '—' }} | {{ $t('inventory.unit') }}: {{ item.unit }} | {{ $t('inventory.purchase_price') }}: {{ formatMoney(item.cost_price) }} {{ $t('common.currency') }} | {{ $t('inventory.retail_price') }}: {{ formatMoney(item.selling_price) }} {{ $t('common.currency') }}
                             </p>
                         </div>
                     </div>
@@ -135,7 +136,7 @@ const getMovementBadge = (type) => {
                         class="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-indigo-600/20 transition cursor-pointer"
                     >
                         <span>📄</span>
-                        <span>طباعة تقرير الحركة A4</span>
+                        <span>{{ $t('contacts.print_statement') }} A4</span>
                     </button>
                 </div>
             </div>
@@ -143,7 +144,7 @@ const getMovementBadge = (type) => {
             <!-- 4 Top KPI Cards -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">الوارد الإجمالي للفترة (+)</span>
+                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('inventory.quantity_in') }}</span>
                     <div class="text-xl font-black font-mono text-emerald-400 flex items-center gap-1.5">
                         <span>📥</span>
                         <span>{{ stats.total_in }}</span>
@@ -152,7 +153,7 @@ const getMovementBadge = (type) => {
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">المنصرف والمبيعات (-)</span>
+                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('inventory.quantity_out') }}</span>
                     <div class="text-xl font-black font-mono text-rose-400 flex items-center gap-1.5">
                         <span>📤</span>
                         <span>{{ stats.total_out }}</span>
@@ -161,7 +162,7 @@ const getMovementBadge = (type) => {
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">صافي الحركة للفترة</span>
+                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('contacts.period_net') || 'صافي الحركة للفترة' }}</span>
                     <div class="text-xl font-black font-mono flex items-center gap-1.5" :class="stats.net_movement >= 0 ? 'text-emerald-400' : 'text-rose-400'">
                         <span>⚖️</span>
                         <span>{{ stats.net_movement >= 0 ? '+' : '' }}{{ stats.net_movement }}</span>
@@ -170,7 +171,7 @@ const getMovementBadge = (type) => {
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">رصيد النطاق الحالي</span>
+                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('inventory.current_stock') }}</span>
                     <div class="text-xl font-black font-mono text-amber-400 flex items-center gap-1.5">
                         <span>📦</span>
                         <span>{{ stats.current_scope_stock }}</span>
@@ -183,49 +184,49 @@ const getMovementBadge = (type) => {
             <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-3">
                 <!-- Date Presets Bar -->
                 <div class="flex flex-wrap items-center gap-1.5 pb-2 border-b border-slate-800/80 text-xs">
-                    <span class="text-slate-500 font-bold text-[11px] ml-1">فترات سريعة:</span>
-                    <button @click="applyDatePreset('today')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">اليوم</button>
-                    <button @click="applyDatePreset('this_week')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">هذا الأسبوع</button>
-                    <button @click="applyDatePreset('this_month')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">هذا الشهر</button>
-                    <button @click="applyDatePreset('this_year')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">هذا العام</button>
-                    <button @click="applyDatePreset('all')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">كافة الحركات</button>
+                    <span class="text-slate-500 font-bold text-[11px] ml-1">{{ $t('contacts.report_period') }}:</span>
+                    <button @click="applyDatePreset('today')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">{{ $t('dashboard.today') || 'اليوم' }}</button>
+                    <button @click="applyDatePreset('this_week')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">{{ $t('dashboard.this_week') || 'هذا الأسبوع' }}</button>
+                    <button @click="applyDatePreset('this_month')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">{{ $t('dashboard.this_month') || 'هذا الشهر' }}</button>
+                    <button @click="applyDatePreset('this_year')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">{{ $t('dashboard.this_year') || 'هذا العام' }}</button>
+                    <button @click="applyDatePreset('all')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">{{ $t('common.all') }}</button>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                     <div class="space-y-1">
-                        <label class="text-[11px] font-bold text-slate-300">نوع الحركة</label>
+                        <label class="text-[11px] font-bold text-slate-300">{{ $t('inventory.movement_type') }}</label>
                         <SearchableSelect
                             v-model="movementType"
                             :options="movementTypeOptions"
-                            placeholder="اختر النوع..."
+                            :placeholder="$t('inventory.movement_type')"
                         />
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-[11px] font-bold text-slate-300">الفرع / المخزن</label>
+                        <label class="text-[11px] font-bold text-slate-300">{{ $t('common.store') }}</label>
                         <SearchableSelect
                             v-model="storeId"
                             :options="storeOptions"
-                            placeholder="اختر المخزن..."
+                            :placeholder="$t('common.store')"
                         />
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-[11px] font-bold text-slate-300">من تاريخ</label>
-                        <DatePicker v-model="dateFrom" placeholder="من..." />
+                        <label class="text-[11px] font-bold text-slate-300">{{ $t('contacts.from_date') }}</label>
+                        <DatePicker v-model="dateFrom" :placeholder="$t('contacts.from_date')" />
                     </div>
 
                     <div class="space-y-1 flex items-end gap-2">
                         <div class="flex-1">
-                            <label class="text-[11px] font-bold text-slate-300">إلى تاريخ</label>
-                            <DatePicker v-model="dateTo" placeholder="إلى..." />
+                            <label class="text-[11px] font-bold text-slate-300">{{ $t('contacts.to_date') }}</label>
+                            <DatePicker v-model="dateTo" :placeholder="$t('contacts.to_date')" />
                         </div>
                         <button
                             @click="applyFilters"
                             type="button"
                             class="h-10 px-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer"
                         >
-                            تطبيق
+                            {{ $t('common.filter') }}
                         </button>
                     </div>
                 </div>
@@ -238,11 +239,11 @@ const getMovementBadge = (type) => {
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
                                 <th class="pb-3">{{ $t('common.date') }} & {{ $t('common.time') }}</th>
-                                <th class="pb-3">{{ $t('common.status') }}</th>
-                                <th class="pb-3">{{ $t('invoices.invoice_number') }}</th>
+                                <th class="pb-3">{{ $t('inventory.movement_type') }}</th>
+                                <th class="pb-3">{{ $t('contacts.reference_no') }}</th>
                                 <th class="pb-3 font-mono">{{ $t('common.quantity') }}</th>
-                                <th class="pb-3 font-mono">{{ $t('inventory.current_stock') }} (قبل)</th>
-                                <th class="pb-3 font-mono">{{ $t('inventory.current_stock') }} (بعد)</th>
+                                <th class="pb-3 font-mono">{{ $t('inventory.current_stock') }} ({{ $t('inventory.balance_before') || 'قبل' }})</th>
+                                <th class="pb-3 font-mono">{{ $t('inventory.balance_after') }}</th>
                                 <th class="pb-3">{{ $t('common.store') }} / {{ $t('common.user') }}</th>
                             </tr>
                         </thead>
@@ -278,7 +279,7 @@ const getMovementBadge = (type) => {
                                 </td>
 
                                 <td class="py-3.5 font-tajawal text-slate-300">
-                                    <div>{{ m.store_name || 'المخزن الرئيسي' }}</div>
+                                    <div>{{ m.store_name || $t('inventory.store_type_main') }}</div>
                                     <div class="text-[10px] text-slate-500">{{ m.user_name }}</div>
                                 </td>
                             </tr>
@@ -287,14 +288,14 @@ const getMovementBadge = (type) => {
 
                     <div v-if="!movements.data || movements.data.length === 0" class="py-16 text-center space-y-2">
                         <span class="text-3xl">📦</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">لا توجد حركات مسجلة لهذا الصنف في الفترة المحددة</p>
+                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_movements_found') }}</p>
                     </div>
                 </div>
 
                 <!-- Pagination -->
                 <div v-if="movements.links && movements.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
                     <span class="text-xs text-slate-400 font-tajawal">
-                        عرض {{ movements.from || 0 }} إلى {{ movements.to || 0 }} من إجمالي {{ movements.total || 0 }} حركة
+                        {{ $t('common.actions') ? `عرض ${movements.from || 0} إلى ${movements.to || 0} من إجمالي ${movements.total || 0} حركة` : `Showing ${movements.from || 0} to ${movements.to || 0} of ${movements.total || 0}` }}
                     </span>
 
                     <div class="flex items-center gap-1">

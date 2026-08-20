@@ -49,7 +49,7 @@ const savePermissions = () => {
 </script>
 
 <template>
-    <Head title="مصفوفة الأدوار والصلاحيات" />
+    <Head :title="$t('roles.title')" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -59,11 +59,11 @@ const savePermissions = () => {
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">🛡️</span>
                         <h1 class="text-xl sm:text-2xl font-black text-white">
-                            مصفوفة الأدوار والصلاحيات الدقيقة للنظام
+                            {{ $t('roles.title') }}
                         </h1>
                     </div>
                     <p class="text-xs text-slate-400 font-bold">
-                        تحديد صلاحيات الكاشير، المحاسب، وأمين المخزن بدقة وفق أحدث معايير الأمان
+                        {{ $t('roles.subtitle') }}
                     </p>
                 </div>
 
@@ -72,7 +72,7 @@ const savePermissions = () => {
                     class="h-11 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
                 >
                     <span>👥</span>
-                    <span>إدارة المستخدمين</span>
+                    <span>{{ $t('roles.users_management') }}</span>
                 </Link>
             </div>
 
@@ -80,7 +80,7 @@ const savePermissions = () => {
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <!-- Roles List (1 Col) -->
                 <div class="space-y-3">
-                    <h2 class="text-xs font-black text-slate-400">اختر الدور للتعديل:</h2>
+                    <h2 class="text-xs font-black text-slate-400">{{ $t('roles.select_role_prompt') }}</h2>
                     <div class="space-y-2">
                         <button
                             v-for="r in roles"
@@ -95,7 +95,7 @@ const savePermissions = () => {
                                     {{ r.label }}
                                 </h3>
                                 <span class="text-[10px] text-slate-500 font-bold mt-0.5 block">
-                                    {{ r.permissions_count }} صلاحية مفعلة
+                                    {{ $t('roles.active_permissions_count', { count: r.permissions_count }) }}
                                 </span>
                             </div>
                             <span v-if="selectedRoleId === r.id" class="text-amber-400 font-black">←</span>
@@ -109,10 +109,10 @@ const savePermissions = () => {
                         <div class="flex items-center justify-between border-b border-slate-800 pb-4">
                             <div>
                                 <h2 class="text-base font-black text-white flex items-center gap-2">
-                                    <span>صلاحيات:</span>
+                                    <span>{{ $t('roles.permissions_for') }}</span>
                                     <span class="text-amber-400">{{ selected_role?.name }}</span>
                                 </h2>
-                                <p class="text-xs text-slate-400 font-bold mt-0.5">قم بتحديد أو إلغاء الصلاحيات المسموح بها لهذا الدور</p>
+                                <p class="text-xs text-slate-400 font-bold mt-0.5">{{ $t('roles.permissions_sub') }}</p>
                             </div>
 
                             <button
@@ -120,7 +120,7 @@ const savePermissions = () => {
                                 type="button"
                                 class="h-11 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 transition transform active:scale-95 cursor-pointer"
                             >
-                                حفظ الصلاحيات 💾
+                                {{ $t('roles.save_permissions_btn') }}
                             </button>
                         </div>
 

@@ -46,7 +46,7 @@ const lowStockCount = computed(() => {
 </script>
 
 <template>
-    <Head title="أرصدة وجرد الفروع والمخازن" />
+    <Head :title="$t('inventory.store_stocks')" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -59,10 +59,10 @@ const lowStockCount = computed(() => {
                         </Link>
                         <div>
                             <h1 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-                                <span>📊 أرصدة وجرد بضاعة الفروع وعربيات التوزيع</span>
+                                <span>📊 {{ $t('inventory.store_stocks') }}</span>
                             </h1>
                             <p class="text-xs text-slate-400 font-bold mt-0.5">
-                                استعراض كميات المخزون المتوفرة، حدود الأمان، وتقييم البضاعة بكل فرع ومخزن
+                                {{ $t('inventory.store_stocks_subtitle') }}
                             </p>
                         </div>
                     </div>
@@ -74,7 +74,7 @@ const lowStockCount = computed(() => {
                         class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
                     >
                         <span>🚚</span>
-                        <span>إذن تحويل بضاعة للفرع</span>
+                        <span>{{ $t('inventory.new_transfer') }}</span>
                     </Link>
                 </div>
             </div>
@@ -97,23 +97,23 @@ const lowStockCount = computed(() => {
             <!-- Top KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-1">
-                    <span class="text-xs text-slate-400 font-bold">إجمالي عدد الأصناف المعروضة</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('inventory.total_items_count') }}</span>
                     <div class="text-2xl font-black font-mono text-white">
-                        {{ stocks.total || stocks.data?.length || 0 }} <span class="text-xs text-slate-500 font-tajawal">صنف</span>
+                        {{ stocks.total || stocks.data?.length || 0 }} <span class="text-xs text-slate-500 font-tajawal">{{ $t('inventory.item_unit') }}</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-1">
-                    <span class="text-xs text-slate-400 font-bold">أصناف تحت حد الأمان ⚠️</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('inventory.low_stock_count') }} ⚠️</span>
                     <div class="text-2xl font-black font-mono text-rose-400">
-                        {{ lowStockCount }} <span class="text-xs text-slate-500 font-tajawal">صنف</span>
+                        {{ lowStockCount }} <span class="text-xs text-slate-500 font-tajawal">{{ $t('inventory.item_unit') }}</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-1">
-                    <span class="text-xs text-slate-400 font-bold">إجمالي تقييم بضاعة الصفحة (سعر التكلفة)</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('inventory.total_inventory_value') }}</span>
                     <div class="text-2xl font-black font-mono text-emerald-400">
-                        {{ formatMoney(totalValuation) }} <span class="text-xs text-white">ج.م</span>
+                        {{ formatMoney(totalValuation) }} <span class="text-xs text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
             </div>
@@ -128,7 +128,7 @@ const lowStockCount = computed(() => {
                             class="px-3 py-1.5 rounded-xl transition cursor-pointer"
                             :class="stockStatus === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'"
                         >
-                            كافة الأصناف
+                            {{ $t('common.all') }}
                         </button>
                         <button
                             @click="stockStatus = 'low'; applyFilters();"
@@ -136,7 +136,7 @@ const lowStockCount = computed(() => {
                             class="px-3 py-1.5 rounded-xl transition cursor-pointer"
                             :class="stockStatus === 'low' ? 'bg-rose-500 text-white font-black' : 'text-slate-400 hover:text-white'"
                         >
-                            تحت حد الأمان 🚨
+                            {{ $t('inventory.low_stock_only') }}
                         </button>
                         <button
                             @click="stockStatus = 'out'; applyFilters();"
@@ -144,7 +144,7 @@ const lowStockCount = computed(() => {
                             class="px-3 py-1.5 rounded-xl transition cursor-pointer"
                             :class="stockStatus === 'out' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'text-slate-400 hover:text-white'"
                         >
-                            نافد من المخزن (0)
+                            {{ $t('inventory.out_of_stock_only') }}
                         </button>
                     </div>
                 </div>
@@ -154,7 +154,7 @@ const lowStockCount = computed(() => {
                         v-model="search"
                         @input="applyFilters"
                         type="text"
-                        placeholder="بحث باسم أو كود الصنف..."
+                        :placeholder="$t('inventory.search_item_placeholder')"
                         class="w-full h-10 px-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                     >
                 </div>
@@ -169,8 +169,8 @@ const lowStockCount = computed(() => {
                                 <th class="pb-3">{{ $t('inventory.item_name') }}</th>
                                 <th class="pb-3 font-mono">{{ $t('inventory.current_stock') }}</th>
                                 <th class="pb-3 font-mono">{{ $t('inventory.min_stock_level') }}</th>
-                                <th class="pb-3 font-mono">{{ $t('common.unit_cost') }}</th>
-                                <th class="pb-3 font-mono">{{ $t('reports.sales_summary') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('inventory.purchase_price') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('inventory.total_inventory_value') }}</th>
                                 <th class="pb-3 text-center">{{ $t('common.status') }}</th>
                             </tr>
                         </thead>
@@ -186,7 +186,7 @@ const lowStockCount = computed(() => {
                                         class="px-2.5 py-1 rounded-xl border text-xs"
                                         :class="[
                                             st.quantity <= 0 ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' :
-                                            (st.quantity <= st.min_stock_level ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-slate-800 text-emerald-400 border-slate-700')
+                                             (st.quantity <= st.min_stock_level ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-slate-800 text-emerald-400 border-slate-700')
                                         ]"
                                     >
                                         {{ st.quantity }} {{ st.unit || 'كجم' }}
@@ -198,11 +198,11 @@ const lowStockCount = computed(() => {
                                 </td>
 
                                 <td class="py-3.5 font-mono text-slate-300 font-bold">
-                                    {{ formatMoney(st.cost_price) }} ج.م
+                                    {{ formatMoney(st.cost_price) }} {{ $t('common.currency') }}
                                 </td>
 
                                 <td class="py-3.5 font-mono font-black text-white">
-                                    {{ formatMoney(st.total_valuation) }} <span class="text-xs text-amber-400">ج.م</span>
+                                    {{ formatMoney(st.total_valuation) }} <span class="text-xs text-amber-400">{{ $t('common.currency') }}</span>
                                 </td>
 
                                 <td class="py-3.5 text-center font-tajawal">
@@ -210,19 +210,19 @@ const lowStockCount = computed(() => {
                                         v-if="st.quantity <= 0"
                                         class="px-2.5 py-1 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[11px] font-bold"
                                     >
-                                        نافد 🚫
+                                        {{ $t('inventory.out_of_stock_only') }}
                                     </span>
                                     <span
                                         v-else-if="st.quantity <= st.min_stock_level"
                                         class="px-2.5 py-1 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[11px] font-bold"
                                     >
-                                        تحت الأمان ⚠️
+                                        {{ $t('inventory.low_stock_only') }}
                                     </span>
                                     <span
                                         v-else
                                         class="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold"
                                     >
-                                        متوفر وآمن ✅
+                                        {{ $t('inventory.available_only') }}
                                     </span>
                                 </td>
                             </tr>
@@ -231,7 +231,7 @@ const lowStockCount = computed(() => {
 
                     <div v-if="!stocks.data || stocks.data.length === 0" class="py-16 text-center space-y-2">
                         <span class="text-3xl">📦</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">لا توجد أصناف مسجلة في هذا الفرع مطابقة للبحث</p>
+                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_items_found') }}</p>
                     </div>
                 </div>
             </div>

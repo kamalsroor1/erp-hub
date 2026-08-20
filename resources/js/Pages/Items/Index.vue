@@ -15,6 +15,8 @@ const props = defineProps({
 
 const { formatMoney } = useMoney();
 
+import { trans } from '@/helpers/trans';
+
 // Search & Filter state
 const search = ref(props.filters.search || '');
 const category = ref(props.filters.category || 'all');
@@ -34,22 +36,22 @@ const activeFiltersCount = computed(() => {
 
 // Category Options for SearchableSelect
 const categoryOptions = computed(() => [
-    { id: 'all', name: 'كافة التصنيفات والأقسام' },
+    { id: 'all', name: trans('inventory.all_categories') || 'كافة التصنيفات والأقسام' },
     ...props.categories.map(c => ({ id: c, name: c }))
 ]);
 
-const stockStatusOptions = [
-    { id: 'all', name: 'كافة حالات المخزون' },
-    { id: 'low', name: 'الأصناف الحرجة والنواقص 🚨' },
-    { id: 'out', name: 'أصناف نفدت من المخزن (رصيد 0) ❌' },
-    { id: 'in_stock', name: 'أصناف متوفرة بالمخزن ✅' },
-];
+const stockStatusOptions = computed(() => [
+    { id: 'all', name: trans('inventory.all_stock') || 'كافة حالات المخزون' },
+    { id: 'low', name: trans('inventory.low_stock_only') || 'الأصناف الحرجة والنواقص 🚨' },
+    { id: 'out', name: trans('inventory.out_of_stock_only') || 'أصناف نفدت من المخزن (رصيد 0) ❌' },
+    { id: 'in_stock', name: trans('inventory.available_only') || 'أصناف متوفرة بالمخزن ✅' },
+]);
 
-const statusOptions = [
-    { id: 'all', name: 'الكل (نشط وغير نشط)' },
-    { id: 'active', name: 'الأصناف النشطة للبيع فقط' },
-    { id: 'inactive', name: 'الأصناف المعطلة مؤقتاً' },
-];
+const statusOptions = computed(() => [
+    { id: 'all', name: trans('common.all') || 'الكل' },
+    { id: 'active', name: trans('common.active') || 'الأصناف النشطة' },
+    { id: 'inactive', name: trans('common.inactive') || 'الأصناف المعطلة' },
+]);
 
 const applyFilters = () => {
     router.get('/items', {
@@ -151,7 +153,7 @@ const deleteItem = (item) => {
 </script>
 
 <template>
-    <Head title="دليل الأصناف والأسعار" />
+    <Head :title="$t('inventory.title')" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -161,11 +163,11 @@ const deleteItem = (item) => {
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">📦</span>
                         <h1 class="text-xl sm:text-2xl font-black text-white">
-                            دليل الأصناف والأسعار والمخزون
+                            {{ $t('inventory.title') }}
                         </h1>
                     </div>
                     <p class="text-xs text-slate-400 font-bold">
-                        إدارة خامات وتوليفات البن، مستويات الأمان، وتكلفة وأسعار البيع
+                        {{ $t('inventory.subtitle') }}
                     </p>
                 </div>
 
@@ -176,7 +178,7 @@ const deleteItem = (item) => {
                         class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
                     >
                         <span class="text-base font-black">+</span>
-                        <span>إضافة صنف جديد</span>
+                        <span>{{ $t('inventory.add_new_item') }}</span>
                     </button>
                 </div>
             </div>
@@ -184,26 +186,26 @@ const deleteItem = (item) => {
             <!-- KPI Summary Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">إجمالي الأصناف المسجلة</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('inventory.total_items_count') }}</span>
                     <div class="text-2xl font-black font-mono text-white">
-                        {{ metrics.total_items || 0 }} <span class="text-xs text-slate-500 font-tajawal">صنف</span>
+                        {{ metrics.total_items || 0 }} <span class="text-xs text-slate-500 font-tajawal">{{ $t('inventory.item_unit') }}</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">أصناف تحت حد الطلب (حرجة)</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('inventory.low_stock_count') }}</span>
                     <div class="text-2xl font-black font-mono text-rose-400 flex items-center gap-2">
                         <span>{{ metrics.low_stock_count || 0 }}</span>
                         <span v-if="metrics.low_stock_count > 0" class="text-xs px-2 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 font-tajawal">
-                            انتبه للنواقص
+                            {{ $t('inventory.low_stock_warning') }}
                         </span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">القيمة التقديرية للمخزون (سعر التكلفة)</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('inventory.total_inventory_value') }}</span>
                     <div class="text-2xl font-black font-mono text-emerald-400">
-                        {{ formatMoney(metrics.total_stock_value) }} <span class="text-xs text-white">ج.م</span>
+                        {{ formatMoney(metrics.total_stock_value) }} <span class="text-xs text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
             </div>
@@ -215,7 +217,7 @@ const deleteItem = (item) => {
                         <input
                             v-model="search"
                             type="text"
-                            placeholder="... بحث باسم الصنف أو الباركود"
+                            :placeholder="$t('inventory.search_item_placeholder')"
                             class="w-full pr-10 pl-4 py-2.5 bg-slate-950/80 border border-slate-800 rounded-2xl text-xs text-white placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
@@ -232,7 +234,7 @@ const deleteItem = (item) => {
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
                                 :class="stockStatus === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'"
                             >
-                                الكل
+                                {{ $t('common.all') }}
                             </button>
                             <button
                                 @click="stockStatus = 'low'; applyFilters();"
@@ -240,7 +242,7 @@ const deleteItem = (item) => {
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
                                 :class="stockStatus === 'low' ? 'bg-rose-500 text-white font-black' : 'text-slate-400 hover:text-white'"
                             >
-                                النواقص 🚨
+                                {{ $t('inventory.low_stock_only') }}
                             </button>
                         </div>
 
@@ -251,7 +253,7 @@ const deleteItem = (item) => {
                             class="h-10 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
                         >
                             <span>⚙️</span>
-                            <span>تصفية وفلاتر متقدمة</span>
+                            <span>{{ $t('common.filter') }}</span>
                             <span
                                 v-if="activeFiltersCount > 0"
                                 class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-mono font-black text-[11px] flex items-center justify-center"
@@ -264,15 +266,15 @@ const deleteItem = (item) => {
 
                 <!-- Active Filters Chips -->
                 <div v-if="activeFiltersCount > 0" class="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800/80 text-xs">
-                    <span class="text-slate-500 text-[11px] font-bold">الفلاتر النشطة:</span>
+                    <span class="text-slate-500 text-[11px] font-bold">{{ $t('dashboard.quick_filter') || 'الفلاتر النشطة' }}:</span>
 
                     <span v-if="category !== 'all'" class="px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center gap-1.5 font-bold">
-                        <span>القسم: {{ category }}</span>
+                        <span>{{ $t('inventory.category') }}: {{ category }}</span>
                         <button @click="category = 'all'; applyFilters();" class="hover:text-rose-400">✕</button>
                     </span>
 
                     <button @click="resetFilters" class="text-slate-400 hover:text-rose-400 text-xs underline font-bold mr-1">
-                        مسح كافة الفلاتر
+                        {{ $t('common.clear_all') || 'مسح كافة الفلاتر' }}
                     </button>
                 </div>
             </div>
@@ -305,7 +307,7 @@ const deleteItem = (item) => {
                                     <div class="font-black text-white font-tajawal flex items-center gap-1.5">
                                         <span>{{ item.name }}</span>
                                         <span v-if="item.is_low_stock" class="px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 text-[10px] font-bold">
-                                            حرج
+                                            {{ $t('inventory.low_stock_only') }}
                                         </span>
                                     </div>
                                     <div v-if="item.notes" class="text-[10px] text-slate-500 truncate max-w-xs font-tajawal">{{ item.notes }}</div>
@@ -347,12 +349,21 @@ const deleteItem = (item) => {
                                 <!-- Actions -->
                                 <td class="py-3.5 text-center">
                                     <div class="flex items-center justify-center gap-1.5 font-tajawal">
+                                        <!-- Movements Link -->
+                                        <Link
+                                            :href="`/items/${item.id}/movements`"
+                                            class="p-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-400 transition"
+                                            :title="$t('inventory.view_movements')"
+                                        >
+                                            📜
+                                        </Link>
+
                                         <!-- Edit Button -->
                                         <button
                                             @click="openEditModal(item)"
                                             type="button"
                                             class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 transition cursor-pointer"
-                                            title="تعديل بيانات وسعر الصنف"
+                                            :title="$t('common.edit')"
                                         >
                                             ✏️
                                         </button>
@@ -363,7 +374,7 @@ const deleteItem = (item) => {
                                             type="button"
                                             class="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition cursor-pointer"
                                             :class="!item.can_be_deleted ? 'opacity-40 cursor-not-allowed' : ''"
-                                            :title="item.can_be_deleted ? 'حذف الصنف' : item.deletion_blockers.join(', ')"
+                                            :title="item.can_be_deleted ? $t('common.delete') : item.deletion_blockers.join(', ')"
                                         >
                                             🗑️
                                         </button>
@@ -375,14 +386,14 @@ const deleteItem = (item) => {
 
                     <div v-if="!items.data || items.data.length === 0" class="py-16 text-center space-y-2">
                         <span class="text-3xl">📦</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">لا توجد أصناف مطابقة للبحث</p>
+                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_items_found') }}</p>
                     </div>
                 </div>
 
                 <!-- Pagination -->
                 <div v-if="items.links && items.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
                     <span class="text-xs text-slate-400 font-tajawal">
-                        عرض {{ items.from || 0 }} إلى {{ items.to || 0 }} من إجمالي {{ items.total || 0 }} صنف
+                        {{ $t('common.actions') ? `عرض ${items.from || 0} إلى ${items.to || 0} من إجمالي ${items.total || 0}` : `Showing ${items.from || 0} to ${items.to || 0} of ${items.total || 0}` }}
                     </span>
 
                     <div class="flex items-center gap-1">
@@ -415,39 +426,39 @@ const deleteItem = (item) => {
         >
             <div class="space-y-5">
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🔍 البحث بالاسم أو الباركود</label>
+                    <label class="text-xs font-black text-slate-300">🔍 {{ $t('inventory.search_item_placeholder') }}</label>
                     <input
                         v-model="search"
                         type="text"
-                        placeholder="... اكتب للبحث"
+                        :placeholder="$t('common.search')"
                         class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none transition"
                     >
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🗂️ التصنيف أو القسم</label>
+                    <label class="text-xs font-black text-slate-300">🗂️ {{ $t('inventory.category') }}</label>
                     <SearchableSelect
                         v-model="category"
                         :options="categoryOptions"
-                        placeholder="اختر التصنيف..."
+                        :placeholder="$t('inventory.all_categories')"
                     />
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🚨 حالة المخزون</label>
+                    <label class="text-xs font-black text-slate-300">🚨 {{ $t('inventory.stock_status') }}</label>
                     <SearchableSelect
                         v-model="stockStatus"
                         :options="stockStatusOptions"
-                        placeholder="اختر حالة المخزون..."
+                        :placeholder="$t('inventory.all_stock')"
                     />
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">⚙️ حالة البيع والنشاط</label>
+                    <label class="text-xs font-black text-slate-300">⚙️ {{ $t('common.status') }}</label>
                     <SearchableSelect
                         v-model="status"
                         :options="statusOptions"
-                        placeholder="اختر الحالة..."
+                        :placeholder="$t('common.all')"
                     />
                 </div>
             </div>
@@ -465,7 +476,7 @@ const deleteItem = (item) => {
                     <div class="flex items-center gap-2">
                         <span class="text-lg">📦</span>
                         <h3 class="font-black text-base text-white">
-                            {{ editingItem ? 'تعديل بيانات الصنف' : 'إضافة صنف جديد للدليل' }}
+                            {{ editingItem ? $t('inventory.item_updated') : $t('inventory.add_new_item') }}
                         </h3>
                     </div>
                     <button @click="showItemModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
@@ -473,12 +484,12 @@ const deleteItem = (item) => {
 
                 <form @submit.prevent="saveItem" class="space-y-4">
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">اسم الصنف *</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('inventory.item_name') }} *</label>
                         <input
                             v-model="itemForm.name"
                             type="text"
                             required
-                            placeholder="مثال: بن برازيلي كولومبي وسط..."
+                            :placeholder="$t('inventory.item_name')"
                             class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                         >
                         <p v-if="itemForm.errors.name" class="text-rose-400 text-[10px]">{{ itemForm.errors.name }}</p>
@@ -486,21 +497,21 @@ const deleteItem = (item) => {
 
                     <div class="grid grid-cols-2 gap-3">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">كود الصنف / الباركود</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.item_code') }} / {{ $t('inventory.barcode') }}</label>
                             <input
                                 v-model="itemForm.code"
                                 type="text"
-                                placeholder="مثال: COF-001"
+                                :placeholder="$t('inventory.barcode_placeholder')"
                                 class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-amber-500 focus:outline-none"
                             >
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">القسم / التصنيف</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.category') }}</label>
                             <input
                                 v-model="itemForm.category"
                                 type="text"
-                                placeholder="مثال: بن مطحون / خامات"
+                                :placeholder="$t('inventory.category_placeholder')"
                                 class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                             >
                         </div>
@@ -508,20 +519,20 @@ const deleteItem = (item) => {
 
                     <div class="grid grid-cols-3 gap-3">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">الوحدة *</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.unit') }} *</label>
                             <select
                                 v-model="itemForm.unit"
                                 class="w-full px-3 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                             >
-                                <option value="كجم">كيلوجرام (كجم)</option>
+                                <option value="كجم">{{ $t('inventory.unit_weight_short') }} (كجم)</option>
                                 <option value="جرام">جرام</option>
-                                <option value="قطعة">قطعة / علبة</option>
+                                <option value="قطعة">{{ $t('inventory.unit_piece_short') }}</option>
                                 <option value="شيكارة">شيكارة / كرتونة</option>
                             </select>
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">سعر التكلفة *</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.purchase_price') }} *</label>
                             <input
                                 v-model="itemForm.cost_price"
                                 type="number"
@@ -532,7 +543,7 @@ const deleteItem = (item) => {
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">سعر البيع *</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.retail_price') }} *</label>
                             <input
                                 v-model="itemForm.selling_price"
                                 type="number"
@@ -544,7 +555,7 @@ const deleteItem = (item) => {
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">حد الأمان (الحد الأدنى للرصيد)</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('inventory.min_stock_level') }}</label>
                         <input
                             v-model="itemForm.min_stock_level"
                             type="number"
@@ -554,7 +565,7 @@ const deleteItem = (item) => {
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">ملاحظات إضافية</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('common.notes') }}</label>
                         <textarea
                             v-model="itemForm.notes"
                             rows="2"
@@ -568,14 +579,14 @@ const deleteItem = (item) => {
                             type="button"
                             class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
                         >
-                            إلغاء
+                            {{ $t('common.cancel') }}
                         </button>
                         <button
                             type="submit"
                             :disabled="itemForm.processing"
                             class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
-                            {{ itemForm.processing ? 'جاري الحفظ...' : (editingItem ? 'حفظ التعديلات' : 'إضافة الصنف') }}
+                            {{ itemForm.processing ? '...' : (editingItem ? $t('common.save') : $t('inventory.add_new_item')) }}
                         </button>
                     </div>
                 </form>

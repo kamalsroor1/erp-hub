@@ -1,8 +1,9 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import SearchableSelect from '@/Components/SearchableSelect.vue';
+import { trans } from '@/helpers/trans';
 
 const props = defineProps({
     users: { type: Object, required: true },
@@ -47,10 +48,10 @@ const userForm = useForm({
     is_active: true,
 });
 
-const storeOptions = [
-    { id: null, name: 'كافة الفروع / بدون تقييد' },
+const storeOptions = computed(() => [
+    { id: null, name: trans('users.all_stores_option') || 'كافة الفروع / بدون تقييد' },
     ...props.stores
-];
+]);
 
 const openCreateModal = () => {
     editingUser.value = null;
@@ -97,7 +98,8 @@ const toggleUser = (u) => {
 };
 
 const deleteUser = (u) => {
-    if (confirm(`هل أنت متأكد من حذف حساب (${u.name})؟`)) {
+    const confirmMsg = trans('users.delete_confirm', { name: u.name }) || `هل أنت متأكد من حذف حساب (${u.name})؟`;
+    if (confirm(confirmMsg)) {
         router.delete(`/users/${u.id}`, {
             preserveScroll: true,
         });
@@ -106,7 +108,7 @@ const deleteUser = (u) => {
 </script>
 
 <template>
-    <Head title="إدارة المستخدمين وصلاحيات الكاشير" />
+    <Head :title="$t('users.title')" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -116,11 +118,11 @@ const deleteUser = (u) => {
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">👥</span>
                         <h1 class="text-xl sm:text-2xl font-black text-white">
-                            إدارة حسابات المستخدمين، الكاشير، وصلاحيات الفروع
+                            {{ $t('users.title') }}
                         </h1>
                     </div>
                     <p class="text-xs text-slate-400 font-bold">
-                        إنشاء وتعديل حسابات الدخول، تعيين الأدوار (كاشير، محاسب، أمين مخزن)، وتحديد الفروع
+                        {{ $t('users.subtitle') }}
                     </p>
                 </div>
 
@@ -130,7 +132,7 @@ const deleteUser = (u) => {
                         class="h-11 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
                     >
                         <span>🛡️</span>
-                        <span>مصفوفة الصلاحيات</span>
+                        <span>{{ $t('users.matrix_btn') }}</span>
                     </Link>
 
                     <button
@@ -139,7 +141,7 @@ const deleteUser = (u) => {
                         class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
                     >
                         <span class="text-base font-black">+</span>
-                        <span>إضافة مستخدم جديد</span>
+                        <span>{{ $t('users.create_btn') }}</span>
                     </button>
                 </div>
             </div>
@@ -151,7 +153,7 @@ const deleteUser = (u) => {
                         <input
                             v-model="search"
                             type="text"
-                            placeholder="... بحث باسم المستخدم أو رقم الهاتف أو البريد"
+                            :placeholder="$t('users.search_placeholder')"
                             class="w-full pr-10 pl-4 py-2.5 bg-slate-950/80 border border-slate-800 rounded-2xl text-xs text-white placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
@@ -164,11 +166,11 @@ const deleteUser = (u) => {
                             v-model="roleFilter"
                             class="px-3.5 py-2.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                         >
-                            <option value="all">كافة الأدوار والوظائف</option>
-                            <option value="admin">مدير النظام 👑</option>
-                            <option value="cashier">كاشير مبيعات 🛒</option>
-                            <option value="storekeeper">أمين مخزن 📦</option>
-                            <option value="accountant">محاسب 💼</option>
+                            <option value="all">{{ $t('users.all_roles') }}</option>
+                            <option value="admin">{{ $t('users.role_admin') }}</option>
+                            <option value="cashier">{{ $t('users.role_cashier') }}</option>
+                            <option value="storekeeper">{{ $t('users.role_storekeeper') }}</option>
+                            <option value="accountant">{{ $t('users.role_accountant') }}</option>
                         </select>
                     </div>
                 </div>
@@ -207,12 +209,12 @@ const deleteUser = (u) => {
                                             (u.primary_role === 'cashier' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-300')
                                         ]"
                                     >
-                                        {{ u.primary_role === 'admin' ? 'مدير 👑' : (u.primary_role === 'cashier' ? 'كاشير 🛒' : (u.primary_role === 'storekeeper' ? 'أمين مخزن 📦' : 'محاسب 💼')) }}
+                                        {{ u.primary_role === 'admin' ? $t('users.role_admin') : (u.primary_role === 'cashier' ? $t('users.role_cashier') : (u.primary_role === 'storekeeper' ? $t('users.role_storekeeper') : $t('users.role_accountant'))) }}
                                     </span>
                                 </td>
 
                                 <td class="py-3.5 font-tajawal text-slate-300">
-                                    {{ u.default_store_name || 'كافة الفروع 🌐' }}
+                                    {{ u.default_store_name || $t('users.all_stores_option') }}
                                 </td>
 
                                 <td class="py-3.5 text-center">
@@ -222,7 +224,7 @@ const deleteUser = (u) => {
                                         class="px-2.5 py-0.5 rounded-full text-[10px] font-bold font-tajawal transition cursor-pointer"
                                         :class="u.is_active ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'"
                                     >
-                                        {{ u.is_active ? 'مفعل 🟢' : 'معطل 🔴' }}
+                                        {{ u.is_active ? $t('users.status_active') : $t('users.status_inactive') }}
                                     </button>
                                 </td>
 
@@ -233,7 +235,7 @@ const deleteUser = (u) => {
                                             type="button"
                                             class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold transition cursor-pointer"
                                         >
-                                            تعديل ✏️
+                                            {{ $t('common.edit') }} ✏️
                                         </button>
 
                                         <button
@@ -251,14 +253,14 @@ const deleteUser = (u) => {
 
                     <div v-if="!users.data || users.data.length === 0" class="py-16 text-center space-y-2">
                         <span class="text-3xl">👥</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">لا يوجد مستخدمين مسجلين</p>
+                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('users.empty_users') }}</p>
                     </div>
                 </div>
 
                 <!-- Pagination -->
                 <div v-if="users.links && users.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
                     <span class="text-xs text-slate-400 font-tajawal">
-                        عرض {{ users.from || 0 }} إلى {{ users.to || 0 }} من إجمالي {{ users.total || 0 }} مستخدم
+                        {{ $t('common.showing') }} {{ users.from || 0 }} {{ $t('common.to') }} {{ users.to || 0 }} {{ $t('common.of') }} {{ users.total || 0 }}
                     </span>
 
                     <div class="flex items-center gap-1">
@@ -291,7 +293,7 @@ const deleteUser = (u) => {
             <div @click.stop class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <h3 class="font-black text-base text-white">
-                        {{ editingUser ? 'تعديل بيانات وصلاحيات المستخدم' : 'إضافة حساب مستخدم / كاشير جديد 👤' }}
+                        {{ editingUser ? $t('users.edit_title') : $t('users.create_title') }}
                     </h3>
                     <button @click="showModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
                 </div>
@@ -299,7 +301,7 @@ const deleteUser = (u) => {
                 <form @submit.prevent="saveUser" class="space-y-4">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">الاسم الكامل *</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('users.full_name') }}</label>
                             <input
                                 v-model="userForm.name"
                                 type="text"
@@ -310,7 +312,7 @@ const deleteUser = (u) => {
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">رقم الهاتف للدخول *</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('users.phone_for_login') }}</label>
                             <input
                                 v-model="userForm.phone"
                                 type="text"
@@ -321,7 +323,7 @@ const deleteUser = (u) => {
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">البريد الإلكتروني (اختياري)</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('users.email_optional') }}</label>
                             <input
                                 v-model="userForm.email"
                                 type="email"
@@ -332,7 +334,7 @@ const deleteUser = (u) => {
 
                         <div class="space-y-1.5">
                             <label class="text-xs font-bold text-slate-300">
-                                {{ editingUser ? 'كلمة المرور (اتركه فارغاً لعدم التغيير)' : 'كلمة المرور *' }}
+                                {{ editingUser ? $t('users.password_leave_blank') : $t('users.password_required') }}
                             </label>
                             <input
                                 v-model="userForm.password"
@@ -344,24 +346,24 @@ const deleteUser = (u) => {
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">الدور والوظيفة *</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('users.role_field') }}</label>
                             <select
                                 v-model="userForm.role"
                                 class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                             >
-                                <option value="cashier">كاشير مبيعات ونقطة بيع 🛒</option>
-                                <option value="storekeeper">أمين مخزن وتوريدات 📦</option>
-                                <option value="accountant">محاسب ومدقق مالي 💼</option>
-                                <option value="admin">مدير النظام (كامل الصلاحيات) 👑</option>
+                                <option value="cashier">{{ $t('users.role_cashier') }}</option>
+                                <option value="storekeeper">{{ $t('users.role_storekeeper') }}</option>
+                                <option value="accountant">{{ $t('users.role_accountant') }}</option>
+                                <option value="admin">{{ $t('users.role_admin') }}</option>
                             </select>
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">الفرع / المخزن المعين عليه</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('users.assigned_store') }}</label>
                             <SearchableSelect
                                 v-model="userForm.default_store_id"
                                 :options="storeOptions"
-                                placeholder="اختر الفرع..."
+                                :placeholder="$t('inventory.select_store')"
                             />
                         </div>
                     </div>
@@ -372,14 +374,14 @@ const deleteUser = (u) => {
                             type="button"
                             class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
                         >
-                            إلغاء
+                            {{ $t('common.cancel') }}
                         </button>
                         <button
                             type="submit"
                             :disabled="userForm.processing"
                             class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
-                            {{ userForm.processing ? 'جاري الحفظ...' : 'حفظ المستخدم' }}
+                            {{ userForm.processing ? $t('users.saving_user') : $t('users.save_user') }}
                         </button>
                     </div>
                 </form>

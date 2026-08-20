@@ -68,7 +68,7 @@ const { formatMoney } = useMoney();
                 type="button"
                 class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-black text-xs transition"
             >
-                فاتورة جديدة (متابعة البيع)
+                {{ $t('pos.new_invoice_continue') }}
             </button>
         </div>
     </div>

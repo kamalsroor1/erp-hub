@@ -45,16 +45,16 @@ const saveCustomer = async () => {
 
             <div class="space-y-2.5 text-xs">
                 <div>
-                    <label class="block text-slate-400 mb-1">اسم العميل:</label>
+                    <label class="block text-slate-400 mb-1">{{ $t('pos.customer_name') }}:</label>
                     <input
                         v-model="form.name"
                         type="text"
-                        placeholder="مثال: كافيه الأهرام"
+                        :placeholder="$t('contacts.name')"
                         class="w-full h-9 bg-slate-800 border border-slate-700 rounded-xl px-3 text-white focus:outline-none focus:border-indigo-500"
                     />
                 </div>
                 <div>
-                    <label class="block text-slate-400 mb-1">رقم الهاتف:</label>
+                    <label class="block text-slate-400 mb-1">{{ $t('pos.customer_phone') }}:</label>
                     <input
                         v-model="form.phone"
                         type="tel"
@@ -63,13 +63,13 @@ const saveCustomer = async () => {
                     />
                 </div>
                 <div>
-                    <label class="block text-slate-400 mb-1">فئة السعر:</label>
+                    <label class="block text-slate-400 mb-1">{{ $t('pos.price_tier') }}:</label>
                     <select
                         v-model="form.price_tier"
                         class="w-full h-9 bg-slate-800 border border-slate-700 rounded-xl px-3 text-white focus:outline-none focus:border-indigo-500"
                     >
-                        <option value="retail">تجزئة (قطاعي)</option>
-                        <option value="wholesale">جملة</option>
+                        <option value="retail">{{ $t('pos.retail_tier') }}</option>
+                        <option value="wholesale">{{ $t('pos.wholesale_tier') }}</option>
                     </select>
                 </div>
 
@@ -83,7 +83,7 @@ const saveCustomer = async () => {
                     type="button"
                     class="w-full h-10 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black text-xs transition mt-2"
                 >
-                    {{ isSaving ? 'جاري الحفظ...' : 'حفظ واختيار العميل' }}
+                    {{ isSaving ? '...' : $t('pos.save_select_customer') }}
                 </button>
             </div>
         </div>

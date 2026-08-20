@@ -4,6 +4,7 @@ import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import DatePicker from '@/Components/DatePicker.vue';
 import { useMoney } from '@/Composables/useMoney';
+import { trans } from '@/helpers/trans';
 
 const props = defineProps({
     supplier: { type: Object, required: true },
@@ -59,7 +60,7 @@ const paymentForm = useForm({
     amount: props.supplier.current_balance > 0 ? props.supplier.current_balance : '',
     payment_method: 'cash',
     payment_date: new Date().toISOString().split('T')[0],
-    notes: 'سداد دفعة نقدية للمورد من كشف الحساب',
+    notes: '',
 });
 
 const savePayment = () => {
@@ -73,7 +74,7 @@ const savePayment = () => {
 </script>
 
 <template>
-    <Head :title="`كشف حساب المورد: ${supplier.name}`" />
+    <Head :title="`${$t('contacts.ledger_title')}: ${supplier.name}`" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -86,12 +87,12 @@ const savePayment = () => {
                         </Link>
                         <div>
                             <h1 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-                                <span>كشف حساب المورد:</span>
+                                <span>{{ $t('contacts.ledger_title') }}:</span>
                                 <span class="text-amber-400">{{ supplier.name }}</span>
                                 <span v-if="supplier.company_name" class="text-xs text-slate-400 font-normal">({{ supplier.company_name }})</span>
                             </h1>
                             <p class="text-xs text-slate-400 font-bold mt-0.5">
-                                هاتف: {{ supplier.phone || 'غير مسجل' }} | العنوان: {{ supplier.address || 'غير محدد' }}
+                                {{ $t('common.phone') }}: {{ supplier.phone || '—' }} | {{ $t('common.address') }}: {{ supplier.address || '—' }}
                             </p>
                         </div>
                     </div>
@@ -104,7 +105,7 @@ const savePayment = () => {
                         class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
                     >
                         <span>💸</span>
-                        <span>سند صرف وسداد للمورد</span>
+                        <span>{{ $t('contacts.record_disbursement_voucher') }}</span>
                     </button>
 
                     <button
@@ -113,69 +114,62 @@ const savePayment = () => {
                         class="h-11 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
                     >
                         <span>🖨️</span>
-                        <span>طباعة كشف الحساب (A4)</span>
+                        <span>{{ $t('contacts.print_statement') }}</span>
                     </button>
                 </div>
-            </div>
-
-            <!-- Printable Header (Visible only on print) -->
-            <div class="hidden print:block text-center border-b pb-4 mb-6">
-                <h1 class="text-2xl font-black">سرور كوفي - كشف حساب مورد تفصيلي</h1>
-                <div class="text-sm font-bold mt-1">المورد: {{ supplier.name }} {{ supplier.company_name ? '(' + supplier.company_name + ')' : '' }}</div>
-                <div class="text-xs text-gray-600">الفترة من: {{ filters.from || 'البداية' }} إلى: {{ filters.to || 'اليوم' }}</div>
             </div>
 
             <!-- Filter Controls (Hidden on print) -->
             <div class="print:hidden bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-3">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div class="flex flex-wrap items-center gap-2">
-                        <span class="text-xs font-bold text-slate-400">فترة التقرير:</span>
+                        <span class="text-xs font-bold text-slate-400">{{ $t('contacts.report_period') }}:</span>
                         <div class="flex items-center gap-1.5 bg-slate-950 p-1 rounded-2xl border border-slate-800 text-xs font-bold">
                             <button
                                 @click="setQuickDate('today')"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl transition cursor-pointer text-slate-400 hover:text-white"
                             >
-                                اليوم
+                                {{ $t('dashboard.today') || 'اليوم' }}
                             </button>
                             <button
                                 @click="setQuickDate('this_month')"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl transition cursor-pointer text-slate-400 hover:text-white"
                             >
-                                هذا الشهر
+                                {{ $t('dashboard.this_month') || 'هذا الشهر' }}
                             </button>
                             <button
                                 @click="setQuickDate('this_year')"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl transition cursor-pointer text-slate-400 hover:text-white"
                             >
-                                هذه السنة
+                                {{ $t('dashboard.this_year') || 'هذا العام' }}
                             </button>
                             <button
                                 @click="setQuickDate('all')"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl transition cursor-pointer text-slate-400 hover:text-white"
                             >
-                                كافة الحركات
+                                {{ $t('common.all') }}
                             </button>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-2">
                         <div class="w-36">
-                            <DatePicker v-model="dateFrom" placeholder="من تاريخ..." />
+                            <DatePicker v-model="dateFrom" :placeholder="$t('contacts.from_date')" />
                         </div>
                         <span class="text-slate-500 text-xs">←</span>
                         <div class="w-36">
-                            <DatePicker v-model="dateTo" placeholder="إلى تاريخ..." />
+                            <DatePicker v-model="dateTo" :placeholder="$t('contacts.to_date')" />
                         </div>
                         <button
                             @click="applyFilters"
                             type="button"
                             class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer"
                         >
-                            تطبيق
+                            {{ $t('common.filter') }}
                         </button>
                     </div>
                 </div>
@@ -184,23 +178,23 @@ const savePayment = () => {
             <!-- Financial Summary Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">إجمالي المشتريات والتوريدات / دائن (+)</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('contacts.period_credit') }}</span>
                     <div class="text-2xl font-black font-mono text-white">
-                        {{ formatMoney(summary.total_purchases) }} <span class="text-xs text-amber-400">ج.م</span>
+                        {{ formatMoney(summary.total_purchases) }} <span class="text-xs text-amber-400">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">إجمالي المدفوعات وسندات الصرف / مدين (-)</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('contacts.period_debit') }}</span>
                     <div class="text-2xl font-black font-mono text-emerald-400">
-                        {{ formatMoney(summary.total_payments) }} <span class="text-xs text-white">ج.م</span>
+                        {{ formatMoney(summary.total_payments) }} <span class="text-xs text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">الرصيد المتبقي مستحق للمورد (صافي المديونية)</span>
+                    <span class="text-xs text-slate-400 font-bold">{{ $t('contacts.closing_balance') }}</span>
                     <div class="text-2xl font-black font-mono text-rose-400">
-                        {{ formatMoney(summary.current_balance) }} <span class="text-xs text-white">ج.م</span>
+                        {{ formatMoney(summary.current_balance) }} <span class="text-xs text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
             </div>
@@ -212,11 +206,11 @@ const savePayment = () => {
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
                                 <th class="pb-3">{{ $t('common.date') }}</th>
-                                <th class="pb-3">{{ $t('common.actions') }}</th>
-                                <th class="pb-3">{{ $t('invoices.invoice_number') }}</th>
-                                <th class="pb-3 font-mono text-white">دائن (+) [شراء]</th>
-                                <th class="pb-3 font-mono text-emerald-400">مدين (-) [سداد]</th>
-                                <th class="pb-3 font-mono text-amber-400">{{ $t('contacts.current_balance') }}</th>
+                                <th class="pb-3">{{ $t('contacts.transaction_type') }}</th>
+                                <th class="pb-3">{{ $t('contacts.reference_no') }}</th>
+                                <th class="pb-3 font-mono text-white">{{ $t('contacts.period_credit') }}</th>
+                                <th class="pb-3 font-mono text-emerald-400">{{ $t('contacts.period_debit') }}</th>
+                                <th class="pb-3 font-mono text-amber-400">{{ $t('contacts.closing_balance') }}</th>
                                 <th class="pb-3">{{ $t('common.notes') }}</th>
                             </tr>
                         </thead>
@@ -237,15 +231,15 @@ const savePayment = () => {
                                 </td>
 
                                 <td class="py-3 font-mono font-bold text-white">
-                                    {{ row.credit > 0 ? formatMoney(row.credit) + ' ج.م' : '—' }}
+                                    {{ row.credit > 0 ? formatMoney(row.credit) + ' ' + $t('common.currency') : '—' }}
                                 </td>
 
                                 <td class="py-3 font-mono font-bold text-emerald-400">
-                                    {{ row.debit > 0 ? formatMoney(row.debit) + ' ج.م' : '—' }}
+                                    {{ row.debit > 0 ? formatMoney(row.debit) + ' ' + $t('common.currency') : '—' }}
                                 </td>
 
                                 <td class="py-3 font-mono font-black text-rose-400 text-sm">
-                                    {{ formatMoney(row.balance_after) }} ج.م
+                                    {{ formatMoney(row.balance_after) }} {{ $t('common.currency') }}
                                 </td>
 
                                 <td class="py-3 font-tajawal text-slate-400 text-[11px]">
@@ -257,7 +251,7 @@ const savePayment = () => {
 
                     <div v-if="ledger.length === 0" class="py-16 text-center space-y-2">
                         <span class="text-3xl">📜</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">لا توجد حركات مسجلة لهذا المورد في الفترة المحددة</p>
+                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('contacts.statement_empty') }}</p>
                     </div>
                 </div>
             </div>
@@ -272,18 +266,18 @@ const savePayment = () => {
         >
             <div @click.stop class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="font-black text-base text-white">تسجيل سند صرف وسداد للمورد 💸</h3>
+                    <h3 class="font-black text-base text-white">{{ $t('contacts.record_disbursement_voucher') }}</h3>
                     <button @click="showPaymentModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
                 </div>
 
                 <form @submit.prevent="savePayment" class="space-y-4">
                     <div class="p-3 bg-slate-950/80 rounded-2xl border border-slate-800 flex items-center justify-between">
-                        <span class="text-xs text-slate-400 font-bold">المديونية المستحقة حالياً:</span>
-                        <span class="font-mono font-black text-rose-400 text-base">{{ formatMoney(supplier.current_balance) }} ج.م</span>
+                        <span class="text-xs text-slate-400 font-bold">{{ $t('contacts.current_balance') }}:</span>
+                        <span class="font-mono font-black text-rose-400 text-base">{{ formatMoney(supplier.current_balance) }} {{ $t('common.currency') }}</span>
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">المبلغ المدفوع (ج.م) *</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('contacts.voucher_amount') }} ({{ $t('common.currency') }}) *</label>
                         <input
                             v-model.number="paymentForm.amount"
                             type="number"
@@ -296,29 +290,30 @@ const savePayment = () => {
 
                     <div class="grid grid-cols-2 gap-3">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">طريقة السداد *</label>
+                            <label class="text-xs font-bold text-slate-300">{{ $t('contacts.payment_method') }} *</label>
                             <select
                                 v-model="paymentForm.payment_method"
                                 class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                             >
-                                <option value="cash">نقداً كاش 💵</option>
-                                <option value="instapay">انستاباي ⚡</option>
-                                <option value="wallet">محفظة إلكترونية 📱</option>
-                                <option value="bank">تحويل بنكي 🏦</option>
+                                <option value="cash">{{ $t('pos.cash') }} 💵</option>
+                                <option value="instapay">InstaPay ⚡</option>
+                                <option value="wallet">{{ $t('pos.wallet') }} 📱</option>
+                                <option value="bank">{{ $t('pos.bank') }} 🏦</option>
                             </select>
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">تاريخ السند *</label>
-                            <DatePicker v-model="paymentForm.payment_date" placeholder="تاريخ السند..." />
+                            <label class="text-xs font-bold text-slate-300">{{ $t('common.date') }} *</label>
+                            <DatePicker v-model="paymentForm.payment_date" :placeholder="$t('common.date')" />
                         </div>
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">ملاحظات السند</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('common.notes') }}</label>
                         <input
                             v-model="paymentForm.notes"
                             type="text"
+                            :placeholder="$t('common.notes')"
                             class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                         >
                     </div>
@@ -329,14 +324,14 @@ const savePayment = () => {
                             type="button"
                             class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
                         >
-                            إلغاء
+                            {{ $t('common.cancel') }}
                         </button>
                         <button
                             type="submit"
                             :disabled="paymentForm.processing"
                             class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
-                            {{ paymentForm.processing ? 'جاري القيد...' : 'اعتماد سند الصرف' }}
+                            {{ paymentForm.processing ? '...' : $t('contacts.record_disbursement_voucher') }}
                         </button>
                     </div>
                 </form>

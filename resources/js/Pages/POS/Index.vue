@@ -6,6 +6,7 @@ import { useMoney } from '@/Composables/useMoney';
 import { usePOSCart } from '@/Composables/usePOSCart';
 import { useKeyboardShortcuts } from '@/Composables/useKeyboardShortcuts';
 import { posService } from '@/Services/posService';
+import { trans } from '@/helpers/trans';
 
 // Atomic POS Components (SOLID - SRP)
 import POSItemCard from '@/Components/POS/POSItemCard.vue';
@@ -190,7 +191,7 @@ const pressNumpad = (val) => {
 
 // Expenses Rows
 const addExpenseRow = () => {
-    additionalExpenses.value.push({ title: 'شحن وتوصيل', amount: 0 });
+    additionalExpenses.value.push({ title: trans('invoices.shipping') || 'شحن وتوصيل', amount: 0 });
 };
 const removeExpenseRow = (idx) => {
     additionalExpenses.value.splice(idx, 1);
@@ -199,7 +200,7 @@ const removeExpenseRow = (idx) => {
 // Clear Cart with Confirmation
 const handleClearCart = () => {
     if (cart.value.length === 0) return;
-    if (confirm('هل أنت متأكد من تفريغ السلة بالكامل؟')) {
+    if (confirm(trans('pos.clear_cart_confirm') || 'هل أنت متأكد من تفريغ السلة بالكامل؟')) {
         clearCart();
     }
 };
@@ -207,12 +208,12 @@ const handleClearCart = () => {
 // POS Checkout via Service Layer
 const submitCheckout = async () => {
     if (cart.value.length === 0) {
-        errorMessage.value = 'يرجى إضافة أصناف إلى السلة أولاً!';
+        errorMessage.value = trans('pos.empty_cart_error') || 'يرجى إضافة أصناف إلى السلة أولاً!';
         return;
     }
 
     if (!props.active_store?.id) {
-        errorMessage.value = 'يرجى تحديد فرع نشط أولاً!';
+        errorMessage.value = trans('pos.no_active_store_error') || 'يرجى تحديد فرع نشط أولاً!';
         return;
     }
 
@@ -353,7 +354,7 @@ useKeyboardShortcuts({
                                 ref="searchInputRef"
                                 v-model="searchQuery"
                                 type="text"
-                                placeholder="🔍 ابحث باسم الصنف أو الباركود... (F2)"
+                                :placeholder="$t('pos.search_placeholder')"
                                 class="w-full h-11 bg-slate-950 border border-slate-800 rounded-2xl pl-10 pr-4 text-xs font-bold text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500 transition shadow-inner font-tajawal"
                             />
                             <button
@@ -374,7 +375,7 @@ useKeyboardShortcuts({
                                 class="px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 cursor-pointer"
                                 :class="selectedCategory === 'all' ? 'bg-amber-500 text-slate-950 font-black shadow-md' : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'"
                             >
-                                الكل ({{ items.length }})
+                                {{ $t('common.all') }} ({{ items.length }})
                             </button>
 
                             <button
@@ -404,7 +405,7 @@ useKeyboardShortcuts({
                         </div>
 
                         <div v-if="filteredItems.length === 0" class="py-20 text-center text-slate-500 text-xs font-bold">
-                            لا توجد أصناف تطابق البحث
+                            {{ $t('inventory.no_items_found') }}
                         </div>
                     </div>
                 </div>
@@ -419,9 +420,9 @@ useKeyboardShortcuts({
                         >
                             <span class="text-base">👤</span>
                             <div class="flex-1 truncate">
-                                <div class="text-xs font-black text-white truncate">{{ selectedCustomer?.name || 'عميل نقدي افتراضي' }}</div>
+                                <div class="text-xs font-black text-white truncate">{{ selectedCustomer?.name || $t('pos.cash_customer') }}</div>
                                 <div class="text-[10px] text-slate-400 font-mono">
-                                    {{ selectedCustomer?.phone || '-' }} • المتبقي: {{ formatMoney(selectedCustomer?.current_balance) }} ج.م
+                                    {{ selectedCustomer?.phone || '-' }} • {{ $t('contacts.balance') }}: {{ formatMoney(selectedCustomer?.current_balance) }} {{ $t('common.currency') }}
                                 </div>
                             </div>
                             <span class="text-slate-400 text-xs">▼</span>
@@ -431,7 +432,7 @@ useKeyboardShortcuts({
                             @click="showNewCustomerModal = true"
                             type="button"
                             class="h-9 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-amber-400 font-bold text-xs flex items-center gap-1 transition cursor-pointer"
-                            title="إضافة عميل جديد"
+                            :title="$t('pos.add_new_customer')"
                         >
                             <span>➕</span>
                         </button>
@@ -451,14 +452,14 @@ useKeyboardShortcuts({
 
                         <div v-if="cart.length === 0" class="py-16 text-center text-slate-500 text-xs font-bold space-y-2">
                             <div class="text-3xl">🛒</div>
-                            <div>السلة فارغة، اختر أصنافاً للبدء</div>
+                            <div>{{ $t('pos.empty_cart_msg') }}</div>
                         </div>
                     </div>
 
                     <!-- Touch Numpad Popup / Panel -->
                     <div v-if="showNumpad" class="p-3 bg-slate-950 border-t border-slate-800 shrink-0 space-y-2">
                         <div class="flex items-center justify-between text-xs">
-                            <span class="text-slate-400 font-bold">إدخال الأرقام باللمس:</span>
+                            <span class="text-slate-400 font-bold">{{ $t('pos.numpad_title') }}</span>
                             <div class="flex items-center gap-2">
                                 <button
                                     @click="numpadTarget = 'paid_amount'"
@@ -466,7 +467,7 @@ useKeyboardShortcuts({
                                     class="px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer"
                                     :class="numpadTarget === 'paid_amount' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400'"
                                 >
-                                    المدفوع
+                                    {{ $t('invoices.paid') }}
                                 </button>
                                 <button
                                     @click="numpadTarget = 'discount_value'"
@@ -474,7 +475,7 @@ useKeyboardShortcuts({
                                     class="px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer"
                                     :class="numpadTarget === 'discount_value' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400'"
                                 >
-                                    الخصم
+                                    {{ $t('invoices.discount') }}
                                 </button>
                             </div>
                         </div>
@@ -485,7 +486,7 @@ useKeyboardShortcuts({
                             <button v-for="num in ['1','2','3','0']" :key="num" @click="pressNumpad(num)" type="button" class="h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center cursor-pointer">{{ num }}</button>
                             <button @click="pressNumpad('.')" type="button" class="h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center cursor-pointer">.</button>
                             <button @click="pressNumpad('00')" type="button" class="h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center cursor-pointer">00</button>
-                            <button @click="quickSetPaidExact" type="button" class="col-span-2 h-9 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-tajawal font-black flex items-center justify-center cursor-pointer">كامل المبلغ 💵</button>
+                            <button @click="quickSetPaidExact" type="button" class="col-span-2 h-9 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-tajawal font-black flex items-center justify-center cursor-pointer">{{ $t('pos.quick_amount_full') }}</button>
                         </div>
                     </div>
 

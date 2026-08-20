@@ -1,8 +1,9 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { useMoney } from '@/Composables/useMoney';
+import { trans } from '@/helpers/trans';
 
 const props = defineProps({
     tab: { type: String, default: 'items' },
@@ -16,14 +17,14 @@ const { formatMoney } = useMoney();
 const currentTab = ref(props.tab);
 const search = ref(props.filters.search || '');
 
-const tabs = [
-    { id: 'items', name: 'الأصناف والمخزون 📦', countKey: 'items' },
-    { id: 'customers', name: 'العملاء 👥', countKey: 'customers' },
-    { id: 'suppliers', name: 'الموردين 🏭', countKey: 'suppliers' },
-    { id: 'stores', name: 'الفروع والمخازن 🏬', countKey: 'stores' },
-    { id: 'expenses', name: 'المصروفات 💸', countKey: 'expenses' },
-    { id: 'returns', name: 'المرتجعات 🔄', countKey: 'returns' },
-];
+const tabs = computed(() => [
+    { id: 'items', name: trans('trash.tab_items') || 'الأصناف والمخزون 📦', countKey: 'items' },
+    { id: 'customers', name: trans('trash.tab_customers') || 'العملاء 👥', countKey: 'customers' },
+    { id: 'suppliers', name: trans('trash.tab_suppliers') || 'الموردين 🏭', countKey: 'suppliers' },
+    { id: 'stores', name: trans('trash.tab_stores') || 'الفروع والمخازن 🏬', countKey: 'stores' },
+    { id: 'expenses', name: trans('trash.tab_expenses') || 'المصروفات 💸', countKey: 'expenses' },
+    { id: 'returns', name: trans('trash.tab_returns') || 'المرتجعات 🔄', countKey: 'returns' },
+]);
 
 const setTab = (t) => {
     currentTab.value = t;
@@ -57,7 +58,8 @@ const restoreRecord = (id) => {
 };
 
 const forceDeleteRecord = (id) => {
-    if (confirm('تحذير: الحذف النهائي لا يمكن التراجع عنه أبداً. هل أنت متأكد؟')) {
+    const confirmMsg = trans('trash.confirm_force_delete') || 'تحذير: الحذف النهائي لا يمكن التراجع عنه أبداً. هل أنت متأكد؟';
+    if (confirm(confirmMsg)) {
         router.delete(`/trash/${currentTab.value}/${id}/force-delete`, {
             preserveScroll: true,
         });
@@ -66,7 +68,7 @@ const forceDeleteRecord = (id) => {
 </script>
 
 <template>
-    <Head title="سلة المحذوفات المركزية واسترجاع البيانات" />
+    <Head :title="$t('trash.title')" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -76,11 +78,11 @@ const forceDeleteRecord = (id) => {
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">🗑️</span>
                         <h1 class="text-xl sm:text-2xl font-black text-white">
-                            سلة المحذوفات المركزية والأرشفة الآمنة
+                            {{ $t('trash.title') }}
                         </h1>
                     </div>
                     <p class="text-xs text-slate-400 font-bold">
-                        استعادة السجلات المحذوفة خطأ أو مسحها نهائياً مع حماية العلاقات
+                        {{ $t('trash.subtitle') }}
                     </p>
                 </div>
             </div>
@@ -111,7 +113,7 @@ const forceDeleteRecord = (id) => {
                 <input
                     v-model="search"
                     type="text"
-                    placeholder="... بحث في السجلات المحذوفة"
+                    :placeholder="$t('trash.search_placeholder')"
                     class="w-full pr-10 pl-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl text-xs text-white placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
                 >
                 <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
@@ -125,10 +127,10 @@ const forceDeleteRecord = (id) => {
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-3">الاسم / البيان</th>
-                                <th class="pb-3">التفاصيل</th>
-                                <th class="pb-3">توقيت الحذف</th>
-                                <th class="pb-3 text-center">الإجراءات</th>
+                                <th class="pb-3">{{ $t('trash.record_name') }}</th>
+                                <th class="pb-3">{{ $t('trash.record_details') }}</th>
+                                <th class="pb-3">{{ $t('trash.deleted_time') }}</th>
+                                <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">
@@ -140,10 +142,10 @@ const forceDeleteRecord = (id) => {
                                 <td class="py-3.5 font-tajawal text-slate-400">
                                     <span v-if="r.code" class="font-mono text-amber-400">{{ r.code }} | </span>
                                     <span v-if="r.category">{{ r.category }}</span>
-                                    <span v-if="r.amount" class="font-mono font-bold text-rose-400">{{ formatMoney(r.amount) }} ج.م</span>
+                                    <span v-if="r.amount" class="font-mono font-bold text-rose-400">{{ formatMoney(r.amount) }} {{ $t('common.currency') }}</span>
                                     <span v-if="r.phone" class="font-mono">{{ r.phone }}</span>
                                     <span v-if="r.company_name">{{ r.company_name }}</span>
-                                    <span v-if="r.net_total" class="font-mono text-emerald-400">{{ formatMoney(r.net_total) }} ج.م</span>
+                                    <span v-if="r.net_total" class="font-mono text-emerald-400">{{ formatMoney(r.net_total) }} {{ $t('common.currency') }}</span>
                                 </td>
 
                                 <td class="py-3.5 font-tajawal text-slate-500 text-[11px]">
@@ -157,7 +159,7 @@ const forceDeleteRecord = (id) => {
                                             type="button"
                                             class="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 font-bold transition cursor-pointer"
                                         >
-                                            استعادة 🔄
+                                            {{ $t('trash.restore_btn') }}
                                         </button>
 
                                         <button
@@ -165,7 +167,7 @@ const forceDeleteRecord = (id) => {
                                             type="button"
                                             class="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 font-bold transition cursor-pointer"
                                         >
-                                            حذف نهائي ❌
+                                            {{ $t('trash.force_delete_btn') }}
                                         </button>
                                     </div>
                                 </td>
@@ -175,14 +177,14 @@ const forceDeleteRecord = (id) => {
 
                     <div v-if="!records.data || records.data.length === 0" class="py-16 text-center space-y-2">
                         <span class="text-3xl">🎉</span>
-                        <p class="text-xs font-bold text-emerald-400 font-tajawal">لا توجد عناصر محذوفة في هذا القسم</p>
+                        <p class="text-xs font-bold text-emerald-400 font-tajawal">{{ $t('trash.empty_trash') }}</p>
                     </div>
                 </div>
 
                 <!-- Pagination -->
                 <div v-if="records.links && records.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
                     <span class="text-xs text-slate-400 font-tajawal">
-                        عرض {{ records.from || 0 }} إلى {{ records.to || 0 }} من إجمالي {{ records.total || 0 }}
+                        {{ $t('common.showing') }} {{ records.from || 0 }} {{ $t('common.to') }} {{ records.to || 0 }} {{ $t('common.of') }} {{ records.total || 0 }}
                     </span>
 
                     <div class="flex items-center gap-1">

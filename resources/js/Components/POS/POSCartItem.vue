@@ -44,7 +44,7 @@ const increaseQty = () => {
             <div class="flex-1 truncate">
                 <div class="font-black text-xs text-white truncate">{{ line.name }}</div>
                 <div class="text-[10px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
-                    <span>السعر:</span>
+                    <span>{{ $t('invoices.unit_price') }}:</span>
                     <input
                         v-model.number="line.unit_price"
                         @input="emit('change')"
@@ -52,7 +52,7 @@ const increaseQty = () => {
                         min="0"
                         class="w-16 h-5 bg-slate-900 border border-slate-700 rounded px-1 text-center font-mono font-bold text-white text-[11px] focus:outline-none focus:border-amber-500"
                     />
-                    <span>ج.م</span>
+                    <span>{{ $t('common.currency') }}</span>
                 </div>
             </div>
 
@@ -92,7 +92,7 @@ const increaseQty = () => {
                     @click="emit('remove', index)"
                     type="button"
                     class="text-slate-500 hover:text-rose-400 text-xs mt-0.5 cursor-pointer"
-                    title="حذف البند"
+                    :title="$t('common.delete')"
                 >
                     ✕
                 </button>
@@ -101,7 +101,7 @@ const increaseQty = () => {
 
         <!-- Quick Weight Chips for Bulk / Coffee -->
         <div v-if="isWeightBased" class="flex items-center gap-1 pt-1 border-t border-slate-900 text-[10px]">
-            <span class="text-slate-500 text-[9px] px-1">وزن:</span>
+            <span class="text-slate-500 text-[9px] px-1">{{ $t('common.quantity') }}:</span>
             <button
                 @click="setExactWeight(0.125)"
                 type="button"
@@ -135,14 +135,14 @@ const increaseQty = () => {
         <!-- Last Customer Price Tag (if available) -->
         <div v-if="line.last_sold_price" class="flex items-center justify-between pt-1 border-t border-slate-900 text-[10px]">
             <span class="text-amber-400 font-mono">
-                🏷️ آخر سعر للعميل: {{ formatMoney(line.last_sold_price.unit_price) }} ج.م
+                🏷️ {{ $t('pos.last_customer_price') }}: {{ formatMoney(line.last_sold_price.unit_price) }} {{ $t('common.currency') }}
             </span>
             <button
                 @click="emit('apply-last-price', line)"
                 type="button"
                 class="px-2 py-0.5 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-black text-[9px] transition cursor-pointer"
             >
-                تطبيق
+                {{ $t('pos.apply_btn') }}
             </button>
         </div>
     </div>

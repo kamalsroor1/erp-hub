@@ -5,6 +5,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import SearchableSelect from '@/Components/SearchableSelect.vue';
 import DatePicker from '@/Components/DatePicker.vue';
 import { useMoney } from '@/Composables/useMoney';
+import { trans } from '@/helpers/trans';
 
 const props = defineProps({
     invoice: { type: Object, required: true },
@@ -27,22 +28,22 @@ const form = useForm({
     additional_expenses: props.invoice.additional_expenses ? [...props.invoice.additional_expenses] : [],
 });
 
-const customerOptions = props.customers.map(c => ({
+const customerOptions = computed(() => props.customers.map(c => ({
     id: c.id,
-    name: `${c.name} (${c.phone || 'بدون هاتف'})`
-}));
+    name: `${c.name} (${c.phone || '—'})`
+})));
 
-const itemCatalogOptions = props.items_catalog.map(i => ({
+const itemCatalogOptions = computed(() => props.items_catalog.map(i => ({
     id: i.id,
-    name: `${i.name} [${i.code || '—'}] - ${i.selling_price} ج.م (مخزون: ${i.current_stock})`,
+    name: `${i.name} [${i.code || '—'}] - ${i.selling_price} (${trans('inventory.current_stock') || 'مخزون'}: ${i.current_stock})`,
     raw: i,
-}));
+})));
 
 const selectedItemId = ref(null);
 
 const addItemToInvoice = () => {
     if (!selectedItemId.value) return;
-    const selectedOption = itemCatalogOptions.find(o => o.id === selectedItemId.value);
+    const selectedOption = itemCatalogOptions.value.find(o => o.id === selectedItemId.value);
     if (!selectedOption) return;
 
     const rawItem = selectedOption.raw;
@@ -118,7 +119,7 @@ const submitUpdate = () => {
 </script>
 
 <template>
-    <Head :title="`تعديل فاتورة مبيعات: ${invoice.invoice_number}`" />
+    <Head :title="`${$t('invoices.edit_invoice')}: ${invoice.invoice_number}`" />
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
@@ -131,11 +132,11 @@ const submitUpdate = () => {
                         </Link>
                         <div>
                             <h1 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-                                <span>تعديل فاتورة مبيعات رقم:</span>
-                                <span class="text-amber-400 font-mono">{{ invoice.invoice_number }}</span>
+                                <span>{{ $t('invoices.edit_invoice') }}:</span>
+                                <span class="text-amber-400 font-mono">#{{ invoice.invoice_number }}</span>
                             </h1>
                             <p class="text-xs text-slate-400 font-bold mt-0.5">
-                                تعديل الأصناف، الأسعار، العميل، والمدفوعات مع إعادة تسوية المخزون فورياً
+                                {{ $t('invoices.subtitle') }}
                             </p>
                         </div>
                     </div>
@@ -146,28 +147,28 @@ const submitUpdate = () => {
                 <!-- Top Details Grid -->
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">العميل *</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('invoices.customer') }} *</label>
                         <SearchableSelect
                             v-model="form.customer_id"
                             :options="customerOptions"
-                            placeholder="اختر العميل..."
+                            :placeholder="$t('invoices.select_customer')"
                         />
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">تاريخ الفاتورة *</label>
-                        <DatePicker v-model="form.invoice_date" placeholder="تاريخ الفاتورة..." />
+                        <label class="text-xs font-bold text-slate-300">{{ $t('common.date') }} *</label>
+                        <DatePicker v-model="form.invoice_date" :placeholder="$t('common.date')" />
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">نوع التحصيل / الدفع *</label>
+                        <label class="text-xs font-bold text-slate-300">{{ $t('invoices.payment_type') }} *</label>
                         <select
                             v-model="form.payment_type"
                             class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                         >
-                            <option value="cash">نقداً (كاش بالكامل) 💵</option>
-                            <option value="credit">آجل (على الحساب بالكامل) ⏳</option>
-                            <option value="partial">دفع جزئي (مقدم + آجل) ⚖️</option>
+                            <option value="cash">{{ $t('invoices.payment_cash') }} 💵</option>
+                            <option value="credit">{{ $t('invoices.payment_credit') }} ⏳</option>
+                            <option value="partial">{{ $t('invoices.payment_partial') }} ⚖️</option>
                         </select>
                     </div>
                 </div>
@@ -177,21 +178,21 @@ const submitUpdate = () => {
                     <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-slate-800 pb-3">
                         <h2 class="text-sm font-black text-white flex items-center gap-2">
                             <span>📦</span>
-                            <span>بنود وأصناف الفاتورة</span>
+                            <span>{{ $t('pos.cart_items') }}</span>
                         </h2>
 
                         <div class="w-full sm:w-96 flex items-center gap-2">
                             <SearchableSelect
                                 v-model="selectedItemId"
                                 :options="itemCatalogOptions"
-                                placeholder="🔍 اختر صنفاً لإضافته..."
+                                :placeholder="$t('inventory.choose_item')"
                             />
                             <button
                                 @click="addItemToInvoice"
                                 type="button"
                                 class="h-10 px-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shrink-0 transition cursor-pointer"
                             >
-                                + إضافة
+                                + {{ $t('common.add') }}
                             </button>
                         </div>
                     </div>
@@ -201,12 +202,12 @@ const submitUpdate = () => {
                         <table class="w-full text-right text-xs">
                             <thead>
                                 <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                    <th class="pb-3">الصنف</th>
-                                    <th class="pb-3 w-28">الكمية</th>
-                                    <th class="pb-3 w-28">السعر (ج.م)</th>
-                                    <th class="pb-3 w-28">الخصم (ج.م)</th>
-                                    <th class="pb-3 w-28 font-mono">الإجمالي</th>
-                                    <th class="pb-3 text-center w-12">حذف</th>
+                                    <th class="pb-3">{{ $t('inventory.item_name') }}</th>
+                                    <th class="pb-3 w-28">{{ $t('common.quantity') }}</th>
+                                    <th class="pb-3 w-28">{{ $t('invoices.unit_price') }}</th>
+                                    <th class="pb-3 w-28">{{ $t('invoices.discount') }}</th>
+                                    <th class="pb-3 w-28 font-mono">{{ $t('common.total') }}</th>
+                                    <th class="pb-3 text-center w-12">{{ $t('common.delete') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-800/60 font-sans">
@@ -250,7 +251,7 @@ const submitUpdate = () => {
                                     </td>
 
                                     <td class="py-3 font-mono font-black text-amber-400">
-                                        {{ formatMoney(item.total_price) }} ج.م
+                                        {{ formatMoney(item.total_price) }} {{ $t('common.currency') }}
                                     </td>
 
                                     <td class="py-3 text-center">
@@ -267,7 +268,7 @@ const submitUpdate = () => {
                         </table>
 
                         <div v-if="form.items.length === 0" class="py-10 text-center text-slate-500 text-xs font-bold">
-                            ⚠️ لا توجد أصناف مضافة للفاتورة بعد
+                            ⚠️ {{ $t('pos.empty_cart') }}
                         </div>
                     </div>
                 </div>
@@ -278,23 +279,23 @@ const submitUpdate = () => {
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
                         <h2 class="text-xs font-black text-white border-b border-slate-800 pb-2 flex items-center gap-2">
                             <span>🏷️</span>
-                            <span>الخصم والمصاريف الإضافية</span>
+                            <span>{{ $t('invoices.discount') }} & {{ $t('invoices.shipping') }}</span>
                         </h2>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="space-y-1">
-                                <label class="text-[11px] font-bold text-slate-300">نوع الخصم</label>
+                                <label class="text-[11px] font-bold text-slate-300">{{ $t('invoices.discount') }}</label>
                                 <select
                                     v-model="form.discount_type"
                                     class="w-full px-3 py-2 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                                 >
-                                    <option value="fixed">مبلغ ثابت (ج.م)</option>
-                                    <option value="percentage">نسبة مئوية (%)</option>
+                                    <option value="fixed">{{ $t('common.fixed_amount') || 'مبلغ ثابت' }}</option>
+                                    <option value="percentage">{{ $t('common.percentage') || 'نسبة مئوية (%)' }}</option>
                                 </select>
                             </div>
 
                             <div class="space-y-1">
-                                <label class="text-[11px] font-bold text-slate-300">قيمة الخصم</label>
+                                <label class="text-[11px] font-bold text-slate-300">{{ $t('invoices.discount') }}</label>
                                 <input
                                     v-model.number="form.discount_value"
                                     type="number"
@@ -306,11 +307,11 @@ const submitUpdate = () => {
                         </div>
 
                         <div class="space-y-1">
-                            <label class="text-[11px] font-bold text-slate-300">ملاحظات الفاتورة</label>
+                            <label class="text-[11px] font-bold text-slate-300">{{ $t('invoices.notes') }}</label>
                             <textarea
                                 v-model="form.notes"
                                 rows="3"
-                                placeholder="أي ملاحظات خاصة بالفاتورة..."
+                                :placeholder="$t('invoices.notes')"
                                 class="w-full px-3 py-2 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                             ></textarea>
                         </div>
@@ -320,27 +321,27 @@ const submitUpdate = () => {
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
                         <h2 class="text-xs font-black text-white border-b border-slate-800 pb-2 flex items-center gap-2">
                             <span>💰</span>
-                            <span>الحسابات النهائية والاعتماد</span>
+                            <span>{{ $t('invoices.financial_summary') }}</span>
                         </h2>
 
                         <div class="space-y-2 text-xs">
                             <div class="flex justify-between text-slate-400">
-                                <span>إجمالي البنود (قبل الخصم):</span>
-                                <span class="font-mono text-white">{{ formatMoney(subtotal) }} ج.م</span>
+                                <span>{{ $t('invoices.subtotal') }}:</span>
+                                <span class="font-mono text-white">{{ formatMoney(subtotal) }} {{ $t('common.currency') }}</span>
                             </div>
 
                             <div class="flex justify-between text-slate-400">
-                                <span>قيمة الخصم:</span>
-                                <span class="font-mono text-rose-400">- {{ formatMoney(discountTotal) }} ج.م</span>
+                                <span>{{ $t('invoices.discount') }}:</span>
+                                <span class="font-mono text-rose-400">- {{ formatMoney(discountTotal) }} {{ $t('common.currency') }}</span>
                             </div>
 
                             <div class="flex justify-between pt-2 border-t border-slate-800 text-sm font-black text-white">
-                                <span>صافي الفاتورة النهائي:</span>
-                                <span class="font-mono text-amber-400 text-base">{{ formatMoney(netTotal) }} ج.م</span>
+                                <span>{{ $t('invoices.net_total') }}:</span>
+                                <span class="font-mono text-amber-400 text-base">{{ formatMoney(netTotal) }} {{ $t('common.currency') }}</span>
                             </div>
 
                             <div v-if="form.payment_type !== 'credit'" class="pt-2">
-                                <label class="text-[11px] font-bold text-slate-300 block mb-1">المبلغ المسدد والمدفوع (ج.م)</label>
+                                <label class="text-[11px] font-bold text-slate-300 block mb-1">{{ $t('invoices.paid') }} ({{ $t('common.currency') }})</label>
                                 <input
                                     v-model.number="form.paid_amount"
                                     type="number"
@@ -351,8 +352,8 @@ const submitUpdate = () => {
                             </div>
 
                             <div class="flex justify-between text-slate-400 pt-1">
-                                <span>المتبقي آجل على العميل:</span>
-                                <span class="font-mono text-rose-400 font-bold">{{ formatMoney(remainingAmount) }} ج.م</span>
+                                <span>{{ $t('invoices.remaining') }}:</span>
+                                <span class="font-mono text-rose-400 font-bold">{{ formatMoney(remainingAmount) }} {{ $t('common.currency') }}</span>
                             </div>
                         </div>
 

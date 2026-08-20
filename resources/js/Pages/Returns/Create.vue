@@ -5,6 +5,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import SearchableSelect from '@/Components/SearchableSelect.vue';
 import DatePicker from '@/Components/DatePicker.vue';
 import { useMoney } from '@/Composables/useMoney';
+import { trans } from '@/helpers/trans';
 
 const props = defineProps({
     customers: { type: Array, default: () => [] },
@@ -31,10 +32,17 @@ const customerOptions = computed(() => {
     }));
 });
 
+const supplierOptions = computed(() => {
+    return props.suppliers.map(s => ({
+        id: s.id,
+        name: `${s.name} ${s.phone ? '(' + s.phone + ')' : ''}`,
+    }));
+});
+
 const availableItemOptions = computed(() => {
     return props.items.map(item => ({
         id: item.id,
-        name: `${item.name} (${item.unit || ''}) - سعر البيع: ${item.selling_price} | التكلفة: ${item.cost_price}`,
+        name: `${item.name} (${item.unit || ''}) - ${trans('inventory.selling_price') || 'سعر البيع'}: ${item.selling_price} | ${trans('inventory.cost_price') || 'التكلفة'}: ${item.cost_price}`,
     }));
 });
 
@@ -46,7 +54,7 @@ const addItemRow = () => {
     if (!item) return;
 
     if (form.items.some(it => it.item_id === item.id)) {
-        alert('هذا الصنف مضاف بالفعل بالمستند');
+        alert(trans('returns.item_already_added') || 'هذا الصنف مضاف بالفعل بالمستند');
         return;
     }
 
@@ -55,7 +63,7 @@ const addItemRow = () => {
     form.items.push({
         item_id: item.id,
         name: item.name,
-        unit: item.unit || 'كجم',
+        unit: item.unit || trans('inventory.unit_kg') || 'كجم',
         quantity: 1,
         unit_price: defaultPrice || 0,
     });
@@ -73,7 +81,7 @@ const netTotal = computed(() => {
 
 const submitReturn = () => {
     if (form.items.length === 0) {
-        alert('يرجى إضافة صنف واحد على الأقل للمرتجع');
+        alert(trans('returns.add_at_least_one_item') || 'يرجى إضافة صنف واحد على الأقل للمرتجع');
         return;
     }
     form.post('/returns', {
@@ -83,7 +91,7 @@ const submitReturn = () => {
 </script>
 
 <template>
-    <Head title="تسجيل مستند مرتجع جديد" />
+    <Head :title="$t('returns.create_title')" />
 
     <AppLayout>
         <div class="max-w-5xl mx-auto space-y-6 font-tajawal">
@@ -95,11 +103,11 @@ const submitReturn = () => {
                             →
                         </Link>
                         <h1 class="text-xl sm:text-2xl font-black text-white">
-                            تسجيل مستند مرتجع وإشعار تسوية مخزنية
+                            {{ $t('returns.create_title') }}
                         </h1>
                     </div>
                     <p class="text-xs text-slate-400 font-bold">
-                        إرجاع بضاعة مباعة أو مشتراة وعكس حركتها بالحسابات والمخزن
+                        {{ $t('returns.create_subtitle') }}
                     </p>
                 </div>
             </div>
@@ -111,7 +119,7 @@ const submitReturn = () => {
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
                         <h2 class="text-sm font-black text-white border-b border-slate-800 pb-2 flex items-center gap-2">
                             <span>🔄</span>
-                            <span>نوع المرتجع والطرف المعني</span>
+                            <span>{{ $t('returns.return_type') }} & {{ $t('returns.party_name') }}</span>
                         </h2>
 
                         <!-- Type Selector Pill -->
@@ -123,7 +131,7 @@ const submitReturn = () => {
                                 :class="form.return_type === 'sales_return' ? 'bg-rose-500 text-white font-black border-rose-400 shadow-md shadow-rose-500/20' : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'"
                             >
                                 <span>↩️</span>
-                                <span>مرتجع مبيعات (من عميل)</span>
+                                <span>{{ $t('returns.sales_return') }}</span>
                             </button>
 
                             <button
@@ -133,40 +141,40 @@ const submitReturn = () => {
                                 :class="form.return_type === 'purchase_return' ? 'bg-emerald-500 text-slate-950 font-black border-emerald-400 shadow-md shadow-emerald-500/20' : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'"
                             >
                                 <span>↪️</span>
-                                <span>مرتجع مشتريات (إلى مورد)</span>
+                                <span>{{ $t('returns.purchase_return') }}</span>
                             </button>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                             <div v-if="form.return_type === 'sales_return'" class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">العميل المسترجع منه *</label>
+                                <label class="text-xs font-bold text-slate-300">{{ $t('returns.customer_from') }}</label>
                                 <SearchableSelect
                                     v-model="form.customer_id"
                                     :options="customerOptions"
-                                    placeholder="اختر العميل..."
+                                    :placeholder="$t('invoices.select_customer')"
                                 />
                             </div>
 
                             <div v-else class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">المورد المرتجع إليه *</label>
+                                <label class="text-xs font-bold text-slate-300">{{ $t('returns.supplier_to') }}</label>
                                 <SearchableSelect
                                     v-model="form.supplier_id"
-                                    :options="suppliers"
-                                    placeholder="اختر المورد..."
+                                    :options="supplierOptions"
+                                    :placeholder="$t('suppliers.select_supplier') || 'اختر المورد...'"
                                 />
                             </div>
 
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">تاريخ المرتجع *</label>
-                                <DatePicker v-model="form.return_date" placeholder="تاريخ المستند..." />
+                                <label class="text-xs font-bold text-slate-300">{{ $t('returns.return_date') }} *</label>
+                                <DatePicker v-model="form.return_date" :placeholder="$t('returns.return_date')" />
                             </div>
 
                             <div class="space-y-1.5 sm:col-span-2">
-                                <label class="text-xs font-bold text-slate-300">سبب الإرجاع أو الملاحظات</label>
+                                <label class="text-xs font-bold text-slate-300">{{ $t('returns.reason') }}</label>
                                 <input
                                     v-model="form.reason"
                                     type="text"
-                                    placeholder="مثال: تلف بالعبوة / خطأ في الصنف / مرتجع فائض..."
+                                    :placeholder="$t('returns.reason_placeholder')"
                                     class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
                                 >
                             </div>
@@ -177,7 +185,7 @@ const submitReturn = () => {
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
                         <h2 class="text-sm font-black text-white border-b border-slate-800 pb-2 flex items-center gap-2">
                             <span>📦</span>
-                            <span>الأصناف المرتجعة</span>
+                            <span>{{ $t('returns.return_items') }}</span>
                         </h2>
 
                         <!-- Add Item Row Selector -->
@@ -186,7 +194,7 @@ const submitReturn = () => {
                                 <SearchableSelect
                                     v-model="selectedItemToAdd"
                                     :options="availableItemOptions"
-                                    placeholder="اختر الصنف لإضافته..."
+                                    :placeholder="$t('returns.select_item_to_add')"
                                 />
                             </div>
                             <button
@@ -194,7 +202,7 @@ const submitReturn = () => {
                                 type="button"
                                 class="h-10 px-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer"
                             >
-                                + إضافة
+                                + {{ $t('common.add') }}
                             </button>
                         </div>
 
@@ -203,10 +211,10 @@ const submitReturn = () => {
                             <table class="w-full text-right text-xs">
                                 <thead>
                                     <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                        <th class="pb-2">الصنف</th>
-                                        <th class="pb-2 w-28">الكمية</th>
-                                        <th class="pb-2 w-28">سعر الوحدة</th>
-                                        <th class="pb-2 font-mono">الإجمالي</th>
+                                        <th class="pb-2">{{ $t('inventory.item_name') }}</th>
+                                        <th class="pb-2 w-28">{{ $t('common.quantity') }}</th>
+                                        <th class="pb-2 w-28">{{ $t('invoices.unit_price') }}</th>
+                                        <th class="pb-2 font-mono">{{ $t('common.total') }}</th>
                                         <th class="pb-2 text-center w-10">✕</th>
                                     </tr>
                                 </thead>
@@ -240,7 +248,7 @@ const submitReturn = () => {
                                         </td>
 
                                         <td class="py-2.5 font-mono font-black text-emerald-400">
-                                            {{ formatMoney((it.quantity || 0) * (it.unit_price || 0)) }} ج.م
+                                            {{ formatMoney((it.quantity || 0) * (it.unit_price || 0)) }} {{ $t('common.currency') }}
                                         </td>
 
                                         <td class="py-2.5 text-center">
@@ -257,7 +265,7 @@ const submitReturn = () => {
                             </table>
 
                             <div v-if="form.items.length === 0" class="py-8 text-center text-slate-500 text-xs font-bold font-tajawal">
-                                لم تقم بإضافة أي أصناف بعد.
+                                {{ $t('returns.empty_return_items') }}
                             </div>
                         </div>
                     </div>
@@ -266,16 +274,16 @@ const submitReturn = () => {
                 <!-- Right Col: Financial Summary & Confirmation -->
                 <div class="space-y-5">
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4 sticky top-20">
-                        <h2 class="text-base font-black text-white border-b border-slate-800 pb-3">ملخص قيمة المرتجع</h2>
+                        <h2 class="text-base font-black text-white border-b border-slate-800 pb-3">{{ $t('returns.summary_title') }}</h2>
 
                         <div class="space-y-3 font-mono">
                             <div class="flex items-center justify-between text-xs">
-                                <span class="text-slate-200 font-bold font-tajawal">إجمالي قيمة المرتجع:</span>
-                                <span class="text-xl font-black text-amber-400">{{ formatMoney(netTotal) }} ج.م</span>
+                                <span class="text-slate-200 font-bold font-tajawal">{{ $t('returns.total_returns_val') }}:</span>
+                                <span class="text-xl font-black text-amber-400">{{ formatMoney(netTotal) }} {{ $t('common.currency') }}</span>
                             </div>
 
                             <div class="space-y-1 pt-2 border-t border-slate-800">
-                                <label class="text-xs font-bold text-slate-300 font-tajawal">المبلغ المسترد نقداً للعميل / من المورد</label>
+                                <label class="text-xs font-bold text-slate-300 font-tajawal">{{ $t('returns.refund_amount_cash') }}</label>
                                 <input
                                     v-model.number="form.refund_amount"
                                     type="number"
@@ -284,7 +292,7 @@ const submitReturn = () => {
                                     class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-emerald-400 font-mono font-black focus:outline-none"
                                 >
                                 <p class="text-[10px] text-slate-500 font-tajawal mt-0.5">
-                                    إذا تم ترك 0 سيتم قيد المبلغ كرصيد في حساب الطرف.
+                                    {{ $t('returns.refund_hint') }}
                                 </p>
                             </div>
                         </div>
@@ -295,7 +303,7 @@ const submitReturn = () => {
                             class="w-full h-12 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
                             <span>🔄</span>
-                            <span>{{ form.processing ? 'جاري الحفظ...' : 'اعتماد مستند المرتجع وتسوية المخزن' }}</span>
+                            <span>{{ form.processing ? '...' : $t('returns.confirm_return_save') }}</span>
                         </button>
                     </div>
                 </div>
