@@ -76,6 +76,11 @@ class HandleInertiaRequests extends Middleware
             ],
             'tenant' => $tenant ? (new \App\Http\Resources\TenantResource($tenant))->resolve() : null,
             'system_theme_color' => fn () => \App\Models\Setting::get('system_theme_color', 'amber'),
+            'branding' => fn () => [
+                'logo_light' => '/logo-light.png?v=' . (\App\Models\Setting::get('logo_light_v', '1')),
+                'logo_dark' => '/logo-dark.png?v=' . (\App\Models\Setting::get('logo_dark_v', '1')),
+                'logo' => '/logo.png?v=' . (\App\Models\Setting::get('logo_v', '1')),
+            ],
             'activeStore' => $activeStore ? [
                 'id' => $activeStore->id,
                 'name' => $activeStore->name,

@@ -57,6 +57,8 @@ const form = useForm({
     telegram_chat_id: props.settings.telegram_chat_id || '',
     telegram_notifications_enabled: props.settings.telegram_notifications_enabled,
     logo_file: null,
+    logo_light_file: null,
+    logo_dark_file: null,
 });
 
 const isPreset = computed(() => {
@@ -96,12 +98,30 @@ const onHexTextInput = (val) => {
 };
 
 const logoPreview = ref(null);
+const logoLightPreview = ref(null);
+const logoDarkPreview = ref(null);
 
 const handleLogoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
         form.logo_file = file;
         logoPreview.value = URL.createObjectURL(file);
+    }
+};
+
+const handleLogoLightChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        form.logo_light_file = file;
+        logoLightPreview.value = URL.createObjectURL(file);
+    }
+};
+
+const handleLogoDarkChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        form.logo_dark_file = file;
+        logoDarkPreview.value = URL.createObjectURL(file);
     }
 };
 
@@ -400,24 +420,61 @@ const clearCache = () => {
             <div v-if="currentTab === 'branding'" class="space-y-6">
                 <form @submit.prevent="saveSettings" class="space-y-6">
                     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-6">
-                        <!-- Logo Upload Section -->
-                        <div class="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-slate-200 dark:border-slate-800">
-                            <div class="w-24 h-24 rounded-3xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2 flex items-center justify-center overflow-hidden shadow-inner shrink-0">
-                                <img
-                                    :src="logoPreview || '/logo.png'"
-                                    alt="شعار المؤسسة"
-                                    class="w-full h-full object-contain"
-                                >
+                        <!-- Dual Logo Upload Section (Light Mode & Dark Mode) -->
+                        <div class="pb-6 border-b border-slate-200 dark:border-slate-800 space-y-4">
+                            <div>
+                                <h3 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                                    <span>🖼️</span>
+                                    <span>{{ $t('settings.company_logo') }}</span>
+                                </h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">{{ $t('settings.logo_hint') }}</p>
                             </div>
 
-                            <div class="space-y-2 text-center sm:text-right">
-                                <h3 class="text-sm font-black text-slate-900 dark:text-white">{{ $t('settings.company_logo') }}</h3>
-                                <p class="text-xs text-slate-500 dark:text-slate-400">{{ $t('settings.logo_hint') }}</p>
-                                <div>
-                                    <label class="inline-block px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-700 cursor-pointer transition">
-                                        <span>{{ $t('settings.choose_logo') }}</span>
-                                        <input type="file" accept="image/*" @change="handleLogoChange" class="hidden">
-                                    </label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- ☀️ Light Mode Logo Card -->
+                                <div class="p-4 rounded-3xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 flex items-center gap-4 shadow-xs">
+                                    <div class="w-20 h-20 rounded-2xl bg-white border border-slate-200 p-2 flex items-center justify-center overflow-hidden shadow-xs shrink-0">
+                                        <img
+                                            :src="logoLightPreview || '/logo-light.png'"
+                                            alt="شعار الوضع الفاتح"
+                                            class="w-full h-full object-contain"
+                                        >
+                                    </div>
+
+                                    <div class="space-y-1.5 flex-1 min-w-0">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-sm">☀️</span>
+                                            <h4 class="text-xs font-black text-slate-900 dark:text-white truncate">{{ $t('settings.company_logo_light') }}</h4>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">{{ $t('settings.logo_light_hint') }}</p>
+                                        <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-700 cursor-pointer transition shadow-xs">
+                                            <span>{{ $t('settings.choose_logo_light') }}</span>
+                                            <input type="file" accept="image/*" @change="handleLogoLightChange" class="hidden">
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- 🌙 Dark Mode Logo Card -->
+                                <div class="p-4 rounded-3xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 flex items-center gap-4 shadow-xs">
+                                    <div class="w-20 h-20 rounded-2xl bg-slate-900 border border-slate-800 p-2 flex items-center justify-center overflow-hidden shadow-xs shrink-0">
+                                        <img
+                                            :src="logoDarkPreview || '/logo-dark.png'"
+                                            alt="شعار الوضع الداكن"
+                                            class="w-full h-full object-contain"
+                                        >
+                                    </div>
+
+                                    <div class="space-y-1.5 flex-1 min-w-0">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-sm">🌙</span>
+                                            <h4 class="text-xs font-black text-slate-900 dark:text-white truncate">{{ $t('settings.company_logo_dark') }}</h4>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">{{ $t('settings.logo_dark_hint') }}</p>
+                                        <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-700 cursor-pointer transition shadow-xs">
+                                            <span>{{ $t('settings.choose_logo_dark') }}</span>
+                                            <input type="file" accept="image/*" @change="handleLogoDarkChange" class="hidden">
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>

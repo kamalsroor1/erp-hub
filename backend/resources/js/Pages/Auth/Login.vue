@@ -38,7 +38,8 @@ const fillAccount = (phone, password) => {
             <!-- Header / Brand Logo -->
             <div class="text-center space-y-3">
                 <div class="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-white dark:bg-slate-800 p-2 shadow-2xl shadow-theme-primary border border-slate-200 dark:border-slate-700">
-                    <img src="/logo.png" alt="Logo" class="w-full h-full object-contain filter drop-shadow-sm">
+                    <img src="/logo-light.png" alt="Logo Light" class="w-full h-full object-contain filter drop-shadow-sm dark:hidden">
+                    <img src="/logo-dark.png" alt="Logo Dark" class="w-full h-full object-contain filter drop-shadow-sm hidden dark:block">
                 </div>
                 <div>
                     <h1 class="text-2xl font-black text-white font-tajawal tracking-tight">

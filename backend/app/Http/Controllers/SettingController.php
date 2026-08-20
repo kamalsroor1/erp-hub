@@ -65,16 +65,45 @@ final class SettingController extends Controller
             'telegram_bot_token' => 'nullable|string|max:255',
             'telegram_chat_id' => 'nullable|string|max:255',
             'telegram_notifications_enabled' => 'boolean',
-            'logo_file' => 'nullable|image|max:3072',
+            'logo_file' => 'nullable|image|max:4096',
+            'logo_light_file' => 'nullable|image|max:4096',
+            'logo_dark_file' => 'nullable|image|max:4096',
         ]);
+
+        if ($request->hasFile('logo_light_file')) {
+            $file = $request->file('logo_light_file');
+            @copy($file->getRealPath(), public_path('logo-light.png'));
+            Setting::set('logo_light_v', (string)time());
+            if (!file_exists(public_path('logo.png'))) {
+                @copy($file->getRealPath(), public_path('logo.png'));
+            }
+        }
+
+        if ($request->hasFile('logo_dark_file')) {
+            $file = $request->file('logo_dark_file');
+            @copy($file->getRealPath(), public_path('logo-dark.png'));
+            Setting::set('logo_dark_v', (string)time());
+            if (!file_exists(public_path('logo.png'))) {
+                @copy($file->getRealPath(), public_path('logo.png'));
+            }
+        }
 
         if ($request->hasFile('logo_file')) {
             $file = $request->file('logo_file');
             @copy($file->getRealPath(), public_path('logo.png'));
+            Setting::set('logo_v', (string)time());
+            if (!file_exists(public_path('logo-light.png'))) {
+                @copy($file->getRealPath(), public_path('logo-light.png'));
+            }
+            if (!file_exists(public_path('logo-dark.png'))) {
+                @copy($file->getRealPath(), public_path('logo-dark.png'));
+            }
         }
 
+        $excludeKeys = ['logo_file', 'logo_light_file', 'logo_dark_file'];
+
         foreach ($validated as $key => $value) {
-            if ($key === 'logo_file') continue;
+            if (in_array($key, $excludeKeys, true)) continue;
             if (is_bool($value)) {
                 Setting::set($key, $value ? '1' : '0');
             } else {

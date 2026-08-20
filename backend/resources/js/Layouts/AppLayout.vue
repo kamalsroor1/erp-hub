@@ -14,6 +14,11 @@ const stores = computed(() => page.props.stores || []);
 const activeShift = computed(() => page.props.activeShift);
 const isAdmin = computed(() => user.value.roles?.includes('admin'));
 
+// Branding Dual Mode Logos
+const branding = computed(() => page.props.branding || {});
+const logoLightSrc = computed(() => branding.value.logo_light || '/logo-light.png');
+const logoDarkSrc = computed(() => branding.value.logo_dark || '/logo-dark.png');
+
 // Sidebar collapse & Mobile drawer state
 const isSidebarOpen = ref(false);
 const isSidebarCollapsed = ref(false);
@@ -204,7 +209,10 @@ const getUserRoleLabel = computed(() => {
                         :class="isSidebarCollapsed ? 'w-12 h-12' : 'w-14 h-14'"
                         :title="tenant?.name || 'سرور كوفي'"
                     >
-                        <img src="/logo.png" alt="Logo" class="w-full h-full object-contain filter drop-shadow-xs group-hover:brightness-105">
+                        <!-- Light Mode Logo -->
+                        <img :src="logoLightSrc" alt="Logo" class="w-full h-full object-contain filter drop-shadow-xs group-hover:brightness-105 dark:hidden">
+                        <!-- Dark Mode Logo -->
+                        <img :src="logoDarkSrc" alt="Logo" class="w-full h-full object-contain filter drop-shadow-xs group-hover:brightness-105 hidden dark:block">
                     </Link>
                     <div v-if="!isSidebarCollapsed" class="truncate min-w-0">
                         <h1 class="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white font-tajawal line-clamp-1 leading-snug">
