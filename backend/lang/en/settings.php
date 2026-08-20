@@ -67,4 +67,10 @@ return [
     'live_preview_title'        => 'Live Real-time Theme Preview:',
     'preview_kpi_sales'         => 'Sample Sales KPI',
     'preview_button_active'     => 'Primary Action Button',
+    'custom_color_title'        => 'Or Pick Your Custom Brand Color (Color Picker):',
+    'custom_color_sub'          => 'Pick any color shade with a single click using the color picker or enter HEX code directly',
+    'custom_color_label'        => 'Interactive Color Picker & Calendar',
+    'hex_code_label'            => 'Color Code (HEX)',
+    'quick_swatches'            => 'Quick Extended Swatches:',
+    'custom_color_badge'        => 'Custom Color Active',
 ];

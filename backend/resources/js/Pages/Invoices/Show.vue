@@ -87,7 +87,7 @@ const getPaymentBadge = computed(() => {
                     <Link
                         v-if="invoice.status !== 'cancelled'"
                         :href="`/invoices/${invoice.id}/edit`"
-                        class="px-4 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition cursor-pointer"
+                        class="px-4 py-2.5 rounded-2xl btn-primary-theme font-black text-xs flex items-center gap-1.5 transition transform active:scale-95 cursor-pointer"
                     >
                         <span>✏️</span>
                         <span>{{ $t('invoices.edit_invoice') }}</span>

@@ -367,11 +367,11 @@ const getUserRoleLabel = computed(() => {
                     <FeatureGate feature="pos.access">
                         <Link
                             href="/pos"
-                            class="h-9 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-emerald-500/20 transition transform active:scale-95 cursor-pointer font-tajawal shrink-0"
+                            class="h-9 px-3 rounded-xl btn-primary-theme font-black text-xs flex items-center gap-1.5 transition transform active:scale-95 cursor-pointer font-tajawal shrink-0"
                         >
                             <span>⚡</span>
                             <span class="hidden sm:inline">{{ $t('nav.pos_fast') }}</span>
-                            <span class="px-1.5 py-0.5 rounded bg-slate-950/25 text-white text-[10px] font-mono">F2</span>
+                            <span class="px-1.5 py-0.5 rounded bg-black/25 text-white text-[10px] font-mono">F2</span>
                         </Link>
                     </FeatureGate>
 

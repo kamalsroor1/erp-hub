@@ -102,7 +102,7 @@ const savePayment = () => {
                     <button
                         @click="showPaymentModal = true"
                         type="button"
-                        class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
+                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
                     >
                         <span>💸</span>
                         <span>{{ $t('contacts.record_disbursement_voucher') }}</span>
@@ -329,7 +329,7 @@ const savePayment = () => {
                         <button
                             type="submit"
                             :disabled="paymentForm.processing"
-                            class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                            class="px-5 py-2.5 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
                             {{ paymentForm.processing ? '...' : $t('contacts.record_disbursement_voucher') }}
                         </button>

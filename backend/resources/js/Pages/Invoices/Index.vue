@@ -211,7 +211,7 @@ const printA4 = (id) => {
 
                 <Link
                     href="/pos"
-                    class="h-11 px-5 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition transform active:scale-95 font-tajawal cursor-pointer"
+                    class="h-11 px-5 rounded-2xl btn-primary-theme font-black text-xs flex items-center justify-center gap-2 transition transform active:scale-95 font-tajawal cursor-pointer"
                 >
                     <span class="text-base font-black">+</span>
                     <span>{{ $t('invoices.new_sale_invoice') }}</span>

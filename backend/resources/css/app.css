@@ -155,14 +155,14 @@ body {
 
 .tab-theme-active {
     background-color: var(--color-primary) !important;
-    color: #020617 !important;
+    color: var(--color-primary-text, #020617) !important;
     font-weight: 900 !important;
     box-shadow: 0 4px 14px 0 rgba(var(--color-primary-rgb), 0.3) !important;
 }
 
 .btn-primary-theme {
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%) !important;
-    color: #ffffff !important;
+    color: var(--color-primary-text, #ffffff) !important;
     box-shadow: 0 10px 25px -5px rgba(var(--color-primary-rgb), 0.35) !important;
     transition: all 0.2s ease !important;
 }

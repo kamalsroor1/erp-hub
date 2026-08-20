@@ -61,7 +61,7 @@ final class SettingController extends Controller
             'thermal_show_customer_balance' => 'boolean',
             'print_show_qr' => 'boolean',
             'invoice_primary_color' => 'nullable|string|in:amber,emerald,blue,slate',
-            'system_theme_color' => 'nullable|string|in:amber,emerald,blue,purple,rose,orange,teal,indigo',
+            'system_theme_color' => 'nullable|string|max:50',
             'telegram_bot_token' => 'nullable|string|max:255',
             'telegram_chat_id' => 'nullable|string|max:255',
             'telegram_notifications_enabled' => 'boolean',

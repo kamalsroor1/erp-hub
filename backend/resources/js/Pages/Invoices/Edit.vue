@@ -368,7 +368,7 @@ const submitUpdate = () => {
                             <button
                                 type="submit"
                                 :disabled="form.processing || form.items.length === 0"
-                                class="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                                class="px-6 py-2.5 rounded-2xl btn-primary-theme font-black text-xs transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                             >
                                 {{ form.processing ? $t('common.save') + '...' : $t('common.save') + ' 💾' }}
                             </button>

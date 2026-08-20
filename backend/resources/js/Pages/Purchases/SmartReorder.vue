@@ -106,7 +106,7 @@ const createPurchaseFromSelected = () => {
                         @click="createPurchaseFromSelected"
                         :disabled="selectedItemIds.length === 0"
                         type="button"
-                        class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <span>📥</span>
                         <span>{{ $t('purchases.generate_po_for_selected', { count: selectedItemIds.length }) }}</span>

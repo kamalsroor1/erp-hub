@@ -1,8 +1,8 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { useTheme } from '@/Composables/useTheme';
+import { useTheme, PRESET_PALETTES } from '@/Composables/useTheme';
 
 const props = defineProps({
     settings: { type: Object, required: true },
@@ -25,6 +25,21 @@ const palettes = [
     { id: 'indigo', name: 'النيلي الداكن (Deep Indigo)', sub: 'هدوء تكنولوجي عصري حديث', hex: '#6366f1', ring: 'ring-indigo-500', bg: 'bg-indigo-500', icon: '🌌' },
 ];
 
+const extendedSwatches = [
+    { hex: '#06b6d4', name: 'Cyan' },
+    { hex: '#84cc16', name: 'Lime' },
+    { hex: '#ec4899', name: 'Pink' },
+    { hex: '#e11d48', name: 'Crimson' },
+    { hex: '#8b5cf6', name: 'Violet' },
+    { hex: '#0ea5e9', name: 'Sky' },
+    { hex: '#10b981', name: 'Emerald' },
+    { hex: '#eab308', name: 'Yellow' },
+    { hex: '#d97706', name: 'Bronze' },
+    { hex: '#64748b', name: 'Slate' },
+    { hex: '#14b8a6', name: 'Mint' },
+    { hex: '#f97316', name: 'Coral' },
+];
+
 const form = useForm({
     company_name: props.settings.company_name,
     company_subtitle: props.settings.company_subtitle,
@@ -44,9 +59,40 @@ const form = useForm({
     logo_file: null,
 });
 
+const isPreset = computed(() => {
+    return palettes.some(p => p.id === form.system_theme_color);
+});
+
+const activeHexColor = computed(() => {
+    const preset = palettes.find(p => p.id === form.system_theme_color);
+    if (preset) return preset.hex;
+    if (form.system_theme_color && form.system_theme_color.startsWith('#')) return form.system_theme_color;
+    return '#f59e0b';
+});
+
+const customPickerColor = ref(activeHexColor.value);
+
 const selectPalette = (paletteId) => {
     form.system_theme_color = paletteId;
+    const preset = palettes.find(p => p.id === paletteId);
+    if (preset) customPickerColor.value = preset.hex;
     applyColorTheme(paletteId);
+};
+
+const onCustomColorInput = (e) => {
+    const newHex = e.target.value;
+    customPickerColor.value = newHex;
+    form.system_theme_color = newHex;
+    applyColorTheme(newHex);
+};
+
+const onHexTextInput = (val) => {
+    if (!val) return;
+    let hex = val.trim();
+    if (!hex.startsWith('#')) hex = `#${hex}`;
+    customPickerColor.value = hex;
+    form.system_theme_color = hex;
+    applyColorTheme(hex);
 };
 
 const logoPreview = ref(null);
@@ -230,6 +276,73 @@ const clearCache = () => {
                             </div>
                         </div>
 
+                        <!-- 🎨 Custom Color Picker & Color Calendar Section -->
+                        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 space-y-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+                                <div>
+                                    <h3 class="text-xs font-black text-slate-900 dark:text-white flex items-center gap-2">
+                                        <span>🖌️</span>
+                                        <span>{{ $t('settings.custom_color_title') }}</span>
+                                    </h3>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{{ $t('settings.custom_color_sub') }}</p>
+                                </div>
+                                <span v-if="!isPreset" class="px-2.5 py-1 rounded-xl text-[11px] font-black bg-theme-light text-theme-primary border border-theme-light self-start sm:self-auto">
+                                    ✓ {{ $t('settings.custom_color_badge') }}
+                                </span>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-4">
+                                <!-- Interactive Color Wheel / Native Input -->
+                                <div class="flex items-center gap-3 bg-white dark:bg-slate-900 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+                                    <div class="relative w-10 h-10 rounded-xl overflow-hidden shadow-xs cursor-pointer border border-slate-300 dark:border-slate-700 flex items-center justify-center">
+                                        <input
+                                            type="color"
+                                            :value="activeHexColor"
+                                            @input="onCustomColorInput"
+                                            class="absolute -inset-4 w-20 h-20 opacity-0 cursor-pointer"
+                                            :title="$t('settings.custom_color_label')"
+                                        >
+                                        <div class="w-full h-full rounded-xl transition-transform hover:scale-110" :style="{ backgroundColor: activeHexColor }"></div>
+                                    </div>
+                                    <div>
+                                        <span class="text-[10px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('settings.custom_color_label') }}</span>
+                                        <span class="text-xs font-mono font-black text-slate-900 dark:text-white">{{ activeHexColor.toUpperCase() }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Direct HEX Input Field -->
+                                <div class="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+                                    <span class="text-xs font-bold text-slate-400">#</span>
+                                    <input
+                                        type="text"
+                                        :value="activeHexColor.replace('#', '')"
+                                        @input="onHexTextInput($event.target.value)"
+                                        maxlength="7"
+                                        placeholder="3B82F6"
+                                        class="w-24 bg-transparent text-xs font-mono font-black text-slate-900 dark:text-white uppercase focus:outline-none"
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Extended Quick Swatches Calendar -->
+                            <div class="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800/80">
+                                <span class="text-[11px] font-bold text-slate-600 dark:text-slate-400 block">{{ $t('settings.quick_swatches') }}</span>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <button
+                                        v-for="swatch in extendedSwatches"
+                                        :key="swatch.hex"
+                                        type="button"
+                                        @click="onHexTextInput(swatch.hex)"
+                                        class="w-7 h-7 rounded-xl transition transform hover:scale-125 cursor-pointer shadow-xs border border-white/20 relative flex items-center justify-center"
+                                        :style="{ backgroundColor: swatch.hex }"
+                                        :title="swatch.name + ' (' + swatch.hex + ')'"
+                                    >
+                                        <span v-if="activeHexColor.toLowerCase() === swatch.hex.toLowerCase()" class="text-white text-[10px] font-black">✓</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Live Real-Time Preview Card -->
                         <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 space-y-4">
                             <h3 class="text-xs font-black text-slate-900 dark:text-white flex items-center gap-2">
@@ -244,7 +357,7 @@ const clearCache = () => {
                                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ $t('settings.preview_kpi_sales') }}</span>
                                         <span class="text-base">💵</span>
                                     </div>
-                                    <div class="text-2xl font-black font-mono" :style="{ color: palettes.find(p => p.id === form.system_theme_color)?.hex || '#f59e0b' }">
+                                    <div class="text-2xl font-black font-mono text-theme-primary">
                                         24,850.00 <span class="text-xs font-bold text-slate-500">ج.م</span>
                                     </div>
                                 </div>
@@ -252,11 +365,7 @@ const clearCache = () => {
                                 <!-- Sample Action Button -->
                                 <button
                                     type="button"
-                                    class="h-12 px-5 rounded-2xl text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg transition transform active:scale-95 cursor-pointer"
-                                    :style="{
-                                        background: `linear-gradient(135deg, ${palettes.find(p => p.id === form.system_theme_color)?.hex || '#f59e0b'} 0%, ${palettes.find(p => p.id === form.system_theme_color)?.hex}dd 100%)`,
-                                        boxShadow: `0 10px 20px -5px ${palettes.find(p => p.id === form.system_theme_color)?.hex}50`
-                                    }"
+                                    class="h-12 px-5 rounded-2xl btn-primary-theme font-black text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
                                 >
                                     <span>⚡</span>
                                     <span>{{ $t('settings.preview_button_active') }} (F2)</span>
@@ -264,15 +373,9 @@ const clearCache = () => {
 
                                 <!-- Sample Badge & Store Chip -->
                                 <div class="flex flex-col items-center sm:items-start gap-2">
-                                    <span
-                                        class="px-3 py-1 rounded-xl text-xs font-black border"
-                                        :style="{
-                                            backgroundColor: `${palettes.find(p => p.id === form.system_theme_color)?.hex}20`,
-                                            borderColor: `${palettes.find(p => p.id === form.system_theme_color)?.hex}50`,
-                                            color: palettes.find(p => p.id === form.system_theme_color)?.hex || '#f59e0b'
-                                        }"
-                                    >
-                                        ✓ الفرع النشط: محمص سرور الرئيسي
+                                    <span class="px-3 py-1.5 rounded-xl text-xs font-black badge-theme flex items-center gap-1.5 shadow-xs">
+                                        <span>✓</span>
+                                        <span>الفرع النشط: محمص سرور الرئيسي</span>
                                     </span>
                                 </div>
                             </div>

@@ -67,4 +67,10 @@ return [
     'live_preview_title'        => 'معاينة حية فورية للمظهر المختار:',
     'preview_kpi_sales'         => 'مبيعات اليوم التجريبية',
     'preview_button_active'     => 'زر رئيسي نشط',
+    'custom_color_title'        => 'أو اختر لونك الخاص المخصص (Color Picker):',
+    'custom_color_sub'          => 'اختر أي درجة لون بنقرة واحدة عبر كليندر الألوان أو اكتب كود الـ HEX مباشرة',
+    'custom_color_label'        => 'كليندر ومنتقي الألوان التفاعلي',
+    'hex_code_label'            => 'كود اللون (HEX)',
+    'quick_swatches'            => 'درجات ألوان مميزة وسريعة:',
+    'custom_color_badge'        => 'لون مخصص نشط',
 ];
