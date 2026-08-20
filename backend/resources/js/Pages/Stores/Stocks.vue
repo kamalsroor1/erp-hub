@@ -54,7 +54,7 @@ const lowStockCount = computed(() => {
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="space-y-1">
                     <div class="flex items-center gap-3">
-                        <Link href="/stores" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition">
+                        <Link href="/stores" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-sm transition active:scale-90 shadow-xs border border-slate-200 dark:border-transparent">
                             →
                         </Link>
                         <div>
@@ -68,10 +68,10 @@ const lowStockCount = computed(() => {
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2.5">
+                <div class="flex items-center gap-2.5 w-full sm:w-auto">
                     <Link
                         href="/stock-transfers/create"
-                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
+                        class="w-full sm:w-auto h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer shadow-theme-primary"
                     >
                         <span>🚚</span>
                         <span>{{ $t('inventory.new_transfer') }}</span>
@@ -80,13 +80,13 @@ const lowStockCount = computed(() => {
             </div>
 
             <!-- Store Selector Tabs -->
-            <div class="flex items-center gap-2 overflow-x-auto pb-2">
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
                 <button
                     v-for="st in stores"
                     :key="st.id"
                     @click="switchStore(st.id)"
                     type="button"
-                    class="px-4 py-2.5 rounded-2xl text-xs font-bold transition whitespace-nowrap cursor-pointer flex items-center gap-2 border"
+                    class="h-11 px-4 rounded-2xl text-xs font-bold transition whitespace-nowrap cursor-pointer flex items-center gap-2 border active:scale-95 shadow-xs shrink-0"
                     :class="currentStoreId === st.id ? 'tab-theme-active border-theme-primary' : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80'"
                 >
                     <span>{{ st.type === 'wholesale_van' || st.type === 'van' ? '🚚' : (st.type === 'main_warehouse' || st.type === 'warehouse' ? '🏭' : '🏬') }}</span>
@@ -94,38 +94,38 @@ const lowStockCount = computed(() => {
                 </button>
             </div>
 
-            <!-- Top KPI Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-1">
+            <!-- Top KPI Cards (Bento Grid on Mobile) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4 font-tajawal">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('inventory.total_items_count') }}</span>
-                    <div class="text-2xl font-black font-mono text-slate-900 dark:text-white">
-                        {{ stocks.total || stocks.data?.length || 0 }} <span class="text-xs text-slate-400 font-tajawal">{{ $t('inventory.item_unit') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-slate-900 dark:text-white">
+                        {{ stocks.total || stocks.data?.length || 0 }} <span class="text-[11px] text-slate-400 font-tajawal">{{ $t('inventory.item_unit') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-1">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('inventory.low_stock_count') }} ⚠️</span>
-                    <div class="text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
-                        {{ lowStockCount }} <span class="text-xs text-slate-400 font-tajawal">{{ $t('inventory.item_unit') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
+                        {{ lowStockCount }} <span class="text-[11px] text-slate-400 font-tajawal">{{ $t('inventory.item_unit') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-1">
+                <div class="col-span-2 sm:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('inventory.total_inventory_value') }}</span>
-                    <div class="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
-                        {{ formatMoney(totalValuation) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                        {{ formatMoney(totalValuation) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- Filter Controls Bar -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-4">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 font-tajawal">
                 <div class="flex items-center gap-2">
-                    <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-950 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs font-bold">
+                    <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-950 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs font-bold w-full sm:w-auto">
                         <button
                             @click="stockStatus = 'all'; applyFilters();"
                             type="button"
-                            class="px-3 py-1.5 rounded-xl transition cursor-pointer"
+                            class="flex-1 sm:flex-none h-9 px-3 rounded-xl transition cursor-pointer active:scale-95"
                             :class="stockStatus === 'all' ? 'tab-theme-active' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                         >
                             {{ $t('common.all') }}
@@ -133,7 +133,7 @@ const lowStockCount = computed(() => {
                         <button
                             @click="stockStatus = 'low'; applyFilters();"
                             type="button"
-                            class="px-3 py-1.5 rounded-xl transition cursor-pointer"
+                            class="flex-1 sm:flex-none h-9 px-3 rounded-xl transition cursor-pointer active:scale-95"
                             :class="stockStatus === 'low' ? 'bg-rose-500 text-white font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                         >
                             {{ $t('inventory.low_stock_only') }}
@@ -141,7 +141,7 @@ const lowStockCount = computed(() => {
                         <button
                             @click="stockStatus = 'out'; applyFilters();"
                             type="button"
-                            class="px-3 py-1.5 rounded-xl transition cursor-pointer"
+                            class="flex-1 sm:flex-none h-9 px-3 rounded-xl transition cursor-pointer active:scale-95"
                             :class="stockStatus === 'out' ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                         >
                             {{ $t('inventory.out_of_stock_only') }}
@@ -149,20 +149,21 @@ const lowStockCount = computed(() => {
                     </div>
                 </div>
 
-                <div class="w-full sm:w-64">
+                <div class="w-full md:w-64">
                     <input
                         v-model="search"
                         @input="applyFilters"
                         type="text"
                         :placeholder="$t('inventory.search_item_placeholder')"
-                        class="w-full h-10 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
+                        class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
                     >
                 </div>
             </div>
 
-            <!-- Stocks Table -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4 overflow-hidden">
-                <div class="overflow-x-auto">
+            <!-- Stocks Table & Mobile Cards -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4 overflow-hidden font-tajawal">
+                <!-- Desktop Table (Hidden on Mobile) -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
@@ -228,11 +229,68 @@ const lowStockCount = computed(() => {
                             </tr>
                         </tbody>
                     </table>
+                </div>
 
-                    <div v-if="!stocks.data || stocks.data.length === 0" class="py-16 text-center space-y-2">
-                        <span class="text-3xl">📦</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_items_found') }}</p>
+                <!-- Mobile Cards View (Visible on Small Screens) -->
+                <div class="md:hidden space-y-3 font-tajawal">
+                    <div
+                        v-for="st in stocks.data"
+                        :key="st.id"
+                        class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-2.5 shadow-xs"
+                    >
+                        <!-- Top: Item Name + Status Badge -->
+                        <div class="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-800/80 pb-2">
+                            <div>
+                                <div class="font-black text-xs text-slate-900 dark:text-white">{{ st.item_name }}</div>
+                                <div class="text-[10px] text-slate-400 font-mono">{{ st.item_code || '—' }}</div>
+                            </div>
+
+                            <span
+                                v-if="st.quantity <= 0"
+                                class="px-2 py-0.5 rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 text-[10px] font-bold shrink-0"
+                            >
+                                {{ $t('inventory.out_of_stock_only') }}
+                            </span>
+                            <span
+                                v-else-if="st.quantity <= st.min_stock_level"
+                                class="px-2 py-0.5 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-[10px] font-bold shrink-0"
+                            >
+                                {{ $t('inventory.low_stock_only') }}
+                            </span>
+                            <span
+                                v-else
+                                class="px-2 py-0.5 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-bold shrink-0"
+                            >
+                                {{ $t('inventory.available_only') }}
+                            </span>
+                        </div>
+
+                        <!-- Stock & Price Matrix -->
+                        <div class="grid grid-cols-3 gap-2 text-xs font-mono py-1">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('inventory.current_stock') }}</span>
+                                <span
+                                    class="font-black text-xs"
+                                    :class="st.quantity <= 0 ? 'text-rose-600 dark:text-rose-400' : (st.quantity <= st.min_stock_level ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400')"
+                                >
+                                    {{ st.quantity }} {{ st.unit || 'كجم' }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('inventory.min_stock_level') }}</span>
+                                <span class="font-bold text-slate-600 dark:text-slate-400">{{ st.min_stock_level }}</span>
+                            </div>
+                            <div class="text-left">
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('inventory.total_inventory_value') }}</span>
+                                <span class="font-black text-theme-primary">{{ formatMoney(st.total_valuation) }}</span>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <div v-if="!stocks.data || stocks.data.length === 0" class="py-16 text-center space-y-2">
+                    <span class="text-3xl">📦</span>
+                    <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_items_found') }}</p>
                 </div>
             </div>
         </div>

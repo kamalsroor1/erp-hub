@@ -206,19 +206,19 @@ const submitBlendInvoice = () => {
                 <!-- Left 2 Cols: Blending Workspace -->
                 <div class="lg:col-span-2 space-y-5">
                     <!-- Blend Configuration -->
-                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-4">
                         <h2 class="text-sm font-black text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2.5 flex items-center gap-2">
                             <span>⚙️</span>
                             <span>{{ $t('inventory.blend_recipe') }}</span>
                         </h2>
 
-                        <div class="space-y-3">
+                        <div class="space-y-3.5">
                             <div class="space-y-1.5">
                                 <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('inventory.blend_name') }}</label>
                                 <input
                                     v-model="blendName"
                                     type="text"
-                                    class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner"
                                 >
                             </div>
 
@@ -231,8 +231,8 @@ const submitBlendInvoice = () => {
                                         :key="w.value"
                                         @click="targetWeightGrams = w.value"
                                         type="button"
-                                        class="py-2.5 px-3 rounded-2xl border text-xs font-bold transition cursor-pointer"
-                                        :class="targetWeightGrams === w.value ? 'tab-theme-active border-theme-primary shadow-xs' : 'bg-slate-100 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                                        class="h-11 px-3 rounded-2xl border text-xs font-bold transition active:scale-95 cursor-pointer flex items-center justify-center shadow-xs"
+                                        :class="targetWeightGrams === w.value ? 'tab-theme-active border-theme-primary font-black' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                                     >
                                         {{ w.label }}
                                     </button>
@@ -240,14 +240,14 @@ const submitBlendInvoice = () => {
                             </div>
 
                             <!-- Custom Weight Input -->
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                                 <div class="space-y-1">
                                     <label class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ $t('inventory.custom_weight') }}</label>
                                     <input
                                         v-model.number="targetWeightGrams"
                                         type="number"
                                         step="1"
-                                        class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-theme-primary font-mono font-black focus:border-theme-primary focus:outline-none"
+                                        class="w-full h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-theme-primary font-mono font-black focus:border-theme-primary focus:outline-none shadow-inner"
                                     >
                                 </div>
 
@@ -255,7 +255,7 @@ const submitBlendInvoice = () => {
                                     <label class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ $t('inventory.roast_type') }}</label>
                                     <select
                                         v-model="roastType"
-                                        class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
+                                        class="w-full h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none shadow-inner"
                                     >
                                         <option value="فاتح">{{ $t('inventory.roast_light') }}</option>
                                         <option value="وسط">{{ $t('inventory.roast_medium') }}</option>
@@ -268,7 +268,7 @@ const submitBlendInvoice = () => {
                                     <label class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ $t('inventory.grind_level') }}</label>
                                     <select
                                         v-model="grindLevel"
-                                        class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
+                                        class="w-full h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none shadow-inner"
                                     >
                                         <option value="تركي ناعم">{{ $t('inventory.grind_turkish') }}</option>
                                         <option value="إسبريسو">{{ $t('inventory.grind_espresso') }}</option>
@@ -281,14 +281,14 @@ const submitBlendInvoice = () => {
                     </div>
 
                     <!-- Blend Components Builder -->
-                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-4">
                         <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2.5">
                             <h2 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
                                 <span>🫘</span>
                                 <span>{{ $t('inventory.raw_beans_components') }}</span>
                             </h2>
                             <span
-                                class="px-2.5 py-1 rounded-xl text-xs font-mono font-black"
+                                class="px-3 py-1 rounded-xl text-xs font-mono font-black"
                                 :class="totalPercentage === 100 ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30'"
                             >
                                 {{ $t('inventory.total_percentage') }}: {{ totalPercentage }}%
@@ -307,7 +307,7 @@ const submitBlendInvoice = () => {
                             <button
                                 @click="addComponent"
                                 type="button"
-                                class="h-10 px-4 rounded-2xl btn-primary-theme text-xs font-black transition cursor-pointer"
+                                class="h-11 px-5 rounded-2xl btn-primary-theme text-xs font-black transition active:scale-95 cursor-pointer shrink-0 shadow-theme-primary"
                             >
                                 + {{ $t('inventory.add_new_item') }}
                             </button>
@@ -318,48 +318,48 @@ const submitBlendInvoice = () => {
                             <div
                                 v-for="(comp, cIdx) in calculatedComponents"
                                 :key="comp.item_id"
-                                class="p-3.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs"
+                                class="p-4 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 shadow-xs"
                             >
                                 <div class="w-full sm:w-1/3">
-                                    <div class="font-black text-slate-900 dark:text-white text-xs">{{ comp.name }}</div>
+                                    <div class="font-black text-slate-900 dark:text-white text-xs sm:text-sm">{{ comp.name }}</div>
                                     <div class="text-[11px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">
                                         {{ $t('inventory.retail_price') }}: {{ comp.selling_price }} {{ $t('common.currency') }}
                                     </div>
                                 </div>
 
                                 <!-- Percentage Slider / Input -->
-                                <div class="w-full sm:w-1/3 flex items-center gap-2">
+                                <div class="w-full sm:w-1/3 flex items-center gap-3">
                                     <input
                                         v-model.number="components[cIdx].percentage"
                                         type="range"
                                         min="0"
                                         max="100"
                                         step="5"
-                                        class="w-full accent-theme-primary cursor-pointer"
+                                        class="flex-1 h-3 accent-theme-primary cursor-pointer rounded-lg"
                                     >
-                                    <div class="w-14 flex items-center">
+                                    <div class="flex items-center gap-1 shrink-0">
                                         <input
                                             v-model.number="components[cIdx].percentage"
                                             type="number"
                                             min="0"
                                             max="100"
-                                            class="w-12 px-1.5 py-1 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono font-black text-theme-primary focus:outline-none"
+                                            class="w-14 h-9 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono font-black text-theme-primary focus:outline-none shadow-inner"
                                         >
-                                        <span class="text-xs text-slate-500 dark:text-slate-400 mr-1">%</span>
+                                        <span class="text-xs text-slate-500 dark:text-slate-400">%</span>
                                     </div>
                                 </div>
 
                                 <!-- Calculated Grams & Line Total -->
-                                <div class="w-full sm:w-1/3 flex items-center justify-between sm:justify-end gap-3 font-mono">
-                                    <div class="text-left">
-                                        <div class="text-xs font-black text-emerald-600 dark:text-emerald-400">{{ comp.grams }} جم</div>
+                                <div class="w-full sm:w-1/3 flex items-center justify-between sm:justify-end gap-3 font-mono border-t sm:border-t-0 border-slate-200 dark:border-slate-800/80 pt-2 sm:pt-0">
+                                    <div class="text-right sm:text-left">
+                                        <div class="text-xs sm:text-sm font-black text-emerald-600 dark:text-emerald-400">{{ comp.grams }} جم</div>
                                         <div class="text-[11px] text-slate-500 dark:text-slate-400">{{ comp.price }} {{ $t('common.currency') }}</div>
                                     </div>
 
                                     <button
                                         @click="removeComponent(cIdx)"
                                         type="button"
-                                        class="w-8 h-8 rounded-xl bg-rose-500/15 hover:bg-rose-500/30 text-rose-600 dark:text-rose-400 flex items-center justify-center transition cursor-pointer"
+                                        class="w-9 h-9 rounded-xl bg-rose-500/15 hover:bg-rose-500/30 text-rose-600 dark:text-rose-400 flex items-center justify-center transition active:scale-90 cursor-pointer shrink-0"
                                     >
                                         ✕
                                     </button>
@@ -377,7 +377,7 @@ const submitBlendInvoice = () => {
                                     min="0"
                                     step="1"
                                     placeholder="0"
-                                    class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-emerald-600 dark:text-emerald-400 font-mono font-bold focus:border-theme-primary focus:outline-none"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-emerald-600 dark:text-emerald-400 font-mono font-bold focus:border-theme-primary focus:outline-none shadow-inner"
                                 >
                             </div>
 
@@ -387,7 +387,7 @@ const submitBlendInvoice = () => {
                                     v-model="notes"
                                     type="text"
                                     :placeholder="$t('inventory.blend_notes')"
-                                    class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
                                 >
                             </div>
                         </div>
@@ -396,7 +396,7 @@ const submitBlendInvoice = () => {
 
                 <!-- Right Col: Financial Summary & Direct Cashier Action -->
                 <div class="space-y-5">
-                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xl space-y-5 sticky top-20">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl space-y-5 sticky top-20">
                         <div class="border-b border-slate-200 dark:border-slate-800 pb-3">
                             <h2 class="text-base font-black text-slate-900 dark:text-white">{{ $t('inventory.blend_cost_summary') }}</h2>
                             <p class="text-xs text-theme-primary font-mono mt-0.5">{{ targetWeightGrams }} جرام ({{ (targetWeightGrams / 1000).toFixed(3) }} {{ $t('inventory.unit_weight_short') }})</p>
@@ -434,7 +434,7 @@ const submitBlendInvoice = () => {
                             @click="submitBlendInvoice"
                             type="button"
                             :disabled="form.processing || components.length === 0"
-                            class="w-full h-12 rounded-2xl btn-primary-theme font-black text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                            class="w-full h-12 rounded-2xl btn-primary-theme font-black text-sm flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer disabled:opacity-50 shadow-theme-primary"
                         >
                             <span>🧾</span>
                             <span>{{ form.processing ? $t('common.save') + '...' : $t('pos.confirm_invoice') + ' (F2)' }}</span>

@@ -113,27 +113,27 @@ const getMovementBadge = (type) => {
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="space-y-1">
                     <div class="flex items-center gap-3">
-                        <Link href="/items" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                        <Link href="/items" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-sm transition active:scale-90 shadow-xs border border-slate-200 dark:border-transparent">
                             →
                         </Link>
                         <div>
-                            <h1 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+                            <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                                 <span>{{ $t('inventory.movements_title') }}:</span>
-                                <span class="text-amber-400">{{ item.name }}</span>
-                                <span v-if="item.code" class="text-xs text-slate-400 font-mono font-normal">({{ item.code }})</span>
+                                <span class="text-theme-primary">{{ item.name }}</span>
+                                <span v-if="item.code" class="text-xs text-slate-500 dark:text-slate-400 font-mono font-normal">({{ item.code }})</span>
                             </h1>
-                            <p class="text-xs text-slate-400 font-bold mt-0.5">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">
                                 {{ $t('inventory.category') }}: {{ item.category || '—' }} | {{ $t('inventory.unit') }}: {{ item.unit }} | {{ $t('inventory.purchase_price') }}: {{ formatMoney(item.cost_price) }} {{ $t('common.currency') }} | {{ $t('inventory.retail_price') }}: {{ formatMoney(item.selling_price) }} {{ $t('common.currency') }}
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 w-full sm:w-auto">
                     <button
                         @click="printReport"
                         type="button"
-                        class="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-indigo-600/20 transition cursor-pointer"
+                        class="w-full sm:w-auto h-11 px-5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20 transition active:scale-95 cursor-pointer"
                     >
                         <span>📄</span>
                         <span>{{ $t('contacts.print_statement') }} A4</span>
@@ -141,60 +141,60 @@ const getMovementBadge = (type) => {
                 </div>
             </div>
 
-            <!-- 4 Top KPI Cards -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('inventory.quantity_in') }}</span>
-                    <div class="text-xl font-black font-mono text-emerald-400 flex items-center gap-1.5">
+            <!-- 4 Top KPI Cards (Bento Grid on Mobile) -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5 font-tajawal">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 space-y-1 shadow-xs">
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('inventory.quantity_in') }}</span>
+                    <div class="text-lg sm:text-xl font-black font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                         <span>📥</span>
                         <span>{{ stats.total_in }}</span>
-                        <span class="text-xs font-tajawal text-slate-400 font-normal">{{ item.unit }}</span>
+                        <span class="text-xs font-tajawal text-slate-500 dark:text-slate-400 font-normal">{{ item.unit }}</span>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('inventory.quantity_out') }}</span>
-                    <div class="text-xl font-black font-mono text-rose-400 flex items-center gap-1.5">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 space-y-1 shadow-xs">
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('inventory.quantity_out') }}</span>
+                    <div class="text-lg sm:text-xl font-black font-mono text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
                         <span>📤</span>
                         <span>{{ stats.total_out }}</span>
-                        <span class="text-xs font-tajawal text-slate-400 font-normal">{{ item.unit }}</span>
+                        <span class="text-xs font-tajawal text-slate-500 dark:text-slate-400 font-normal">{{ item.unit }}</span>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('contacts.period_net') || 'صافي الحركة للفترة' }}</span>
-                    <div class="text-xl font-black font-mono flex items-center gap-1.5" :class="stats.net_movement >= 0 ? 'text-emerald-400' : 'text-rose-400'">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 space-y-1 shadow-xs">
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('contacts.period_net') || 'صافي الحركة للفترة' }}</span>
+                    <div class="text-lg sm:text-xl font-black font-mono flex items-center gap-1.5" :class="stats.net_movement >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
                         <span>⚖️</span>
                         <span>{{ stats.net_movement >= 0 ? '+' : '' }}{{ stats.net_movement }}</span>
-                        <span class="text-xs font-tajawal text-slate-400 font-normal">{{ item.unit }}</span>
+                        <span class="text-xs font-tajawal text-slate-500 dark:text-slate-400 font-normal">{{ item.unit }}</span>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('inventory.current_stock') }}</span>
-                    <div class="text-xl font-black font-mono text-amber-400 flex items-center gap-1.5">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 space-y-1 shadow-xs">
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('inventory.current_stock') }}</span>
+                    <div class="text-lg sm:text-xl font-black font-mono text-theme-primary flex items-center gap-1.5">
                         <span>📦</span>
                         <span>{{ stats.current_scope_stock }}</span>
-                        <span class="text-xs font-tajawal text-slate-400 font-normal">{{ item.unit }}</span>
+                        <span class="text-xs font-tajawal text-slate-500 dark:text-slate-400 font-normal">{{ item.unit }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- Filter Controls & Presets -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-3">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 shadow-xs space-y-3 font-tajawal">
                 <!-- Date Presets Bar -->
-                <div class="flex flex-wrap items-center gap-1.5 pb-2 border-b border-slate-800/80 text-xs">
-                    <span class="text-slate-500 font-bold text-[11px] ml-1">{{ $t('contacts.report_period') }}:</span>
-                    <button @click="applyDatePreset('today')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">{{ $t('dashboard.today') || 'اليوم' }}</button>
-                    <button @click="applyDatePreset('this_week')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">{{ $t('dashboard.this_week') || 'هذا الأسبوع' }}</button>
-                    <button @click="applyDatePreset('this_month')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">{{ $t('dashboard.this_month') || 'هذا الشهر' }}</button>
-                    <button @click="applyDatePreset('this_year')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">{{ $t('dashboard.this_year') || 'هذا العام' }}</button>
-                    <button @click="applyDatePreset('all')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">{{ $t('common.all') }}</button>
+                <div class="flex flex-wrap items-center gap-1.5 pb-2 border-b border-slate-200 dark:border-slate-800/80 text-xs">
+                    <span class="text-slate-500 dark:text-slate-400 font-bold text-[11px] ml-1">{{ $t('contacts.report_period') }}:</span>
+                    <button @click="applyDatePreset('today')" type="button" class="h-9 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold transition active:scale-95">{{ $t('dashboard.today') || 'اليوم' }}</button>
+                    <button @click="applyDatePreset('this_week')" type="button" class="h-9 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold transition active:scale-95">{{ $t('dashboard.this_week') || 'هذا الأسبوع' }}</button>
+                    <button @click="applyDatePreset('this_month')" type="button" class="h-9 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold transition active:scale-95">{{ $t('dashboard.this_month') || 'هذا الشهر' }}</button>
+                    <button @click="applyDatePreset('this_year')" type="button" class="h-9 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold transition active:scale-95">{{ $t('dashboard.this_year') || 'هذا العام' }}</button>
+                    <button @click="applyDatePreset('all')" type="button" class="h-9 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold transition active:scale-95">{{ $t('common.all') }}</button>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                     <div class="space-y-1">
-                        <label class="text-[11px] font-bold text-slate-300">{{ $t('inventory.movement_type') }}</label>
+                        <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300">{{ $t('inventory.movement_type') }}</label>
                         <SearchableSelect
                             v-model="movementType"
                             :options="movementTypeOptions"
@@ -203,7 +203,7 @@ const getMovementBadge = (type) => {
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-[11px] font-bold text-slate-300">{{ $t('common.store') }}</label>
+                        <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300">{{ $t('common.store') }}</label>
                         <SearchableSelect
                             v-model="storeId"
                             :options="storeOptions"
@@ -212,19 +212,19 @@ const getMovementBadge = (type) => {
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-[11px] font-bold text-slate-300">{{ $t('contacts.from_date') }}</label>
+                        <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300">{{ $t('contacts.from_date') }}</label>
                         <DatePicker v-model="dateFrom" :placeholder="$t('contacts.from_date')" />
                     </div>
 
                     <div class="space-y-1 flex items-end gap-2">
                         <div class="flex-1">
-                            <label class="text-[11px] font-bold text-slate-300">{{ $t('contacts.to_date') }}</label>
+                            <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300">{{ $t('contacts.to_date') }}</label>
                             <DatePicker v-model="dateTo" :placeholder="$t('contacts.to_date')" />
                         </div>
                         <button
                             @click="applyFilters"
                             type="button"
-                            class="h-10 px-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer"
+                            class="h-11 px-5 rounded-2xl btn-primary-theme text-xs font-black transition active:scale-95 cursor-pointer shadow-theme-primary"
                         >
                             {{ $t('common.filter') }}
                         </button>
@@ -232,12 +232,13 @@ const getMovementBadge = (type) => {
                 </div>
             </div>
 
-            <!-- Movements Table -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4 overflow-hidden">
-                <div class="overflow-x-auto">
+            <!-- Movements Table & Mobile Cards -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4 overflow-hidden font-tajawal">
+                <!-- Desktop Table (Hidden on Mobile) -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                 <th class="pb-3">{{ $t('common.date') }} & {{ $t('common.time') }}</th>
                                 <th class="pb-3">{{ $t('inventory.movement_type') }}</th>
                                 <th class="pb-3">{{ $t('contacts.reference_no') }}</th>
@@ -247,9 +248,9 @@ const getMovementBadge = (type) => {
                                 <th class="pb-3">{{ $t('common.store') }} / {{ $t('common.user') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/60 font-sans">
-                            <tr v-for="m in movements.data" :key="m.id" class="hover:bg-slate-800/30 transition">
-                                <td class="py-3.5 font-mono text-slate-400 text-[11px]">
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
+                            <tr v-for="m in movements.data" :key="m.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
+                                <td class="py-3.5 font-mono text-slate-500 dark:text-slate-400 text-[11px]">
                                     {{ m.created_at }}
                                 </td>
 
@@ -262,54 +263,100 @@ const getMovementBadge = (type) => {
                                     </span>
                                 </td>
 
-                                <td class="py-3.5 font-mono text-amber-400 font-bold">
+                                <td class="py-3.5 font-mono text-theme-primary font-bold">
                                     {{ m.document_number || '—' }}
                                 </td>
 
-                                <td class="py-3.5 font-mono font-black text-sm" :class="m.quantity > 0 ? 'text-emerald-400' : 'text-rose-400'">
+                                <td class="py-3.5 font-mono font-black text-sm" :class="m.quantity > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
                                     {{ m.quantity > 0 ? '+' : '' }}{{ m.quantity }} {{ item.unit }}
                                 </td>
 
-                                <td class="py-3.5 font-mono text-slate-400">
+                                <td class="py-3.5 font-mono text-slate-500 dark:text-slate-400">
                                     {{ m.stock_before }}
                                 </td>
 
-                                <td class="py-3.5 font-mono font-bold text-white">
+                                <td class="py-3.5 font-mono font-bold text-slate-900 dark:text-white">
                                     {{ m.stock_after }}
                                 </td>
 
-                                <td class="py-3.5 font-tajawal text-slate-300">
+                                <td class="py-3.5 font-tajawal text-slate-700 dark:text-slate-300">
                                     <div>{{ m.store_name || $t('inventory.store_type_main') }}</div>
-                                    <div class="text-[10px] text-slate-500">{{ m.user_name }}</div>
+                                    <div class="text-[10px] text-slate-400 dark:text-slate-500">{{ m.user_name }}</div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
 
-                    <div v-if="!movements.data || movements.data.length === 0" class="py-16 text-center space-y-2">
-                        <span class="text-3xl">📦</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_movements_found') }}</p>
+                <!-- Mobile Cards View (Visible on Small Screens) -->
+                <div class="md:hidden space-y-3 font-tajawal">
+                    <div
+                        v-for="m in movements.data"
+                        :key="m.id"
+                        class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-2.5 shadow-xs"
+                    >
+                        <!-- Top: Type Badge + Doc # + Date -->
+                        <div class="flex items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800/80 pb-2">
+                            <div class="flex items-center gap-1.5">
+                                <span
+                                    class="px-2 py-0.5 rounded-lg text-[10px] font-black border"
+                                    :class="getMovementBadge(m.movement_type).class"
+                                >
+                                    {{ getMovementBadge(m.movement_type).label }}
+                                </span>
+                                <span v-if="m.document_number" class="font-mono text-xs font-bold text-theme-primary">#{{ m.document_number }}</span>
+                            </div>
+                            <span class="font-mono text-[11px] text-slate-400">{{ m.created_at }}</span>
+                        </div>
+
+                        <!-- Quantity and Stocks Matrix -->
+                        <div class="grid grid-cols-3 gap-2 text-xs font-mono py-1">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('common.quantity') }}</span>
+                                <span class="font-black" :class="m.quantity > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
+                                    {{ m.quantity > 0 ? '+' : '' }}{{ m.quantity }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('inventory.balance_before') || 'الرصيد قبل' }}</span>
+                                <span class="font-bold text-slate-600 dark:text-slate-400">{{ m.stock_before }}</span>
+                            </div>
+                            <div class="text-left">
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('inventory.balance_after') || 'الرصيد بعد' }}</span>
+                                <span class="font-black text-slate-900 dark:text-white">{{ m.stock_after }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-tajawal border-t border-slate-200 dark:border-slate-800/80 pt-1.5">
+                            <span>🏬 {{ m.store_name || $t('inventory.store_type_main') }}</span>
+                            <span>👤 {{ m.user_name || '—' }}</span>
+                        </div>
                     </div>
                 </div>
 
+                <div v-if="!movements.data || movements.data.length === 0" class="py-16 text-center space-y-2">
+                    <span class="text-3xl">📦</span>
+                    <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_movements_found') }}</p>
+                </div>
+
                 <!-- Pagination -->
-                <div v-if="movements.links && movements.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
-                    <span class="text-xs text-slate-400 font-tajawal">
-                        {{ $t('common.actions') ? `عرض ${movements.from || 0} إلى ${movements.to || 0} من إجمالي ${movements.total || 0} حركة` : `Showing ${movements.from || 0} to ${movements.to || 0} of ${movements.total || 0}` }}
+                <div v-if="movements.links && movements.links.length > 3" class="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 font-sans">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-tajawal">
+                        {{ `عرض ${movements.from || 0} إلى ${movements.to || 0} من إجمالي ${movements.total || 0} حركة` }}
                     </span>
 
-                    <div class="flex items-center gap-1">
+                    <div class="flex flex-wrap items-center justify-center gap-1">
                         <template v-for="(link, lIdx) in movements.links" :key="lIdx">
                             <Link
                                 v-if="link.url"
                                 :href="link.url"
-                                class="px-3 py-1.5 rounded-xl text-xs font-bold transition"
-                                :class="link.active ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'"
+                                class="h-9 min-w-[36px] px-3 rounded-xl text-xs font-bold transition flex items-center justify-center active:scale-95 shadow-xs"
+                                :class="link.active ? 'btn-primary-theme text-slate-950 font-black' : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'"
                                 v-html="link.label"
                             />
                             <span
                                 v-else
-                                class="px-3 py-1.5 rounded-xl text-xs text-slate-600 font-bold"
+                                class="h-9 min-w-[36px] px-3 rounded-xl text-xs text-slate-400 dark:text-slate-600 font-bold flex items-center justify-center"
                                 v-html="link.label"
                             />
                         </template>

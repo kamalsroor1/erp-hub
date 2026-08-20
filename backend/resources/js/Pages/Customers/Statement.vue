@@ -66,24 +66,24 @@ const printStatement = () => {
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 no-print">
                 <div class="space-y-1">
                     <div class="flex items-center gap-3">
-                        <Link href="/customers" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                        <Link href="/customers" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-sm transition active:scale-90 shadow-xs border border-slate-200 dark:border-transparent">
                             →
                         </Link>
-                        <h1 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                             <span>{{ $t('contacts.ledger_title') }}:</span>
-                            <span class="text-amber-400">{{ customer.name }}</span>
+                            <span class="text-theme-primary">{{ customer.name }}</span>
                         </h1>
                     </div>
-                    <p class="text-xs text-slate-400">
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
                         {{ $t('contacts.ledger_subtitle') }}
                     </p>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 w-full sm:w-auto">
                     <button
                         @click="printStatement"
                         type="button"
-                        class="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-indigo-600/20 transition cursor-pointer"
+                        class="w-full sm:w-auto h-11 px-5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-indigo-600/20 transition active:scale-95 cursor-pointer"
                     >
                         <span>📄</span>
                         <span>{{ $t('contacts.print_statement') }}</span>
@@ -92,52 +92,52 @@ const printStatement = () => {
             </div>
 
             <!-- Customer Summary Card -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-4 font-tajawal">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <span class="text-xs text-slate-500 font-bold">{{ $t('contacts.customer_name') }}</span>
-                        <div class="text-base font-black text-white mt-0.5">{{ customer.name }}</div>
-                        <div v-if="customer.phone" class="text-xs text-slate-400 font-mono" dir="ltr">📱 {{ customer.phone }}</div>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.customer_name') }}</span>
+                        <div class="text-base font-black text-slate-900 dark:text-white mt-0.5">{{ customer.name }}</div>
+                        <div v-if="customer.phone" class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5" dir="ltr">📱 {{ customer.phone }}</div>
                     </div>
 
                     <div>
-                        <span class="text-xs text-slate-500 font-bold">{{ $t('common.address') }}</span>
-                        <div class="text-xs text-slate-300 font-bold mt-1">{{ customer.address || '—' }}</div>
-                        <div v-if="customer.tax_number" class="text-[11px] text-slate-400 font-mono">{{ $t('invoices.tax_number') || 'الرقم الضريبي' }}: {{ customer.tax_number }}</div>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('common.address') }}</span>
+                        <div class="text-xs text-slate-700 dark:text-slate-300 font-bold mt-1">{{ customer.address || '—' }}</div>
+                        <div v-if="customer.tax_number" class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{{ $t('invoices.tax_number') || 'الرقم الضريبي' }}: {{ customer.tax_number }}</div>
                     </div>
 
                     <div>
-                        <span class="text-xs text-slate-500 font-bold">{{ $t('contacts.closing_balance') }}</span>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.closing_balance') }}</span>
                         <div
                             class="text-xl font-black font-mono mt-0.5"
-                            :class="customer.current_balance > 0 ? 'text-rose-400' : (customer.current_balance < 0 ? 'text-indigo-400' : 'text-slate-400')"
+                            :class="customer.current_balance > 0 ? 'text-rose-600 dark:text-rose-400' : (customer.current_balance < 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400')"
                         >
-                            {{ formatMoney(customer.current_balance) }} <span class="text-xs text-white">{{ $t('common.currency') }}</span>
+                            {{ formatMoney(customer.current_balance) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Date Range Filter & Presets -->
-                <div class="pt-3 border-t border-slate-800 space-y-3 no-print">
+                <div class="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-3 no-print">
                     <div class="flex flex-wrap items-center gap-1.5 text-xs">
-                        <span class="text-slate-500 font-bold text-[11px] ml-1">{{ $t('contacts.report_period') }}:</span>
-                        <button @click="applyDatePreset('today')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">{{ $t('dashboard.today') || 'اليوم' }}</button>
-                        <button @click="applyDatePreset('this_month')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">{{ $t('dashboard.this_month') || 'هذا الشهر' }}</button>
-                        <button @click="applyDatePreset('this_year')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">{{ $t('dashboard.this_year') || 'هذا العام' }}</button>
-                        <button @click="applyDatePreset('all')" type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition">{{ $t('common.all') }}</button>
+                        <span class="text-slate-500 dark:text-slate-400 font-bold text-[11px] ml-1">{{ $t('contacts.report_period') }}:</span>
+                        <button @click="applyDatePreset('today')" type="button" class="h-9 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold transition active:scale-95 cursor-pointer">{{ $t('dashboard.today') || 'اليوم' }}</button>
+                        <button @click="applyDatePreset('this_month')" type="button" class="h-9 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold transition active:scale-95 cursor-pointer">{{ $t('dashboard.this_month') || 'هذا الشهر' }}</button>
+                        <button @click="applyDatePreset('this_year')" type="button" class="h-9 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold transition active:scale-95 cursor-pointer">{{ $t('dashboard.this_year') || 'هذا العام' }}</button>
+                        <button @click="applyDatePreset('all')" type="button" class="h-9 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold transition active:scale-95 cursor-pointer">{{ $t('common.all') }}</button>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-3">
-                        <div class="w-44">
+                        <div class="w-full sm:w-44">
                             <DatePicker v-model="dateFrom" :placeholder="$t('contacts.from_date')" />
                         </div>
-                        <div class="w-44">
+                        <div class="w-full sm:w-44">
                             <DatePicker v-model="dateTo" :placeholder="$t('contacts.to_date')" />
                         </div>
                         <button
                             @click="filterStatement"
                             type="button"
-                            class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer"
+                            class="w-full sm:w-auto h-11 px-5 rounded-2xl btn-primary-theme text-xs font-black transition active:scale-95 cursor-pointer shadow-theme-primary"
                         >
                             {{ $t('common.filter') }}
                         </button>
@@ -145,84 +145,128 @@ const printStatement = () => {
                 </div>
             </div>
 
-            <!-- 3 Summary KPI Cards for Statement Period -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('contacts.period_debit') }}</span>
-                    <div class="text-xl font-black font-mono text-rose-400">
-                        {{ formatMoney(summary.total_debit) }} <span class="text-xs text-white">{{ $t('common.currency') }}</span>
+            <!-- 3 Summary KPI Cards for Statement Period (Bento Grid on Mobile) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4 font-tajawal">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold block">{{ $t('contacts.period_debit') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
+                        {{ formatMoney(summary.total_debit) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('contacts.period_credit') }}</span>
-                    <div class="text-xl font-black font-mono text-emerald-400">
-                        {{ formatMoney(summary.total_credit) }} <span class="text-xs text-white">{{ $t('common.currency') }}</span>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold block">{{ $t('contacts.period_credit') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                        {{ formatMoney(summary.total_credit) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('contacts.closing_balance') }}</span>
-                    <div class="text-xl font-black font-mono text-amber-400">
-                        {{ formatMoney(summary.current_balance) }} <span class="text-xs text-white">{{ $t('common.currency') }}</span>
+                <div class="col-span-2 sm:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold block">{{ $t('contacts.closing_balance') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-theme-primary">
+                        {{ formatMoney(summary.current_balance) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Ledger Table -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4 overflow-hidden">
-                <div class="overflow-x-auto">
+            <!-- Ledger Table & Mobile Cards -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-4 overflow-hidden font-tajawal">
+                <!-- Desktop Table (Hidden on Mobile) -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                 <th class="pb-3">{{ $t('common.date') }}</th>
                                 <th class="pb-3">{{ $t('contacts.transaction_type') }}</th>
                                 <th class="pb-3">{{ $t('contacts.reference_no') }}</th>
-                                <th class="pb-3 font-mono text-rose-400">{{ $t('contacts.period_debit') }}</th>
-                                <th class="pb-3 font-mono text-emerald-400">{{ $t('contacts.period_credit') }}</th>
-                                <th class="pb-3 font-mono text-amber-400">{{ $t('contacts.closing_balance') }}</th>
+                                <th class="pb-3 font-mono text-rose-600 dark:text-rose-400">{{ $t('contacts.period_debit') }}</th>
+                                <th class="pb-3 font-mono text-emerald-600 dark:text-emerald-400">{{ $t('contacts.period_credit') }}</th>
+                                <th class="pb-3 font-mono text-theme-primary">{{ $t('contacts.closing_balance') }}</th>
                                 <th class="pb-3">{{ $t('common.notes') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/60 font-sans">
-                            <tr v-for="(row, idx) in ledger" :key="idx" class="hover:bg-slate-800/30 transition">
-                                <td class="py-3 font-mono text-slate-400 text-[11px]">{{ row.date }}</td>
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
+                            <tr v-for="(row, idx) in ledger" :key="idx" class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
+                                <td class="py-3 font-mono text-slate-500 dark:text-slate-400 text-[11px]">{{ row.date }}</td>
 
                                 <td class="py-3 font-bold font-tajawal">
                                     <span
                                         class="px-2 py-0.5 rounded-lg text-[10.5px] font-bold border"
-                                        :class="row.type.includes('فاتورة') ? 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30' : (row.type.includes('قبض') ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : 'bg-amber-500/15 text-amber-400 border-amber-500/30')"
+                                        :class="row.type.includes('فاتورة') ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border-indigo-500/30' : (row.type.includes('قبض') ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30' : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30')"
                                     >
                                         {{ row.type }}
                                     </span>
                                 </td>
 
-                                <td class="py-3 font-mono text-white font-bold">
+                                <td class="py-3 font-mono text-slate-900 dark:text-white font-bold">
                                     {{ row.ref_number || '—' }}
                                 </td>
 
-                                <td class="py-3 font-mono font-bold text-rose-400">
+                                <td class="py-3 font-mono font-bold text-rose-600 dark:text-rose-400">
                                     {{ row.debit > 0 ? formatMoney(row.debit) : '—' }}
                                 </td>
 
-                                <td class="py-3 font-mono font-bold text-emerald-400">
+                                <td class="py-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">
                                     {{ row.credit > 0 ? formatMoney(row.credit) : '—' }}
                                 </td>
 
-                                <td class="py-3 font-mono font-black text-amber-400 text-sm">
+                                <td class="py-3 font-mono font-black text-theme-primary text-sm">
                                     {{ formatMoney(row.balance_after) }} {{ $t('common.currency') }}
                                 </td>
 
-                                <td class="py-3 text-slate-400 text-[11px] font-tajawal">
+                                <td class="py-3 text-slate-500 dark:text-slate-400 text-[11px] font-tajawal">
                                     {{ row.notes || '—' }}
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
 
-                    <div v-if="ledger.length === 0" class="py-12 text-center text-slate-500 text-xs font-bold font-tajawal">
-                        {{ $t('contacts.statement_empty') }}
+                <!-- Mobile Cards View (Visible on Small Screens) -->
+                <div class="md:hidden space-y-3">
+                    <div
+                        v-for="(row, idx) in ledger"
+                        :key="idx"
+                        class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-2.5 shadow-xs font-tajawal"
+                    >
+                        <!-- Top Row: Type + Reference + Date -->
+                        <div class="flex items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800/80 pb-2">
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="px-2 py-0.5 rounded-lg text-[10.5px] font-bold border"
+                                    :class="row.type.includes('فاتورة') ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border-indigo-500/30' : (row.type.includes('قبض') ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30' : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30')"
+                                >
+                                    {{ row.type }}
+                                </span>
+                                <span v-if="row.ref_number" class="font-mono text-xs font-black text-slate-900 dark:text-white">#{{ row.ref_number }}</span>
+                            </div>
+                            <span class="font-mono text-[11px] text-slate-400">{{ row.date }}</span>
+                        </div>
+
+                        <!-- Amounts Matrix -->
+                        <div class="grid grid-cols-3 gap-2 text-xs font-mono py-1">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('contacts.period_debit') }}</span>
+                                <span class="font-bold text-rose-600 dark:text-rose-400">{{ row.debit > 0 ? formatMoney(row.debit) : '—' }}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('contacts.period_credit') }}</span>
+                                <span class="font-bold text-emerald-600 dark:text-emerald-400">{{ row.credit > 0 ? formatMoney(row.credit) : '—' }}</span>
+                            </div>
+                            <div class="text-left">
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('contacts.closing_balance') }}</span>
+                                <span class="font-black text-theme-primary">{{ formatMoney(row.balance_after) }}</span>
+                            </div>
+                        </div>
+
+                        <div v-if="row.notes" class="text-[11px] text-slate-500 dark:text-slate-400 font-tajawal border-t border-slate-200 dark:border-slate-800/80 pt-1.5">
+                            📝 {{ row.notes }}
+                        </div>
                     </div>
+                </div>
+
+                <div v-if="ledger.length === 0" class="py-12 text-center text-slate-400 text-xs font-bold font-tajawal">
+                    {{ $t('contacts.statement_empty') }}
                 </div>
             </div>
         </div>

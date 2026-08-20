@@ -127,15 +127,15 @@ const submitUpdate = () => {
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="space-y-1">
                     <div class="flex items-center gap-3">
-                        <Link :href="`/invoices/${invoice.id}`" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                        <Link :href="`/invoices/${invoice.id}`" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-sm transition active:scale-90 shadow-xs border border-slate-200 dark:border-transparent">
                             →
                         </Link>
                         <div>
-                            <h1 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+                            <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                                 <span>{{ $t('invoices.edit_invoice') }}:</span>
-                                <span class="text-amber-400 font-mono">#{{ invoice.invoice_number }}</span>
+                                <span class="text-theme-primary font-mono">#{{ invoice.invoice_number }}</span>
                             </h1>
-                            <p class="text-xs text-slate-400 font-bold mt-0.5">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">
                                 {{ $t('invoices.subtitle') }}
                             </p>
                         </div>
@@ -145,9 +145,9 @@ const submitUpdate = () => {
 
             <form @submit.prevent="submitUpdate" class="space-y-6">
                 <!-- Top Details Grid -->
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('invoices.customer') }} *</label>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('invoices.customer') }} *</label>
                         <SearchableSelect
                             v-model="form.customer_id"
                             :options="customerOptions"
@@ -156,15 +156,15 @@ const submitUpdate = () => {
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('common.date') }} *</label>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.date') }} *</label>
                         <DatePicker v-model="form.invoice_date" :placeholder="$t('common.date')" />
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('invoices.payment_type') }} *</label>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('invoices.payment_type') }} *</label>
                         <select
                             v-model="form.payment_type"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                            class="w-full h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner"
                         >
                             <option value="cash">{{ $t('invoices.payment_cash') }} 💵</option>
                             <option value="credit">{{ $t('invoices.payment_credit') }} ⏳</option>
@@ -174,9 +174,9 @@ const submitUpdate = () => {
                 </div>
 
                 <!-- Add Items Section -->
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
-                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-slate-800 pb-3">
-                        <h2 class="text-sm font-black text-white flex items-center gap-2">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-4 font-tajawal">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
+                        <h2 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
                             <span>📦</span>
                             <span>{{ $t('pos.cart_items') }}</span>
                         </h2>
@@ -190,18 +190,18 @@ const submitUpdate = () => {
                             <button
                                 @click="addItemToInvoice"
                                 type="button"
-                                class="h-10 px-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shrink-0 transition cursor-pointer"
+                                class="h-11 px-5 rounded-2xl btn-primary-theme text-xs font-black shrink-0 transition active:scale-95 cursor-pointer shadow-theme-primary"
                             >
                                 + {{ $t('common.add') }}
                             </button>
                         </div>
                     </div>
 
-                    <!-- Items Table -->
-                    <div class="overflow-x-auto">
+                    <!-- Items Desktop Table (Hidden on Mobile) -->
+                    <div class="hidden md:block overflow-x-auto">
                         <table class="w-full text-right text-xs">
                             <thead>
-                                <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                                <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                     <th class="pb-3">{{ $t('inventory.item_name') }}</th>
                                     <th class="pb-3 w-28">{{ $t('common.quantity') }}</th>
                                     <th class="pb-3 w-28">{{ $t('invoices.unit_price') }}</th>
@@ -210,11 +210,11 @@ const submitUpdate = () => {
                                     <th class="pb-3 text-center w-12">{{ $t('common.delete') }}</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-800/60 font-sans">
-                                <tr v-for="(item, idx) in form.items" :key="idx" class="hover:bg-slate-800/30 transition">
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
+                                <tr v-for="(item, idx) in form.items" :key="idx" class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
                                     <td class="py-3 font-tajawal">
-                                        <div class="font-bold text-white">{{ item.name }}</div>
-                                        <div class="text-[10px] text-slate-500 font-mono">{{ item.code || '—' }} ({{ item.unit }})</div>
+                                        <div class="font-bold text-slate-900 dark:text-white">{{ item.name }}</div>
+                                        <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">{{ item.code || '—' }} ({{ item.unit }})</div>
                                     </td>
 
                                     <td class="py-3">
@@ -224,7 +224,7 @@ const submitUpdate = () => {
                                             type="number"
                                             step="0.001"
                                             min="0.001"
-                                            class="w-full px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono font-bold text-white text-center focus:border-amber-500 focus:outline-none"
+                                            class="w-full h-10 px-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-mono font-bold text-slate-900 dark:text-white text-center focus:border-amber-500 focus:outline-none shadow-inner"
                                         >
                                     </td>
 
@@ -235,7 +235,7 @@ const submitUpdate = () => {
                                             type="number"
                                             step="0.01"
                                             min="0"
-                                            class="w-full px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono font-bold text-white text-center focus:border-amber-500 focus:outline-none"
+                                            class="w-full h-10 px-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-mono font-bold text-slate-900 dark:text-white text-center focus:border-amber-500 focus:outline-none shadow-inner"
                                         >
                                     </td>
 
@@ -246,11 +246,11 @@ const submitUpdate = () => {
                                             type="number"
                                             step="0.01"
                                             min="0"
-                                            class="w-full px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-rose-400 text-center focus:border-amber-500 focus:outline-none"
+                                            class="w-full h-10 px-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-mono text-rose-600 dark:text-rose-400 font-bold text-center focus:border-amber-500 focus:outline-none shadow-inner"
                                         >
                                     </td>
 
-                                    <td class="py-3 font-mono font-black text-amber-400">
+                                    <td class="py-3 font-mono font-black text-theme-primary">
                                         {{ formatMoney(item.total_price) }} {{ $t('common.currency') }}
                                     </td>
 
@@ -258,7 +258,7 @@ const submitUpdate = () => {
                                         <button
                                             @click="removeItem(idx)"
                                             type="button"
-                                            class="p-1 rounded-lg text-rose-400 hover:bg-rose-500/20 transition cursor-pointer"
+                                            class="w-9 h-9 rounded-xl bg-rose-500/15 hover:bg-rose-500/30 text-rose-600 dark:text-rose-400 flex items-center justify-center transition active:scale-90 cursor-pointer"
                                         >
                                             🗑️
                                         </button>
@@ -266,28 +266,97 @@ const submitUpdate = () => {
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
 
-                        <div v-if="form.items.length === 0" class="py-10 text-center text-slate-500 text-xs font-bold">
-                            ⚠️ {{ $t('pos.empty_cart') }}
+                    <!-- Items Mobile Cards (Visible on Small Screens) -->
+                    <div class="md:hidden space-y-3 font-tajawal">
+                        <div
+                            v-for="(item, idx) in form.items"
+                            :key="idx"
+                            class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-3 shadow-xs"
+                        >
+                            <!-- Top: Name + Delete -->
+                            <div class="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2.5">
+                                <div>
+                                    <div class="font-bold text-sm text-slate-900 dark:text-white">{{ item.name }}</div>
+                                    <div class="text-[10px] text-slate-500 font-mono">{{ item.code || '—' }} ({{ item.unit }})</div>
+                                </div>
+                                <button
+                                    @click="removeItem(idx)"
+                                    type="button"
+                                    class="w-9 h-9 rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400 flex items-center justify-center transition active:scale-90 cursor-pointer shrink-0"
+                                >
+                                    🗑️
+                                </button>
+                            </div>
+
+                            <!-- Inputs Grid -->
+                            <div class="grid grid-cols-3 gap-2">
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400">{{ $t('common.quantity') }}</label>
+                                    <input
+                                        v-model.number="item.quantity"
+                                        @input="calculateLineTotal(item)"
+                                        type="number"
+                                        step="0.001"
+                                        min="0.001"
+                                        class="w-full h-10 px-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-mono font-bold text-slate-900 dark:text-white text-center focus:outline-none shadow-inner"
+                                    >
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400">{{ $t('invoices.unit_price') }}</label>
+                                    <input
+                                        v-model.number="item.unit_price"
+                                        @input="calculateLineTotal(item)"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        class="w-full h-10 px-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-mono font-bold text-slate-900 dark:text-white text-center focus:outline-none shadow-inner"
+                                    >
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400">{{ $t('invoices.discount') }}</label>
+                                    <input
+                                        v-model.number="item.discount_amount"
+                                        @input="calculateLineTotal(item)"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        class="w-full h-10 px-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-mono font-bold text-rose-600 dark:text-rose-400 text-center focus:outline-none shadow-inner"
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Line Total -->
+                            <div class="flex items-center justify-between text-xs font-mono pt-2 border-t border-slate-200 dark:border-slate-800">
+                                <span class="text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('common.total') }}:</span>
+                                <span class="font-black text-sm text-theme-primary">{{ formatMoney(item.total_price) }} {{ $t('common.currency') }}</span>
+                            </div>
                         </div>
+                    </div>
+
+                    <div v-if="form.items.length === 0" class="py-10 text-center text-slate-400 text-xs font-bold font-tajawal">
+                        ⚠️ {{ $t('pos.empty_cart') }}
                     </div>
                 </div>
 
                 <!-- Financial Summary & Actions -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 font-tajawal">
                     <!-- Left: Notes & Discounts -->
-                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
-                        <h2 class="text-xs font-black text-white border-b border-slate-800 pb-2 flex items-center gap-2">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-4">
+                        <h2 class="text-xs font-black text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2 flex items-center gap-2">
                             <span>🏷️</span>
                             <span>{{ $t('invoices.discount') }} & {{ $t('invoices.shipping') }}</span>
                         </h2>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="space-y-1">
-                                <label class="text-[11px] font-bold text-slate-300">{{ $t('invoices.discount') }}</label>
+                                <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300">{{ $t('invoices.discount') }}</label>
                                 <select
                                     v-model="form.discount_type"
-                                    class="w-full px-3 py-2 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                                    class="w-full h-11 px-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner"
                                 >
                                     <option value="fixed">{{ $t('common.fixed_amount') || 'مبلغ ثابت' }}</option>
                                     <option value="percentage">{{ $t('common.percentage') || 'نسبة مئوية (%)' }}</option>
@@ -295,72 +364,72 @@ const submitUpdate = () => {
                             </div>
 
                             <div class="space-y-1">
-                                <label class="text-[11px] font-bold text-slate-300">{{ $t('invoices.discount') }}</label>
+                                <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300">{{ $t('invoices.discount') }}</label>
                                 <input
                                     v-model.number="form.discount_value"
                                     type="number"
                                     step="0.01"
                                     min="0"
-                                    class="w-full px-3 py-2 rounded-2xl bg-slate-950 border border-slate-800 text-xs font-mono font-bold text-rose-400 focus:border-amber-500 focus:outline-none"
+                                    class="w-full h-11 px-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm font-mono font-bold text-rose-600 dark:text-rose-400 focus:border-amber-500 focus:outline-none shadow-inner"
                                 >
                             </div>
                         </div>
 
                         <div class="space-y-1">
-                            <label class="text-[11px] font-bold text-slate-300">{{ $t('invoices.notes') }}</label>
+                            <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300">{{ $t('invoices.notes') }}</label>
                             <textarea
                                 v-model="form.notes"
                                 rows="3"
                                 :placeholder="$t('invoices.notes')"
-                                class="w-full px-3 py-2 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                                class="w-full p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner"
                             ></textarea>
                         </div>
                     </div>
 
                     <!-- Right: Calculations & Save -->
-                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
-                        <h2 class="text-xs font-black text-white border-b border-slate-800 pb-2 flex items-center gap-2">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-4">
+                        <h2 class="text-xs font-black text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2 flex items-center gap-2">
                             <span>💰</span>
                             <span>{{ $t('invoices.financial_summary') }}</span>
                         </h2>
 
-                        <div class="space-y-2 text-xs">
-                            <div class="flex justify-between text-slate-400">
+                        <div class="space-y-2 text-xs font-mono">
+                            <div class="flex justify-between text-slate-500 dark:text-slate-400 font-tajawal">
                                 <span>{{ $t('invoices.subtotal') }}:</span>
-                                <span class="font-mono text-white">{{ formatMoney(subtotal) }} {{ $t('common.currency') }}</span>
+                                <span class="font-mono text-slate-900 dark:text-white font-bold">{{ formatMoney(subtotal) }} {{ $t('common.currency') }}</span>
                             </div>
 
-                            <div class="flex justify-between text-slate-400">
+                            <div class="flex justify-between text-slate-500 dark:text-slate-400 font-tajawal">
                                 <span>{{ $t('invoices.discount') }}:</span>
-                                <span class="font-mono text-rose-400">- {{ formatMoney(discountTotal) }} {{ $t('common.currency') }}</span>
+                                <span class="font-mono text-rose-600 dark:text-rose-400 font-bold">- {{ formatMoney(discountTotal) }} {{ $t('common.currency') }}</span>
                             </div>
 
-                            <div class="flex justify-between pt-2 border-t border-slate-800 text-sm font-black text-white">
+                            <div class="flex justify-between pt-2 border-t border-slate-200 dark:border-slate-800 text-sm font-black text-slate-900 dark:text-white font-tajawal">
                                 <span>{{ $t('invoices.net_total') }}:</span>
-                                <span class="font-mono text-amber-400 text-base">{{ formatMoney(netTotal) }} {{ $t('common.currency') }}</span>
+                                <span class="font-mono text-theme-primary text-base">{{ formatMoney(netTotal) }} {{ $t('common.currency') }}</span>
                             </div>
 
                             <div v-if="form.payment_type !== 'credit'" class="pt-2">
-                                <label class="text-[11px] font-bold text-slate-300 block mb-1">{{ $t('invoices.paid') }} ({{ $t('common.currency') }})</label>
+                                <label class="text-[11px] font-bold text-slate-700 dark:text-slate-300 block mb-1 font-tajawal">{{ $t('invoices.paid') }} ({{ $t('common.currency') }})</label>
                                 <input
                                     v-model.number="form.paid_amount"
                                     type="number"
                                     step="0.01"
                                     min="0"
-                                    class="w-full px-3 py-2 rounded-2xl bg-slate-950 border border-slate-800 text-xs font-mono font-bold text-emerald-400 focus:border-amber-500 focus:outline-none"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm font-mono font-bold text-emerald-600 dark:text-emerald-400 focus:border-amber-500 focus:outline-none shadow-inner"
                                 >
                             </div>
 
-                            <div class="flex justify-between text-slate-400 pt-1">
+                            <div class="flex justify-between text-slate-500 dark:text-slate-400 pt-1 font-tajawal">
                                 <span>{{ $t('invoices.remaining') }}:</span>
-                                <span class="font-mono text-rose-400 font-bold">{{ formatMoney(remainingAmount) }} {{ $t('common.currency') }}</span>
+                                <span class="font-mono text-rose-600 dark:text-rose-400 font-bold">{{ formatMoney(remainingAmount) }} {{ $t('common.currency') }}</span>
                             </div>
                         </div>
 
-                        <div class="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
+                        <div class="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-3">
                             <Link
                                 :href="`/invoices/${invoice.id}`"
-                                class="px-5 py-2.5 rounded-2xl border border-slate-700 hover:bg-slate-800 text-slate-300 text-xs font-bold transition"
+                                class="h-11 px-5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition flex items-center justify-center active:scale-95 shadow-xs"
                             >
                                 {{ $t('common.cancel') }}
                             </Link>
@@ -368,7 +437,7 @@ const submitUpdate = () => {
                             <button
                                 type="submit"
                                 :disabled="form.processing || form.items.length === 0"
-                                class="px-6 py-2.5 rounded-2xl btn-primary-theme font-black text-xs transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                                class="h-11 px-6 rounded-2xl btn-primary-theme font-black text-xs transition transform active:scale-95 cursor-pointer disabled:opacity-50 shadow-theme-primary"
                             >
                                 {{ form.processing ? $t('common.save') + '...' : $t('common.save') + ' 💾' }}
                             </button>

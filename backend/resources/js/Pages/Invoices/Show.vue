@@ -63,31 +63,31 @@ const getPaymentBadge = computed(() => {
             <!-- Header & Action Bar -->
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="space-y-1">
-                    <div class="flex items-center gap-3">
-                        <Link href="/invoices" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                    <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                        <Link href="/invoices" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-sm transition active:scale-90 shadow-xs border border-slate-200 dark:border-transparent">
                             →
                         </Link>
-                        <h1 class="text-xl sm:text-2xl font-black text-white">
-                            {{ $t('invoices.invoice_number') }} #<span class="font-mono text-amber-400">{{ invoice.invoice_number }}</span>
+                        <h1 class="text-lg sm:text-2xl font-black text-slate-900 dark:text-white">
+                            {{ $t('invoices.invoice_number') }} #<span class="font-mono text-theme-primary">{{ invoice.invoice_number }}</span>
                         </h1>
                         <span class="px-2.5 py-1 rounded-xl text-xs font-bold border" :class="getPaymentBadge.class">
                             {{ getPaymentBadge.label }}
                         </span>
-                        <span v-if="invoice.status === 'cancelled'" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                        <span v-if="invoice.status === 'cancelled'" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30">
                             {{ $t('invoices.status_cancelled') }}
                         </span>
                     </div>
-                    <p class="text-xs text-slate-400">
-                        {{ $t('common.date') }}: <span class="font-mono">{{ invoice.formatted_created_at || invoice.invoice_date }}</span> • {{ $t('common.store') }}: <span class="text-slate-200">{{ invoice.store?.name }}</span> • {{ $t('invoices.cashier') }}: <span class="text-slate-200">{{ invoice.cashier_name }}</span>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
+                        {{ $t('common.date') }}: <span class="font-mono">{{ invoice.formatted_created_at || invoice.invoice_date }}</span> • {{ $t('common.store') }}: <span class="text-slate-900 dark:text-slate-200">{{ invoice.store?.name }}</span> • {{ $t('invoices.cashier') }}: <span class="text-slate-900 dark:text-slate-200">{{ invoice.cashier_name }}</span>
                     </p>
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                     <Link
                         v-if="invoice.status !== 'cancelled'"
                         :href="`/invoices/${invoice.id}/edit`"
-                        class="px-4 py-2.5 rounded-2xl btn-primary-theme font-black text-xs flex items-center gap-1.5 transition transform active:scale-95 cursor-pointer"
+                        class="flex-1 sm:flex-none h-11 px-4 rounded-2xl btn-primary-theme font-black text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-theme-primary"
                     >
                         <span>✏️</span>
                         <span>{{ $t('invoices.edit_invoice') }}</span>
@@ -96,7 +96,7 @@ const getPaymentBadge = computed(() => {
                     <button
                         @click="printThermal"
                         type="button"
-                        class="px-4 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-emerald-500/20 transition cursor-pointer"
+                        class="flex-1 sm:flex-none h-11 px-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 transition active:scale-95 cursor-pointer"
                     >
                         <span>🖨️</span>
                         <span>{{ $t('invoices.print_thermal') }}</span>
@@ -105,17 +105,17 @@ const getPaymentBadge = computed(() => {
                     <button
                         @click="printA4"
                         type="button"
-                        class="px-4 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center gap-1.5 border border-slate-700 transition cursor-pointer"
+                        class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-700 transition active:scale-95 cursor-pointer shadow-xs"
                     >
                         <span>📄</span>
-                        <span>{{ $t('invoices.print_a4') }}</span>
+                        <span class="hidden sm:inline">{{ $t('invoices.print_a4') }}</span>
                     </button>
 
                     <button
                         v-if="invoice.status !== 'cancelled'"
                         @click="showCancelModal = true"
                         type="button"
-                        class="px-4 py-2.5 rounded-2xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 text-rose-400 font-black text-xs flex items-center gap-1.5 transition cursor-pointer"
+                        class="h-11 px-4 rounded-2xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-600 dark:text-rose-400 font-black text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
                     >
                         <span>⚠️</span>
                         <span>{{ $t('invoices.cancel_invoice') }}</span>
@@ -123,59 +123,60 @@ const getPaymentBadge = computed(() => {
                 </div>
             </div>
 
-            <!-- Customer & Invoice Overview Card -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Customer & Invoice Overview Card (Bento Grid on Mobile) -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-4 font-tajawal">
                 <!-- Customer Card -->
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
-                    <span class="text-xs text-slate-500 font-bold">{{ $t('invoices.customer_details') }}</span>
-                    <div class="text-base font-black text-white">
+                <div class="col-span-2 md:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 space-y-2 shadow-xs">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('invoices.customer_details') }}</span>
+                    <div class="text-base font-black text-slate-900 dark:text-white">
                         {{ invoice.customer?.name || $t('pos.cash_customer') }}
                     </div>
-                    <div v-if="invoice.customer?.phone" class="text-xs text-slate-400 font-mono" dir="ltr">
+                    <div v-if="invoice.customer?.phone" class="text-xs text-slate-500 dark:text-slate-400 font-mono" dir="ltr">
                         📱 {{ invoice.customer.phone }}
                     </div>
-                    <div v-if="invoice.customer" class="text-xs text-slate-400">
-                        {{ $t('contacts.balance') }}: <span class="font-mono font-bold text-amber-400">{{ formatMoney(invoice.customer.balance) }} {{ $t('common.currency') }}</span>
+                    <div v-if="invoice.customer" class="text-xs text-slate-500 dark:text-slate-400">
+                        {{ $t('contacts.balance') }}: <span class="font-mono font-bold text-theme-primary">{{ formatMoney(invoice.customer.balance) }} {{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
                 <!-- Financial Card 1 -->
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
-                    <span class="text-xs text-slate-500 font-bold">{{ $t('invoices.subtotal') }} & {{ $t('invoices.discount') }}</span>
-                    <div class="text-xl font-black font-mono text-white">
-                        {{ formatMoney(invoice.total_amount) }} <span class="text-xs text-slate-400">{{ $t('common.currency') }}</span>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 space-y-1.5 shadow-xs">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('invoices.subtotal') }} & {{ $t('invoices.discount') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-slate-900 dark:text-white">
+                        {{ formatMoney(invoice.total_amount) }} <span class="text-[11px] text-slate-500 dark:text-slate-400">{{ $t('common.currency') }}</span>
                     </div>
-                    <div class="text-xs text-slate-400">
-                        {{ $t('invoices.discount') }}: <span class="font-mono text-rose-400">{{ formatMoney(invoice.discount_amount) }} {{ $t('common.currency') }}</span>
+                    <div class="text-xs text-slate-500 dark:text-slate-400">
+                        {{ $t('invoices.discount') }}: <span class="font-mono font-bold text-rose-600 dark:text-rose-400">{{ formatMoney(invoice.discount_amount) }} {{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
                 <!-- Financial Card 2 (Net & Paid) -->
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
-                    <span class="text-xs text-slate-500 font-bold">{{ $t('invoices.net_total') }} & {{ $t('invoices.paid') }}</span>
-                    <div class="text-2xl font-black font-mono text-emerald-400">
-                        {{ formatMoney(invoice.net_total) }} <span class="text-xs text-white">{{ $t('common.currency') }}</span>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 space-y-1.5 shadow-xs">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('invoices.net_total') }} & {{ $t('invoices.paid') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                        {{ formatMoney(invoice.net_total) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
-                    <div class="text-xs text-slate-300 flex items-center justify-between">
-                        <span>{{ $t('invoices.paid') }}: <b class="font-mono">{{ formatMoney(invoice.paid_amount) }}</b></span>
-                        <span v-if="Number(invoice.remaining_amount) > 0" class="text-rose-400 font-bold">
+                    <div class="text-xs text-slate-600 dark:text-slate-300 flex items-center justify-between">
+                        <span>{{ $t('invoices.paid') }}: <b class="font-mono text-slate-900 dark:text-white">{{ formatMoney(invoice.paid_amount) }}</b></span>
+                        <span v-if="Number(invoice.remaining_amount) > 0" class="text-rose-600 dark:text-rose-400 font-bold">
                             {{ $t('invoices.remaining') }}: <b class="font-mono">{{ formatMoney(invoice.remaining_amount) }}</b>
                         </span>
                     </div>
                 </div>
             </div>
 
-            <!-- Items Table -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
-                <h3 class="text-sm font-black text-white flex items-center gap-2">
+            <!-- Items Table & Mobile Cards -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-4 font-tajawal">
+                <h3 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2.5">
                     <span>📦</span>
                     <span>{{ $t('pos.cart_items') }}</span>
                 </h3>
 
-                <div class="overflow-x-auto">
+                <!-- Desktop Table (Hidden on Mobile) -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                 <th class="pb-3">#</th>
                                 <th class="pb-3">{{ $t('inventory.item_name') }}</th>
                                 <th class="pb-3">{{ $t('common.quantity') }}</th>
@@ -183,20 +184,20 @@ const getPaymentBadge = computed(() => {
                                 <th class="pb-3 text-left">{{ $t('common.total') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/60 font-sans">
-                            <tr v-for="(item, idx) in invoice.items" :key="item.id" class="hover:bg-slate-800/30 transition">
-                                <td class="py-3 text-slate-500 font-mono">{{ idx + 1 }}</td>
-                                <td class="py-3 font-bold text-white font-tajawal">
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
+                            <tr v-for="(item, idx) in invoice.items" :key="item.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
+                                <td class="py-3 text-slate-400 font-mono">{{ idx + 1 }}</td>
+                                <td class="py-3 font-bold text-slate-900 dark:text-white font-tajawal">
                                     {{ item.item_name }}
-                                    <span v-if="item.item_code" class="text-[10px] text-slate-500 font-mono block">{{ $t('inventory.item_code') }}: {{ item.item_code }}</span>
+                                    <span v-if="item.item_code" class="text-[10px] text-slate-400 font-mono block">{{ $t('inventory.item_code') }}: {{ item.item_code }}</span>
                                 </td>
-                                <td class="py-3 font-mono font-bold text-slate-200">
+                                <td class="py-3 font-mono font-bold text-slate-700 dark:text-slate-200">
                                     {{ item.quantity }} {{ item.unit }}
                                 </td>
-                                <td class="py-3 font-mono text-slate-300">
+                                <td class="py-3 font-mono text-slate-600 dark:text-slate-300">
                                     {{ formatMoney(item.unit_price) }}
                                 </td>
-                                <td class="py-3 font-mono font-bold text-emerald-400 text-left text-sm">
+                                <td class="py-3 font-mono font-bold text-emerald-600 dark:text-emerald-400 text-left text-sm">
                                     {{ formatMoney(item.total_price) }}
                                 </td>
                             </tr>
@@ -204,30 +205,54 @@ const getPaymentBadge = computed(() => {
                     </table>
                 </div>
 
+                <!-- Mobile Cards View (Visible on Small Screens) -->
+                <div class="md:hidden space-y-2.5">
+                    <div
+                        v-for="(item, idx) in invoice.items"
+                        :key="item.id"
+                        class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-2 shadow-xs"
+                    >
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="font-bold text-xs text-slate-900 dark:text-white font-tajawal">
+                                <span>{{ idx + 1 }}. </span>{{ item.item_name }}
+                                <span v-if="item.item_code" class="text-[10px] text-slate-400 font-mono block">#{{ item.item_code }}</span>
+                            </div>
+                            <span class="font-mono font-black text-xs text-emerald-600 dark:text-emerald-400 shrink-0">
+                                {{ formatMoney(item.total_price) }} {{ $t('common.currency') }}
+                            </span>
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-mono pt-1 border-t border-slate-200 dark:border-slate-800/80">
+                            <span>الكمية: <b class="text-slate-900 dark:text-white">{{ item.quantity }} {{ item.unit }}</b></span>
+                            <span>السعر: <b class="text-slate-900 dark:text-white">{{ formatMoney(item.unit_price) }}</b></span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Notes -->
-                <div v-if="invoice.notes" class="p-3 rounded-2xl bg-slate-950/60 border border-slate-800 text-xs text-slate-300">
-                    <span class="font-bold text-amber-400">{{ $t('common.notes') }}:</span> {{ invoice.notes }}
+                <div v-if="invoice.notes" class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300">
+                    <span class="font-bold text-theme-primary">{{ $t('common.notes') }}:</span> {{ invoice.notes }}
                 </div>
             </div>
 
             <!-- Additional Expenses Section (if any) -->
-            <div v-if="invoice.expenses && invoice.expenses.length > 0" class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-3">
-                <h3 class="text-sm font-black text-white flex items-center gap-2">
+            <div v-if="invoice.expenses && invoice.expenses.length > 0" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xs space-y-3 font-tajawal">
+                <h3 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2.5">
                     <span>🚚</span>
                     <span>{{ $t('invoices.shipping') }}</span>
                 </h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                 <th class="pb-2">{{ $t('common.notes') }}</th>
                                 <th class="pb-2 text-left font-mono">{{ $t('common.total') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/60 font-sans">
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
                             <tr v-for="exp in invoice.expenses" :key="exp.id">
-                                <td class="py-2.5 font-bold text-slate-200 font-tajawal">{{ exp.title }}</td>
-                                <td class="py-2.5 font-mono font-bold text-emerald-400 text-left">{{ formatMoney(exp.amount) }} {{ $t('common.currency') }}</td>
+                                <td class="py-2.5 font-bold text-slate-900 dark:text-slate-200 font-tajawal">{{ exp.title }}</td>
+                                <td class="py-2.5 font-mono font-bold text-emerald-600 dark:text-emerald-400 text-left">{{ formatMoney(exp.amount) }} {{ $t('common.currency') }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -235,31 +260,31 @@ const getPaymentBadge = computed(() => {
             </div>
 
             <!-- Payments History Log Section -->
-            <div v-if="invoice.payments && invoice.payments.length > 0" class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-3">
-                <h3 class="text-sm font-black text-white flex items-center gap-2">
+            <div v-if="invoice.payments && invoice.payments.length > 0" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xs space-y-3 font-tajawal">
+                <h3 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2.5">
                     <span>💳</span>
                     <span>{{ $t('invoices.financial_summary') }}</span>
                 </h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                 <th class="pb-2">{{ $t('common.date') }}</th>
                                 <th class="pb-2">{{ $t('invoices.paid') }}</th>
                                 <th class="pb-2">{{ $t('invoices.payment_method') }}</th>
                                 <th class="pb-2 text-left">{{ $t('common.user') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/60 font-sans">
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
                             <tr v-for="pay in invoice.payments" :key="pay.id">
-                                <td class="py-2.5 font-mono text-slate-300">{{ pay.payment_date }}</td>
-                                <td class="py-2.5 font-mono font-bold text-emerald-400">{{ formatMoney(pay.amount) }} {{ $t('common.currency') }}</td>
-                                <td class="py-2.5 font-tajawal text-slate-300">
-                                    <span class="px-2 py-0.5 rounded-lg bg-slate-800 border border-slate-700 text-[11px] font-bold">
+                                <td class="py-2.5 font-mono text-slate-700 dark:text-slate-300">{{ pay.payment_date }}</td>
+                                <td class="py-2.5 font-mono font-bold text-emerald-600 dark:text-emerald-400">{{ formatMoney(pay.amount) }} {{ $t('common.currency') }}</td>
+                                <td class="py-2.5 font-tajawal text-slate-700 dark:text-slate-300">
+                                    <span class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-bold">
                                         {{ pay.payment_method === 'instapay' ? '⚡ ' + $t('invoices.payment_instapay') : (pay.payment_method === 'wallet' ? '📱 ' + $t('invoices.payment_wallet') : '💵 ' + $t('invoices.payment_cash')) }}
                                     </span>
                                 </td>
-                                <td class="py-2.5 text-left text-slate-400 font-tajawal">{{ pay.user_name || $t('invoices.cashier') }}</td>
+                                <td class="py-2.5 text-left text-slate-500 dark:text-slate-400 font-tajawal">{{ pay.user_name || $t('invoices.cashier') }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -268,26 +293,32 @@ const getPaymentBadge = computed(() => {
         </div>
 
         <!-- Cancel Invoice Reason Modal -->
-        <div v-if="showCancelModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl font-tajawal animate-in fade-in zoom-in-95 duration-150">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="text-base font-black text-white flex items-center gap-2">
+        <div v-if="showCancelModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs select-none">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl font-tajawal">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
                         <span>⚠️ {{ $t('invoices.cancel_modal_title') }}</span>
                     </h3>
-                    <button @click="showCancelModal = false" class="text-slate-400 hover:text-white font-bold cursor-pointer">✕</button>
+                    <button
+                        @click="showCancelModal = false"
+                        type="button"
+                        class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center justify-center text-sm font-bold transition active:scale-90 cursor-pointer shadow-xs"
+                    >
+                        ✕
+                    </button>
                 </div>
 
-                <p class="text-xs text-slate-300">
+                <p class="text-xs text-slate-600 dark:text-slate-300">
                     {{ $t('invoices.cancel_modal_desc', { number: invoice.invoice_number }) }}
                 </p>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-slate-300">{{ $t('invoices.cancel_reason_label') }}</label>
+                    <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('invoices.cancel_reason_label') }}</label>
                     <textarea
                         v-model="cancelReason"
                         rows="3"
                         :placeholder="$t('invoices.cancel_reason_placeholder')"
-                        class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white placeholder:text-slate-500 focus:border-rose-500 focus:outline-none"
+                        class="w-full p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-rose-500 focus:outline-none shadow-inner"
                     ></textarea>
                 </div>
 
@@ -295,7 +326,7 @@ const getPaymentBadge = computed(() => {
                     <button
                         @click="showCancelModal = false"
                         type="button"
-                        class="flex-1 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
+                        class="flex-1 h-11 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95 cursor-pointer shadow-xs"
                     >
                         {{ $t('common.cancel') }}
                     </button>
@@ -303,7 +334,7 @@ const getPaymentBadge = computed(() => {
                         :disabled="isCancelling || !cancelReason || cancelReason.trim().length < 3"
                         @click="confirmCancel"
                         type="button"
-                        class="flex-1 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-black transition shadow-lg shadow-rose-600/30 cursor-pointer"
+                        class="flex-1 h-11 rounded-2xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-black transition active:scale-95 shadow-md shadow-rose-600/30 cursor-pointer"
                     >
                         {{ isCancelling ? '...' : $t('invoices.confirm_cancel_btn') }}
                     </button>

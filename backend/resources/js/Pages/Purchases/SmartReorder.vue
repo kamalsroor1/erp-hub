@@ -79,25 +79,25 @@ const createPurchaseFromSelected = () => {
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="space-y-1">
                     <div class="flex items-center gap-3">
-                        <Link href="/purchases" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                        <Link href="/purchases" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-sm transition active:scale-90 shadow-xs border border-slate-200 dark:border-transparent">
                             →
                         </Link>
                         <div>
-                            <h1 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+                            <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                                 <span>🧠 {{ $t('purchases.smart_reorder') }}</span>
                             </h1>
-                            <p class="text-xs text-slate-400 font-bold mt-0.5">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">
                                 {{ $t('purchases.smart_reorder_sub') }}
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2.5">
+                <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
                     <button
                         @click="selectAllCritical"
                         type="button"
-                        class="h-11 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold transition cursor-pointer"
+                        class="flex-1 sm:flex-none h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-theme-primary border border-slate-200 dark:border-slate-700 text-xs font-bold transition active:scale-95 cursor-pointer shadow-xs"
                     >
                         ⚡ {{ $t('purchases.select_all_critical') }}
                     </button>
@@ -106,7 +106,7 @@ const createPurchaseFromSelected = () => {
                         @click="createPurchaseFromSelected"
                         :disabled="selectedItemIds.length === 0"
                         type="button"
-                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                        class="flex-1 sm:flex-none h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-theme-primary"
                     >
                         <span>📥</span>
                         <span>{{ $t('purchases.generate_po_for_selected', { count: selectedItemIds.length }) }}</span>
@@ -114,83 +114,83 @@ const createPurchaseFromSelected = () => {
                 </div>
             </div>
 
-            <!-- Top Analytics Metric Cards -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-1">
+            <!-- Top Analytics Metric Cards (Bento Grid on Mobile) -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 font-tajawal">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 shadow-xs space-y-1">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs text-slate-400 font-bold">{{ $t('purchases.critical_stockouts') }}</span>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('purchases.critical_stockouts') }}</span>
                         <span class="text-sm">🚨</span>
                     </div>
-                    <div class="text-2xl font-black font-mono text-rose-400">
+                    <div class="text-xl sm:text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
                         {{ metrics.critical_count || 0 }}
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-1">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 shadow-xs space-y-1">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs text-slate-400 font-bold">{{ $t('purchases.warning_stockouts') }}</span>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('purchases.warning_stockouts') }}</span>
                         <span class="text-sm">⚠️</span>
                     </div>
-                    <div class="text-2xl font-black font-mono text-amber-400">
+                    <div class="text-xl sm:text-2xl font-black font-mono text-theme-primary">
                         {{ metrics.warning_count || 0 }}
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-1">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 shadow-xs space-y-1">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs text-slate-400 font-bold">{{ $t('purchases.safe_stockouts') }}</span>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('purchases.safe_stockouts') }}</span>
                         <span class="text-sm">✅</span>
                     </div>
-                    <div class="text-2xl font-black font-mono text-emerald-400">
+                    <div class="text-xl sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
                         {{ metrics.safe_count || 0 }}
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-1">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 shadow-xs space-y-1">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs text-slate-400 font-bold">{{ $t('purchases.total_reorder_cost') }}</span>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('purchases.total_reorder_cost') }}</span>
                         <span class="text-sm">💰</span>
                     </div>
-                    <div class="text-2xl font-black font-mono text-white">
-                        {{ formatMoney(metrics.total_estimated_cost || 0) }} <span class="text-xs text-amber-400">{{ $t('common.currency') }}</span>
+                    <div class="text-xl sm:text-2xl font-black font-mono text-slate-900 dark:text-white">
+                        {{ formatMoney(metrics.total_estimated_cost || 0) }} <span class="text-[11px] text-theme-primary">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- Filter Controls Bar -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 font-tajawal">
                 <div class="flex flex-wrap items-center gap-3">
                     <!-- Urgency Filter Tabs -->
-                    <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-2xl border border-slate-800 text-xs font-bold">
+                    <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-950 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs font-bold w-full sm:w-auto overflow-x-auto">
                         <button
                             @click="urgencyFilter = 'all'; applyFilters();"
                             type="button"
-                            class="px-3 py-1.5 rounded-xl transition cursor-pointer"
-                            :class="urgencyFilter === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'"
+                            class="flex-1 sm:flex-none h-9 px-3 rounded-xl transition cursor-pointer active:scale-95"
+                            :class="urgencyFilter === 'all' ? 'tab-theme-active' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                         >
                             {{ $t('common.all') }} ({{ suggestions.length }})
                         </button>
                         <button
                             @click="urgencyFilter = 'critical'; applyFilters();"
                             type="button"
-                            class="px-3 py-1.5 rounded-xl transition cursor-pointer"
-                            :class="urgencyFilter === 'critical' ? 'bg-rose-500 text-white font-black' : 'text-slate-400 hover:text-white'"
+                            class="flex-1 sm:flex-none h-9 px-3 rounded-xl transition cursor-pointer active:scale-95"
+                            :class="urgencyFilter === 'critical' ? 'bg-rose-500 text-white font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                         >
                             {{ $t('purchases.status_critical') }} 🚨
                         </button>
                         <button
                             @click="urgencyFilter = 'warning'; applyFilters();"
                             type="button"
-                            class="px-3 py-1.5 rounded-xl transition cursor-pointer"
-                            :class="urgencyFilter === 'warning' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white'"
+                            class="flex-1 sm:flex-none h-9 px-3 rounded-xl transition cursor-pointer active:scale-95"
+                            :class="urgencyFilter === 'warning' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                         >
                             {{ $t('purchases.status_warning') }} ⚠️
                         </button>
                         <button
                             @click="urgencyFilter = 'safe'; applyFilters();"
                             type="button"
-                            class="px-3 py-1.5 rounded-xl transition cursor-pointer"
-                            :class="urgencyFilter === 'safe' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'text-slate-400 hover:text-white'"
+                            class="flex-1 sm:flex-none h-9 px-3 rounded-xl transition cursor-pointer active:scale-95"
+                            :class="urgencyFilter === 'safe' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                         >
                             {{ $t('purchases.status_safe') }} ✅
                         </button>
@@ -201,19 +201,19 @@ const createPurchaseFromSelected = () => {
                         v-if="stores.length > 0"
                         v-model="selectedStoreId"
                         @change="applyFilters"
-                        class="h-10 px-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:border-amber-500 focus:outline-none"
+                        class="h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-slate-200 focus:border-amber-500 focus:outline-none shadow-inner"
                     >
                         <option value="all">{{ $t('common.all_stores') }}</option>
                         <option v-for="st in stores" :key="st.id" :value="st.id">{{ st.name }}</option>
                     </select>
 
                     <!-- Analysis Period & Target Days -->
-                    <div class="flex items-center gap-2 text-xs text-slate-300 font-bold">
+                    <div class="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 font-bold">
                         <span>{{ $t('purchases.daily_consumption') }}:</span>
                         <select
                             v-model.number="analysisDays"
                             @change="applyFilters"
-                            class="h-10 px-3 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none"
+                            class="h-11 px-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none shadow-inner"
                         >
                             <option :value="7">{{ $t('purchases.days_count', { count: 7 }) }}</option>
                             <option :value="14">{{ $t('purchases.days_count', { count: 14 }) }}</option>
@@ -224,7 +224,7 @@ const createPurchaseFromSelected = () => {
                         <select
                             v-model.number="targetCoverDays"
                             @change="applyFilters"
-                            class="h-10 px-3 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none"
+                            class="h-11 px-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none shadow-inner"
                         >
                             <option :value="7">{{ $t('purchases.days_count', { count: 7 }) }}</option>
                             <option :value="15">{{ $t('purchases.days_count', { count: 15 }) }}</option>
@@ -235,23 +235,24 @@ const createPurchaseFromSelected = () => {
                 </div>
 
                 <!-- Search Input -->
-                <div class="w-full sm:w-64">
+                <div class="w-full md:w-64">
                     <input
                         v-model="search"
                         @input="applyFilters"
                         type="text"
                         :placeholder="$t('purchases.search_placeholder')"
-                        class="w-full h-10 px-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                        class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner"
                     >
                 </div>
             </div>
 
-            <!-- Reorder Suggestions Table -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4 overflow-hidden">
-                <div class="overflow-x-auto">
+            <!-- Reorder Suggestions Table & Mobile Cards -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4 overflow-hidden font-tajawal">
+                <!-- Desktop Table (Hidden on Mobile) -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                 <th class="pb-3 text-center w-10">
                                     <input
                                         type="checkbox"
@@ -264,13 +265,13 @@ const createPurchaseFromSelected = () => {
                                 <th class="pb-3 font-mono">{{ $t('purchases.sales_period', { days: analysisDays }) }}</th>
                                 <th class="pb-3 font-mono">{{ $t('purchases.daily_usage') }}</th>
                                 <th class="pb-3 font-mono">{{ $t('purchases.days_of_stock') }}</th>
-                                <th class="pb-3 font-mono text-amber-400">{{ $t('purchases.suggested_qty') }}</th>
+                                <th class="pb-3 font-mono text-theme-primary">{{ $t('purchases.suggested_qty') }}</th>
                                 <th class="pb-3 font-mono">{{ $t('purchases.estimated_cost') }}</th>
                                 <th class="pb-3 text-center">{{ $t('common.status') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/60 font-sans">
-                            <tr v-for="it in suggestions" :key="it.id" class="hover:bg-slate-800/30 transition">
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
+                            <tr v-for="it in suggestions" :key="it.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
                                 <td class="py-3 text-center">
                                     <input
                                         type="checkbox"
@@ -281,61 +282,61 @@ const createPurchaseFromSelected = () => {
                                 </td>
 
                                 <td class="py-3">
-                                    <div class="font-black text-white font-tajawal">{{ it.name }}</div>
-                                    <div class="text-[10px] text-slate-500 font-mono">{{ it.code }}</div>
+                                    <div class="font-black text-slate-900 dark:text-white font-tajawal">{{ it.name }}</div>
+                                    <div class="text-[10px] text-slate-400 dark:text-slate-500 font-mono">{{ it.code }}</div>
                                 </td>
 
                                 <td class="py-3 font-mono font-black">
                                     <span
                                         class="px-2.5 py-1 rounded-xl text-xs border"
                                         :class="[
-                                            Number(it.current_stock) <= 0 ? 'bg-rose-500/20 border-rose-500/30 text-rose-400' :
-                                            (it.urgency === 'critical' ? 'bg-rose-500/10 border-rose-500/20 text-rose-300' :
-                                            (it.urgency === 'warning' ? 'bg-amber-500/20 border-amber-500/30 text-amber-400' : 'bg-slate-800 border-slate-700 text-slate-300'))
+                                            Number(it.current_stock) <= 0 ? 'bg-rose-500/20 border-rose-500/30 text-rose-600 dark:text-rose-400' :
+                                            (it.urgency === 'critical' ? 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-300' :
+                                            (it.urgency === 'warning' ? 'bg-amber-500/20 border-amber-500/30 text-amber-600 dark:text-amber-400' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'))
                                         ]"
                                     >
                                         {{ it.current_stock }} {{ it.unit || $t('inventory.unit_kg') || 'كجم' }}
                                     </span>
                                 </td>
 
-                                <td class="py-3 font-mono text-slate-300 font-bold">
+                                <td class="py-3 font-mono text-slate-700 dark:text-slate-300 font-bold">
                                     {{ it.analysis_sales }} {{ it.unit || $t('inventory.unit_kg') || 'كجم' }}
                                 </td>
 
-                                <td class="py-3 font-mono text-slate-400">
+                                <td class="py-3 font-mono text-slate-500 dark:text-slate-400">
                                     {{ it.daily_consumption }} / {{ $t('common.day') || 'يوم' }}
                                 </td>
 
                                 <td class="py-3 font-mono font-bold">
-                                    <span :class="it.days_remaining <= 3 ? 'text-rose-400 font-black' : (it.days_remaining <= 7 ? 'text-amber-400' : 'text-emerald-400')">
+                                    <span :class="it.days_remaining <= 3 ? 'text-rose-600 dark:text-rose-400 font-black' : (it.days_remaining <= 7 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400')">
                                         {{ it.days_remaining === 999 ? $t('purchases.unlimited_days') : $t('purchases.days_count', { count: it.days_remaining }) }}
                                     </span>
                                 </td>
 
-                                <td class="py-3 font-mono font-black text-emerald-400 text-sm">
+                                <td class="py-3 font-mono font-black text-emerald-600 dark:text-emerald-400 text-sm">
                                     {{ it.suggested_quantity }} {{ it.unit || $t('inventory.unit_kg') || 'كجم' }}
                                 </td>
 
-                                <td class="py-3 font-mono font-bold text-white">
+                                <td class="py-3 font-mono font-bold text-slate-900 dark:text-white">
                                     {{ formatMoney(it.estimated_cost) }} {{ $t('common.currency') }}
                                 </td>
 
                                 <td class="py-3 text-center font-tajawal">
                                     <span
                                         v-if="it.urgency === 'critical'"
-                                        class="px-2.5 py-1 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold text-[11px]"
+                                        class="px-2.5 py-1 rounded-xl bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 font-bold text-[11px]"
                                     >
                                         {{ $t('purchases.status_critical') }} 🚨
                                     </span>
                                     <span
                                         v-else-if="it.urgency === 'warning'"
-                                        class="px-2.5 py-1 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold text-[11px]"
+                                        class="px-2.5 py-1 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold text-[11px]"
                                     >
                                         {{ $t('purchases.status_warning') }} ⚠️
                                     </span>
                                     <span
                                         v-else
-                                        class="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold text-[11px]"
+                                        class="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-bold text-[11px]"
                                     >
                                         {{ $t('purchases.status_safe') }} ✅
                                     </span>
@@ -343,11 +344,75 @@ const createPurchaseFromSelected = () => {
                             </tr>
                         </tbody>
                     </table>
+                </div>
 
-                    <div v-if="suggestions.length === 0" class="py-16 text-center space-y-2">
-                        <span class="text-3xl">🎉</span>
-                        <p class="text-xs font-bold text-emerald-400 font-tajawal">{{ $t('purchases.no_reorder_needed') }}</p>
+                <!-- Mobile Cards View (Visible on Small Screens) -->
+                <div class="md:hidden space-y-3 font-tajawal">
+                    <div
+                        v-for="it in suggestions"
+                        :key="it.id"
+                        class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-2.5 shadow-xs"
+                    >
+                        <div class="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-800/80 pb-2">
+                            <div class="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    :value="it.id"
+                                    v-model="selectedItemIds"
+                                    class="rounded accent-amber-500 w-4 h-4 cursor-pointer"
+                                >
+                                <div>
+                                    <div class="font-black text-xs text-slate-900 dark:text-white">{{ it.name }}</div>
+                                    <div class="text-[10px] text-slate-400 font-mono">{{ it.code || '—' }}</div>
+                                </div>
+                            </div>
+
+                            <span
+                                v-if="it.urgency === 'critical'"
+                                class="px-2 py-0.5 rounded-lg bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 font-bold text-[10px]"
+                            >
+                                {{ $t('purchases.status_critical') }} 🚨
+                            </span>
+                            <span
+                                v-else-if="it.urgency === 'warning'"
+                                class="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold text-[10px]"
+                            >
+                                {{ $t('purchases.status_warning') }} ⚠️
+                            </span>
+                            <span
+                                v-else
+                                class="px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-bold text-[10px]"
+                            >
+                                {{ $t('purchases.status_safe') }} ✅
+                            </span>
+                        </div>
+
+                        <!-- Metrics Matrix -->
+                        <div class="grid grid-cols-3 gap-2 text-xs font-mono py-1">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('inventory.current_stock') }}</span>
+                                <span class="font-bold text-slate-900 dark:text-white">{{ it.current_stock }} {{ it.unit || 'كجم' }}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('purchases.suggested_qty') }}</span>
+                                <span class="font-black text-emerald-600 dark:text-emerald-400">{{ it.suggested_quantity }} {{ it.unit || 'كجم' }}</span>
+                            </div>
+                            <div class="text-left">
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('purchases.estimated_cost') }}</span>
+                                <span class="font-black text-theme-primary">{{ formatMoney(it.estimated_cost) }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono border-t border-slate-200 dark:border-slate-800/80 pt-1.5 font-tajawal">
+                            <span>الاستهلاك اليومي: <b class="font-mono">{{ it.daily_consumption }}</b></span>
+                            <span>الرصيد يكفي: <b class="font-mono text-theme-primary">{{ it.days_remaining === 999 ? $t('purchases.unlimited_days') : $t('purchases.days_count', { count: it.days_remaining }) }}</b></span>
+                        </div>
                     </div>
+                </div>
+
+                <div v-if="suggestions.length === 0" class="py-16 text-center space-y-2">
+                    <span class="text-3xl">🎉</span>
+                    <p class="text-xs font-bold text-emerald-600 dark:text-emerald-400 font-tajawal">{{ $t('purchases.no_reorder_needed') }}</p>
                 </div>
             </div>
         </div>
