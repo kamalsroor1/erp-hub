@@ -17,6 +17,7 @@ const { formatMoney } = useMoney();
 
 const dateFrom = ref(props.filters.from || '');
 const dateTo = ref(props.filters.to || '');
+const activePreset = ref(props.filters.from ? 'custom' : 'all');
 
 const applyFilters = () => {
     router.get(`/suppliers/${props.supplier.id}/statement`, {
@@ -30,6 +31,7 @@ const applyFilters = () => {
 };
 
 const setQuickDate = (range) => {
+    activePreset.value = range;
     const today = new Date();
     if (range === 'today') {
         const str = today.toISOString().split('T')[0];
@@ -82,11 +84,15 @@ const savePayment = () => {
             <div class="print:hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="space-y-1">
                     <div class="flex items-center gap-3">
-                        <Link href="/suppliers" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-sm transition active:scale-90 shadow-xs border border-slate-200 dark:border-transparent">
+                        <Link
+                            href="/suppliers"
+                            class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-sm transition active:scale-90 shadow-xs border border-slate-200 dark:border-transparent shrink-0"
+                            :title="$t('common.back') || 'رجوع'"
+                        >
                             →
                         </Link>
                         <div>
-                            <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                            <h1 class="text-base sm:text-2xl font-black text-slate-900 dark:text-white flex flex-wrap items-center gap-1.5">
                                 <span>{{ $t('contacts.ledger_title') }}:</span>
                                 <span class="text-theme-primary">{{ supplier.name }}</span>
                                 <span v-if="supplier.company_name" class="text-xs text-slate-500 dark:text-slate-400 font-normal">({{ supplier.company_name }})</span>
@@ -102,7 +108,7 @@ const savePayment = () => {
                     <button
                         @click="showPaymentModal = true"
                         type="button"
-                        class="flex-1 sm:flex-none h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer shadow-theme-primary"
+                        class="flex-1 sm:flex-none h-11 px-5 rounded-2xl btn-primary-theme font-black text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer shadow-theme-primary"
                     >
                         <span>💸</span>
                         <span>{{ $t('contacts.record_disbursement_voucher') }}</span>
@@ -111,7 +117,7 @@ const savePayment = () => {
                     <button
                         @click="printStatement"
                         type="button"
-                        class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer shadow-xs"
+                        class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer shadow-xs active:scale-95"
                     >
                         <span>🖨️</span>
                         <span>{{ $t('contacts.print_statement') }}</span>
@@ -120,56 +126,59 @@ const savePayment = () => {
             </div>
 
             <!-- Filter Controls (Hidden on print) -->
-            <div class="print:hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 shadow-xs space-y-3">
+            <div class="print:hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-xs space-y-3">
                 <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ $t('contacts.report_period') }}:</span>
-                        <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-950/80 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs font-bold">
+                        <div class="flex flex-wrap items-center gap-1.5 text-xs font-bold">
                             <button
                                 @click="setQuickDate('today')"
                                 type="button"
-                                class="h-9 px-3 rounded-xl transition active:scale-95 cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                                class="h-9 px-3.5 rounded-xl transition active:scale-95 cursor-pointer shadow-xs"
+                                :class="activePreset === 'today' ? 'bg-theme-primary text-slate-950 font-black' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'"
                             >
-                                {{ $t('dashboard.today') || 'اليوم' }}
+                                {{ $t('common.today') || 'اليوم' }}
                             </button>
                             <button
                                 @click="setQuickDate('this_month')"
                                 type="button"
-                                class="h-9 px-3 rounded-xl transition active:scale-95 cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                                class="h-9 px-3.5 rounded-xl transition active:scale-95 cursor-pointer shadow-xs"
+                                :class="activePreset === 'this_month' ? 'bg-theme-primary text-slate-950 font-black' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'"
                             >
-                                {{ $t('dashboard.this_month') || 'هذا الشهر' }}
+                                {{ $t('common.this_month') || 'هذا الشهر' }}
                             </button>
                             <button
                                 @click="setQuickDate('this_year')"
                                 type="button"
-                                class="h-9 px-3 rounded-xl transition active:scale-95 cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                                class="h-9 px-3.5 rounded-xl transition active:scale-95 cursor-pointer shadow-xs"
+                                :class="activePreset === 'this_year' ? 'bg-theme-primary text-slate-950 font-black' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'"
                             >
-                                {{ $t('dashboard.this_year') || 'هذا العام' }}
+                                {{ $t('common.this_year') || 'هذا العام' }}
                             </button>
                             <button
                                 @click="setQuickDate('all')"
                                 type="button"
-                                class="h-9 px-3 rounded-xl transition active:scale-95 cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                                class="h-9 px-3.5 rounded-xl transition active:scale-95 cursor-pointer shadow-xs"
+                                :class="activePreset === 'all' ? 'bg-theme-primary text-slate-950 font-black' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'"
                             >
-                                {{ $t('common.all') }}
+                                {{ $t('common.all') || 'الكل' }}
                             </button>
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-2">
-                        <div class="flex-1 sm:w-36">
-                            <DatePicker v-model="dateFrom" :placeholder="$t('contacts.from_date')" />
+                    <div class="flex flex-col sm:flex-row items-center gap-2.5 sm:gap-3">
+                        <div class="w-full sm:w-44">
+                            <DatePicker v-model="dateFrom" :placeholder="$t('contacts.from_date') || 'من تاريخ'" />
                         </div>
-                        <span class="text-slate-400 text-xs">←</span>
-                        <div class="flex-1 sm:w-36">
-                            <DatePicker v-model="dateTo" :placeholder="$t('contacts.to_date')" />
+                        <div class="w-full sm:w-44">
+                            <DatePicker v-model="dateTo" :placeholder="$t('contacts.to_date') || 'إلى تاريخ'" />
                         </div>
                         <button
-                            @click="applyFilters"
+                            @click="activePreset = 'custom'; applyFilters();"
                             type="button"
-                            class="w-full sm:w-auto h-11 px-5 rounded-2xl btn-primary-theme text-xs font-black transition active:scale-95 cursor-pointer shadow-theme-primary"
+                            class="w-full sm:w-auto h-11 px-6 rounded-2xl btn-primary-theme text-xs font-black transition active:scale-95 cursor-pointer shadow-theme-primary shrink-0"
                         >
-                            {{ $t('common.filter') }}
+                            {{ $t('common.filter') || 'تصفية' }}
                         </button>
                     </div>
                 </div>

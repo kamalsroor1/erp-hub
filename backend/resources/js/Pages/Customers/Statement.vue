@@ -16,8 +16,10 @@ const { formatMoney } = useMoney();
 
 const dateFrom = ref(props.filters.from || '');
 const dateTo = ref(props.filters.to || '');
+const activePreset = ref(props.filters.from ? 'custom' : 'all');
 
 const applyDatePreset = (preset) => {
+    activePreset.value = preset;
     const now = new Date();
     const formatDate = (d) => d.toISOString().split('T')[0];
 
@@ -63,27 +65,33 @@ const printStatement = () => {
     <AppLayout>
         <div class="max-w-5xl mx-auto space-y-6 font-tajawal">
             <!-- Header & Action Bar -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 no-print">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 no-print">
                 <div class="space-y-1">
                     <div class="flex items-center gap-3">
-                        <Link href="/customers" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-sm transition active:scale-90 shadow-xs border border-slate-200 dark:border-transparent">
+                        <Link
+                            href="/customers"
+                            class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-sm transition active:scale-90 shadow-xs border border-slate-200 dark:border-transparent shrink-0"
+                            :title="$t('common.back') || 'رجوع'"
+                        >
                             →
                         </Link>
-                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-                            <span>{{ $t('contacts.ledger_title') }}:</span>
-                            <span class="text-theme-primary">{{ customer.name }}</span>
-                        </h1>
+                        <div>
+                            <h1 class="text-base sm:text-xl font-black text-slate-900 dark:text-white flex flex-wrap items-center gap-1.5">
+                                <span>{{ $t('contacts.ledger_title') }}:</span>
+                                <span class="text-theme-primary">{{ customer.name }}</span>
+                            </h1>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
+                                {{ $t('contacts.ledger_subtitle') }}
+                            </p>
+                        </div>
                     </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
-                        {{ $t('contacts.ledger_subtitle') }}
-                    </p>
                 </div>
 
                 <div class="flex items-center gap-2 w-full sm:w-auto">
                     <button
                         @click="printStatement"
                         type="button"
-                        class="w-full sm:w-auto h-11 px-5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-indigo-600/20 transition active:scale-95 cursor-pointer"
+                        class="w-full sm:w-auto h-11 px-5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-md shadow-indigo-600/20 transition active:scale-95 cursor-pointer"
                     >
                         <span>📄</span>
                         <span>{{ $t('contacts.print_statement') }}</span>
@@ -94,22 +102,22 @@ const printStatement = () => {
             <!-- Customer Summary Card -->
             <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-4 font-tajawal">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
+                    <div class="space-y-1">
                         <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.customer_name') }}</span>
-                        <div class="text-base font-black text-slate-900 dark:text-white mt-0.5">{{ customer.name }}</div>
-                        <div v-if="customer.phone" class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5" dir="ltr">📱 {{ customer.phone }}</div>
+                        <div class="text-base font-black text-slate-900 dark:text-white">{{ customer.name }}</div>
+                        <div v-if="customer.phone" class="text-xs text-slate-500 dark:text-slate-400 font-mono" dir="ltr">📱 {{ customer.phone }}</div>
                     </div>
 
-                    <div>
+                    <div class="space-y-1">
                         <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('common.address') }}</span>
-                        <div class="text-xs text-slate-700 dark:text-slate-300 font-bold mt-1">{{ customer.address || '—' }}</div>
+                        <div class="text-xs text-slate-700 dark:text-slate-300 font-bold">{{ customer.address || '—' }}</div>
                         <div v-if="customer.tax_number" class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{{ $t('invoices.tax_number') || 'الرقم الضريبي' }}: {{ customer.tax_number }}</div>
                     </div>
 
-                    <div>
+                    <div class="space-y-1">
                         <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.closing_balance') }}</span>
                         <div
-                            class="text-xl font-black font-mono mt-0.5"
+                            class="text-xl font-black font-mono"
                             :class="customer.current_balance > 0 ? 'text-rose-600 dark:text-rose-400' : (customer.current_balance < 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400')"
                         >
                             {{ formatMoney(customer.current_balance) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
@@ -121,25 +129,53 @@ const printStatement = () => {
                 <div class="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-3 no-print">
                     <div class="flex flex-wrap items-center gap-1.5 text-xs">
                         <span class="text-slate-500 dark:text-slate-400 font-bold text-[11px] ml-1">{{ $t('contacts.report_period') }}:</span>
-                        <button @click="applyDatePreset('today')" type="button" class="h-9 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold transition active:scale-95 cursor-pointer">{{ $t('dashboard.today') || 'اليوم' }}</button>
-                        <button @click="applyDatePreset('this_month')" type="button" class="h-9 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold transition active:scale-95 cursor-pointer">{{ $t('dashboard.this_month') || 'هذا الشهر' }}</button>
-                        <button @click="applyDatePreset('this_year')" type="button" class="h-9 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold transition active:scale-95 cursor-pointer">{{ $t('dashboard.this_year') || 'هذا العام' }}</button>
-                        <button @click="applyDatePreset('all')" type="button" class="h-9 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold transition active:scale-95 cursor-pointer">{{ $t('common.all') }}</button>
+                        <button
+                            @click="applyDatePreset('today')"
+                            type="button"
+                            class="h-9 px-3.5 rounded-xl font-bold transition active:scale-95 cursor-pointer shadow-xs"
+                            :class="activePreset === 'today' ? 'bg-theme-primary text-slate-950 font-black' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'"
+                        >
+                            {{ $t('common.today') || 'اليوم' }}
+                        </button>
+                        <button
+                            @click="applyDatePreset('this_month')"
+                            type="button"
+                            class="h-9 px-3.5 rounded-xl font-bold transition active:scale-95 cursor-pointer shadow-xs"
+                            :class="activePreset === 'this_month' ? 'bg-theme-primary text-slate-950 font-black' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'"
+                        >
+                            {{ $t('common.this_month') || 'هذا الشهر' }}
+                        </button>
+                        <button
+                            @click="applyDatePreset('this_year')"
+                            type="button"
+                            class="h-9 px-3.5 rounded-xl font-bold transition active:scale-95 cursor-pointer shadow-xs"
+                            :class="activePreset === 'this_year' ? 'bg-theme-primary text-slate-950 font-black' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'"
+                        >
+                            {{ $t('common.this_year') || 'هذا العام' }}
+                        </button>
+                        <button
+                            @click="applyDatePreset('all')"
+                            type="button"
+                            class="h-9 px-3.5 rounded-xl font-bold transition active:scale-95 cursor-pointer shadow-xs"
+                            :class="activePreset === 'all' ? 'bg-theme-primary text-slate-950 font-black' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'"
+                        >
+                            {{ $t('common.all') || 'الكل' }}
+                        </button>
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-3">
-                        <div class="w-full sm:w-44">
-                            <DatePicker v-model="dateFrom" :placeholder="$t('contacts.from_date')" />
+                    <div class="flex flex-col sm:flex-row items-center gap-2.5 sm:gap-3">
+                        <div class="w-full sm:flex-1">
+                            <DatePicker v-model="dateFrom" :placeholder="$t('contacts.from_date') || 'من تاريخ'" />
                         </div>
-                        <div class="w-full sm:w-44">
-                            <DatePicker v-model="dateTo" :placeholder="$t('contacts.to_date')" />
+                        <div class="w-full sm:flex-1">
+                            <DatePicker v-model="dateTo" :placeholder="$t('contacts.to_date') || 'إلى تاريخ'" />
                         </div>
                         <button
-                            @click="filterStatement"
+                            @click="activePreset = 'custom'; filterStatement();"
                             type="button"
-                            class="w-full sm:w-auto h-11 px-5 rounded-2xl btn-primary-theme text-xs font-black transition active:scale-95 cursor-pointer shadow-theme-primary"
+                            class="w-full sm:w-auto h-11 px-6 rounded-2xl btn-primary-theme text-xs font-black transition active:scale-95 cursor-pointer shadow-theme-primary shrink-0"
                         >
-                            {{ $t('common.filter') }}
+                            {{ $t('common.filter') || 'تصفية' }}
                         </button>
                     </div>
                 </div>
