@@ -31,72 +31,83 @@ const handleConfirm = () => {
     const finalQty = customWeightInput.value ? Number(customWeightInput.value) : selectedWeight.value;
     if (finalQty > 0) {
         emit('confirm', { item: props.item, quantity: finalQty });
+        customWeightInput.value = '';
+        emit('close');
     }
-    customWeightInput.value = '';
 };
 </script>
 
 <template>
-    <div
-        v-if="show && item"
-        @click="emit('close')"
-        class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal select-none"
-    >
-        <div @click.stop class="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-                <div class="space-y-0.5">
-                    <h3 class="font-black text-sm sm:text-base text-slate-900 dark:text-white leading-tight">{{ item.name }}</h3>
-                    <p class="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono font-bold">
-                        {{ $t('pos.kilo_price') }}: {{ formatMoney(effectiveKiloPrice(item)) }} {{ $t('common.currency') }}
-                    </p>
-                </div>
-                <button
-                    @click="emit('close')"
-                    type="button"
-                    class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center justify-center text-sm font-bold transition active:scale-90 cursor-pointer shadow-xs shrink-0"
-                >
-                    ✕
-                </button>
-            </div>
-
-            <!-- Weight Chips (OCP - extensible via presets prop) -->
-            <div class="grid grid-cols-2 gap-2.5">
-                <button
-                    v-for="w in presets"
-                    :key="w.val"
-                    @click="selectedWeight = w.val; customWeightInput = ''"
-                    type="button"
-                    class="p-3.5 rounded-2xl border text-center transition active:scale-95 cursor-pointer shadow-xs"
-                    :class="selectedWeight === w.val && !customWeightInput ? 'bg-emerald-500/15 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-black ring-2 ring-emerald-500/30' : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'"
-                >
-                    <div class="text-xs sm:text-sm font-bold">{{ w.label }}</div>
-                    <div class="text-[11px] font-mono text-slate-500 dark:text-slate-400 mt-1 font-bold">
-                        {{ formatMoney(effectiveKiloPrice(item) * w.val) }} {{ $t('common.currency') }}
-                    </div>
-                </button>
-            </div>
-
-            <!-- Custom Weight Input -->
-            <div class="space-y-1">
-                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('pos.custom_weight') }}:</label>
-                <input
-                    v-model="customWeightInput"
-                    type="number"
-                    inputmode="decimal"
-                    step="0.001"
-                    placeholder="0.750"
-                    class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 text-center text-sm font-mono font-black text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 shadow-inner"
-                />
-            </div>
-
-            <button
-                @click="handleConfirm"
-                type="button"
-                class="w-full h-12 rounded-2xl btn-primary-theme font-black text-sm transition transform active:scale-95 cursor-pointer shadow-theme-primary flex items-center justify-center gap-2"
+    <Teleport to="body">
+        <Transition name="modal-zoom">
+            <div
+                v-if="show && item"
+                @click="emit('close')"
+                class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 font-tajawal select-none"
             >
-                <span>⚡</span>
-                <span>{{ $t('pos.confirm_add_cart') }}</span>
-            </button>
-        </div>
-    </div>
+                <div @click.stop class="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+                    <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                        <div class="space-y-0.5">
+                            <h3 class="font-black text-sm sm:text-base text-slate-900 dark:text-white leading-tight">{{ item.name }}</h3>
+                            <p class="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono font-bold">
+                                {{ $t('pos.kilo_price') }}: {{ formatMoney(effectiveKiloPrice(item)) }} {{ $t('common.currency') }}
+                            </p>
+                        </div>
+                        <button
+                            @click="emit('close')"
+                            type="button"
+                            class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center justify-center text-sm font-bold transition active:scale-90 cursor-pointer shadow-xs shrink-0"
+                        >
+                            ✕
+                        </button>
+                    </div>
+
+                    <!-- Preset Weights Grid (Buttons) -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <button
+                            v-for="w in presetWeights"
+                            :key="w.qty"
+                            @click="selectPreset(w.qty)"
+                            type="button"
+                            class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700/80 transition text-right group cursor-pointer active:scale-95 shadow-xs"
+                        >
+                            <span class="block text-xs sm:text-sm font-black text-slate-900 dark:text-white group-hover:text-theme-primary transition">{{ w.label }}</span>
+                            <span class="block text-[11px] text-slate-400 font-mono mt-0.5">
+                                {{ formatMoney(effectiveKiloPrice(item) * w.qty) }} {{ $t('common.currency') }}
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- Custom Weight Input -->
+                    <div class="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-2">
+                        <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">
+                            {{ $t('pos.custom_weight') }} ({{ $t('pos.grams_or_kilos') }})
+                        </label>
+                        <div class="flex gap-2">
+                            <input
+                                v-model="customWeightInput"
+                                type="number"
+                                step="any"
+                                min="0"
+                                inputmode="decimal"
+                                :placeholder="$t('pos.enter_custom_weight')"
+                                @keyup.enter="applyCustomWeight"
+                                class="flex-1 h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono font-bold focus:ring-2 focus:ring-amber-500 outline-hidden transition shadow-xs"
+                            />
+                            <button
+                                @click="applyCustomWeight"
+                                type="button"
+                                class="h-11 px-4 rounded-2xl btn-primary-theme font-black text-xs transition active:scale-95 cursor-pointer shrink-0 shadow-theme-primary"
+                            >
+                                {{ $t('common.confirm') }}
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-slate-400">
+                            {{ $t('pos.weight_hint') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </Transition>
+    </Teleport>
 </template>

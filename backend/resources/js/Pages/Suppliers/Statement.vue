@@ -307,91 +307,95 @@ const savePayment = () => {
             </div>
         </div>
 
-        <!-- Quick Payment Modal -->
-        <div
-            v-if="showPaymentModal"
-            @click="showPaymentModal = false"
-            class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal select-none"
-            dir="rtl"
-        >
-            <div @click.stop class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-900 dark:text-white">
-                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-                    <h3 class="font-black text-base text-slate-900 dark:text-white">{{ $t('contacts.record_disbursement_voucher') }}</h3>
-                    <button
-                        @click="showPaymentModal = false"
-                        type="button"
-                        class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center justify-center text-sm font-bold transition active:scale-90 cursor-pointer shadow-xs"
-                    >
-                        ✕
-                    </button>
-                </div>
-
-                <form @submit.prevent="savePayment" class="space-y-4">
-                    <div class="p-3.5 bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                        <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.current_balance') }}:</span>
-                        <span class="font-mono font-black text-rose-600 dark:text-rose-400 text-base">{{ formatMoney(supplier.current_balance) }} {{ $t('common.currency') }}</span>
-                    </div>
-
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('contacts.voucher_amount') }} ({{ $t('common.currency') }}) *</label>
-                        <input
-                            v-model.number="paymentForm.amount"
-                            type="number"
-                            step="0.01"
-                            min="0.01"
-                            required
-                            class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm font-mono font-black text-emerald-600 dark:text-emerald-400 focus:border-amber-500 focus:outline-none shadow-inner"
-                        >
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('contacts.payment_method') }} *</label>
-                            <select
-                                v-model="paymentForm.payment_method"
-                                class="w-full h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner"
+        <!-- Quick Payment Modal (Smooth Native Pop) -->
+        <Teleport to="body">
+            <Transition name="modal-zoom">
+                <div
+                    v-if="showPaymentModal"
+                    @click="showPaymentModal = false"
+                    class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 font-tajawal select-none"
+                    dir="rtl"
+                >
+                    <div @click.stop class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 text-slate-900 dark:text-white max-h-[90vh] overflow-y-auto">
+                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                            <h3 class="font-black text-base text-slate-900 dark:text-white">{{ $t('contacts.record_disbursement_voucher') }}</h3>
+                            <button
+                                @click="showPaymentModal = false"
+                                type="button"
+                                class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center justify-center text-sm font-bold transition active:scale-90 cursor-pointer shadow-xs"
                             >
-                                <option value="cash">{{ $t('pos.cash') }} 💵</option>
-                                <option value="instapay">InstaPay ⚡</option>
-                                <option value="wallet">{{ $t('pos.wallet') }} 📱</option>
-                                <option value="bank">{{ $t('pos.bank') }} 🏦</option>
-                            </select>
+                                ✕
+                            </button>
                         </div>
 
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.date') }} *</label>
-                            <DatePicker v-model="paymentForm.payment_date" :placeholder="$t('common.date')" />
-                        </div>
-                    </div>
+                        <form @submit.prevent="savePayment" class="space-y-4">
+                            <div class="p-3.5 bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                                <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.current_balance') }}:</span>
+                                <span class="font-mono font-black text-rose-600 dark:text-rose-400 text-base">{{ formatMoney(supplier.current_balance) }} {{ $t('common.currency') }}</span>
+                            </div>
 
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.notes') }}</label>
-                        <input
-                            v-model="paymentForm.notes"
-                            type="text"
-                            :placeholder="$t('common.notes')"
-                            class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner"
-                        >
-                    </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('contacts.voucher_amount') }} ({{ $t('common.currency') }}) *</label>
+                                <input
+                                    v-model.number="paymentForm.amount"
+                                    type="number"
+                                    step="0.01"
+                                    min="0.01"
+                                    required
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm font-mono font-black text-emerald-600 dark:text-emerald-400 focus:border-amber-500 focus:outline-none shadow-inner"
+                                >
+                            </div>
 
-                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
-                        <button
-                            @click="showPaymentModal = false"
-                            type="button"
-                            class="h-11 px-4 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95 cursor-pointer shadow-xs"
-                        >
-                            {{ $t('common.cancel') }}
-                        </button>
-                        <button
-                            type="submit"
-                            :disabled="paymentForm.processing"
-                            class="h-11 px-5 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50 shadow-theme-primary"
-                        >
-                            {{ paymentForm.processing ? '...' : $t('contacts.record_disbursement_voucher') }}
-                        </button>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div class="space-y-1.5">
+                                    <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('contacts.payment_method') }} *</label>
+                                    <select
+                                        v-model="paymentForm.payment_method"
+                                        class="w-full h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner font-bold"
+                                    >
+                                        <option value="cash">{{ $t('pos.cash') }} 💵</option>
+                                        <option value="instapay">InstaPay ⚡</option>
+                                        <option value="wallet">{{ $t('pos.wallet') }} 📱</option>
+                                        <option value="bank">{{ $t('pos.bank') }} 🏦</option>
+                                    </select>
+                                </div>
+
+                                <div class="space-y-1.5">
+                                    <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.date') }} *</label>
+                                    <DatePicker v-model="paymentForm.payment_date" :placeholder="$t('common.date')" />
+                                </div>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.notes') }}</label>
+                                <input
+                                    v-model="paymentForm.notes"
+                                    type="text"
+                                    :placeholder="$t('common.notes')"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner"
+                                >
+                            </div>
+
+                            <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200 dark:border-slate-800">
+                                <button
+                                    @click="showPaymentModal = false"
+                                    type="button"
+                                    class="h-11 px-5 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95 cursor-pointer shadow-xs"
+                                >
+                                    {{ $t('common.cancel') }}
+                                </button>
+                                <button
+                                    type="submit"
+                                    :disabled="paymentForm.processing"
+                                    class="h-11 px-6 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50 shadow-theme-primary"
+                                >
+                                    {{ paymentForm.processing ? '...' : $t('contacts.record_disbursement_voucher') }}
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                </form>
-            </div>
-        </div>
+                </div>
+            </Transition>
+        </Teleport>
     </AppLayout>
 </template>

@@ -757,51 +757,59 @@ const printA4 = (id) => {
             </div>
         </FilterDrawer>
 
-        <!-- Cancel Invoice Reason Modal -->
-        <div v-if="showCancelModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl font-tajawal animate-in fade-in zoom-in-95 duration-150">
-                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-                    <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                        <AlertTriangle class="w-5 h-5 text-rose-500" />
-                        <span>{{ $t('invoices.cancel_modal_title') }}</span>
-                    </h3>
-                    <button @click="showCancelModal = false" class="text-slate-400 hover:text-slate-700 dark:hover:text-white font-bold cursor-pointer">
-                        <X class="w-4 h-4" />
-                    </button>
-                </div>
+        <!-- Cancel Invoice Reason Modal (Smooth Native Pop) -->
+        <Teleport to="body">
+            <Transition name="modal-zoom">
+                <div
+                    v-if="showCancelModal"
+                    @click="showCancelModal = false"
+                    class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-xs font-tajawal select-none"
+                >
+                    <div @click.stop class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 w-full max-w-md space-y-4 shadow-2xl font-tajawal max-h-[90vh] overflow-y-auto">
+                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                            <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                                <AlertTriangle class="w-5 h-5 text-rose-500" />
+                                <span>{{ $t('invoices.cancel_modal_title') }}</span>
+                            </h3>
+                            <button @click="showCancelModal = false" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center font-bold transition active:scale-90 cursor-pointer shadow-xs">
+                                <X class="w-4 h-4" />
+                            </button>
+                        </div>
 
-                <p class="text-xs text-slate-600 dark:text-slate-300">
-                    {{ $t('invoices.cancel_modal_desc', { number: cancelTargetInvoice?.invoice_number }) }}
-                </p>
+                        <p class="text-xs text-slate-600 dark:text-slate-300">
+                            {{ $t('invoices.cancel_modal_desc', { number: cancelTargetInvoice?.invoice_number }) }}
+                        </p>
 
-                <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('invoices.cancel_reason_label') }}</label>
-                    <textarea
-                        v-model="cancelReason"
-                        rows="3"
-                        :placeholder="$t('invoices.cancel_reason_placeholder')"
-                        class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-rose-500 focus:outline-none"
-                    ></textarea>
-                </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('invoices.cancel_reason_label') }}</label>
+                            <textarea
+                                v-model="cancelReason"
+                                rows="3"
+                                :placeholder="$t('invoices.cancel_reason_placeholder')"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-rose-500 focus:outline-none shadow-inner"
+                            ></textarea>
+                        </div>
 
-                <div class="flex items-center gap-2 pt-2">
-                    <button
-                        @click="showCancelModal = false"
-                        type="button"
-                        class="flex-1 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition cursor-pointer"
-                    >
-                        {{ $t('common.cancel') }}
-                    </button>
-                    <button
-                        :disabled="isCancelling || !cancelReason || cancelReason.trim().length < 3"
-                        @click="confirmCancel"
-                        type="button"
-                        class="flex-1 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-black transition shadow-lg shadow-rose-600/30 cursor-pointer"
-                    >
-                        {{ isCancelling ? '...' : $t('invoices.confirm_cancel_btn') }}
-                    </button>
+                        <div class="flex items-center gap-2 pt-2">
+                            <button
+                                @click="showCancelModal = false"
+                                type="button"
+                                class="flex-1 h-11 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition active:scale-95 cursor-pointer shadow-xs"
+                            >
+                                {{ $t('common.cancel') }}
+                            </button>
+                            <button
+                                :disabled="isCancelling || !cancelReason || cancelReason.trim().length < 3"
+                                @click="confirmCancel"
+                                type="button"
+                                class="flex-1 h-11 rounded-2xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-black transition active:scale-95 shadow-lg shadow-rose-600/30 cursor-pointer"
+                            >
+                                {{ isCancelling ? '...' : $t('invoices.confirm_cancel_btn') }}
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </Transition>
+        </Teleport>
     </AppLayout>
 </template>

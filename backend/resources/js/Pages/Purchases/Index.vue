@@ -458,49 +458,58 @@ const cancelPurchase = (p) => {
             </div>
         </FilterDrawer>
 
-        <!-- Purchase Details Modal -->
-        <div
-            v-if="showDetailsModal && selectedPurchase"
-            @click="showDetailsModal = false"
-            class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
-            dir="rtl"
-        >
-            <div @click.stop class="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <div>
-                        <h3 class="font-black text-base text-white">{{ $t('purchases.details_title') }}: {{ selectedPurchase.purchase_number }}</h3>
-                        <p class="text-xs text-amber-400 font-bold mt-0.5">{{ $t('purchases.supplier') }}: {{ selectedPurchase.supplier_name }} | {{ $t('common.date') }}: {{ selectedPurchase.purchase_date }}</p>
+        <!-- Purchase Details Modal (Smooth Native Pop) -->
+        <Teleport to="body">
+            <Transition name="modal-zoom">
+                <div
+                    v-if="showDetailsModal && selectedPurchase"
+                    @click="showDetailsModal = false"
+                    class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 font-tajawal select-none"
+                    dir="rtl"
+                >
+                    <div @click.stop class="w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                            <div>
+                                <h3 class="font-black text-base text-slate-900 dark:text-white">{{ $t('purchases.details_title') }}: {{ selectedPurchase.purchase_number }}</h3>
+                                <p class="text-xs text-amber-600 dark:text-amber-400 font-bold mt-0.5">{{ $t('purchases.supplier') }}: {{ selectedPurchase.supplier_name }} | {{ $t('common.date') }}: {{ selectedPurchase.purchase_date }}</p>
+                            </div>
+                            <button
+                                @click="showDetailsModal = false"
+                                class="w-9 h-9 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-400 text-xs hover:text-slate-900 dark:hover:text-white cursor-pointer flex items-center justify-center transition active:scale-90 shadow-xs"
+                            >
+                                <X class="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        <!-- Items list -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-xs">
+                                <thead>
+                                    <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
+                                        <th class="pb-2">{{ $t('purchases.supplied_item') }}</th>
+                                        <th class="pb-2 font-mono">{{ $t('common.quantity') }}</th>
+                                        <th class="pb-2 font-mono">{{ $t('invoices.unit_price') }}</th>
+                                        <th class="pb-2 font-mono">{{ $t('common.total') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200/60 dark:divide-slate-800/60 font-sans">
+                                    <tr v-for="it in selectedPurchase.items" :key="it.id">
+                                        <td class="py-2.5 font-bold text-slate-900 dark:text-white font-tajawal">{{ it.item_name }}</td>
+                                        <td class="py-2.5 font-mono font-bold text-amber-600 dark:text-amber-400">{{ it.quantity }}</td>
+                                        <td class="py-2.5 font-mono text-slate-700 dark:text-slate-300">{{ formatMoney(it.unit_cost) }}</td>
+                                        <td class="py-2.5 font-mono font-black text-emerald-600 dark:text-emerald-400">{{ formatMoney(it.subtotal) }} {{ $t('common.currency') }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-between font-mono">
+                            <span class="text-xs text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('purchases.net_invoice_total') }}:</span>
+                            <span class="text-lg font-black text-amber-600 dark:text-amber-400">{{ formatMoney(selectedPurchase.net_total) }} {{ $t('common.currency') }}</span>
+                        </div>
                     </div>
-                    <button @click="showDetailsModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
                 </div>
-
-                <!-- Items list -->
-                <div class="overflow-x-auto">
-                    <table class="w-full text-right text-xs">
-                        <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-2">{{ $t('purchases.supplied_item') }}</th>
-                                <th class="pb-2 font-mono">{{ $t('common.quantity') }}</th>
-                                <th class="pb-2 font-mono">{{ $t('invoices.unit_price') }}</th>
-                                <th class="pb-2 font-mono">{{ $t('common.total') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-800/60 font-sans">
-                            <tr v-for="it in selectedPurchase.items" :key="it.id">
-                                <td class="py-2.5 font-bold text-white font-tajawal">{{ it.item_name }}</td>
-                                <td class="py-2.5 font-mono font-bold text-amber-400">{{ it.quantity }}</td>
-                                <td class="py-2.5 font-mono text-slate-300">{{ formatMoney(it.unit_cost) }}</td>
-                                <td class="py-2.5 font-mono font-black text-emerald-400">{{ formatMoney(it.subtotal) }} {{ $t('common.currency') }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="p-4 bg-slate-950/80 rounded-2xl border border-slate-800 flex items-center justify-between font-mono">
-                    <span class="text-xs text-slate-400 font-tajawal">{{ $t('purchases.net_invoice_total') }}:</span>
-                    <span class="text-lg font-black text-amber-400">{{ formatMoney(selectedPurchase.net_total) }} {{ $t('common.currency') }}</span>
-                </div>
-            </div>
-        </div>
+            </Transition>
+        </Teleport>
     </AppLayout>
 </template>

@@ -428,54 +428,68 @@ const getModuleBadge = (module) => {
                 </div>
             </FilterDrawer>
 
-            <!-- Inspection Modal -->
-            <div v-if="selectedLog" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs font-tajawal" dir="rtl">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-xl w-full p-5 sm:p-6 space-y-4 shadow-2xl text-slate-900 dark:text-white">
-                    <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-                        <h3 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
-                            <span>🔍 {{ $t('activity.log_details_title', { id: selectedLog.id }) }}</span>
-                        </h3>
-                        <button @click="selectedLog = null" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs hover:text-slate-900 dark:hover:text-white transition active:scale-90 flex items-center justify-center cursor-pointer">✕</button>
-                    </div>
+            <!-- Inspection Modal (Smooth Native Pop) -->
+            <Teleport to="body">
+                <Transition name="modal-zoom">
+                    <div
+                        v-if="selectedLog"
+                        @click="selectedLog = null"
+                        class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-xs font-tajawal select-none"
+                        dir="rtl"
+                    >
+                        <div @click.stop class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-xl w-full p-5 sm:p-6 space-y-4 shadow-2xl text-slate-900 dark:text-white max-h-[90vh] overflow-y-auto">
+                            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                                <h3 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                                    <span>🔍 {{ $t('activity.log_details_title', { id: selectedLog.id }) }}</span>
+                                </h3>
+                                <button
+                                    @click="selectedLog = null"
+                                    class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs hover:text-slate-900 dark:hover:text-white transition active:scale-90 flex items-center justify-center cursor-pointer shadow-xs"
+                                >
+                                    ✕
+                                </button>
+                            </div>
 
-                    <div class="space-y-3 text-xs">
-                        <div class="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
-                            <div><span class="text-slate-500 dark:text-slate-400">{{ $t('common.user') }}:</span> <strong class="text-slate-900 dark:text-white block mt-0.5">{{ selectedLog.user_name }}</strong></div>
-                            <div><span class="text-slate-500 dark:text-slate-400">{{ $t('common.store') }}:</span> <strong class="text-slate-900 dark:text-white block mt-0.5">{{ selectedLog.store_name }}</strong></div>
-                            <div><span class="text-slate-500 dark:text-slate-400">{{ $t('common.date') }}:</span> <span class="text-slate-700 dark:text-slate-300 font-mono block mt-0.5">{{ selectedLog.created_at }}</span></div>
-                            <div><span class="text-slate-500 dark:text-slate-400">{{ $t('activity.ip_address') }}:</span> <span class="text-slate-700 dark:text-slate-300 font-mono block mt-0.5">{{ selectedLog.ip_address || '-' }}</span></div>
-                        </div>
+                            <div class="space-y-3 text-xs">
+                                <div class="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
+                                    <div><span class="text-slate-500 dark:text-slate-400">{{ $t('common.user') }}:</span> <strong class="text-slate-900 dark:text-white block mt-0.5">{{ selectedLog.user_name }}</strong></div>
+                                    <div><span class="text-slate-500 dark:text-slate-400">{{ $t('common.store') }}:</span> <strong class="text-slate-900 dark:text-white block mt-0.5">{{ selectedLog.store_name }}</strong></div>
+                                    <div><span class="text-slate-500 dark:text-slate-400">{{ $t('common.date') }}:</span> <span class="text-slate-700 dark:text-slate-300 font-mono block mt-0.5">{{ selectedLog.created_at }}</span></div>
+                                    <div><span class="text-slate-500 dark:text-slate-400">{{ $t('activity.ip_address') }}:</span> <span class="text-slate-700 dark:text-slate-300 font-mono block mt-0.5">{{ selectedLog.ip_address || '-' }}</span></div>
+                                </div>
 
-                        <div>
-                            <span class="text-slate-700 dark:text-slate-300 font-bold block mb-1">{{ $t('activity.full_description') }}</span>
-                            <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-sans leading-relaxed">
-                                {{ selectedLog.description }}
+                                <div>
+                                    <span class="text-slate-700 dark:text-slate-300 font-bold block mb-1">{{ $t('activity.full_description') }}</span>
+                                    <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-sans leading-relaxed">
+                                        {{ selectedLog.description }}
+                                    </div>
+                                </div>
+
+                                <div v-if="selectedLog.user_agent">
+                                    <span class="text-slate-700 dark:text-slate-300 font-bold block mb-1">{{ $t('activity.user_agent') }}</span>
+                                    <div class="bg-slate-50 dark:bg-slate-950 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-mono text-[10px] break-all">
+                                        {{ selectedLog.user_agent }}
+                                    </div>
+                                </div>
+
+                                <div v-if="selectedLog.payload">
+                                    <span class="text-slate-700 dark:text-slate-300 font-bold block mb-1">{{ $t('activity.payload_data') }}</span>
+                                    <pre class="bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-theme-primary font-mono text-[10px] overflow-x-auto max-h-48">{{ JSON.stringify(selectedLog.payload, null, 2) }}</pre>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end pt-2">
+                                <button
+                                    @click="selectedLog = null"
+                                    class="h-11 px-6 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer transition active:scale-95 border border-slate-200 dark:border-slate-700 shadow-xs"
+                                >
+                                    {{ $t('common.close') }}
+                                </button>
                             </div>
                         </div>
-
-                        <div v-if="selectedLog.user_agent">
-                            <span class="text-slate-700 dark:text-slate-300 font-bold block mb-1">{{ $t('activity.user_agent') }}</span>
-                            <div class="bg-slate-50 dark:bg-slate-950 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-mono text-[10px] break-all">
-                                {{ selectedLog.user_agent }}
-                            </div>
-                        </div>
-
-                        <div v-if="selectedLog.payload">
-                            <span class="text-slate-700 dark:text-slate-300 font-bold block mb-1">{{ $t('activity.payload_data') }}</span>
-                            <pre class="bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-theme-primary font-mono text-[10px] overflow-x-auto max-h-48">{{ JSON.stringify(selectedLog.payload, null, 2) }}</pre>
-                        </div>
                     </div>
-
-                    <div class="flex justify-end pt-2">
-                        <button
-                            @click="selectedLog = null"
-                            class="h-11 px-6 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer transition active:scale-95 border border-slate-200 dark:border-slate-700 shadow-xs"
-                        >
-                            {{ $t('common.close') }}
-                        </button>
-                    </div>
-                </div>
-            </div>
+                </Transition>
+            </Teleport>
         </div>
     </AppLayout>
 </template>

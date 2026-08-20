@@ -514,178 +514,197 @@ const toggleActive = (c) => {
             </div>
         </FilterDrawer>
 
-        <!-- Add / Edit Customer Modal -->
-        <div
-            v-if="showCustomerModal"
-            @click="showCustomerModal = false"
-            class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
-            dir="rtl"
-        >
-            <div @click.stop class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="font-black text-base text-white">
-                        {{ editingCustomer ? $t('contacts.customer_updated') : $t('contacts.add_new_customer') }}
-                    </h3>
-                    <button @click="showCustomerModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
-                </div>
-
-                <form @submit.prevent="saveCustomer" class="space-y-4">
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('contacts.customer_name') }} *</label>
-                        <input
-                            v-model="customerForm.name"
-                            type="text"
-                            required
-                            :placeholder="$t('contacts.customer_name')"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
-                        >
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('common.phone') }}</label>
-                            <input
-                                v-model="customerForm.phone"
-                                type="text"
-                                placeholder="01xxxxxxxxx"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-amber-500 focus:outline-none"
+        <!-- Add / Edit Customer Modal (Smooth Native Pop) -->
+        <Teleport to="body">
+            <Transition name="modal-zoom">
+                <div
+                    v-if="showCustomerModal"
+                    @click="showCustomerModal = false"
+                    class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 font-tajawal select-none"
+                    dir="rtl"
+                >
+                    <div @click.stop class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                            <h3 class="font-black text-base text-slate-900 dark:text-white">
+                                {{ editingCustomer ? $t('contacts.customer_updated') : $t('contacts.add_new_customer') }}
+                            </h3>
+                            <button
+                                @click="showCustomerModal = false"
+                                class="w-9 h-9 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-400 text-xs hover:text-slate-900 dark:hover:text-white cursor-pointer flex items-center justify-center transition active:scale-90 shadow-xs"
                             >
+                                <X class="w-4 h-4" />
+                            </button>
                         </div>
 
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('invoices.tax_number') || 'الرقم الضريبي' }}</label>
-                            <input
-                                v-model="customerForm.tax_number"
-                                type="text"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-amber-500 focus:outline-none"
-                            >
-                        </div>
-                    </div>
+                        <form @submit.prevent="saveCustomer" class="space-y-4">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('contacts.customer_name') }} *</label>
+                                <input
+                                    v-model="customerForm.name"
+                                    type="text"
+                                    required
+                                    :placeholder="$t('contacts.customer_name')"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner"
+                                >
+                            </div>
 
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('common.address') }}</label>
-                        <input
-                            v-model="customerForm.address"
-                            type="text"
-                            :placeholder="$t('common.address')"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
-                        >
-                    </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div class="space-y-1.5">
+                                    <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.phone') }}</label>
+                                    <input
+                                        v-model="customerForm.phone"
+                                        type="tel"
+                                        inputmode="tel"
+                                        placeholder="01xxxxxxxxx"
+                                        class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono focus:border-amber-500 focus:outline-none shadow-inner"
+                                    >
+                                </div>
 
-                    <div v-if="!editingCustomer" class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('contacts.opening_balance') }} ({{ $t('common.currency') }})</label>
-                        <input
-                            v-model="customerForm.opening_balance"
-                            type="number"
-                            step="0.001"
-                            placeholder="0.00"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-amber-500 focus:outline-none"
-                        >
-                    </div>
+                                <div class="space-y-1.5">
+                                    <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('invoices.tax_number') || 'الرقم الضريبي' }}</label>
+                                    <input
+                                        v-model="customerForm.tax_number"
+                                        type="text"
+                                        class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono focus:border-amber-500 focus:outline-none shadow-inner"
+                                    >
+                                </div>
+                            </div>
 
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('common.notes') }}</label>
-                        <textarea
-                            v-model="customerForm.notes"
-                            rows="2"
-                            class="w-full px-3.5 py-2 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
-                        ></textarea>
-                    </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.address') }}</label>
+                                <input
+                                    v-model="customerForm.address"
+                                    type="text"
+                                    :placeholder="$t('common.address')"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner"
+                                >
+                            </div>
 
-                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
-                        <button
-                            @click="showCustomerModal = false"
-                            type="button"
-                            class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
-                        >
-                            {{ $t('common.cancel') }}
-                        </button>
-                        <button
-                            type="submit"
-                            :disabled="customerForm.processing"
-                            class="px-5 py-2.5 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50"
-                        >
-                            {{ customerForm.processing ? '...' : (editingCustomer ? $t('common.save') : $t('contacts.add_new_customer')) }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                            <div v-if="!editingCustomer" class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('contacts.opening_balance') }} ({{ $t('common.currency') }})</label>
+                                <input
+                                    v-model="customerForm.opening_balance"
+                                    type="number"
+                                    step="0.001"
+                                    placeholder="0.00"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono focus:border-amber-500 focus:outline-none shadow-inner"
+                                >
+                            </div>
 
-        <!-- Payment Collection Voucher Modal -->
-        <div
-            v-if="showPaymentModal"
-            @click="showPaymentModal = false"
-            class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
-            dir="rtl"
-        >
-            <div @click.stop class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <div>
-                        <h3 class="font-black text-base text-white">{{ $t('contacts.record_receipt_voucher') }}</h3>
-                        <p class="text-xs text-emerald-400 font-bold mt-0.5">{{ selectedCustomerForPayment?.name }}</p>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.notes') }}</label>
+                                <textarea
+                                    v-model="customerForm.notes"
+                                    rows="2"
+                                    class="w-full p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner"
+                                ></textarea>
+                            </div>
+
+                            <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200 dark:border-slate-800">
+                                <button
+                                    @click="showCustomerModal = false"
+                                    type="button"
+                                    class="h-11 px-5 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95 cursor-pointer shadow-xs"
+                                >
+                                    {{ $t('common.cancel') }}
+                                </button>
+                                <button
+                                    type="submit"
+                                    :disabled="customerForm.processing"
+                                    class="h-11 px-6 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50 shadow-theme-primary"
+                                >
+                                    {{ customerForm.processing ? '...' : (editingCustomer ? $t('common.save') : $t('contacts.add_new_customer')) }}
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                    <button @click="showPaymentModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
                 </div>
+            </Transition>
+        </Teleport>
 
-                <form @submit.prevent="submitPayment" class="space-y-4">
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('contacts.voucher_amount') }} ({{ $t('common.currency') }}) *</label>
-                        <input
-                            v-model="paymentForm.amount"
-                            type="number"
-                            step="0.01"
-                            required
-                            placeholder="0.00"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-sm text-emerald-400 font-mono font-black focus:border-amber-500 focus:outline-none"
-                        >
-                    </div>
+        <!-- Payment Collection Voucher Modal (Smooth Native Pop) -->
+        <Teleport to="body">
+            <Transition name="modal-zoom">
+                <div
+                    v-if="showPaymentModal"
+                    @click="showPaymentModal = false"
+                    class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 font-tajawal select-none"
+                    dir="rtl"
+                >
+                    <div @click.stop class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                            <div>
+                                <h3 class="font-black text-base text-slate-900 dark:text-white">{{ $t('contacts.record_receipt_voucher') }}</h3>
+                                <p class="text-xs text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">{{ selectedCustomerForPayment?.name }}</p>
+                            </div>
+                            <button
+                                @click="showPaymentModal = false"
+                                class="w-9 h-9 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-400 text-xs hover:text-slate-900 dark:hover:text-white cursor-pointer flex items-center justify-center transition active:scale-90 shadow-xs"
+                            >
+                                <X class="w-4 h-4" />
+                            </button>
+                        </div>
 
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('contacts.payment_method') }} *</label>
-                        <SearchableSelect
-                            v-model="paymentForm.payment_method"
-                            :options="paymentMethodOptions"
-                            :placeholder="$t('contacts.payment_method')"
-                        />
-                    </div>
+                        <form @submit.prevent="submitPayment" class="space-y-4">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('contacts.voucher_amount') }} ({{ $t('common.currency') }}) *</label>
+                                <input
+                                    v-model="paymentForm.amount"
+                                    type="number"
+                                    step="0.01"
+                                    required
+                                    placeholder="0.00"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm text-emerald-600 dark:text-emerald-400 font-mono font-black focus:border-amber-500 focus:outline-none shadow-inner"
+                                >
+                            </div>
 
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('common.date') }} *</label>
-                        <DatePicker
-                            v-model="paymentForm.payment_date"
-                            :placeholder="$t('common.date')"
-                        />
-                    </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('contacts.payment_method') }} *</label>
+                                <SearchableSelect
+                                    v-model="paymentForm.payment_method"
+                                    :options="paymentMethodOptions"
+                                    :placeholder="$t('contacts.payment_method')"
+                                />
+                            </div>
 
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('common.notes') }}</label>
-                        <input
-                            v-model="paymentForm.notes"
-                            type="text"
-                            :placeholder="$t('common.notes')"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
-                        >
-                    </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.date') }} *</label>
+                                <DatePicker
+                                    v-model="paymentForm.payment_date"
+                                    :placeholder="$t('common.date')"
+                                />
+                            </div>
 
-                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
-                        <button
-                            @click="showPaymentModal = false"
-                            type="button"
-                            class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
-                        >
-                            {{ $t('common.cancel') }}
-                        </button>
-                        <button
-                            type="submit"
-                            :disabled="paymentForm.processing"
-                            class="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black shadow-lg shadow-emerald-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
-                        >
-                            {{ paymentForm.processing ? '...' : $t('contacts.record_receipt_voucher') }}
-                        </button>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.notes') }}</label>
+                                <input
+                                    v-model="paymentForm.notes"
+                                    type="text"
+                                    :placeholder="$t('common.notes')"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none shadow-inner"
+                                >
+                            </div>
+
+                            <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200 dark:border-slate-800">
+                                <button
+                                    @click="showPaymentModal = false"
+                                    type="button"
+                                    class="h-11 px-5 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95 cursor-pointer shadow-xs"
+                                >
+                                    {{ $t('common.cancel') }}
+                                </button>
+                                <button
+                                    type="submit"
+                                    :disabled="paymentForm.processing"
+                                    class="h-11 px-6 rounded-2xl btn-primary-theme text-xs font-black shadow-theme-primary transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                                >
+                                    {{ paymentForm.processing ? '...' : $t('contacts.record_receipt_voucher') }}
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                </form>
-            </div>
-        </div>
+                </div>
+            </Transition>
+        </Teleport>
     </AppLayout>
 </template>

@@ -181,45 +181,49 @@ const openDetailsModal = (t) => {
             </div>
         </div>
 
-        <!-- Transfer Details Modal -->
-        <div
-            v-if="showDetailsModal && selectedTransfer"
-            @click="showDetailsModal = false"
-            class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal select-none"
-            dir="rtl"
-        >
-            <div @click.stop class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-900 dark:text-white">
-                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-                    <div>
-                        <h3 class="font-black text-sm sm:text-base text-slate-900 dark:text-white">{{ $t('inventory.transfers_title') }}: {{ selectedTransfer.transfer_number }}</h3>
-                        <p class="text-xs text-theme-primary font-bold mt-0.5">{{ selectedTransfer.from_store_name }} ← {{ selectedTransfer.to_store_name }}</p>
-                    </div>
-                    <button
-                        @click="showDetailsModal = false"
-                        type="button"
-                        class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center justify-center text-sm font-bold transition active:scale-90 cursor-pointer shadow-xs"
-                    >
-                        ✕
-                    </button>
-                </div>
+        <!-- Transfer Details Modal (Smooth Native Pop) -->
+        <Teleport to="body">
+            <Transition name="modal-zoom">
+                <div
+                    v-if="showDetailsModal && selectedTransfer"
+                    @click="showDetailsModal = false"
+                    class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 font-tajawal select-none"
+                    dir="rtl"
+                >
+                    <div @click.stop class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 text-slate-900 dark:text-white max-h-[90vh] overflow-y-auto">
+                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                            <div>
+                                <h3 class="font-black text-sm sm:text-base text-slate-900 dark:text-white">{{ $t('inventory.transfers_title') }}: {{ selectedTransfer.transfer_number }}</h3>
+                                <p class="text-xs text-theme-primary font-bold mt-0.5">{{ selectedTransfer.from_store_name }} ← {{ selectedTransfer.to_store_name }}</p>
+                            </div>
+                            <button
+                                @click="showDetailsModal = false"
+                                type="button"
+                                class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center justify-center text-sm font-bold transition active:scale-90 cursor-pointer shadow-xs"
+                            >
+                                ✕
+                            </button>
+                        </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-right text-xs">
-                        <thead>
-                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
-                                <th class="pb-2">{{ $t('inventory.item_name') }}</th>
-                                <th class="pb-2 font-mono">{{ $t('inventory.transferred_quantity') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
-                            <tr v-for="it in selectedTransfer.items" :key="it.id">
-                                <td class="py-2.5 font-bold text-slate-900 dark:text-white font-tajawal">{{ it.item_name }}</td>
-                                <td class="py-2.5 font-mono font-black text-theme-primary">{{ it.quantity }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-xs">
+                                <thead>
+                                    <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
+                                        <th class="pb-2">{{ $t('inventory.item_name') }}</th>
+                                        <th class="pb-2 font-mono">{{ $t('inventory.transferred_quantity') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
+                                    <tr v-for="it in selectedTransfer.items" :key="it.id">
+                                        <td class="py-2.5 font-bold text-slate-900 dark:text-white font-tajawal">{{ it.item_name }}</td>
+                                        <td class="py-2.5 font-mono font-black text-theme-primary">{{ it.quantity }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </Transition>
+        </Teleport>
     </AppLayout>
 </template>

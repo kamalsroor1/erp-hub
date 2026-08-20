@@ -318,3 +318,41 @@
 ### حاجات لسه محتاجة شغل (مستقبلاً)
 - [ ] إضافة إيماءة السحب لتحديث البيانات (Pull-to-refresh) في صفحات القوائم الطويلة.
 - [ ] إضافة وضع العمل دون اتصال (Offline Service Worker Cache) للفواتير المخزنة محلياً.
+
+---
+
+## 🎯 جلسة المراجعة والترقية الشاملة لكافة النوافذ المنبثقة، التنبيهات، القوائم الجانبية، والـ Toasts (Alerts, Popups, Modals, Sidebars, Toasts & Confirm Dialogs) بتاريخ 2026-08-21
+
+### 1. جرد شامل لجميع العناصر المستهدفة (Inventory of All Interactive Overlays)
+
+| فئة العنصر (Category) | الملفات والمكونات المستهدفة (Target Components) | نوع الحركة والتفاعل (Native Animation) |
+|---|---|---|
+| **Sidebars / Navigation Drawers** | `Layouts/AppLayout.vue`<br>`Layouts/SuperAdminLayout.vue`<br>`Components/FilterDrawer.vue` | `sidebar-drawer` (انزلاق ناعم من اليمين في RTL بمعدل 250ms مع `cubic-bezier(0.16, 1, 0.3, 1)` وتلاشي الخلفية `backdrop-blur`) |
+| **Bottom Sheets & Action Menus** | `Components/ActionMenu.vue`<br>`Layouts/AppLayout.vue` (Notification Drawer) | `sheet-slide` (ارتفاع نابض من الأسفل مع مقبض سحب لمسي `w-12 h-1.5` و `pb-safe`) |
+| **POS Fast Flow Modals** | `Components/POS/POSWeightPickerModal.vue`<br>`Components/POS/POSCustomerPickerModal.vue`<br>`Components/POS/POSQuickCustomerModal.vue`<br>`Components/POS/POSSuccessModal.vue` | `modal-zoom` (انبثاق نابض مركزي Teleport إلى body مع `scale(0.92)` وخلفية زجاجية معتمة) |
+| **Resource Form Modals** | `Pages/Invoices/Index.vue` & `Pages/Invoices/Show.vue` (Cancel Modal)<br>`Pages/Items/Index.vue` (Item Form Modal)<br>`Pages/Customers/Index.vue` (Customer Form & Payment Collection)<br>`Pages/Suppliers/Index.vue` & `Suppliers/Statement.vue` (Supplier Form & Disbursement)<br>`Pages/Expenses/Index.vue` (Expense Form Modal)<br>`Pages/Stores/Index.vue` (Store Form & User Assignment Modals)<br>`Pages/Users/Index.vue` (User Form Modal) | `modal-zoom` + `Teleport to="body"` مع سكرول داخلي مرن `max-h-[90vh] overflow-y-auto` وهيدر وفوتر ثابتين وأزرار لمس `h-11` |
+| **Transaction & Inspection Modals** | `Pages/DailyJournal/Index.vue` (Open Shift, Close Shift Z-Report, Quick Expense)<br>`Pages/Purchases/Index.vue` (Purchase Details Modal)<br>`Pages/Returns/Index.vue` (Return Details Modal)<br>`Pages/StockTransfers/Index.vue` (Transfer Items Modal)<br>`Pages/ActivityLogs/Index.vue` (Log Inspection Modal) | `modal-zoom` + `Teleport to="body"` مع جداول مصفوفية واضحة ومقاسات شاشات الهاتف |
+| **SweetAlert2 & Confirm Dialogs** | `helpers/alert.js`<br>`resources/css/app.css` (`.swal2-popup.swal2-modal`, `.swal2-popup.swal2-toast`) | نابض فيزيائي `swal-native-pop` و `swal-toast-slide` مع نبضات اهتزاز لمسي (Haptic Feedback) |
+
+---
+
+### 2. التحسينات التقنية والهندسية المنفذة (Technical & UX Enhancements)
+
+1. **عزل النوافذ عبر `<Teleport to="body">`:**
+   - تم تغليف جميع المودالات والنوافذ المنبثقة في التطبيق داخل `<Teleport to="body">` لمنع حدوث أي مشاكل `z-index` أو اقتصاص الحواف بسبب الـ `overflow` أو الـ `transform` في العناصر الأب.
+
+2. **الانتقالات الفيزيائية النابضة (Spring Micro-Interactions):**
+   - استبدال الظهور والاختفاء الفجائي بحركات انتقال انسيابية فائقة النعومة:
+     - **النوافذ المنبثقة:** انسياب مركب وتكبير نابض `transform: scale(0.92) translateY(8px) -> scale(1) translateY(0)` بمعدل 0.24 ثانية ومنحنى بيزير `cubic-bezier(0.16, 1, 0.3, 1)`.
+     - **القوائم الجانبية ودروج الفلترة:** انزلاق طبيعي من جهة اليمين في الواجهة العربية `translateX(100%) -> translateX(0)`.
+     - **القوائم السفلية (Bottom Sheets):** انزلاق نابض من أسفل الشاشة `translateY(100%) -> translateY(0)`.
+
+3. **إمكانية الاستخدام والراحة اللمسية على شاشات الهاتف (Touch Ergonomics):**
+   - ضبط أزرار الإغلاق (✕) لتكون بحجم لمس مريح `w-9 h-9` مع تأثير ضغط `active:scale-90`.
+   - توحيد ارتفاع كافة حقول الإدخال والاختيار داخل النوافذ إلى `h-11 rounded-2xl` مع ظلال غائرة `shadow-inner`.
+   - رفع ارتفاع أزرار الإجراءات الأساسية (حفظ / اعتماد / تأكيد) إلى `h-11 px-6` وأزرار الإلغاء إلى `h-11 px-5`.
+   - منع خروج النوافذ عن حدود الشاشة الصغيرة عبر إضافة سكرول داخلي `max-h-[90vh] overflow-y-auto`.
+
+4. **تطوير رسائل وتنبيهات SweetAlert2:**
+   - كتابة Keyframes مخصصة في `app.css` لتنبيهات SweetAlert2 والـ Toasts لتعمل بحركة ارتداد نابضة سلسة بدون فلاش أبيض أو قفزة فجائية.
+   - خلفيات زجاجية معتمة `backdrop-filter: blur(8px)` وزوايا دائرية فاخرة `rounded-3xl` وظلال عميقة.

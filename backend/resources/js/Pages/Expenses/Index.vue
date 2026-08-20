@@ -454,125 +454,134 @@ const deleteExpense = (e) => {
             </div>
         </FilterDrawer>
 
-        <!-- Add / Edit Expense Modal -->
-        <div
-            v-if="showModal"
-            @click="showModal = false"
-            class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
-            dir="rtl"
-        >
-            <div @click.stop class="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-900 dark:text-white">
-                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-                    <h3 class="font-black text-base text-slate-900 dark:text-white">
-                        {{ editingExpense ? $t('expenses.edit_expense') : $t('expenses.new_expense') }}
-                    </h3>
-                    <button @click="showModal = false" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs dark:hover:text-white transition">✕</button>
-                </div>
-
-                <form @submit.prevent="saveExpense" class="space-y-4">
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('expenses.expense_item') }} *</label>
-                        <input
-                            v-model="expenseForm.title"
-                            type="text"
-                            required
-                            placeholder="مثال: شراء كراتين شحن / صيانة طاحونة رقم 2..."
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
-                        >
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('expenses.amount') }} *</label>
-                            <input
-                                v-model.number="expenseForm.amount"
-                                type="number"
-                                step="0.01"
-                                min="0.01"
-                                required
-                                placeholder="0.00"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-mono font-black text-rose-600 dark:text-rose-400 focus:border-theme-primary focus:outline-none"
-                            >
-                        </div>
-
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.date') }} *</label>
-                            <DatePicker v-model="expenseForm.expense_date" :placeholder="$t('common.date')" />
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('expenses.cost_center') }} *</label>
-                            <select
-                                v-model="expenseForm.cost_center"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
-                            >
-                                <option v-for="(label, key) in cost_centers" :key="key" :value="key">
-                                    {{ label }}
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('invoices.payment_method') }} *</label>
-                            <select
-                                v-model="expenseForm.payment_method"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
-                            >
-                                <option value="cash">{{ $t('treasury.cash_drawer') }} 💵</option>
-                                <option value="instapay">{{ $t('treasury.instapay') }} ⚡</option>
-                                <option value="e_wallet">{{ $t('treasury.e_wallet') }} 📱</option>
-                                <option value="visa">{{ $t('treasury.visa') }} 💳</option>
-                                <option value="bank_transfer">{{ $t('treasury.bank_transfer') }} 🏦</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('expenses.quick_category') }}</label>
-                        <div class="flex flex-wrap gap-1.5">
+        <!-- Add / Edit Expense Modal (Smooth Native Pop) -->
+        <Teleport to="body">
+            <Transition name="modal-zoom">
+                <div
+                    v-if="showModal"
+                    @click="showModal = false"
+                    class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 font-tajawal select-none"
+                    dir="rtl"
+                >
+                    <div @click.stop class="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 text-slate-900 dark:text-white max-h-[90vh] overflow-y-auto">
+                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                            <h3 class="font-black text-base text-slate-900 dark:text-white">
+                                {{ editingExpense ? $t('expenses.edit_expense') : $t('expenses.new_expense') }}
+                            </h3>
                             <button
-                                v-for="c in quickCategories"
-                                :key="c"
-                                @click="expenseForm.category = c"
-                                type="button"
-                                class="px-2.5 py-1 rounded-xl text-[11px] font-bold border transition cursor-pointer"
-                                :class="expenseForm.category === c ? 'bg-theme-light text-theme-primary border-theme-primary' : 'bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white'"
+                                @click="showModal = false"
+                                class="w-9 h-9 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-400 text-xs hover:text-slate-900 dark:hover:text-white cursor-pointer flex items-center justify-center transition active:scale-90 shadow-xs"
                             >
-                                {{ c }}
+                                <X class="w-4 h-4" />
                             </button>
                         </div>
-                    </div>
 
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('invoices.notes') }}</label>
-                        <input
-                            v-model="expenseForm.notes"
-                            type="text"
-                            :placeholder="$t('invoices.notes')"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
-                        >
-                    </div>
+                        <form @submit.prevent="saveExpense" class="space-y-4">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('expenses.expense_item') }} *</label>
+                                <input
+                                    v-model="expenseForm.title"
+                                    type="text"
+                                    required
+                                    placeholder="مثال: شراء كراتين شحن / صيانة طاحونة رقم 2..."
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
+                                >
+                            </div>
 
-                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
-                        <button
-                            @click="showModal = false"
-                            type="button"
-                            class="px-4 py-2.5 rounded-2xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                        >
-                            {{ $t('common.cancel') }}
-                        </button>
-                        <button
-                            type="submit"
-                            :disabled="expenseForm.processing"
-                            class="px-5 py-2.5 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50"
-                        >
-                            {{ expenseForm.processing ? $t('common.save') + '...' : $t('common.save') }}
-                        </button>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div class="space-y-1.5">
+                                    <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('expenses.amount') }} *</label>
+                                    <input
+                                        v-model.number="expenseForm.amount"
+                                        type="number"
+                                        step="0.01"
+                                        min="0.01"
+                                        required
+                                        placeholder="0.00"
+                                        class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm font-mono font-black text-rose-600 dark:text-rose-400 focus:border-theme-primary focus:outline-none shadow-inner"
+                                    >
+                                </div>
+
+                                <div class="space-y-1.5">
+                                    <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.date') }} *</label>
+                                    <DatePicker v-model="expenseForm.expense_date" :placeholder="$t('common.date')" />
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div class="space-y-1.5">
+                                    <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('expenses.cost_center') }} *</label>
+                                    <select
+                                        v-model="expenseForm.cost_center"
+                                        class="w-full h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none shadow-inner font-bold"
+                                    >
+                                        <option v-for="(label, key) in cost_centers" :key="key" :value="key">
+                                            {{ label }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="space-y-1.5">
+                                    <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('invoices.payment_method') }} *</label>
+                                    <select
+                                        v-model="expenseForm.payment_method"
+                                        class="w-full h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none shadow-inner font-bold"
+                                    >
+                                        <option value="cash">{{ $t('treasury.cash_drawer') }} 💵</option>
+                                        <option value="instapay">{{ $t('treasury.instapay') }} ⚡</option>
+                                        <option value="e_wallet">{{ $t('treasury.e_wallet') }} 📱</option>
+                                        <option value="visa">{{ $t('treasury.visa') }} 💳</option>
+                                        <option value="bank_transfer">{{ $t('treasury.bank_transfer') }} 🏦</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('expenses.quick_category') }}</label>
+                                <div class="flex flex-wrap gap-1.5">
+                                    <button
+                                        v-for="c in quickCategories"
+                                        :key="c"
+                                        @click="expenseForm.category = c"
+                                        type="button"
+                                        class="px-3 py-1.5 rounded-xl text-xs font-bold border transition active:scale-95 cursor-pointer shadow-xs"
+                                        :class="expenseForm.category === c ? 'bg-theme-light text-theme-primary border-theme-primary' : 'bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white'"
+                                    >
+                                        {{ c }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('invoices.notes') }}</label>
+                                <input
+                                    v-model="expenseForm.notes"
+                                    type="text"
+                                    :placeholder="$t('invoices.notes')"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
+                                >
+                            </div>
+
+                            <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200 dark:border-slate-800">
+                                <button
+                                    @click="showModal = false"
+                                    type="button"
+                                    class="h-11 px-5 rounded-2xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95 cursor-pointer shadow-xs"
+                                >
+                                    {{ $t('common.cancel') }}
+                                </button>
+                                <button
+                                    type="submit"
+                                    :disabled="expenseForm.processing"
+                                    class="h-11 px-6 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50 shadow-theme-primary"
+                                >
+                                    {{ expenseForm.processing ? $t('common.save') + '...' : $t('common.save') }}
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                </form>
-            </div>
-        </div>
+                </div>
+            </Transition>
+        </Teleport>
     </AppLayout>
 </template>
