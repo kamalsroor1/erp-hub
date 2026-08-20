@@ -129,11 +129,7 @@ const triggerUpdateModal = () => {
                 
                 <!-- Section 1: Cashier & Sales -->
                 <div class="space-y-1">
-                    <div class="text-[10px] font-extrabold uppercase text-slate-400 dark:text-slate-500 px-2 tracking-wider">
-                        الكاشير والمبيعات
-                    </div>
-
-                    <Link
+                    <div class="text-[10px] font-extrabold uppercase text-slate-400 dark:tex                    <Link
                         v-if="can('pos.access')"
                         href="/pos"
                         @click="closeMenu"
@@ -142,9 +138,9 @@ const triggerUpdateModal = () => {
                     >
                         <div class="flex items-center gap-2.5">
                             <span class="text-base">⚡</span>
-                            <span>كاشير ونقاط البيع (POS)</span>
+                            <span>{{ $t('nav.pos') }}</span>
                         </div>
-                        <span class="text-xs px-1.5 py-0.5 rounded-md bg-emerald-500 text-white font-bold">سريع</span>
+                        <span class="text-xs px-1.5 py-0.5 rounded-md bg-emerald-500 text-white font-bold">{{ $t('common.fast') || 'سريع' }}</span>
                     </Link>
 
                     <Link
@@ -156,7 +152,7 @@ const triggerUpdateModal = () => {
                     >
                         <div class="flex items-center gap-2.5">
                             <span class="text-base">🔐</span>
-                            <span>ورديات الكاشير ودرج النقدية</span>
+                            <span>{{ $t('nav.shifts') }}</span>
                         </div>
                         <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold font-mono">Z-Report</span>
                     </Link>
@@ -170,7 +166,7 @@ const triggerUpdateModal = () => {
                     >
                         <div class="flex items-center gap-2.5">
                             <span class="text-base">🧾</span>
-                            <span>فواتير المبيعات ومشاركة واتساب</span>
+                            <span>{{ $t('nav.invoices') }}</span>
                         </div>
                         <span class="text-slate-400 text-xs">‹</span>
                     </Link>
@@ -184,7 +180,7 @@ const triggerUpdateModal = () => {
                     >
                         <div class="flex items-center gap-2.5">
                             <span class="text-base">👥</span>
-                            <span>دليل العملاء وكشوف الحساب</span>
+                            <span>{{ $t('nav.customers') }}</span>
                         </div>
                         <span class="text-slate-400 text-xs">‹</span>
                     </Link>
@@ -193,7 +189,7 @@ const triggerUpdateModal = () => {
                 <!-- Section 2: Inventory & Items -->
                 <div v-if="can('items.view')" class="space-y-1">
                     <div class="text-[10px] font-extrabold uppercase text-slate-400 dark:text-slate-500 px-2 tracking-wider">
-                        المخزون والأصناف
+                        {{ $t('nav.inventory') }}
                     </div>
 
                     <Link
@@ -205,7 +201,7 @@ const triggerUpdateModal = () => {
                     >
                         <div class="flex items-center gap-2.5">
                             <span class="text-base">📦</span>
-                            <span>دليل الأصناف والمخزون</span>
+                            <span>{{ $t('nav.items') }}</span>
                         </div>
                         <span class="text-slate-400 text-xs">‹</span>
                     </Link>
@@ -219,7 +215,7 @@ const triggerUpdateModal = () => {
                     >
                         <div class="flex items-center gap-2.5">
                             <span class="text-base">🚚</span>
-                            <span>التحويل المخزني بين الفروع</span>
+                            <span>{{ $t('nav.stock_transfers') }}</span>
                         </div>
                         <span class="text-slate-400 text-xs">‹</span>
                     </Link>
@@ -228,7 +224,7 @@ const triggerUpdateModal = () => {
                 <!-- Section 3: Suppliers & Purchases & Returns -->
                 <div v-if="can('purchases.view') || can('suppliers.manage') || can('returns.manage')" class="space-y-1">
                     <div class="text-[10px] font-extrabold uppercase text-slate-400 dark:text-slate-500 px-2 tracking-wider">
-                        المشتريات والموردين والمرتجعات
+                        {{ $t('nav.purchases') }}
                     </div>
 
                     <Link
@@ -240,7 +236,7 @@ const triggerUpdateModal = () => {
                     >
                         <div class="flex items-center gap-2.5">
                             <span class="text-base">📦</span>
-                            <span>فواتير المشتريات والتوريد</span>
+                            <span>{{ $t('nav.purchases') }}</span>
                         </div>
                         <span class="text-slate-400 text-xs">‹</span>
                     </Link>
@@ -254,7 +250,7 @@ const triggerUpdateModal = () => {
                     >
                         <div class="flex items-center gap-2.5">
                             <span class="text-base">🔄</span>
-                            <span>مرتجعات المبيعات والمشتريات</span>
+                            <span>{{ $t('nav.returns') }}</span>
                         </div>
                         <span class="text-slate-400 text-xs">‹</span>
                     </Link>
@@ -268,7 +264,7 @@ const triggerUpdateModal = () => {
                     >
                         <div class="flex items-center gap-2.5">
                             <span class="text-base">🏭</span>
-                            <span>دليل الموردين وكشوف الحساب</span>
+                            <span>{{ $t('nav.suppliers') }}</span>
                         </div>
                         <span class="text-slate-400 text-xs">‹</span>
                     </Link>
@@ -277,7 +273,7 @@ const triggerUpdateModal = () => {
                 <!-- Section 4: Treasury, Vouchers & Reports -->
                 <div v-if="can('daily_journal.view') || can('expenses.manage') || can('reports.view')" class="space-y-1">
                     <div class="text-[10px] font-extrabold uppercase text-slate-400 dark:text-slate-500 px-2 tracking-wider">
-                        المالية والخزينة
+                        {{ $t('nav.treasury') }}
                     </div>
 
                     <Link
@@ -289,7 +285,7 @@ const triggerUpdateModal = () => {
                     >
                         <div class="flex items-center gap-2.5">
                             <span class="text-base">💰</span>
-                            <span>سندات القبض والصرف</span>
+                            <span>{{ $t('contacts.voucher_receipt') }} / {{ $t('contacts.voucher_payment') }}</span>
                         </div>
                         <span class="text-slate-400 text-xs">‹</span>
                     </Link>
@@ -303,7 +299,7 @@ const triggerUpdateModal = () => {
                     >
                         <div class="flex items-center gap-2.5">
                             <span class="text-base">💸</span>
-                            <span>المصروفات وتكلفة التشغيل</span>
+                            <span>{{ $t('nav.expenses') }}</span>
                         </div>
                         <span class="text-slate-400 text-xs">‹</span>
                     </Link>
@@ -317,7 +313,7 @@ const triggerUpdateModal = () => {
                     >
                         <div class="flex items-center gap-2.5">
                             <span class="text-base">🏦</span>
-                            <span>حركة الخزينة والصندوق</span>
+                            <span>{{ $t('nav.treasury') }}</span>
                         </div>
                         <span class="text-slate-400 text-xs">‹</span>
                     </Link>
@@ -331,7 +327,7 @@ const triggerUpdateModal = () => {
                     >
                         <div class="flex items-center gap-2.5">
                             <span class="text-base">📈</span>
-                            <span>تقارير الأرباح وتحليلات المبيعات</span>
+                            <span>{{ $t('nav.reports') }}</span>
                         </div>
                         <span class="text-slate-400 text-xs">‹</span>
                     </Link>
@@ -340,7 +336,7 @@ const triggerUpdateModal = () => {
                 <!-- Section 5: Admin & System Settings -->
                 <div v-if="hasRole('admin') || can('roles.manage')" class="space-y-1">
                     <div class="text-[10px] font-extrabold uppercase text-slate-400 dark:text-slate-500 px-2 tracking-wider">
-                        الإدارة والتحكم
+                        {{ $t('nav.management') }}
                     </div>
 
                     <Link
@@ -351,7 +347,7 @@ const triggerUpdateModal = () => {
                     >
                         <div class="flex items-center gap-2.5">
                             <span class="text-base">⚙️</span>
-                            <span>إعدادات النظام والطباعة</span>
+                            <span>{{ $t('nav.settings') }}</span>
                         </div>
                         <span class="text-slate-400 text-xs">‹</span>
                     </Link>
@@ -364,7 +360,7 @@ const triggerUpdateModal = () => {
                     >
                         <div class="flex items-center gap-2.5">
                             <span class="text-base">🕵️‍♂️</span>
-                            <span>سجل الرقابة وتدقيق العمليات</span>
+                            <span>{{ $t('nav.activity_logs') }}</span>
                         </div>
                         <span class="text-slate-400 text-xs">‹</span>
                     </Link>
@@ -383,6 +379,19 @@ const triggerUpdateModal = () => {
                         <span v-if="isDark">🌙</span>
                         <span v-else>☀️</span>
                         <span>{{ isDark ? 'المظهر الليلي (Dark Slate)' : 'المظهر الفاتح (Light Shell)' }}</span>
+                    </span>
+                    <span class="text-[10px] text-slate-400">{{ $t('common.edit') }}</span>
+                </button>
+
+                <button
+                    @click="logout"
+                    type="button"
+                    class="w-full h-10 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/20 flex items-center justify-center gap-2 text-xs font-black transition"
+                >
+                    <span>🚪</span>
+                    <span>{{ $t('nav.logout') }}</span>
+                </button>
+            </div>�ر الفاتح (Light Shell)' }}</span>
                     </span>
                     <span class="text-[10px] text-slate-400">تغيير</span>
                 </button>

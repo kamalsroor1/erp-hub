@@ -17,4 +17,21 @@ return [
     'password' => 'The provided password is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
 
+    // Vue 3 Login Page Localization
+    'title' => 'Sign in to ERP System',
+    'app_name' => 'Sroor ERP & Inventory Management',
+    'subtitle' => 'Sign in with your phone number and password to continue',
+    'phone' => 'Phone / Mobile Number',
+    'phone_placeholder' => '01012316954',
+    'password_label' => 'Password',
+    'password_placeholder' => '••••••••',
+    'remember_me' => 'Remember me on this device',
+    'login_button' => 'Sign In to Dashboard',
+    'logging_in' => 'Authenticating...',
+    'quick_accounts' => 'Authorized Accounts (Super Admin):',
+    'click_to_fill' => 'Click to quick-fill',
+    'super_admin_1' => 'Kamal Sroor (Super Admin 1)',
+    'super_admin_2' => 'General Manager 2 (Super Admin 2)',
+    'login_success' => 'Logged in successfully to ERP System.',
+    'logout_success' => 'Logged out successfully.',
 ];

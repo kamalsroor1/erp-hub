@@ -63,7 +63,7 @@ const isAuth = page.props.auth?.check;
         >
             <div class="bg-slate-900/95 text-white border border-emerald-500/30 px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
                 <div class="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
-                <span class="text-xs font-black text-emerald-400">جاري تحميل الصفحة...</span>
+                <span class="text-xs font-black text-emerald-400">{{ $t('common.loading') }}...</span>
             </div>
         </div>
 
@@ -93,7 +93,7 @@ const isAuth = page.props.auth?.check;
                     @click="isSideMenuOpen = true"
                     type="button"
                     class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition touch-active"
-                    title="القائمة الرئيسية"
+                    :title="$t('nav.main_menu')"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
@@ -105,7 +105,7 @@ const isAuth = page.props.auth?.check;
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 transition touch-active text-xs font-bold"
                 >
                     <span class="text-xs">🏬</span>
-                    <span class="truncate max-w-[140px]">{{ store?.name || 'الفرع الرئيسي' }}</span>
+                    <span class="truncate max-w-[140px]">{{ store?.name || $t('common.main_store_default') }}</span>
                     <span class="text-[10px] text-emerald-500">▼</span>
                 </button>
             </div>
@@ -146,55 +146,55 @@ const isAuth = page.props.auth?.check;
                 <!-- 1. Dashboard -->
                 <Link href="/" prefetch class="flex flex-col items-center justify-center py-1 transition touch-active" :class="page.url === '/' ? 'text-emerald-500 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'">
                     <span class="text-base mb-0.5">📊</span>
-                    <span class="text-[10px]">الرئيسية</span>
+                    <span class="text-[10px]">{{ $t('nav.dashboard') }}</span>
                 </Link>
 
                 <!-- 2. POS Cashier or Items -->
                 <Link v-if="can('pos.access')" href="/pos" prefetch class="flex flex-col items-center justify-center py-1 transition touch-active" :class="page.url.startsWith('/pos') ? 'text-emerald-500 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'">
                     <span class="text-base mb-0.5">⚡</span>
-                    <span class="text-[10px]">كاشير POS</span>
+                    <span class="text-[10px]">{{ $t('nav.pos') }}</span>
                 </Link>
                 <Link v-else-if="can('items.view')" href="/items" prefetch class="flex flex-col items-center justify-center py-1 transition touch-active" :class="page.url.startsWith('/items') ? 'text-emerald-500 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'">
                     <span class="text-base mb-0.5">☕</span>
-                    <span class="text-[10px]">المخزون</span>
+                    <span class="text-[10px]">{{ $t('nav.inventory') }}</span>
                 </Link>
                 <Link v-else href="/purchases" prefetch class="flex flex-col items-center justify-center py-1 transition touch-active" :class="page.url.startsWith('/purchases') ? 'text-emerald-500 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'">
                     <span class="text-base mb-0.5">📦</span>
-                    <span class="text-[10px]">المشتريات</span>
+                    <span class="text-[10px]">{{ $t('nav.purchases') }}</span>
                 </Link>
 
                 <!-- 3. Invoices or Shifts -->
                 <Link v-if="can('invoices.view')" href="/invoices" prefetch class="flex flex-col items-center justify-center py-1 transition touch-active" :class="page.url.startsWith('/invoices') ? 'text-emerald-500 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'">
                     <span class="text-base mb-0.5">🧾</span>
-                    <span class="text-[10px]">الفواتير</span>
+                    <span class="text-[10px]">{{ $t('nav.invoices') }}</span>
                 </Link>
                 <Link v-else-if="can('daily_journal.view')" href="/shifts" prefetch class="flex flex-col items-center justify-center py-1 transition touch-active" :class="page.url.startsWith('/shifts') ? 'text-emerald-500 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'">
                     <span class="text-base mb-0.5">🔐</span>
-                    <span class="text-[10px]">الورديات</span>
+                    <span class="text-[10px]">{{ $t('nav.shifts') }}</span>
                 </Link>
                 <Link v-else href="/customers" prefetch class="flex flex-col items-center justify-center py-1 transition touch-active" :class="page.url.startsWith('/customers') ? 'text-emerald-500 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'">
                     <span class="text-base mb-0.5">👥</span>
-                    <span class="text-[10px]">العملاء</span>
+                    <span class="text-[10px]">{{ $t('nav.customers') }}</span>
                 </Link>
 
                 <!-- 4. Treasury or Reports -->
                 <Link v-if="can('reports.view')" href="/reports" prefetch class="flex flex-col items-center justify-center py-1 transition touch-active" :class="page.url.startsWith('/reports') ? 'text-emerald-500 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'">
                     <span class="text-base mb-0.5">📈</span>
-                    <span class="text-[10px]">الأرباح</span>
+                    <span class="text-[10px]">{{ $t('nav.reports') }}</span>
                 </Link>
                 <Link v-else-if="can('daily_journal.view')" href="/treasury" prefetch class="flex flex-col items-center justify-center py-1 transition touch-active" :class="page.url.startsWith('/treasury') ? 'text-emerald-500 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'">
                     <span class="text-base mb-0.5">🏦</span>
-                    <span class="text-[10px]">الخزينة</span>
+                    <span class="text-[10px]">{{ $t('nav.treasury') }}</span>
                 </Link>
                 <Link v-else href="/suppliers" prefetch class="flex flex-col items-center justify-center py-1 transition touch-active" :class="page.url.startsWith('/suppliers') ? 'text-emerald-500 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'">
                     <span class="text-base mb-0.5">🏭</span>
-                    <span class="text-[10px]">الموردين</span>
+                    <span class="text-[10px]">{{ $t('nav.suppliers') }}</span>
                 </Link>
 
                 <!-- 5. Menu Drawer Trigger -->
                 <button @click="isSideMenuOpen = true" type="button" class="flex flex-col items-center justify-center py-1 transition text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 touch-active">
                     <span class="text-base mb-0.5">☰</span>
-                    <span class="text-[10px]">المزيد</span>
+                    <span class="text-[10px]">{{ $t('nav.more') }}</span>
                 </button>
             </div>
         </nav>
