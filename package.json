@@ -1,0 +1,22 @@
+{
+  "name": "erp-2026-e2e-tests",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test:fresh": "playwright test tests/e2e/specs/unified_fresh_journey.spec.js --headed --project=Mobile-Pixel-7",
+    "test:journey": "playwright test tests/e2e/specs/unified_journey.spec.js --headed --project=Mobile-Pixel-7",
+    "test:e2e": "playwright test",
+    "test:watch": "playwright test --headed --project=Mobile-Pixel-7",
+    "test:ui": "playwright test --ui",
+    "test:auth": "playwright test tests/e2e/specs/01_auth_session.spec.js --headed --project=Mobile-Pixel-7",
+    "test:stores": "playwright test tests/e2e/specs/02_store_switching.spec.js --headed --project=Mobile-Pixel-7",
+    "test:shifts": "playwright test tests/e2e/specs/03_shifts_cash.spec.js --headed --project=Mobile-Pixel-7",
+    "test:pos": "playwright test tests/e2e/specs/04_pos_fast_checkout.spec.js --headed --project=Mobile-Pixel-7",
+    "test:invoices": "playwright test tests/e2e/specs/05_invoices_lifecycle.spec.js --headed --project=Mobile-Pixel-7",
+    "test:report": "playwright show-report tests/e2e/reports"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "puppeteer": "^25.7.0"
+  }
+}
