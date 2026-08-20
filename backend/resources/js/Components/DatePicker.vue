@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import flatpickr from 'flatpickr';
 import { Arabic } from 'flatpickr/dist/l10n/ar.js';
@@ -60,7 +60,7 @@ const clearDate = (e) => {
 </script>
 
 <template>
-    <div class="relative w-full text-xs font-tajawal" :class="{ 'opacity-60 pointer-events-none': disabled }">
+    <div class="relative w-full text-xs sm:text-sm font-tajawal select-none" :class="{ 'opacity-60 pointer-events-none': disabled }">
         <div class="relative flex items-center">
             <span v-if="icon" class="absolute right-3.5 text-sm text-slate-400 pointer-events-none z-10">
                 {{ icon }}
@@ -72,8 +72,8 @@ const clearDate = (e) => {
                 :placeholder="placeholder"
                 :disabled="disabled"
                 readonly
-                class="w-full pr-10 pl-8 py-2.5 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-slate-700 text-white placeholder:text-slate-500 font-mono text-xs cursor-pointer focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 focus:outline-none transition"
-                :class="modelValue ? 'font-bold text-amber-400' : ''"
+                class="w-full h-11 pr-10 pl-9 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-mono text-xs sm:text-sm cursor-pointer focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 focus:outline-none transition shadow-inner font-tajawal"
+                :class="modelValue ? 'font-bold text-amber-600 dark:text-amber-400' : ''"
             >
 
             <!-- Clear Button -->
@@ -81,8 +81,8 @@ const clearDate = (e) => {
                 v-if="clearable && modelValue && !disabled"
                 @click="clearDate"
                 type="button"
-                class="absolute left-2.5 w-5 h-5 rounded-full hover:bg-slate-800 text-slate-400 hover:text-rose-400 flex items-center justify-center text-[10px] transition z-10"
-                title="مسح التاريخ"
+                class="absolute left-2.5 w-6 h-6 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 hover:text-rose-500 flex items-center justify-center text-xs transition z-10 active:scale-90"
+                :title="$t('common.cancel')"
             >
                 ✕
             </button>

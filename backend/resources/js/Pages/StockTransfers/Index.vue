@@ -72,9 +72,10 @@ const openDetailsModal = (t) => {
                 </Link>
             </div>
 
-            <!-- Transfers Table -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4 overflow-hidden">
-                <div class="overflow-x-auto">
+            <!-- Transfers Table & Mobile Cards -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-4 overflow-hidden font-tajawal">
+                <!-- Desktop Table (Hidden on Mobile) -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
@@ -127,11 +128,55 @@ const openDetailsModal = (t) => {
                             </tr>
                         </tbody>
                     </table>
+                </div>
 
-                    <div v-if="!transfers.data || transfers.data.length === 0" class="py-16 text-center space-y-2">
-                        <span class="text-3xl">🚚</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_transfers_found') }}</p>
+                <!-- Mobile Cards View (Visible on Small Screens) -->
+                <div class="md:hidden space-y-3">
+                    <div
+                        v-for="t in transfers.data"
+                        :key="t.id"
+                        class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-3 shadow-xs font-tajawal"
+                    >
+                        <!-- Top Row: Transfer Number + Status -->
+                        <div class="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-800/80 pb-2.5">
+                            <div>
+                                <div class="font-mono font-black text-sm text-theme-primary">{{ t.transfer_number }}</div>
+                                <p class="text-[11px] text-slate-400 font-mono">{{ t.transfer_date }}</p>
+                            </div>
+
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                                {{ $t('common.success') }} 🟢
+                            </span>
+                        </div>
+
+                        <!-- From Store -> To Store -->
+                        <div class="flex items-center justify-between text-xs font-bold bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                            <span class="text-rose-600 dark:text-rose-400">من: {{ t.from_store_name }}</span>
+                            <span class="text-slate-400">←</span>
+                            <span class="text-emerald-600 dark:text-emerald-400">إلى: {{ t.to_store_name }}</span>
+                        </div>
+
+                        <!-- Items Count & Action -->
+                        <div class="flex items-center justify-between gap-2 pt-1">
+                            <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">
+                                📦 {{ t.items_count }} {{ $t('inventory.item_unit') }}
+                            </span>
+
+                            <button
+                                @click="openDetailsModal(t)"
+                                type="button"
+                                class="h-10 px-4 rounded-xl bg-theme-light text-theme-primary font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs border border-theme-light"
+                            >
+                                <span>📋</span>
+                                <span>{{ $t('inventory.view_items') }}</span>
+                            </button>
+                        </div>
                     </div>
+                </div>
+
+                <div v-if="!transfers.data || transfers.data.length === 0" class="py-16 text-center space-y-2">
+                    <span class="text-3xl">🚚</span>
+                    <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_transfers_found') }}</p>
                 </div>
             </div>
         </div>
@@ -140,16 +185,22 @@ const openDetailsModal = (t) => {
         <div
             v-if="showDetailsModal && selectedTransfer"
             @click="showDetailsModal = false"
-            class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
+            class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal select-none"
             dir="rtl"
         >
             <div @click.stop class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-900 dark:text-white">
                 <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                     <div>
-                        <h3 class="font-black text-base text-slate-900 dark:text-white">{{ $t('inventory.transfers_title') }}: {{ selectedTransfer.transfer_number }}</h3>
+                        <h3 class="font-black text-sm sm:text-base text-slate-900 dark:text-white">{{ $t('inventory.transfers_title') }}: {{ selectedTransfer.transfer_number }}</h3>
                         <p class="text-xs text-theme-primary font-bold mt-0.5">{{ selectedTransfer.from_store_name }} ← {{ selectedTransfer.to_store_name }}</p>
                     </div>
-                    <button @click="showDetailsModal = false" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs dark:hover:text-white transition">✕</button>
+                    <button
+                        @click="showDetailsModal = false"
+                        type="button"
+                        class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center justify-center text-sm font-bold transition active:scale-90 cursor-pointer shadow-xs"
+                    >
+                        ✕
+                    </button>
                 </div>
 
                 <div class="overflow-x-auto">

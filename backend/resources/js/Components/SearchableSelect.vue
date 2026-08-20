@@ -123,21 +123,21 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div ref="selectRef" class="relative select-none text-xs font-tajawal w-full" :class="{ 'opacity-60 pointer-events-none': disabled }">
+    <div ref="selectRef" class="relative select-none text-xs sm:text-sm font-tajawal w-full" :class="{ 'opacity-60 pointer-events-none': disabled }">
         <!-- Trigger Button -->
         <div
             @click="toggleDropdown"
-            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-slate-700 text-white flex items-center justify-between gap-2 cursor-pointer transition focus:ring-2 focus:ring-amber-500/50"
+            class="w-full h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-900 dark:text-white flex items-center justify-between gap-2 cursor-pointer transition focus:ring-2 focus:ring-amber-500/50 shadow-inner"
             :class="[
                 isOpen ? 'border-amber-500 ring-2 ring-amber-500/20' : '',
-                selectedOption ? 'font-bold' : 'text-slate-400'
+                selectedOption ? 'font-bold' : 'text-slate-500 dark:text-slate-400'
             ]"
         >
             <div class="flex items-center gap-2 min-w-0 truncate">
                 <span v-if="icon" class="text-sm shrink-0">{{ icon }}</span>
                 <slot name="selected" :option="selectedOption">
-                    <span v-if="displayLabel" class="truncate text-white">{{ displayLabel }}</span>
-                    <span v-else class="text-slate-500 truncate">{{ placeholder }}</span>
+                    <span v-if="displayLabel" class="truncate text-slate-900 dark:text-white font-bold">{{ displayLabel }}</span>
+                    <span v-else class="text-slate-400 dark:text-slate-500 truncate">{{ placeholder }}</span>
                 </slot>
             </div>
 
@@ -147,14 +147,14 @@ onUnmounted(() => {
                     v-if="clearable && modelValue !== null && modelValue !== undefined && modelValue !== '' && !disabled"
                     @click="clearSelection"
                     type="button"
-                    class="w-5 h-5 rounded-full hover:bg-slate-800 text-slate-400 hover:text-rose-400 flex items-center justify-center text-[10px] transition"
+                    class="w-6 h-6 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 hover:text-rose-500 flex items-center justify-center text-xs transition active:scale-90"
                     :title="$t('common.cancel')"
                 >
                     ✕
                 </button>
 
                 <!-- Arrow Indicator -->
-                <span class="text-[10px] text-slate-500 transition-transform duration-200" :class="isOpen ? 'rotate-180 text-amber-400' : ''">
+                <span class="text-xs text-slate-400 dark:text-slate-500 transition-transform duration-200" :class="isOpen ? 'rotate-180 text-amber-500' : ''">
                     ▼
                 </span>
             </div>
@@ -163,36 +163,36 @@ onUnmounted(() => {
         <!-- Dropdown Menu -->
         <div
             v-if="isOpen"
-            class="absolute z-50 right-0 left-0 mt-1.5 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            class="absolute z-50 right-0 left-0 mt-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
         >
             <!-- Search Bar in Dropdown -->
-            <div v-if="searchable" class="p-2 border-b border-slate-800/80 bg-slate-950/50">
+            <div v-if="searchable" class="p-2 border-b border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950/50">
                 <div class="relative">
                     <input
                         ref="searchInputRef"
                         v-model="searchQuery"
                         type="text"
                         :placeholder="searchPlaceholder"
-                        class="w-full pr-8 pl-3 py-1.5 bg-slate-900 border border-slate-700/80 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500 transition"
+                        class="w-full pr-8 pl-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-amber-500 transition shadow-inner font-tajawal"
                         @keydown.stop
                     >
-                    <span class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-500 text-xs pointer-events-none">
+                    <span class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 text-xs pointer-events-none">
                         🔍
                     </span>
                 </div>
             </div>
 
             <!-- Options List (Scrollable) -->
-            <div class="max-h-56 overflow-y-auto p-1.5 space-y-0.5">
+            <div class="max-h-60 overflow-y-auto p-1.5 space-y-1">
                 <div
                     v-for="opt in filteredOptions"
                     :key="getOptionValue(opt)"
                     @click="selectOption(opt)"
-                    class="px-3 py-2 rounded-xl flex items-center justify-between gap-2 cursor-pointer transition text-xs"
+                    class="px-3 py-2.5 rounded-xl flex items-center justify-between gap-2 cursor-pointer transition text-xs sm:text-sm active:scale-98 min-h-[40px]"
                     :class="[
                         getOptionValue(opt) == modelValue
-                            ? 'bg-amber-500/15 text-amber-400 font-black border border-amber-500/30'
-                            : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                            ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 font-black border border-amber-500/30'
+                            : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
                     ]"
                 >
                     <slot name="option" :option="opt">
@@ -203,13 +203,13 @@ onUnmounted(() => {
                         </div>
                     </slot>
 
-                    <span v-if="getOptionValue(opt) == modelValue" class="text-amber-400 font-bold text-xs">
+                    <span v-if="getOptionValue(opt) == modelValue" class="text-amber-500 font-bold text-xs">
                         ✓
                     </span>
                 </div>
 
                 <!-- Empty State -->
-                <div v-if="filteredOptions.length === 0" class="py-6 text-center text-slate-500 text-xs font-bold">
+                <div v-if="filteredOptions.length === 0" class="py-6 text-center text-slate-400 text-xs font-bold font-tajawal">
                     {{ $t('common.no_data') }}
                 </div>
             </div>

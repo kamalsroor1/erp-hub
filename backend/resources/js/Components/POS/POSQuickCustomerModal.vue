@@ -35,45 +35,51 @@ const saveCustomer = async () => {
     <div
         v-if="show"
         @click="emit('close')"
-        class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4"
+        class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal select-none"
     >
-        <div @click.stop class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-2xl space-y-3">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                <h3 class="font-black text-sm text-white">{{ $t('pos.add_new_customer') }}</h3>
-                <button @click="emit('close')" class="w-7 h-7 rounded-xl bg-slate-800 text-slate-400 text-xs">✕</button>
+        <div @click.stop class="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="font-black text-sm sm:text-base text-slate-900 dark:text-white">{{ $t('pos.add_new_customer') }}</h3>
+                <button
+                    @click="emit('close')"
+                    type="button"
+                    class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center justify-center text-sm font-bold transition active:scale-90 cursor-pointer shadow-xs shrink-0"
+                >
+                    ✕
+                </button>
             </div>
 
-            <div class="space-y-2.5 text-xs">
-                <div>
-                    <label class="block text-slate-400 mb-1">{{ $t('pos.customer_name') }}:</label>
+            <div class="space-y-3 text-xs">
+                <div class="space-y-1">
+                    <label class="block font-bold text-slate-700 dark:text-slate-300">{{ $t('pos.customer_name') }}:</label>
                     <input
                         v-model="form.name"
                         type="text"
                         :placeholder="$t('contacts.name')"
-                        class="w-full h-9 bg-slate-800 border border-slate-700 rounded-xl px-3 text-white focus:outline-none focus:border-indigo-500"
+                        class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-amber-500 shadow-inner"
                     />
                 </div>
-                <div>
-                    <label class="block text-slate-400 mb-1">{{ $t('pos.customer_phone') }}:</label>
+                <div class="space-y-1">
+                    <label class="block font-bold text-slate-700 dark:text-slate-300">{{ $t('pos.customer_phone') }}:</label>
                     <input
                         v-model="form.phone"
                         type="tel"
                         placeholder="01012345678"
-                        class="w-full h-9 bg-slate-800 border border-slate-700 rounded-xl px-3 text-white font-mono focus:outline-none focus:border-indigo-500"
+                        class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 text-xs sm:text-sm text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-amber-500 shadow-inner"
                     />
                 </div>
-                <div>
-                    <label class="block text-slate-400 mb-1">{{ $t('pos.price_tier') }}:</label>
+                <div class="space-y-1">
+                    <label class="block font-bold text-slate-700 dark:text-slate-300">{{ $t('pos.price_tier') }}:</label>
                     <select
                         v-model="form.price_tier"
-                        class="w-full h-9 bg-slate-800 border border-slate-700 rounded-xl px-3 text-white focus:outline-none focus:border-indigo-500"
+                        class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 shadow-inner cursor-pointer"
                     >
                         <option value="retail">{{ $t('pos.retail_tier') }}</option>
                         <option value="wholesale">{{ $t('pos.wholesale_tier') }}</option>
                     </select>
                 </div>
 
-                <div v-if="errorMessage" class="p-2 rounded-lg bg-rose-500/20 text-rose-300 text-[10px]">
+                <div v-if="errorMessage" class="p-3 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-bold">
                     {{ errorMessage }}
                 </div>
 
@@ -81,9 +87,10 @@ const saveCustomer = async () => {
                     :disabled="isSaving || !form.name"
                     @click="saveCustomer"
                     type="button"
-                    class="w-full h-10 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black text-xs transition mt-2"
+                    class="w-full h-12 rounded-2xl btn-primary-theme disabled:opacity-50 font-black text-sm transition transform active:scale-95 cursor-pointer shadow-theme-primary flex items-center justify-center gap-2 mt-2"
                 >
-                    {{ isSaving ? '...' : $t('pos.save_select_customer') }}
+                    <span>💾</span>
+                    <span>{{ isSaving ? '...' : $t('pos.save_select_customer') }}</span>
                 </button>
             </div>
         </div>

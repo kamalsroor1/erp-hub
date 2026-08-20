@@ -137,39 +137,39 @@ const cancelPurchase = (p) => {
                 </div>
             </div>
 
-            <!-- KPI Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+            <!-- KPI Summary Cards (Bento Style on mobile) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4 font-tajawal">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('purchases.kpi_total_purchases') }}</span>
-                    <div class="text-2xl font-black font-mono text-theme-primary">
-                        {{ formatMoney(metrics.total_purchases) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-theme-primary">
+                        {{ formatMoney(metrics.total_purchases) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('purchases.kpi_confirmed_count') }}</span>
-                    <div class="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
-                        {{ metrics.confirmed_count || 0 }} <span class="text-xs text-slate-400 font-tajawal">{{ $t('invoices.title') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                        {{ metrics.confirmed_count || 0 }} <span class="text-[11px] text-slate-400 font-tajawal">{{ $t('invoices.title') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                <div class="col-span-2 sm:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('purchases.kpi_unpaid_total') }}</span>
-                    <div class="text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
-                        {{ formatMoney(metrics.unpaid_total) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
+                        {{ formatMoney(metrics.unpaid_total) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- Quick Filter Bar -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-xs space-y-3">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 shadow-xs space-y-3 font-tajawal">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-3">
                     <div class="w-full md:w-96 relative">
                         <input
                             v-model="search"
                             type="text"
                             :placeholder="$t('purchases.search_placeholder')"
-                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner"
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner font-tajawal"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
                             🔍
@@ -181,7 +181,7 @@ const cancelPurchase = (p) => {
                             <button
                                 @click="status = 'all'; applyFilters();"
                                 type="button"
-                                class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
+                                class="h-9 px-3 rounded-xl font-bold transition cursor-pointer active:scale-95"
                                 :class="status === 'all' ? 'tab-theme-active' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('common.all') }}
@@ -189,7 +189,7 @@ const cancelPurchase = (p) => {
                             <button
                                 @click="status = 'confirmed'; applyFilters();"
                                 type="button"
-                                class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
+                                class="h-9 px-3 rounded-xl font-bold transition cursor-pointer active:scale-95"
                                 :class="status === 'confirmed' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('invoices.status_confirmed') }} 🟢
@@ -197,7 +197,7 @@ const cancelPurchase = (p) => {
                             <button
                                 @click="status = 'cancelled'; applyFilters();"
                                 type="button"
-                                class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
+                                class="h-9 px-3 rounded-xl font-bold transition cursor-pointer active:scale-95"
                                 :class="status === 'cancelled' ? 'bg-rose-500 text-white font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('invoices.status_cancelled') }} 🔴
@@ -207,11 +207,11 @@ const cancelPurchase = (p) => {
                         <button
                             @click="isDrawerOpen = true"
                             type="button"
-                            class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+                            class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer active:scale-95 shadow-xs"
                         >
                             <span>⚙️</span>
                             <span>{{ $t('invoices.advanced_filters') }}</span>
-                            <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full bg-theme-primary text-white font-mono font-black text-[11px] flex items-center justify-center">
+                            <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full btn-primary-theme font-mono font-black text-[11px] flex items-center justify-center">
                                 {{ activeFiltersCount }}
                             </span>
                         </button>
@@ -219,9 +219,10 @@ const cancelPurchase = (p) => {
                 </div>
             </div>
 
-            <!-- Purchases Table -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4 overflow-hidden">
-                <div class="overflow-x-auto">
+            <!-- Purchases Table & Mobile Cards -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-4 overflow-hidden font-tajawal">
+                <!-- Desktop Table (Hidden on Mobile) -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
@@ -249,6 +250,11 @@ const cancelPurchase = (p) => {
                                 <td class="py-3.5">
                                     <div class="font-black text-slate-900 dark:text-white font-tajawal">{{ p.supplier_name }}</div>
                                     <div v-if="p.company_name" class="text-[10px] text-slate-500 dark:text-slate-400 font-tajawal">{{ p.company_name }}</div>
+                                </td>
+
+                                <!-- Store -->
+                                <td class="py-3.5 text-slate-600 dark:text-slate-400 font-tajawal">
+                                    {{ p.store_name || '—' }}
                                 </td>
 
                                 <!-- Date -->
@@ -308,11 +314,72 @@ const cancelPurchase = (p) => {
                             </tr>
                         </tbody>
                     </table>
+                </div>
 
-                    <div v-if="!purchases.data || purchases.data.length === 0" class="py-16 text-center space-y-2">
-                        <span class="text-3xl">📦</span>
-                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('purchases.empty_purchases_search') }}</p>
+                <!-- Mobile Cards View (Visible on Small Screens) -->
+                <div class="md:hidden space-y-3">
+                    <div
+                        v-for="p in purchases.data"
+                        :key="p.id"
+                        class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-3 shadow-xs font-tajawal"
+                    >
+                        <!-- Top Row: Invoice Number + Total -->
+                        <div class="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-800/80 pb-2.5">
+                            <div class="space-y-0.5">
+                                <Link :href="`/purchases/${p.id}`" class="font-mono font-black text-sm text-theme-primary hover:underline">
+                                    #{{ p.purchase_number }}
+                                </Link>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">{{ p.supplier_name }} <span v-if="p.company_name">({{ p.company_name }})</span></p>
+                            </div>
+
+                            <div class="text-left font-mono">
+                                <div class="font-black text-sm text-slate-900 dark:text-white">
+                                    {{ formatMoney(p.net_total) }} {{ $t('common.currency') }}
+                                </div>
+                                <div v-if="p.remaining_amount > 0" class="text-[10px] text-rose-600 dark:text-rose-400 font-bold">
+                                    متبقي: {{ formatMoney(p.remaining_amount) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Store & Date -->
+                        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                            <span>🏬 {{ p.store_name || '—' }} • {{ p.purchase_date }}</span>
+                            <span
+                                class="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                                :class="p.status === 'confirmed' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-rose-500/15 text-rose-600 dark:text-rose-400'"
+                            >
+                                {{ p.status === 'confirmed' ? $t('invoices.status_confirmed') : $t('invoices.status_cancelled') }}
+                            </span>
+                        </div>
+
+                        <!-- Mobile Action Bar -->
+                        <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-200 dark:border-slate-800/80">
+                            <button
+                                @click="openDetailsModal(p)"
+                                type="button"
+                                class="flex-1 h-10 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs border border-slate-200 dark:border-slate-700"
+                            >
+                                <span>📋</span>
+                                <span>{{ $t('common.details') }} ({{ p.items_count }})</span>
+                            </button>
+
+                            <button
+                                v-if="p.status === 'confirmed'"
+                                @click="cancelPurchase(p)"
+                                type="button"
+                                class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs shrink-0"
+                                :title="$t('purchases.cancel_btn_title')"
+                            >
+                                ✕
+                            </button>
+                        </div>
                     </div>
+                </div>
+
+                <div v-if="!purchases.data || purchases.data.length === 0" class="py-16 text-center space-y-2">
+                    <span class="text-3xl">📦</span>
+                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('purchases.empty_purchases_search') }}</p>
                 </div>
 
                 <!-- Pagination -->

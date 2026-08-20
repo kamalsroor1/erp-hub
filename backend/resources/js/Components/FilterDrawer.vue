@@ -38,29 +38,29 @@ onUnmounted(() => {
                 <!-- Slide-Over Drawer Container -->
                 <div class="fixed inset-y-0 left-0 max-w-full flex pl-0 sm:pl-10 pointer-events-none">
                     <div
-                        class="drawer-panel w-screen max-w-md bg-slate-900 border-r border-slate-800 shadow-2xl flex flex-col justify-between pointer-events-auto"
+                        class="drawer-panel w-screen max-w-md bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col justify-between pointer-events-auto"
                     >
                         <!-- Drawer Header -->
-                        <div class="p-5 border-b border-slate-800/80 bg-slate-900/90 flex items-center justify-between shrink-0">
+                        <div class="p-5 border-b border-slate-200 dark:border-slate-800/80 bg-slate-50/90 dark:bg-slate-900/90 flex items-center justify-between shrink-0">
                             <div class="flex items-center gap-2.5">
-                                <div class="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center font-bold text-base">
+                                <div class="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-base shadow-xs">
                                     🔍
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <h3 class="font-black text-sm text-white">{{ title }}</h3>
+                                        <h3 class="font-black text-sm sm:text-base text-slate-900 dark:text-white">{{ title }}</h3>
                                         <span v-if="activeCount > 0" class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500 text-slate-950">
                                             {{ activeCount }} {{ $t('common.active_count') }}
                                         </span>
                                     </div>
-                                    <p class="text-[11px] text-slate-400 mt-0.5">{{ subtitle }}</p>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{{ subtitle }}</p>
                                 </div>
                             </div>
 
                             <button
                                 @click="emit('close')"
                                 type="button"
-                                class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-xs transition cursor-pointer"
+                                class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center justify-center text-sm font-bold transition active:scale-90 cursor-pointer shadow-xs"
                             >
                                 ✕
                             </button>
@@ -72,11 +72,11 @@ onUnmounted(() => {
                         </div>
 
                         <!-- Drawer Footer (Sticky Actions) -->
-                        <div class="p-4 border-t border-slate-800/80 bg-slate-950/60 flex items-center justify-between gap-3 shrink-0">
+                        <div class="p-4 border-t border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950/60 flex items-center justify-between gap-3 shrink-0">
                             <button
                                 @click="emit('reset')"
                                 type="button"
-                                class="px-4 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5"
+                                class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition active:scale-95 cursor-pointer flex items-center gap-1.5 border border-slate-200 dark:border-transparent shadow-xs"
                             >
                                 <span>🔄</span>
                                 <span>{{ $t('common.reset_filters') }}</span>
@@ -86,7 +86,7 @@ onUnmounted(() => {
                                 <button
                                     @click="emit('close')"
                                     type="button"
-                                    class="px-4 py-2.5 rounded-2xl border border-slate-700 hover:bg-slate-800 text-slate-300 text-xs font-bold transition cursor-pointer"
+                                    class="h-11 px-4 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition active:scale-95 cursor-pointer shadow-xs"
                                 >
                                     {{ $t('common.cancel') }}
                                 </button>
@@ -94,7 +94,7 @@ onUnmounted(() => {
                                 <button
                                     @click="emit('apply')"
                                     type="button"
-                                    class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white text-xs font-black shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer flex items-center gap-1.5"
+                                    class="h-11 px-5 rounded-2xl btn-primary-theme text-xs font-black shadow-theme-primary transition transform active:scale-95 cursor-pointer flex items-center gap-1.5"
                                 >
                                     <span>🚀</span>
                                     <span>{{ $t('common.apply_filters') }}</span>

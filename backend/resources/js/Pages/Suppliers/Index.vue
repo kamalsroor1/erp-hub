@@ -196,39 +196,39 @@ const toggleActive = (s) => {
                 </button>
             </div>
 
-            <!-- KPI Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+            <!-- KPI Summary Cards (Bento Style on mobile) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.total_payable_suppliers') }}</span>
-                    <div class="text-2xl font-black font-mono text-theme-primary">
-                        {{ formatMoney(metrics.total_payable) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-theme-primary">
+                        {{ formatMoney(metrics.total_payable) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.creditors_count') }}</span>
-                    <div class="text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
-                        {{ metrics.creditors_count || 0 }} <span class="text-xs text-slate-400 font-tajawal">{{ $t('contacts.supplier_unit') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
+                        {{ metrics.creditors_count || 0 }} <span class="text-[11px] text-slate-400 font-tajawal">{{ $t('contacts.supplier_unit') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                <div class="col-span-2 sm:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.total_suppliers_count') }}</span>
-                    <div class="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
-                        {{ metrics.total_suppliers || 0 }} <span class="text-xs text-slate-400 font-tajawal">{{ $t('contacts.supplier_unit') }}</span>
+                    <div class="text-lg sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                        {{ metrics.total_suppliers || 0 }} <span class="text-[11px] text-slate-400 font-tajawal">{{ $t('contacts.supplier_unit') }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- Quick Filter Bar -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-xs space-y-3">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 shadow-xs space-y-3 font-tajawal">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-3">
                     <div class="w-full md:w-96 relative">
                         <input
                             v-model="search"
                             type="text"
                             :placeholder="$t('contacts.search_supplier_placeholder')"
-                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner"
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner font-tajawal"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
                             🔍
@@ -240,7 +240,7 @@ const toggleActive = (s) => {
                             <button
                                 @click="debtStatus = 'all'; applyFilters();"
                                 type="button"
-                                class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
+                                class="h-9 px-3 rounded-xl font-bold transition cursor-pointer active:scale-95"
                                 :class="debtStatus === 'all' ? 'tab-theme-active' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('common.all') }}
@@ -248,7 +248,7 @@ const toggleActive = (s) => {
                             <button
                                 @click="debtStatus = 'creditor'; applyFilters();"
                                 type="button"
-                                class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
+                                class="h-9 px-3 rounded-xl font-bold transition cursor-pointer active:scale-95"
                                 :class="debtStatus === 'creditor' ? 'bg-rose-500 text-white font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('contacts.creditors_only') }}
@@ -258,11 +258,11 @@ const toggleActive = (s) => {
                         <button
                             @click="isDrawerOpen = true"
                             type="button"
-                            class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+                            class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer active:scale-95 shadow-xs"
                         >
                             <span>⚙️</span>
                             <span>{{ $t('common.filter') }}</span>
-                            <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full bg-theme-primary text-white font-mono font-black text-[11px] flex items-center justify-center">
+                            <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full btn-primary-theme font-mono font-black text-[11px] flex items-center justify-center">
                                 {{ activeFiltersCount }}
                             </span>
                         </button>
@@ -270,52 +270,53 @@ const toggleActive = (s) => {
                 </div>
             </div>
 
-            <!-- Suppliers Table -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4 overflow-hidden">
-                <div class="overflow-x-auto">
+            <!-- Suppliers Table & Mobile Cards -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-4 overflow-hidden font-tajawal">
+                <!-- Desktop Table (Hidden on Mobile) -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                 <th class="pb-3">{{ $t('purchases.supplier') }}</th>
                                 <th class="pb-3">{{ $t('contacts.company_name') }}</th>
-                                <th class="pb-3">{{ $t('contacts.phone') }}</th>
-                                <th class="pb-3">{{ $t('contacts.address') }}</th>
-                                <th class="pb-3 font-mono">{{ $t('contacts.current_balance') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('contacts.phone') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('contacts.payable_balance_label') }}</th>
+                                <th class="pb-3 text-center">{{ $t('common.status') }}</th>
                                 <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
                             <tr v-for="s in suppliers.data" :key="s.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
-                                <!-- Name -->
+                                <!-- Supplier Name + Code -->
                                 <td class="py-3.5">
-                                    <div class="font-black text-slate-900 dark:text-white font-tajawal text-sm">{{ s.name }}</div>
-                                    <div v-if="s.notes" class="text-[10px] text-slate-500 font-tajawal">{{ s.notes }}</div>
+                                    <div class="font-black text-slate-900 dark:text-white font-tajawal">{{ s.name }}</div>
+                                    <div class="font-mono text-[10px] text-slate-500 dark:text-slate-400">{{ s.code }}</div>
                                 </td>
 
                                 <!-- Company -->
-                                <td class="py-3.5 font-tajawal font-bold text-slate-700 dark:text-slate-300">
+                                <td class="py-3.5 text-slate-600 dark:text-slate-400 font-tajawal">
                                     {{ s.company_name || '—' }}
                                 </td>
 
                                 <!-- Phone -->
-                                <td class="py-3.5 font-mono text-slate-600 dark:text-slate-300" dir="ltr">
+                                <td class="py-3.5 font-mono text-slate-500 dark:text-slate-400 text-[11px]" dir="ltr">
                                     {{ s.phone || '—' }}
                                 </td>
 
-                                <!-- Address -->
-                                <td class="py-3.5 font-tajawal text-slate-500 dark:text-slate-400">
-                                    {{ s.address || '—' }}
+                                <!-- Current Balance -->
+                                <td class="py-3.5 font-mono font-black text-sm">
+                                    <span :class="s.current_balance > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'">
+                                        {{ formatMoney(s.current_balance) }} {{ $t('common.currency') }}
+                                    </span>
                                 </td>
 
-                                <!-- Balance -->
-                                <td class="py-3.5 font-mono font-black text-sm">
+                                <!-- Status Badge -->
+                                <td class="py-3.5 text-center">
                                     <span
-                                        class="px-2.5 py-1 rounded-xl border"
-                                        :class="[
-                                            s.current_balance > 0 ? 'bg-amber-500/15 border-amber-500/30 text-amber-600 dark:text-amber-400' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'
-                                        ]"
+                                        class="px-2 py-0.5 rounded-full text-[10px] font-bold font-tajawal"
+                                        :class="s.is_active ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-transparent'"
                                     >
-                                        {{ formatMoney(s.current_balance) }} {{ $t('common.currency') }}
+                                        {{ s.is_active ? $t('common.active') : $t('common.inactive') }}
                                     </span>
                                 </td>
 
@@ -378,11 +379,91 @@ const toggleActive = (s) => {
                             </tr>
                         </tbody>
                     </table>
+                </div>
 
-                    <div v-if="!suppliers.data || suppliers.data.length === 0" class="py-16 text-center space-y-2">
-                        <span class="text-3xl">🏭</span>
-                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('contacts.no_suppliers_found') }}</p>
+                <!-- Mobile Cards View (Visible on Small Screens) -->
+                <div class="md:hidden space-y-3">
+                    <div
+                        v-for="s in suppliers.data"
+                        :key="s.id"
+                        class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-3 shadow-xs font-tajawal"
+                    >
+                        <!-- Top Row: Name + Balance -->
+                        <div class="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-800/80 pb-2.5">
+                            <div class="space-y-0.5">
+                                <div class="font-black text-sm text-slate-900 dark:text-white">{{ s.name }}</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{{ s.code }} <span v-if="s.company_name">• {{ s.company_name }}</span></p>
+                            </div>
+
+                            <span
+                                class="font-mono font-black text-sm px-2.5 py-1 rounded-xl"
+                                :class="s.current_balance > 0 ? 'text-rose-600 dark:text-rose-400 bg-rose-500/10 border border-rose-500/20' : 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800'"
+                            >
+                                {{ formatMoney(s.current_balance) }} {{ $t('common.currency') }}
+                            </span>
+                        </div>
+
+                        <!-- Phone & Status -->
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-mono text-slate-600 dark:text-slate-400" dir="ltr">{{ s.phone || '—' }}</span>
+                            <span
+                                class="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                                :class="s.is_active ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'"
+                            >
+                                {{ s.is_active ? $t('common.active') : $t('common.inactive') }}
+                            </span>
+                        </div>
+
+                        <!-- Mobile Action Bar -->
+                        <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-200 dark:border-slate-800/80">
+                            <!-- Disbursement Voucher Button -->
+                            <button
+                                @click="openPaymentModal(s)"
+                                type="button"
+                                class="flex-1 h-10 px-3 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-black text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs"
+                            >
+                                <span>💸</span>
+                                <span>{{ $t('contacts.record_disbursement_voucher') }}</span>
+                            </button>
+
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <!-- Statement -->
+                                <Link
+                                    :href="`/suppliers/${s.id}/statement`"
+                                    class="w-10 h-10 rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 flex items-center justify-center transition active:scale-90 shadow-xs"
+                                    :title="$t('contacts.statement_title')"
+                                >
+                                    📜
+                                </Link>
+
+                                <!-- Edit -->
+                                <button
+                                    @click="openEditModal(s)"
+                                    type="button"
+                                    class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
+                                    :title="$t('common.edit')"
+                                >
+                                    ✏️
+                                </button>
+
+                                <!-- Delete -->
+                                <button
+                                    @click="deleteSupplier(s)"
+                                    type="button"
+                                    class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
+                                    :class="!s.can_be_deleted ? 'opacity-40 cursor-not-allowed' : ''"
+                                    :title="s.can_be_deleted ? $t('common.delete') : s.deletion_blockers.join(', ')"
+                                >
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <div v-if="!suppliers.data || suppliers.data.length === 0" class="py-16 text-center space-y-2">
+                    <span class="text-3xl">🏭</span>
+                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('contacts.no_suppliers_found') }}</p>
                 </div>
 
                 <!-- Pagination -->

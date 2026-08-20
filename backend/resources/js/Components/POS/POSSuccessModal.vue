@@ -15,50 +15,52 @@ const { formatMoney } = useMoney();
     <div
         v-if="show && invoice"
         @click="emit('close')"
-        class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-xs flex items-center justify-center p-4"
+        class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal select-none"
     >
-        <div @click.stop class="w-full max-w-sm bg-slate-900 border border-emerald-500/40 rounded-3xl p-6 shadow-2xl text-center space-y-4 animate-scale-up">
-            <div class="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 text-3xl flex items-center justify-center mx-auto">
+        <div @click.stop class="w-full max-w-sm bg-white dark:bg-slate-900 border border-emerald-500/30 rounded-3xl p-6 sm:p-7 shadow-2xl text-center space-y-4 animate-scale-up">
+            <div class="w-16 h-16 rounded-3xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-3xl flex items-center justify-center mx-auto shadow-xs">
                 ✓
             </div>
 
             <div>
-                <h3 class="text-base font-black text-white">{{ $t('pos.invoice_saved_success') }}</h3>
-                <p class="text-xs text-slate-400 font-mono mt-0.5">
-                    {{ $t('pos.invoice_number') }}: <span class="text-emerald-400 font-bold">#{{ invoice.invoice_number }}</span>
+                <h3 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">{{ $t('pos.invoice_saved_success') }}</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5 font-bold">
+                    {{ $t('pos.invoice_number') }}: <span class="text-emerald-600 dark:text-emerald-400 font-black">#{{ invoice.invoice_number }}</span>
                 </p>
             </div>
 
-            <div class="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-800 text-xs space-y-1.5 font-mono">
-                <div class="flex items-center justify-between text-slate-300">
-                    <span>{{ $t('common.total') }}:</span>
-                    <span class="font-black text-emerald-400">{{ formatMoney(invoice.net_total) }} {{ $t('common.currency') }}</span>
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 text-xs space-y-2 font-mono">
+                <div class="flex items-center justify-between text-slate-700 dark:text-slate-300">
+                    <span class="font-tajawal">{{ $t('common.total') }}:</span>
+                    <span class="font-black text-emerald-600 dark:text-emerald-400 text-sm">{{ formatMoney(invoice.net_total) }} {{ $t('common.currency') }}</span>
                 </div>
-                <div class="flex items-center justify-between text-slate-400">
-                    <span>{{ $t('common.paid') }}:</span>
-                    <span class="font-bold text-white">{{ formatMoney(invoice.paid_amount) }} {{ $t('common.currency') }}</span>
+                <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+                    <span class="font-tajawal">{{ $t('common.paid') }}:</span>
+                    <span class="font-bold text-slate-900 dark:text-white">{{ formatMoney(invoice.paid_amount) }} {{ $t('common.currency') }}</span>
                 </div>
-                <div v-if="invoice.remaining_amount > 0" class="flex items-center justify-between text-rose-400">
-                    <span>{{ $t('pos.amount_remaining_on_acc') }}:</span>
-                    <span class="font-bold">{{ formatMoney(invoice.remaining_amount) }} {{ $t('common.currency') }}</span>
+                <div v-if="invoice.remaining_amount > 0" class="flex items-center justify-between text-rose-600 dark:text-rose-400">
+                    <span class="font-tajawal">{{ $t('pos.amount_remaining_on_acc') }}:</span>
+                    <span class="font-black">{{ formatMoney(invoice.remaining_amount) }} {{ $t('common.currency') }}</span>
                 </div>
             </div>
 
             <!-- Print & Actions Buttons -->
-            <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="grid grid-cols-2 gap-2.5 text-xs">
                 <a
                     :href="invoice.print_thermal_url"
                     target="_blank"
-                    class="p-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black flex items-center justify-center gap-1.5 shadow-md transition"
+                    class="h-11 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/20 transition active:scale-95"
                 >
+                    <span>🖨️</span>
                     <span>{{ $t('pos.print_thermal') }}</span>
                 </a>
 
                 <a
                     :href="invoice.print_a4_url"
                     target="_blank"
-                    class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold flex items-center justify-center gap-1.5 transition"
+                    class="h-11 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold flex items-center justify-center gap-1.5 transition active:scale-95 border border-slate-200 dark:border-transparent"
                 >
+                    <span>📄</span>
                     <span>{{ $t('pos.print_a4') }}</span>
                 </a>
             </div>
@@ -66,7 +68,7 @@ const { formatMoney } = useMoney();
             <button
                 @click="emit('close')"
                 type="button"
-                class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-black text-xs transition"
+                class="w-full h-12 rounded-2xl btn-primary-theme font-black text-sm transition transform active:scale-95 cursor-pointer shadow-theme-primary"
             >
                 {{ $t('pos.new_invoice_continue') }}
             </button>
