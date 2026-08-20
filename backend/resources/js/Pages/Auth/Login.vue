@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, computed } from 'vue';
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { trans } from '@/helpers/trans';
@@ -37,8 +37,8 @@ const fillAccount = (phone, password) => {
         <div class="w-full max-w-md bg-slate-900/90 backdrop-blur-2xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative z-10">
             <!-- Header / Brand Logo -->
             <div class="text-center space-y-3">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-slate-800/80 p-2.5 shadow-xl shadow-amber-500/10 border border-slate-700">
-                    <img src="/logo.png" alt="Logo" class="w-full h-full object-contain">
+                <div class="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-white dark:bg-slate-800 p-2 shadow-2xl shadow-theme-primary border border-slate-200 dark:border-slate-700">
+                    <img src="/logo.png" alt="Logo" class="w-full h-full object-contain filter drop-shadow-sm">
                 </div>
                 <div>
                     <h1 class="text-2xl font-black text-white font-tajawal tracking-tight">

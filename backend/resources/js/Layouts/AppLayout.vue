@@ -196,16 +196,21 @@ const getUserRoleLabel = computed(() => {
             ]"
         >
             <!-- Brand Header -->
-            <div class="h-16 px-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/90 shrink-0">
+            <div class="h-20 px-3.5 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/95 shrink-0">
                 <div class="flex items-center gap-3 min-w-0">
-                    <Link href="/" class="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 p-1.5 flex items-center justify-center shadow-xs border border-slate-200 dark:border-slate-700/80 shrink-0">
-                        <img src="/logo.png" alt="Logo" class="w-full h-full object-contain">
+                    <Link
+                        href="/"
+                        class="rounded-2xl bg-white dark:bg-slate-800 p-1 flex items-center justify-center shadow-xs border border-slate-200 dark:border-slate-700/80 shrink-0 transition-transform duration-200 hover:scale-105 group"
+                        :class="isSidebarCollapsed ? 'w-12 h-12' : 'w-14 h-14'"
+                        :title="tenant?.name || 'سرور كوفي'"
+                    >
+                        <img src="/logo.png" alt="Logo" class="w-full h-full object-contain filter drop-shadow-xs group-hover:brightness-105">
                     </Link>
                     <div v-if="!isSidebarCollapsed" class="truncate min-w-0">
-                        <h1 class="font-black text-xs sm:text-sm tracking-tight text-slate-900 dark:text-white font-tajawal line-clamp-1 leading-snug">
+                        <h1 class="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white font-tajawal line-clamp-1 leading-snug">
                             {{ tenant?.name || 'سرور كوفي' }}
                         </h1>
-                        <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold truncate">{{ $t('nav.cloud_erp_subtitle') }}</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold truncate">{{ $t('nav.cloud_erp_subtitle') }}</p>
                     </div>
                 </div>
 
