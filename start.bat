@@ -1,22 +1,21 @@
 @echo off
-chcp 65001 > nul
-title ERP HUB - نظام سرور كوفي المتكامل
+chcp 65001 >nul
+title Sroor Coffee ERP Hub
 
 echo ================================================================
-echo    🚀 تشغيل نظام سرور كوفي ERP المتكامل (Hub + Web + Mobile)
+echo    Sroor Coffee ERP - Full System Server (Web + Mobile)
 echo ================================================================
 echo.
-echo [1/3] فحص السيرفر والروابط المتاحة...
-echo   - لوحة تحكم السوبر أدمن: http://localhost:8000/admin/super
-echo   - متجر سرور كوفي (الكمبيوتر): http://sroor.localhost:8000/login
-echo   - متجر سرور كوفي (الموبايل عبر الواي فاي): http://10.250.200.55:8000/login
+echo Links:
+echo   - Desktop Admin: http://localhost:8000/admin/super
+echo   - Desktop Store: http://sroor.localhost:8000/login
+echo   - Mobile Wi-Fi:  http://10.250.200.55:8000/login
 echo.
-echo [2/3] فتح المتصفح تلقائياً على النظام...
-start "" "http://localhost:8000/admin/super"
+echo Launching browser...
 start "" "http://sroor.localhost:8000/login"
 echo.
-echo [3/3] جاري تشغيل السيرفرات لجميع الأجهزة والشبكة المحلية (Host: 0.0.0.0)...
-echo اضغط Ctrl+C لإيقاف السيرفر في أي وقت.
+echo Starting servers for all LAN devices (Host 0.0.0.0:8000)...
+echo Press Ctrl+C to stop servers at any time.
 echo ================================================================
 echo.
 
