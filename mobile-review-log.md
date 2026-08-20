@@ -307,6 +307,14 @@
    * `backend/resources/js/Pages/Settings/Index.vue`:
      - تحويل تبويبات الإعدادات الخمسة إلى شريط أزرار انسيابي قابل للتمرير الأفقي (Native Segmented Horizontal Scrollable Bar) بدون تكسر السطور أو تشويه المظهر.
 
-### حاجات لسه محتاجة شغل (زي gestures معقدة أو PWA setup)
-- [ ] إضافة إيماءة السحب للحذف (Swipe to Delete gesture) في سطور سلة الـ POS وعناصر الجداول.
-- [ ] إعداد ملف `manifest.json` وأيقونات PWA وخادم Service Worker للتخزين المؤقت في وضع عدم الاتصال (Offline Mode).
+8. **إيماءات السحب والـ PWA (Swipe Gestures & PWA Setup):**
+   * `backend/resources/js/Components/POS/POSCartItem.vue`:
+     - إضافة دعم إيماءة السحب اللمسية (Native Touch Swipe to Delete) بحيث يكشف سحب الصنف لليسار عن زر حذف أحمر مع نبضة اهتزاز لمسي قوية عند سحب الصنف للحذف كما في تطبيقات iOS/Android الاحترافية.
+   * `backend/resources/js/Components/POS/POSItemCard.vue`:
+     - دمج ردود الفعل اللمسية الفورية (Haptic Impact) والـ `card-native-tap` عند اختيار أي صنف أو شرائح الأوزان (1/8، 1/4، 1/2، 1كجم).
+   * `backend/resources/views/app.blade.php` & `backend/public/manifest.json`:
+     - ربط ملف تعريف الـ PWA المستقل بكافة أيقونات الـ Maskable والألوان الداكنة واللغة العربية للتشغيل كـ Standalone App.
+
+### حاجات لسه محتاجة شغل (مستقبلاً)
+- [ ] إضافة إيماءة السحب لتحديث البيانات (Pull-to-refresh) في صفحات القوائم الطويلة.
+- [ ] إضافة وضع العمل دون اتصال (Offline Service Worker Cache) للفواتير المخزنة محلياً.

@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useMoney } from '@/Composables/useMoney';
+import { useNativeBridge } from '@/Composables/useNativeBridge';
 
 const props = defineProps({
     item: { type: Object, required: true },
@@ -10,6 +11,7 @@ const props = defineProps({
 const emit = defineEmits(['select', 'add-qty']);
 
 const { formatMoney, formatQty } = useMoney();
+const { triggerHaptic } = useNativeBridge();
 
 const effectivePrice = computed(() => {
     return props.customerPriceTier === 'wholesale'
@@ -18,7 +20,7 @@ const effectivePrice = computed(() => {
 });
 
 const isWeightBased = computed(() => {
-    return props.item.unit === 'كجم' || props.item.unit === 'جم' || props.item.unit?.includes('كيلو');
+    return props.line?.unit === 'كجم' || props.item.unit === 'كجم' || props.item.unit === 'جم' || props.item.unit?.includes('كيلو');
 });
 
 const stockBadgeClass = computed(() => {
@@ -30,15 +32,25 @@ const stockBadgeClass = computed(() => {
     }
     return 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
 });
+
+const onSelect = () => {
+    triggerHaptic('light');
+    emit('select', props.item);
+};
+
+const onAddQty = (qty) => {
+    triggerHaptic('medium');
+    emit('add-qty', { item: props.item, quantity: qty });
+};
 </script>
 
 <template>
     <div
-        class="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/90 border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 rounded-2xl flex flex-col justify-between transition shadow-xs group overflow-hidden"
+        class="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/90 border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 rounded-2xl flex flex-col justify-between transition shadow-xs group overflow-hidden card-native-tap select-none"
     >
         <!-- Main Card Area (Tap for Custom Modal / Add 1) -->
         <div
-            @click="emit('select', item)"
+            @click="onSelect"
             class="p-3 cursor-pointer select-none flex-1 flex flex-col justify-between active:bg-slate-100 dark:active:bg-slate-800/60"
         >
             <div>
@@ -66,7 +78,7 @@ const stockBadgeClass = computed(() => {
         <!-- Direct Quick Weight Steppers Bar (For Coffee & Bulk items) -->
         <div v-if="isWeightBased" class="p-2 bg-slate-50 dark:bg-slate-950/80 border-t border-slate-200 dark:border-slate-800/80 grid grid-cols-4 gap-1.5">
             <button
-                @click.stop="emit('add-qty', { item, quantity: 0.125 })"
+                @click.stop="onAddQty(0.125)"
                 type="button"
                 class="h-8 sm:h-7 rounded-xl bg-slate-200/90 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-800 dark:hover:bg-amber-500 text-slate-800 dark:text-slate-200 font-black text-[11px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer shadow-xs"
                 :title="$t('inventory.weight_eighth')"
@@ -74,7 +86,7 @@ const stockBadgeClass = computed(() => {
                 1/8
             </button>
             <button
-                @click.stop="emit('add-qty', { item, quantity: 0.250 })"
+                @click.stop="onAddQty(0.250)"
                 type="button"
                 class="h-8 sm:h-7 rounded-xl bg-slate-200/90 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-800 dark:hover:bg-amber-500 text-slate-800 dark:text-slate-200 font-black text-[11px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer shadow-xs"
                 :title="$t('inventory.weight_quarter')"
@@ -82,7 +94,7 @@ const stockBadgeClass = computed(() => {
                 1/4
             </button>
             <button
-                @click.stop="emit('add-qty', { item, quantity: 0.500 })"
+                @click.stop="onAddQty(0.500)"
                 type="button"
                 class="h-8 sm:h-7 rounded-xl bg-slate-200/90 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-800 dark:hover:bg-amber-500 text-slate-800 dark:text-slate-200 font-black text-[11px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer shadow-xs"
                 :title="$t('inventory.weight_half')"
@@ -90,7 +102,7 @@ const stockBadgeClass = computed(() => {
                 1/2
             </button>
             <button
-                @click.stop="emit('add-qty', { item, quantity: 1.000 })"
+                @click.stop="onAddQty(1.000)"
                 type="button"
                 class="h-8 sm:h-7 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[11px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer shadow-xs"
                 :title="$t('inventory.weight_kilo')"
