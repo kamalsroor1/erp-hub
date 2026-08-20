@@ -137,7 +137,7 @@ const { formatMoney } = useMoney();
                                             class="px-2 py-0.5 rounded-full text-[10px] font-black"
                                             :class="t.status === 'active' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'"
                                         >
-                                            {{ t.status }}
+                                            {{ t.status === 'active' ? $t('super.status_active') : (t.status === 'trial' ? $t('super.status_trial') : $t('super.status_suspended')) }}
                                         </span>
                                     </td>
                                     <td class="py-3 font-mono text-slate-400 text-left">{{ t.created_at }}</td>
@@ -165,7 +165,7 @@ const { formatMoney } = useMoney();
                                 <span class="font-mono text-indigo-400">{{ p.tenants_count }} {{ $t('super.tenants') }}</span>
                             </div>
                             <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono">
-                                <span>{{ formatMoney(p.price_monthly) }} {{ $t('common.currency') }}/شهر</span>
+                                <span>{{ formatMoney(p.price_monthly) }} {{ $t('common.currency') }} / {{ $t('super.per_month') }}</span>
                                 <span class="text-emerald-400">{{ formatMoney(p.mrr_contribution) }} {{ $t('common.currency') }}</span>
                             </div>
                         </div>

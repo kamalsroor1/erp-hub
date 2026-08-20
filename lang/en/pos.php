@@ -41,4 +41,9 @@ return [
     'invoice_confirmed_success' => 'Invoice #[:number] issued successfully!',
     'empty_cart_error'          => 'Please add items to cart first!',
     'no_active_store_error'     => 'Please select an active store first!',
+    'cash_drawer'               => 'Cash Drawer (Cash)',
+    'instapay'                  => 'InstaPay Transfer',
+    'e_wallet'                  => 'Smart E-Wallets',
+    'visa_card'                 => 'Visa / Debit Cards',
+    'bank_transfer'             => 'Bank Wire Transfer',
 ];

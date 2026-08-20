@@ -43,4 +43,9 @@ return [
     'invoice_confirmed_success' => 'تم إصدار الفاتورة رقم [:number] بنجاح!',
     'empty_cart_error'          => 'يرجى إضافة أصناف إلى السلة أولاً!',
     'no_active_store_error'     => 'يرجى تحديد فرع نشط أولاً!',
+    'cash_drawer'               => 'درج الكاش (نقداً)',
+    'instapay'                  => 'إنستاباي (InstaPay)',
+    'e_wallet'                  => 'المحافظ الذكية',
+    'visa_card'                 => 'بطاقات فيزا / شبكة',
+    'bank_transfer'             => 'تحويل بنكي',
 ];

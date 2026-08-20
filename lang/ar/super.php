@@ -56,4 +56,5 @@ return [
     'status_updated_success' => 'تم تحديث حالة المستأجر بنجاح!',
     'plan_updated_success' => 'تم تحديث باقة [:name] بنجاح!',
     'auto_provision_note' => 'تم إنشاء الحساب تلقائياً عبر خدمة التجهيز المركزي',
+    'per_month' => 'شهر',
 ];

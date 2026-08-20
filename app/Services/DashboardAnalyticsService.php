@@ -121,11 +121,11 @@ class DashboardAnalyticsService
 
         $paymentDistribution = [];
         $methodLabels = [
-            'cash'          => 'درج الكاش (نقداً)',
-            'instapay'      => 'إنستاباي (InstaPay)',
-            'e_wallet'      => 'المحافظ الذكية',
-            'visa'          => 'بطاقات فيزا / شبكة',
-            'bank_transfer' => 'تحويل بنكي',
+            'cash'          => __('pos.cash_drawer'),
+            'instapay'      => __('pos.instapay'),
+            'e_wallet'      => __('pos.e_wallet'),
+            'visa'          => __('pos.visa_card'),
+            'bank_transfer' => __('pos.bank_transfer'),
         ];
 
         foreach ($paymentMethods as $mKey => $mAmount) {

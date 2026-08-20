@@ -28,11 +28,13 @@ const maxDailySales = computed(() => {
     return Math.max(...props.analytics.daily_trend.map(d => d.sales), 1);
 });
 
+import { trans } from '@/helpers/trans';
+
 const getPaymentTypeBadge = (type) => {
     switch (type) {
-        case 'cash': return { label: 'نقدي', class: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' };
-        case 'credit': return { label: 'آجل', class: 'bg-rose-500/15 text-rose-400 border border-rose-500/30' };
-        case 'partial': return { label: 'جزئي', class: 'bg-amber-500/15 text-amber-400 border border-amber-500/30' };
+        case 'cash': return { label: trans('invoices.cash') || 'نقدي', class: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' };
+        case 'credit': return { label: trans('invoices.credit') || 'آجل', class: 'bg-rose-500/15 text-rose-400 border border-rose-500/30' };
+        case 'partial': return { label: trans('invoices.partial') || 'جزئي', class: 'bg-amber-500/15 text-amber-400 border border-amber-500/30' };
         default: return { label: type, class: 'bg-slate-800 text-slate-400' };
     }
 };
