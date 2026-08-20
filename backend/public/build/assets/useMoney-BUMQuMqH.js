@@ -1,0 +1,1 @@
+function e(){return{formatMoney:(e,t=2)=>Number(e||0).toLocaleString(`en-US`,{minimumFractionDigits:t,maximumFractionDigits:t}),formatQty:(e,t=3)=>Number(e||0).toLocaleString(`en-US`,{minimumFractionDigits:t,maximumFractionDigits:t})}}export{e as t};
