@@ -117,11 +117,11 @@ const deleteUser = (u) => {
                 <div class="space-y-1">
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">👥</span>
-                        <h1 class="text-xl sm:text-2xl font-black text-white">
+                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                             {{ $t('users.title') }}
                         </h1>
                     </div>
-                    <p class="text-xs text-slate-400 font-bold">
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
                         {{ $t('users.subtitle') }}
                     </p>
                 </div>
@@ -129,7 +129,7 @@ const deleteUser = (u) => {
                 <div class="flex items-center gap-2.5">
                     <Link
                         href="/roles"
-                        class="h-11 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
+                        class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
                     >
                         <span>🛡️</span>
                         <span>{{ $t('users.matrix_btn') }}</span>
@@ -147,14 +147,14 @@ const deleteUser = (u) => {
             </div>
 
             <!-- Quick Filter Bar -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-3">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-xs space-y-3">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-3">
                     <div class="w-full md:w-96 relative">
                         <input
                             v-model="search"
                             type="text"
                             :placeholder="$t('users.search_placeholder')"
-                            class="w-full pr-10 pl-4 py-2.5 bg-slate-950/80 border border-slate-800 rounded-2xl text-xs text-white placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition shadow-inner"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
                             🔍
@@ -164,7 +164,7 @@ const deleteUser = (u) => {
                     <div class="w-full md:w-auto flex items-center gap-2">
                         <select
                             v-model="roleFilter"
-                            class="px-3.5 py-2.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                            class="px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none"
                         >
                             <option value="all">{{ $t('users.all_roles') }}</option>
                             <option value="admin">{{ $t('users.role_admin') }}</option>
@@ -177,11 +177,11 @@ const deleteUser = (u) => {
             </div>
 
             <!-- Users Table -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4 overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                 <th class="pb-3">{{ $t('auth.name') }}</th>
                                 <th class="pb-3">{{ $t('auth.phone') }}</th>
                                 <th class="pb-3">{{ $t('common.user') }}</th>
@@ -190,14 +190,14 @@ const deleteUser = (u) => {
                                 <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/60 font-sans">
-                            <tr v-for="u in users.data" :key="u.id" class="hover:bg-slate-800/30 transition">
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
+                            <tr v-for="u in users.data" :key="u.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
                                 <td class="py-3.5">
-                                    <div class="font-black text-white font-tajawal text-sm">{{ u.name }}</div>
-                                    <div v-if="u.email" class="text-[10px] text-slate-500 font-mono">{{ u.email }}</div>
+                                    <div class="font-black text-slate-900 dark:text-white font-tajawal text-sm">{{ u.name }}</div>
+                                    <div v-if="u.email" class="text-[10px] text-slate-400 dark:text-slate-500 font-mono">{{ u.email }}</div>
                                 </td>
 
-                                <td class="py-3.5 font-mono font-bold text-amber-400 text-xs">
+                                <td class="py-3.5 font-mono font-bold text-amber-600 dark:text-amber-400 text-xs">
                                     {{ u.phone }}
                                 </td>
 
@@ -205,15 +205,15 @@ const deleteUser = (u) => {
                                     <span
                                         class="px-2.5 py-1 rounded-xl text-xs font-bold"
                                         :class="[
-                                            u.primary_role === 'admin' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
-                                            (u.primary_role === 'cashier' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-300')
+                                            u.primary_role === 'admin' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30' :
+                                            (u.primary_role === 'cashier' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-transparent')
                                         ]"
                                     >
                                         {{ u.primary_role === 'admin' ? $t('users.role_admin') : (u.primary_role === 'cashier' ? $t('users.role_cashier') : (u.primary_role === 'storekeeper' ? $t('users.role_storekeeper') : $t('users.role_accountant'))) }}
                                     </span>
                                 </td>
 
-                                <td class="py-3.5 font-tajawal text-slate-300">
+                                <td class="py-3.5 font-tajawal text-slate-700 dark:text-slate-300">
                                     {{ u.default_store_name || $t('users.all_stores_option') }}
                                 </td>
 
@@ -222,7 +222,7 @@ const deleteUser = (u) => {
                                         @click="toggleUser(u)"
                                         type="button"
                                         class="px-2.5 py-0.5 rounded-full text-[10px] font-bold font-tajawal transition cursor-pointer"
-                                        :class="u.is_active ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'"
+                                        :class="u.is_active ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30'"
                                     >
                                         {{ u.is_active ? $t('users.status_active') : $t('users.status_inactive') }}
                                     </button>
@@ -233,7 +233,7 @@ const deleteUser = (u) => {
                                         <button
                                             @click="openEditModal(u)"
                                             type="button"
-                                            class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold transition cursor-pointer"
+                                            class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 text-xs font-bold transition cursor-pointer border border-slate-200 dark:border-transparent"
                                         >
                                             {{ $t('common.edit') }} ✏️
                                         </button>
@@ -241,7 +241,7 @@ const deleteUser = (u) => {
                                         <button
                                             @click="deleteUser(u)"
                                             type="button"
-                                            class="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition cursor-pointer"
+                                            class="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 transition cursor-pointer"
                                         >
                                             🗑️
                                         </button>

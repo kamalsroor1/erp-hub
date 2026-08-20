@@ -34,27 +34,27 @@ const stockBadgeClass = computed(() => {
 
 <template>
     <div
-        class="bg-slate-900 hover:bg-slate-800/90 border border-slate-800 hover:border-amber-500/40 rounded-2xl flex flex-col justify-between transition shadow-sm group overflow-hidden"
+        class="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/90 border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 rounded-2xl flex flex-col justify-between transition shadow-xs group overflow-hidden"
     >
         <!-- Main Card Area (Tap for Custom Modal / Add 1) -->
         <div
             @click="emit('select', item)"
-            class="p-3 cursor-pointer select-none flex-1 flex flex-col justify-between active:bg-slate-800/60"
+            class="p-3 cursor-pointer select-none flex-1 flex flex-col justify-between active:bg-slate-100 dark:active:bg-slate-800/60"
         >
             <div>
-                <div class="flex items-center justify-between text-[10px] text-slate-400 font-bold mb-1">
+                <div class="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 font-bold mb-1">
                     <span class="truncate">{{ item.category || $t('common.all') }}</span>
                     <span class="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold" :class="stockBadgeClass">
                         {{ formatQty(item.current_stock, 1) }} {{ item.unit }}
                     </span>
                 </div>
-                <h3 class="font-black text-xs text-white line-clamp-2 leading-tight group-hover:text-amber-300 transition">
+                <h3 class="font-black text-xs text-slate-900 dark:text-white line-clamp-2 leading-tight group-hover:text-amber-600 dark:group-hover:text-amber-300 transition">
                     {{ item.name }}
                 </h3>
             </div>
 
-            <div class="mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between">
-                <span class="text-xs font-black font-mono text-emerald-400">
+            <div class="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                <span class="text-xs font-black font-mono text-emerald-600 dark:text-emerald-400">
                     {{ formatMoney(effectivePrice) }} <span class="text-[9px] text-slate-400">{{ $t('common.currency') }}</span>
                 </span>
                 <span class="text-[10px] text-slate-400 font-mono">
@@ -64,11 +64,11 @@ const stockBadgeClass = computed(() => {
         </div>
 
         <!-- Direct Quick Weight Steppers Bar (For Coffee & Bulk items) -->
-        <div v-if="isWeightBased" class="p-1.5 bg-slate-950/80 border-t border-slate-800/80 grid grid-cols-4 gap-1">
+        <div v-if="isWeightBased" class="p-1.5 bg-slate-50 dark:bg-slate-950/80 border-t border-slate-200 dark:border-slate-800/80 grid grid-cols-4 gap-1">
             <button
                 @click.stop="emit('add-qty', { item, quantity: 0.125 })"
                 type="button"
-                class="h-7 rounded-lg bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-300 font-bold text-[10px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer"
+                class="h-7 rounded-lg bg-slate-200/80 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer"
                 :title="$t('inventory.weight_eighth')"
             >
                 1/8
@@ -76,7 +76,7 @@ const stockBadgeClass = computed(() => {
             <button
                 @click.stop="emit('add-qty', { item, quantity: 0.250 })"
                 type="button"
-                class="h-7 rounded-lg bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-300 font-bold text-[10px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer"
+                class="h-7 rounded-lg bg-slate-200/80 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer"
                 :title="$t('inventory.weight_quarter')"
             >
                 1/4
@@ -84,7 +84,7 @@ const stockBadgeClass = computed(() => {
             <button
                 @click.stop="emit('add-qty', { item, quantity: 0.500 })"
                 type="button"
-                class="h-7 rounded-lg bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-300 font-bold text-[10px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer"
+                class="h-7 rounded-lg bg-slate-200/80 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px] font-mono transition active:scale-90 flex items-center justify-center cursor-pointer"
                 :title="$t('inventory.weight_half')"
             >
                 1/2

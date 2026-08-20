@@ -178,11 +178,11 @@ const toggleActive = (c) => {
                 <div class="space-y-1">
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">👥</span>
-                        <h1 class="text-xl sm:text-2xl font-black text-white">
+                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                             {{ $t('contacts.customers_title') }}
                         </h1>
                     </div>
-                    <p class="text-xs text-slate-400 font-bold">
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
                         {{ $t('contacts.customers_subtitle') }}
                     </p>
                 </div>
@@ -199,37 +199,37 @@ const toggleActive = (c) => {
 
             <!-- KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">{{ $t('contacts.total_customer_debts') }}</span>
-                    <div class="text-2xl font-black font-mono text-rose-400">
-                        {{ formatMoney(metrics.total_debt) }} <span class="text-xs text-white">{{ $t('common.currency') }}</span>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.total_customer_debts') }}</span>
+                    <div class="text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
+                        {{ formatMoney(metrics.total_debt) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">{{ $t('contacts.debtors_count') }}</span>
-                    <div class="text-2xl font-black font-mono text-amber-400">
-                        {{ metrics.debtors_count || 0 }} <span class="text-xs text-slate-500 font-tajawal">{{ $t('contacts.customer_unit') }}</span>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.debtors_count') }}</span>
+                    <div class="text-2xl font-black font-mono text-amber-600 dark:text-amber-400">
+                        {{ metrics.debtors_count || 0 }} <span class="text-xs text-slate-400 font-tajawal">{{ $t('contacts.customer_unit') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">{{ $t('contacts.total_customers_count') }}</span>
-                    <div class="text-2xl font-black font-mono text-emerald-400">
-                        {{ metrics.total_customers || 0 }} <span class="text-xs text-slate-500 font-tajawal">{{ $t('contacts.customer_unit') }}</span>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.total_customers_count') }}</span>
+                    <div class="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                        {{ metrics.total_customers || 0 }} <span class="text-xs text-slate-400 font-tajawal">{{ $t('contacts.customer_unit') }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- Quick Filter Bar -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-3">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-xs space-y-3">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-3">
                     <div class="w-full md:w-96 relative">
                         <input
                             v-model="search"
                             type="text"
                             :placeholder="$t('contacts.search_customer_placeholder')"
-                            class="w-full pr-10 pl-4 py-2.5 bg-slate-950/80 border border-slate-800 rounded-2xl text-xs text-white placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition shadow-inner"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
                             🔍
@@ -237,12 +237,12 @@ const toggleActive = (c) => {
                     </div>
 
                     <div class="w-full md:w-auto flex flex-wrap items-center justify-between md:justify-end gap-2">
-                        <div class="flex items-center gap-1 bg-slate-950/80 p-1 rounded-2xl border border-slate-800 text-xs">
+                        <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-950/80 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs">
                             <button
                                 @click="debtStatus = 'all'; applyFilters();"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                                :class="debtStatus === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'"
+                                :class="debtStatus === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('common.all') }}
                             </button>
@@ -250,7 +250,7 @@ const toggleActive = (c) => {
                                 @click="debtStatus = 'debtor'; applyFilters();"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                                :class="debtStatus === 'debtor' ? 'bg-rose-500 text-white font-black' : 'text-slate-400 hover:text-white'"
+                                :class="debtStatus === 'debtor' ? 'bg-rose-500 text-white font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('contacts.debtors_only') }}
                             </button>
@@ -259,7 +259,7 @@ const toggleActive = (c) => {
                         <button
                             @click="isDrawerOpen = true"
                             type="button"
-                            class="h-10 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+                            class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
                         >
                             <span>⚙️</span>
                             <span>{{ $t('common.filter') }}</span>
@@ -272,11 +272,11 @@ const toggleActive = (c) => {
             </div>
 
             <!-- Customers Table -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4 overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                 <th class="pb-3">{{ $t('invoices.customer') }}</th>
                                 <th class="pb-3">{{ $t('contacts.phone') }}</th>
                                 <th class="pb-3">{{ $t('contacts.address') }}</th>
@@ -284,21 +284,21 @@ const toggleActive = (c) => {
                                 <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/60 font-sans">
-                            <tr v-for="c in customers.data" :key="c.id" class="hover:bg-slate-800/30 transition">
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
+                            <tr v-for="c in customers.data" :key="c.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
                                 <!-- Name -->
                                 <td class="py-3.5">
-                                    <div class="font-black text-white font-tajawal text-sm">{{ c.name }}</div>
+                                    <div class="font-black text-slate-900 dark:text-white font-tajawal text-sm">{{ c.name }}</div>
                                     <div v-if="c.notes" class="text-[10px] text-slate-500 font-tajawal">{{ c.notes }}</div>
                                 </td>
 
                                 <!-- Phone -->
-                                <td class="py-3.5 font-mono text-slate-300" dir="ltr">
+                                <td class="py-3.5 font-mono text-slate-600 dark:text-slate-300" dir="ltr">
                                     {{ c.phone || '—' }}
                                 </td>
 
                                 <!-- Address -->
-                                <td class="py-3.5 font-tajawal text-slate-400">
+                                <td class="py-3.5 font-tajawal text-slate-500 dark:text-slate-400">
                                     {{ c.address || '—' }}
                                 </td>
 
@@ -307,8 +307,8 @@ const toggleActive = (c) => {
                                     <span
                                         class="px-2.5 py-1 rounded-xl border"
                                         :class="[
-                                            c.current_balance > 0 ? 'bg-rose-500/15 border-rose-500/30 text-rose-400' :
-                                            (c.current_balance < 0 ? 'bg-indigo-500/15 border-indigo-500/30 text-indigo-400' : 'bg-slate-800 border-slate-700 text-slate-400')
+                                            c.current_balance > 0 ? 'bg-rose-500/15 border-rose-500/30 text-rose-600 dark:text-rose-400' :
+                                            (c.current_balance < 0 ? 'bg-indigo-500/15 border-indigo-500/30 text-indigo-600 dark:text-indigo-400' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400')
                                         ]"
                                     >
                                         {{ formatMoney(c.current_balance) }} {{ $t('common.currency') }}
@@ -322,7 +322,7 @@ const toggleActive = (c) => {
                                         <button
                                             @click="openPaymentModal(c)"
                                             type="button"
-                                            class="px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 text-xs font-bold transition cursor-pointer flex items-center gap-1"
+                                            class="px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold transition cursor-pointer flex items-center gap-1"
                                             :title="$t('contacts.record_receipt_voucher')"
                                         >
                                             <span>💵</span>
@@ -332,7 +332,7 @@ const toggleActive = (c) => {
                                         <!-- Statement -->
                                         <Link
                                             :href="`/customers/${c.id}/statement`"
-                                            class="p-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-400 transition"
+                                            class="p-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 transition"
                                             :title="$t('contacts.statement_title')"
                                         >
                                             📜
@@ -342,7 +342,7 @@ const toggleActive = (c) => {
                                         <button
                                             @click="openEditModal(c)"
                                             type="button"
-                                            class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 transition cursor-pointer"
+                                            class="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 transition cursor-pointer"
                                             :title="$t('common.edit')"
                                         >
                                             ✏️
@@ -353,7 +353,7 @@ const toggleActive = (c) => {
                                             @click="toggleActive(c)"
                                             type="button"
                                             class="p-1.5 rounded-xl transition cursor-pointer"
-                                            :class="c.is_active ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 hover:bg-slate-700 text-slate-500'"
+                                            :class="c.is_active ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 dark:text-slate-500'"
                                             :title="c.is_active ? $t('common.active') : $t('common.inactive')"
                                         >
                                             {{ c.is_active ? '🟢' : '⚪' }}
@@ -363,7 +363,7 @@ const toggleActive = (c) => {
                                         <button
                                             @click="deleteCustomer(c)"
                                             type="button"
-                                            class="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition cursor-pointer"
+                                            class="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 transition cursor-pointer"
                                             :class="!c.can_be_deleted ? 'opacity-40 cursor-not-allowed' : ''"
                                             :title="c.can_be_deleted ? $t('common.delete') : c.deletion_blockers.join(', ')"
                                         >
@@ -377,7 +377,7 @@ const toggleActive = (c) => {
 
                     <div v-if="!customers.data || customers.data.length === 0" class="py-16 text-center space-y-2">
                         <span class="text-3xl">👥</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('contacts.no_customers_found') }}</p>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('contacts.no_customers_found') }}</p>
                     </div>
                 </div>
 

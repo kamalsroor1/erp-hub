@@ -171,11 +171,11 @@ const deleteExpense = (e) => {
                 <div class="space-y-1">
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">💸</span>
-                        <h1 class="text-xl sm:text-2xl font-black text-white">
+                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                             {{ $t('expenses.title') }}
                         </h1>
                     </div>
-                    <p class="text-xs text-slate-400 font-bold">
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
                         {{ $t('expenses.expenses_breakdown') }}
                     </p>
                 </div>
@@ -192,37 +192,37 @@ const deleteExpense = (e) => {
 
             <!-- KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">{{ $t('expenses.total_month') }}</span>
-                    <div class="text-2xl font-black font-mono text-rose-400">
-                        {{ formatMoney(metrics.total_month) }} <span class="text-xs text-white">{{ $t('common.currency') }}</span>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('expenses.total_month') }}</span>
+                    <div class="text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
+                        {{ formatMoney(metrics.total_month) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">{{ $t('expenses.total_cash') }}</span>
-                    <div class="text-2xl font-black font-mono text-amber-400">
-                        {{ formatMoney(metrics.total_cash) }} <span class="text-xs text-white">{{ $t('common.currency') }}</span>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('expenses.total_cash') }}</span>
+                    <div class="text-2xl font-black font-mono text-amber-600 dark:text-amber-400">
+                        {{ formatMoney(metrics.total_cash) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">{{ $t('expenses.total_filtered') }}</span>
-                    <div class="text-2xl font-black font-mono text-white">
-                        {{ formatMoney(metrics.total_filtered) }} <span class="text-xs text-amber-400">{{ $t('common.currency') }}</span>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('expenses.total_filtered') }}</span>
+                    <div class="text-2xl font-black font-mono text-slate-900 dark:text-white">
+                        {{ formatMoney(metrics.total_filtered) }} <span class="text-xs text-amber-600 dark:text-amber-400">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- Quick Filter Bar -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-3">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-xs space-y-3">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-3">
                     <div class="w-full md:w-96 relative">
                         <input
                             v-model="search"
                             type="text"
                             :placeholder="$t('expenses.search_placeholder')"
-                            class="w-full pr-10 pl-4 py-2.5 bg-slate-950/80 border border-slate-800 rounded-2xl text-xs text-white placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition shadow-inner"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
                             🔍
@@ -233,7 +233,7 @@ const deleteExpense = (e) => {
                         <button
                             @click="isDrawerOpen = true"
                             type="button"
-                            class="h-10 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+                            class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
                         >
                             <span>⚙️</span>
                             <span>{{ $t('common.advanced_filter') }}</span>
@@ -246,11 +246,11 @@ const deleteExpense = (e) => {
             </div>
 
             <!-- Expenses Table -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4 overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                 <th class="pb-3">{{ $t('invoices.invoice_number') }}</th>
                                 <th class="pb-3">{{ $t('expenses.expense_item') }}</th>
                                 <th class="pb-3">{{ $t('expenses.cost_center') }} & {{ $t('expenses.category') }}</th>
@@ -260,34 +260,34 @@ const deleteExpense = (e) => {
                                 <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/60 font-sans">
-                            <tr v-for="e in expenses.data" :key="e.id" class="hover:bg-slate-800/30 transition">
-                                <td class="py-3.5 font-mono font-bold text-amber-400">
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
+                            <tr v-for="e in expenses.data" :key="e.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
+                                <td class="py-3.5 font-mono font-bold text-amber-600 dark:text-amber-400">
                                     {{ e.expense_number }}
                                 </td>
 
                                 <td class="py-3.5">
-                                    <div class="font-black text-white font-tajawal">{{ e.title }}</div>
+                                    <div class="font-black text-slate-900 dark:text-white font-tajawal">{{ e.title }}</div>
                                     <div v-if="e.notes" class="text-[10px] text-slate-500 font-tajawal">{{ e.notes }}</div>
                                 </td>
 
                                 <td class="py-3.5 font-tajawal">
-                                    <span class="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px] font-bold">
+                                    <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold border border-slate-200 dark:border-transparent">
                                         {{ e.cost_center_label }}
                                     </span>
-                                    <div class="text-[10px] text-amber-400/80 font-bold mt-0.5">{{ e.category }}</div>
+                                    <div class="text-[10px] text-amber-600 dark:text-amber-400/80 font-bold mt-0.5">{{ e.category }}</div>
                                 </td>
 
-                                <td class="py-3.5 font-mono text-slate-400 text-[11px]">
+                                <td class="py-3.5 font-mono text-slate-500 dark:text-slate-400 text-[11px]">
                                     {{ e.expense_date }}
                                 </td>
 
-                                <td class="py-3.5 font-mono font-black text-rose-400 text-sm">
+                                <td class="py-3.5 font-mono font-black text-rose-600 dark:text-rose-400 text-sm">
                                     {{ formatMoney(e.amount) }} {{ $t('common.currency') }}
                                 </td>
 
                                 <td class="py-3.5 font-tajawal">
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-transparent">
                                         {{ e.payment_method === 'cash' ? `${$t('treasury.cash_drawer')} 💵` : e.payment_method }}
                                     </span>
                                 </td>
@@ -297,7 +297,7 @@ const deleteExpense = (e) => {
                                         <button
                                             @click="openEditModal(e)"
                                             type="button"
-                                            class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold transition cursor-pointer"
+                                            class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 text-xs font-bold transition cursor-pointer border border-slate-200 dark:border-transparent"
                                         >
                                             {{ $t('common.edit') }} ✏️
                                         </button>
@@ -305,7 +305,7 @@ const deleteExpense = (e) => {
                                         <button
                                             @click="deleteExpense(e)"
                                             type="button"
-                                            class="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition cursor-pointer"
+                                            class="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 transition cursor-pointer"
                                         >
                                             🗑️
                                         </button>
@@ -317,7 +317,7 @@ const deleteExpense = (e) => {
 
                     <div v-if="!expenses.data || expenses.data.length === 0" class="py-16 text-center space-y-2">
                         <span class="text-3xl">💸</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('expenses.no_expenses') }}</p>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('expenses.no_expenses') }}</p>
                     </div>
                 </div>
 

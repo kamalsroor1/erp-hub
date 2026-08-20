@@ -200,11 +200,11 @@ const printA4 = (id) => {
                 <div class="space-y-1">
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">🧾</span>
-                        <h1 class="text-xl sm:text-2xl font-black text-white font-tajawal">
+                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-tajawal">
                             {{ $t('invoices.title') }}
                         </h1>
                     </div>
-                    <p class="text-xs text-slate-400 font-bold">
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
                         {{ $t('invoices.subtitle') }}
                     </p>
                 </div>
@@ -220,36 +220,36 @@ const printA4 = (id) => {
 
             <!-- 4 Top KPI Summary Cards -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 font-tajawal">
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('invoices.total_invoices_count') }}</span>
-                    <div class="text-xl font-black font-mono text-white flex items-center gap-1.5">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-1 shadow-xs">
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('invoices.total_invoices_count') }}</span>
+                    <div class="text-xl font-black font-mono text-slate-900 dark:text-white flex items-center gap-1.5">
                         <span>🧾</span>
                         <span>{{ stats.total_count }}</span>
                         <span class="text-xs font-tajawal text-slate-400 font-normal">{{ $t('invoices.invoice_unit') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('invoices.total_sales_net') }}</span>
-                    <div class="text-xl font-black font-mono text-emerald-400 flex items-center gap-1.5">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-1 shadow-xs">
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('invoices.total_sales_net') }}</span>
+                    <div class="text-xl font-black font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                         <span>💰</span>
                         <span>{{ formatMoney(stats.total_net) }}</span>
                         <span class="text-xs font-tajawal text-slate-400 font-normal">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('invoices.total_paid_actual') }}</span>
-                    <div class="text-xl font-black font-mono text-amber-400 flex items-center gap-1.5">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-1 shadow-xs">
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('invoices.total_paid_actual') }}</span>
+                    <div class="text-xl font-black font-mono text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
                         <span>💵</span>
                         <span>{{ formatMoney(stats.total_paid) }}</span>
                         <span class="text-xs font-tajawal text-slate-400 font-normal">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-1">
-                    <span class="text-[11px] text-slate-400 font-bold block">{{ $t('invoices.total_remaining_credit') }}</span>
-                    <div class="text-xl font-black font-mono text-rose-400 flex items-center gap-1.5">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-1 shadow-xs">
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('invoices.total_remaining_credit') }}</span>
+                    <div class="text-xl font-black font-mono text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
                         <span>⏳</span>
                         <span>{{ formatMoney(stats.total_remaining) }}</span>
                         <span class="text-xs font-tajawal text-slate-400 font-normal">{{ $t('common.currency') }}</span>
@@ -258,7 +258,7 @@ const printA4 = (id) => {
             </div>
 
             <!-- Quick Action Bar & Drawer Toggle -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm font-tajawal space-y-3">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-xs font-tajawal space-y-3">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-3">
                     <!-- Quick Search Input -->
                     <div class="w-full md:w-96 relative">
@@ -266,7 +266,7 @@ const printA4 = (id) => {
                             v-model="search"
                             type="text"
                             :placeholder="$t('invoices.search_invoices_placeholder')"
-                            class="w-full pr-10 pl-4 py-2.5 bg-slate-950/80 border border-slate-800 rounded-2xl text-xs text-white placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-none transition"
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-none transition shadow-inner"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
                             🔍
@@ -276,12 +276,12 @@ const printA4 = (id) => {
                     <!-- Filter Pills & Drawer Toggle Button -->
                     <div class="w-full md:w-auto flex flex-wrap items-center justify-between md:justify-end gap-2">
                         <!-- Quick Payment Tabs -->
-                        <div class="flex items-center gap-1 bg-slate-950/80 p-1 rounded-2xl border border-slate-800 text-xs">
+                        <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-950/80 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs">
                             <button
                                 @click="paymentType = 'all'; applyFilters();"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                                :class="paymentType === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'"
+                                :class="paymentType === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('common.all') }}
                             </button>
@@ -289,7 +289,7 @@ const printA4 = (id) => {
                                 @click="paymentType = 'cash'; applyFilters();"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                                :class="paymentType === 'cash' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'"
+                                :class="paymentType === 'cash' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('invoices.payment_cash') }} 💵
                             </button>
@@ -297,7 +297,7 @@ const printA4 = (id) => {
                                 @click="paymentType = 'credit'; applyFilters();"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                                :class="paymentType === 'credit' ? 'bg-rose-500 text-white font-black' : 'text-slate-400 hover:text-white'"
+                                :class="paymentType === 'credit' ? 'bg-rose-500 text-white font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('invoices.payment_credit') }}
                             </button>
@@ -307,7 +307,7 @@ const printA4 = (id) => {
                         <button
                             @click="isDrawerOpen = true"
                             type="button"
-                            class="h-10 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+                            class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
                         >
                             <span>⚙️</span>
                             <span>{{ $t('common.filter') }}</span>
@@ -322,36 +322,36 @@ const printA4 = (id) => {
                 </div>
 
                 <!-- Active Filters Chips List (Removable) -->
-                <div v-if="activeFiltersCount > 0" class="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800/80 text-xs">
+                <div v-if="activeFiltersCount > 0" class="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 text-xs">
                     <span class="text-slate-500 text-[11px] font-bold">{{ $t('dashboard.quick_filter') || 'الفلاتر النشطة' }}:</span>
 
-                    <span v-if="storeId !== 'all'" class="px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center gap-1.5 font-bold">
+                    <span v-if="storeId !== 'all'" class="px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center gap-1.5 font-bold">
                         <span>{{ $t('common.store') }}: {{ storeOptions.find(s => s.id == storeId)?.name }}</span>
                         <button @click="storeId = 'all'; applyFilters();" class="hover:text-rose-400">✕</button>
                     </span>
 
-                    <span v-if="dateFrom || dateTo" class="px-2.5 py-1 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center gap-1.5 font-mono font-bold">
+                    <span v-if="dateFrom || dateTo" class="px-2.5 py-1 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 font-mono font-bold">
                         <span>{{ $t('common.date') }}: {{ dateFrom || '...' }} إلى {{ dateTo || '...' }}</span>
                         <button @click="dateFrom = ''; dateTo = ''; applyFilters();" class="hover:text-rose-400">✕</button>
                     </span>
 
-                    <span v-if="status !== 'active'" class="px-2.5 py-1 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center gap-1.5 font-bold">
+                    <span v-if="status !== 'active'" class="px-2.5 py-1 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 flex items-center gap-1.5 font-bold">
                         <span>{{ $t('common.status') }}: {{ statusOptions.find(s => s.id === status)?.name }}</span>
                         <button @click="status = 'active'; applyFilters();" class="hover:text-rose-400">✕</button>
                     </span>
 
-                    <button @click="resetFilters" class="text-slate-400 hover:text-rose-400 text-xs underline font-bold mr-1">
+                    <button @click="resetFilters" class="text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 text-xs underline font-bold mr-1">
                         {{ $t('common.clear_all') || 'مسح كافة الفلاتر' }}
                     </button>
                 </div>
             </div>
 
             <!-- Invoices Data Table -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4 font-tajawal overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4 font-tajawal overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                 <th class="pb-3">{{ $t('invoices.invoice_number') }}</th>
                                 <th class="pb-3">{{ $t('invoices.customer') }}</th>
                                 <th class="pb-3">{{ $t('invoices.store') }}</th>
@@ -364,30 +364,30 @@ const printA4 = (id) => {
                                 <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/60 font-sans">
-                            <tr v-for="inv in invoices.data" :key="inv.id" class="hover:bg-slate-800/40 transition">
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
+                            <tr v-for="inv in invoices.data" :key="inv.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
                                 <!-- Invoice Number -->
-                                <td class="py-3.5 font-mono font-black text-white">
-                                    <Link :href="`/invoices/${inv.id}`" class="hover:text-amber-400 flex items-center gap-1">
+                                <td class="py-3.5 font-mono font-black text-slate-900 dark:text-white">
+                                    <Link :href="`/invoices/${inv.id}`" class="hover:text-amber-600 dark:hover:text-amber-400 flex items-center gap-1">
                                         <span>#{{ inv.invoice_number }}</span>
                                     </Link>
                                 </td>
 
                                 <!-- Customer -->
                                 <td class="py-3.5">
-                                    <div class="font-bold text-slate-200 font-tajawal">{{ inv.customer_name }}</div>
+                                    <div class="font-bold text-slate-900 dark:text-slate-200 font-tajawal">{{ inv.customer_name }}</div>
                                     <div v-if="inv.customer_phone" class="text-[10px] text-slate-500 font-mono" dir="ltr">{{ inv.customer_phone }}</div>
                                 </td>
 
                                 <!-- Store -->
                                 <td class="py-3.5">
-                                    <span class="px-2 py-0.5 rounded-lg bg-slate-800 border border-slate-700/60 text-slate-300 text-[11px] font-tajawal">
+                                    <span class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-300 text-[11px] font-tajawal">
                                         🏬 {{ inv.store_name }}
                                     </span>
                                 </td>
 
                                 <!-- Date -->
-                                <td class="py-3.5 text-slate-400 font-mono text-[11px]">
+                                <td class="py-3.5 text-slate-500 dark:text-slate-400 font-mono text-[11px]">
                                     {{ inv.formatted_created_at || inv.created_at }}
                                 </td>
 
@@ -399,18 +399,18 @@ const printA4 = (id) => {
                                 </td>
 
                                 <!-- Net Total -->
-                                <td class="py-3.5 font-mono font-bold text-emerald-400 text-sm">
+                                <td class="py-3.5 font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">
                                     {{ formatMoney(inv.net_total) }}
                                 </td>
 
                                 <!-- Paid -->
-                                <td class="py-3.5 font-mono font-bold text-slate-200">
+                                <td class="py-3.5 font-mono font-bold text-slate-900 dark:text-slate-200">
                                     {{ formatMoney(inv.paid_amount) }}
                                 </td>
 
                                 <!-- Remaining -->
                                 <td class="py-3.5 font-mono font-bold">
-                                    <span :class="Number(inv.remaining_amount) > 0 ? 'text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-lg border border-rose-500/20' : 'text-slate-400'">
+                                    <span :class="Number(inv.remaining_amount) > 0 ? 'text-rose-600 dark:text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-lg border border-rose-500/20' : 'text-slate-400'">
                                         {{ formatMoney(inv.remaining_amount) }}
                                     </span>
                                 </td>
@@ -428,7 +428,7 @@ const printA4 = (id) => {
                                         <!-- View Show Page -->
                                         <Link
                                             :href="`/invoices/${inv.id}`"
-                                            class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer"
+                                            class="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition cursor-pointer"
                                             :title="$t('invoices.view_invoice')"
                                         >
                                             👁️
@@ -438,7 +438,7 @@ const printA4 = (id) => {
                                         <Link
                                             v-if="inv.status !== 'cancelled' && status !== 'trash'"
                                             :href="`/invoices/${inv.id}/edit`"
-                                            class="p-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-400 transition cursor-pointer"
+                                            class="p-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-600 dark:text-amber-400 transition cursor-pointer"
                                             :title="$t('invoices.edit_invoice')"
                                         >
                                             ✏️
@@ -448,7 +448,7 @@ const printA4 = (id) => {
                                         <button
                                             @click="printThermal(inv.id)"
                                             type="button"
-                                            class="p-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 transition cursor-pointer"
+                                            class="p-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 transition cursor-pointer"
                                             :title="$t('invoices.print_thermal')"
                                         >
                                             🖨️
@@ -458,7 +458,7 @@ const printA4 = (id) => {
                                         <button
                                             @click="printA4(inv.id)"
                                             type="button"
-                                            class="p-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-400 transition cursor-pointer"
+                                            class="p-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 transition cursor-pointer"
                                             :title="$t('invoices.print_a4')"
                                         >
                                             📄
@@ -469,7 +469,7 @@ const printA4 = (id) => {
                                             v-if="inv.status !== 'cancelled' && status !== 'trash'"
                                             @click="openCancelModal(inv)"
                                             type="button"
-                                            class="p-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 transition cursor-pointer"
+                                            class="p-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-600 dark:text-rose-400 transition cursor-pointer"
                                             :title="$t('invoices.cancel_invoice')"
                                         >
                                             🚫
@@ -480,7 +480,7 @@ const printA4 = (id) => {
                                             v-if="status === 'trash'"
                                             @click="restoreInvoice(inv)"
                                             type="button"
-                                            class="p-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 transition cursor-pointer"
+                                            class="p-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 transition cursor-pointer"
                                             :title="$t('trash.restore_btn') || 'استعادة الفاتورة'"
                                         >
                                             ♻️
@@ -491,7 +491,7 @@ const printA4 = (id) => {
                                             v-if="status !== 'trash'"
                                             @click="confirmDelete(inv)"
                                             type="button"
-                                            class="p-1.5 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition cursor-pointer"
+                                            class="p-1.5 rounded-xl bg-slate-100 hover:bg-rose-100 dark:bg-slate-800 dark:hover:bg-rose-500/20 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 transition cursor-pointer"
                                             :title="$t('common.delete')"
                                         >
                                             🗑️
@@ -505,7 +505,7 @@ const printA4 = (id) => {
                     <!-- Empty State -->
                     <div v-if="!invoices.data || invoices.data.length === 0" class="py-16 text-center space-y-2">
                         <span class="text-3xl">🧾</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('invoices.no_invoices_found') }}</p>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('invoices.no_invoices_found') }}</p>
                     </div>
                 </div>
 

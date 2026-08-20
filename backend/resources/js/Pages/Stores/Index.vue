@@ -120,11 +120,11 @@ const saveUserAssignment = () => {
                 <div class="space-y-1">
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">🏬</span>
-                        <h1 class="text-xl sm:text-2xl font-black text-white">
+                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                             {{ $t('inventory.stores_title') }}
                         </h1>
                     </div>
-                    <p class="text-xs text-slate-400 font-bold">
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
                         {{ $t('inventory.stores_subtitle') }}
                     </p>
                 </div>
@@ -132,7 +132,7 @@ const saveUserAssignment = () => {
                 <div class="flex items-center gap-2.5">
                     <Link
                         href="/store-stocks"
-                        class="h-11 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
+                        class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
                     >
                         <span>📊</span>
                         <span>{{ $t('inventory.store_stocks') }}</span>
@@ -154,25 +154,25 @@ const saveUserAssignment = () => {
                 <div
                     v-for="s in stores"
                     :key="s.id"
-                    class="bg-slate-900 border rounded-3xl p-5 shadow-sm space-y-4 transition hover:border-amber-500/50 flex flex-col justify-between"
-                    :class="s.is_main ? 'border-amber-500/40 bg-gradient-to-br from-slate-900 to-amber-950/15' : 'border-slate-800'"
+                    class="bg-white dark:bg-slate-900 border rounded-3xl p-5 shadow-xs space-y-4 transition hover:border-amber-500/50 flex flex-col justify-between"
+                    :class="s.is_main ? 'border-amber-500/40 dark:bg-gradient-to-br dark:from-slate-900 dark:to-amber-950/15' : 'border-slate-200 dark:border-slate-800'"
                 >
                     <div class="space-y-4">
                         <div class="flex items-start justify-between">
                             <div class="flex items-center gap-3">
-                                <div class="w-11 h-11 rounded-2xl bg-slate-800 flex items-center justify-center text-xl">
+                                <div class="w-11 h-11 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl">
                                     <span v-if="s.type === 'wholesale_van' || s.type === 'van'">🚚</span>
                                     <span v-else-if="s.type === 'main_warehouse' || s.type === 'warehouse'">🏭</span>
                                     <span v-else>🏬</span>
                                 </div>
                                 <div>
-                                    <h3 class="font-black text-white text-sm flex items-center gap-2">
+                                    <h3 class="font-black text-slate-900 dark:text-white text-sm flex items-center gap-2">
                                         <span>{{ s.name }}</span>
                                         <span v-if="s.is_main" class="px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 text-[10px] font-black">{{ $t('inventory.store_type_main') }} 👑</span>
                                     </h3>
                                     <div class="flex items-center gap-2 mt-0.5">
-                                        <span class="text-xs text-slate-500 font-mono font-bold">{{ s.code }}</span>
-                                        <span class="text-[10px] text-slate-400 font-tajawal">
+                                        <span class="text-xs text-slate-400 dark:text-slate-500 font-mono font-bold">{{ s.code }}</span>
+                                        <span class="text-[10px] text-slate-500 dark:text-slate-400 font-tajawal">
                                             ({{ s.type === 'wholesale_van' || s.type === 'van' ? 'عربية توزيع جملة' : (s.type === 'main_warehouse' || s.type === 'warehouse' ? $t('inventory.store_type_main') : $t('inventory.store_type_branch')) }})
                                         </span>
                                     </div>
@@ -183,40 +183,40 @@ const saveUserAssignment = () => {
                                 @click="toggleActive(s)"
                                 type="button"
                                 class="px-2 py-0.5 rounded-full text-[10px] font-bold transition cursor-pointer"
-                                :class="s.is_active ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' : 'bg-rose-500/20 text-rose-400 hover:bg-rose-500/30'"
+                                :class="s.is_active ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/30' : 'bg-rose-500/20 text-rose-600 dark:text-rose-400 hover:bg-rose-500/30'"
                                 :title="s.is_active ? $t('common.active') : $t('common.inactive')"
                             >
                                 {{ s.is_active ? '🟢 ' + $t('common.active') : '⚪ ' + $t('common.inactive') }}
                             </button>
                         </div>
 
-                        <div class="text-xs text-slate-400 space-y-1.5 font-tajawal pt-2 border-t border-slate-800/80">
-                            <div v-if="s.address" class="flex items-center gap-1.5 text-slate-300">
+                        <div class="text-xs text-slate-500 dark:text-slate-400 space-y-1.5 font-tajawal pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div v-if="s.address" class="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
                                 <span>📍</span>
                                 <span>{{ s.address }}</span>
                             </div>
-                            <div v-if="s.phone" class="flex items-center gap-1.5 font-mono text-slate-300">
+                            <div v-if="s.phone" class="flex items-center gap-1.5 font-mono text-slate-700 dark:text-slate-300">
                                 <span>📱</span>
                                 <span>{{ s.phone }}</span>
                             </div>
                             <div class="flex items-center justify-between pt-1">
                                 <span>📦 {{ $t('inventory.total_items_count') }}:</span>
-                                <strong class="text-white font-mono text-xs">{{ s.stocks_count }} {{ $t('inventory.item_unit') }}</strong>
+                                <strong class="text-slate-900 dark:text-white font-mono text-xs">{{ s.stocks_count }} {{ $t('inventory.item_unit') }}</strong>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span>🧾 {{ $t('dashboard.invoices_today') || 'الفواتير' }}:</span>
-                                <span class="text-slate-300 font-mono">{{ s.invoices_count || 0 }}</span>
+                                <span class="text-slate-700 dark:text-slate-300 font-mono">{{ s.invoices_count || 0 }}</span>
                             </div>
                         </div>
 
                         <!-- Assigned Staff -->
-                        <div class="pt-2 border-t border-slate-800/80 space-y-1.5">
+                        <div class="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-1.5">
                             <div class="flex items-center justify-between text-[11px]">
-                                <span class="text-slate-400 font-bold">{{ $t('users.title') || 'الموظفون المعينون' }}:</span>
+                                <span class="text-slate-500 dark:text-slate-400 font-bold">{{ $t('users.title') || 'الموظفون المعينون' }}:</span>
                                 <button
                                     @click="openUserAssignmentModal(s)"
                                     type="button"
-                                    class="text-amber-400 hover:text-amber-300 text-[10px] font-black cursor-pointer"
+                                    class="text-amber-600 dark:text-amber-400 hover:text-amber-500 text-[10px] font-black cursor-pointer"
                                 >
                                     + {{ $t('common.edit') || 'إدارة الموظفين' }}
                                 </button>
@@ -225,11 +225,11 @@ const saveUserAssignment = () => {
                                 <span
                                     v-for="u in s.assigned_users"
                                     :key="u.id"
-                                    class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 text-[10px] font-bold"
+                                    class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold border border-slate-200 dark:border-transparent"
                                 >
                                     👤 {{ u.name }}
                                 </span>
-                                <span v-if="!s.assigned_users || s.assigned_users.length === 0" class="text-[10px] text-slate-500 italic">
+                                <span v-if="!s.assigned_users || s.assigned_users.length === 0" class="text-[10px] text-slate-400 dark:text-slate-500 italic">
                                     {{ $t('common.no_records') || 'لا يوجد موظفون مخصصون' }}
                                 </span>
                             </div>
@@ -237,10 +237,10 @@ const saveUserAssignment = () => {
                     </div>
 
                     <!-- Actions -->
-                    <div class="pt-3 flex items-center justify-between gap-2 border-t border-slate-800">
+                    <div class="pt-3 flex items-center justify-between gap-2 border-t border-slate-100 dark:border-slate-800">
                         <Link
                             :href="`/store-stocks?store_id=${s.id}`"
-                            class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition flex items-center gap-1"
+                            class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition flex items-center gap-1 border border-slate-200 dark:border-transparent"
                         >
                             <span>📦</span>
                             <span>{{ $t('inventory.store_stocks') }}</span>
@@ -250,7 +250,7 @@ const saveUserAssignment = () => {
                             <button
                                 @click="openEditModal(s)"
                                 type="button"
-                                class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold transition cursor-pointer"
+                                class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 text-xs font-bold transition cursor-pointer border border-slate-200 dark:border-transparent"
                                 :title="$t('common.edit')"
                             >
                                 ✏️
