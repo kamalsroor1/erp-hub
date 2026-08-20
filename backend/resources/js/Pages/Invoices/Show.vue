@@ -2,8 +2,18 @@
 import { ref, computed } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import ActionMenu from '@/Components/ActionMenu.vue';
 import { useMoney } from '@/Composables/useMoney';
 import { trans } from '@/helpers/trans';
+import { notifySuccess } from '@/helpers/alert';
+import {
+    Printer,
+    FileText,
+    Pencil,
+    Ban,
+    Copy,
+    ArrowRight
+} from 'lucide-vue-next';
 
 const props = defineProps({
     invoice: { type: Object, required: true },
@@ -21,6 +31,13 @@ const printThermal = () => {
 
 const printA4 = () => {
     window.open(`/invoices/${props.invoice.id}/print/a4`, '_blank', 'width=900,height=800');
+};
+
+const copyInvoiceNumber = async () => {
+    try {
+        await navigator.clipboard.writeText(props.invoice.invoice_number);
+        notifySuccess('تم نسخ رقم الفاتورة إلى الحافظة');
+    } catch (e) {}
 };
 
 const confirmCancel = () => {
@@ -53,6 +70,42 @@ const getPaymentBadge = computed(() => {
     if (inv.payment_type === 'partial') return { label: trans('invoices.payment_partial') || 'جزئي', class: 'bg-amber-500/15 text-amber-400 border-amber-500/30' };
     return { label: inv.payment_type, class: 'bg-slate-800 text-slate-400' };
 });
+
+const showActions = computed(() => [
+    {
+        label: trans('invoices.print_thermal') || 'طباعة إيصال حراري (80mm)',
+        icon: Printer,
+        variant: 'success',
+        onClick: printThermal,
+        show: true
+    },
+    {
+        label: trans('invoices.print_a4') || 'طباعة فاتورة ضريبية (A4)',
+        icon: FileText,
+        onClick: printA4,
+        show: true
+    },
+    {
+        label: trans('invoices.edit_invoice') || 'تعديل بيانات الفاتورة',
+        icon: Pencil,
+        variant: 'warning',
+        href: `/invoices/${props.invoice.id}/edit`,
+        show: props.invoice.status !== 'cancelled'
+    },
+    {
+        label: 'نسخ رقم الفاتورة',
+        icon: Copy,
+        onClick: copyInvoiceNumber,
+        show: true
+    },
+    {
+        label: trans('invoices.cancel_invoice') || 'إلغاء الفاتورة',
+        icon: Ban,
+        variant: 'danger',
+        onClick: () => { showCancelModal.value = true; },
+        show: props.invoice.status !== 'cancelled'
+    }
+]);
 </script>
 
 <template>
@@ -61,65 +114,80 @@ const getPaymentBadge = computed(() => {
     <AppLayout>
         <div class="max-w-5xl mx-auto space-y-6 font-tajawal">
             <!-- Header & Action Bar -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="space-y-1">
-                    <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
-                        <Link href="/invoices" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-sm transition active:scale-90 shadow-xs border border-slate-200 dark:border-transparent">
-                            →
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xs space-y-3">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <!-- Title & Badges -->
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <Link
+                            href="/invoices"
+                            class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-sm transition active:scale-90 shadow-xs border border-slate-200 dark:border-slate-700 shrink-0"
+                            :title="$t('common.back') || 'الرجوع'"
+                        >
+                            <ArrowRight class="w-4 h-4" />
                         </Link>
-                        <h1 class="text-lg sm:text-2xl font-black text-slate-900 dark:text-white">
-                            {{ $t('invoices.invoice_number') }} #<span class="font-mono text-theme-primary">{{ invoice.invoice_number }}</span>
-                        </h1>
-                        <span class="px-2.5 py-1 rounded-xl text-xs font-bold border" :class="getPaymentBadge.class">
-                            {{ getPaymentBadge.label }}
-                        </span>
-                        <span v-if="invoice.status === 'cancelled'" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30">
-                            {{ $t('invoices.status_cancelled') }}
-                        </span>
+                        <div class="min-w-0">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h1 class="text-base sm:text-xl font-black text-slate-900 dark:text-white font-tajawal leading-tight">
+                                    {{ $t('invoices.invoice_number') }} <span class="font-mono text-theme-primary">#{{ invoice.invoice_number }}</span>
+                                </h1>
+                                <span class="px-2.5 py-0.5 rounded-xl text-[10.5px] font-bold border shrink-0" :class="getPaymentBadge.class">
+                                    {{ getPaymentBadge.label }}
+                                </span>
+                                <span v-if="invoice.status === 'cancelled'" class="px-2.5 py-0.5 rounded-xl text-[10.5px] font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 shrink-0">
+                                    {{ $t('invoices.status_cancelled') }}
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
-                        {{ $t('common.date') }}: <span class="font-mono">{{ invoice.formatted_created_at || invoice.invoice_date }}</span> • {{ $t('common.store') }}: <span class="text-slate-900 dark:text-slate-200">{{ invoice.store?.name }}</span> • {{ $t('invoices.cashier') }}: <span class="text-slate-900 dark:text-slate-200">{{ invoice.cashier_name }}</span>
-                    </p>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <!-- Quick Thermal Print (Primary CTA) -->
+                        <button
+                            @click="printThermal"
+                            type="button"
+                            class="flex-1 sm:flex-none h-11 px-4 sm:px-5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-emerald-500/20 transition active:scale-95 cursor-pointer"
+                        >
+                            <Printer class="w-4 h-4" />
+                            <span>{{ $t('invoices.print_thermal') || 'طباعة حراري' }}</span>
+                        </button>
+
+                        <!-- Quick Edit (If Active) -->
+                        <Link
+                            v-if="invoice.status !== 'cancelled'"
+                            :href="`/invoices/${invoice.id}/edit`"
+                            class="h-11 px-3.5 rounded-2xl btn-primary-theme font-black text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-theme-primary"
+                            :title="$t('invoices.edit_invoice')"
+                        >
+                            <Pencil class="w-4 h-4" />
+                            <span class="hidden md:inline">{{ $t('invoices.edit_invoice') }}</span>
+                        </Link>
+
+                        <!-- Action Menu (All Other Actions) -->
+                        <ActionMenu
+                            :items="showActions"
+                            :title="`#${invoice.invoice_number}`"
+                            buttonClass="h-11 px-3 rounded-2xl"
+                        />
+                    </div>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                    <Link
-                        v-if="invoice.status !== 'cancelled'"
-                        :href="`/invoices/${invoice.id}/edit`"
-                        class="flex-1 sm:flex-none h-11 px-4 rounded-2xl btn-primary-theme font-black text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-theme-primary"
-                    >
-                        <span>✏️</span>
-                        <span>{{ $t('invoices.edit_invoice') }}</span>
-                    </Link>
-
-                    <button
-                        @click="printThermal"
-                        type="button"
-                        class="flex-1 sm:flex-none h-11 px-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 transition active:scale-95 cursor-pointer"
-                    >
-                        <span>🖨️</span>
-                        <span>{{ $t('invoices.print_thermal') }}</span>
-                    </button>
-
-                    <button
-                        @click="printA4"
-                        type="button"
-                        class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-700 transition active:scale-95 cursor-pointer shadow-xs"
-                    >
-                        <span>📄</span>
-                        <span class="hidden sm:inline">{{ $t('invoices.print_a4') }}</span>
-                    </button>
-
-                    <button
-                        v-if="invoice.status !== 'cancelled'"
-                        @click="showCancelModal = true"
-                        type="button"
-                        class="h-11 px-4 rounded-2xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-600 dark:text-rose-400 font-black text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
-                    >
-                        <span>⚠️</span>
-                        <span>{{ $t('invoices.cancel_invoice') }}</span>
-                    </button>
+                <!-- Meta Strip -->
+                <div class="flex flex-wrap items-center gap-2 sm:gap-4 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 text-[11px] text-slate-500 dark:text-slate-400 font-bold">
+                    <span class="inline-flex items-center gap-1">
+                        <span>📅 {{ $t('common.date') }}:</span>
+                        <span class="font-mono text-slate-700 dark:text-slate-300">{{ invoice.formatted_created_at || invoice.invoice_date }}</span>
+                    </span>
+                    <span>•</span>
+                    <span class="inline-flex items-center gap-1">
+                        <span>🏬 {{ $t('common.store') }}:</span>
+                        <span class="text-slate-700 dark:text-slate-300 font-black">{{ invoice.store?.name }}</span>
+                    </span>
+                    <span>•</span>
+                    <span class="inline-flex items-center gap-1">
+                        <span>👤 {{ $t('invoices.cashier') }}:</span>
+                        <span class="text-slate-700 dark:text-slate-300 font-black">{{ invoice.cashier_name }}</span>
+                    </span>
                 </div>
             </div>
 

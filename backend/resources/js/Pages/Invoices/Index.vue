@@ -197,6 +197,56 @@ const getStatusBadge = (st) => {
     return { label: st, class: 'bg-slate-800 text-slate-400 border-slate-700' };
 };
 
+const getInvoiceActions = (inv) => [
+    {
+        label: trans('invoices.view_invoice') || 'عرض تفاصيل الفاتورة',
+        icon: Eye,
+        href: `/invoices/${inv.id}`,
+        show: true
+    },
+    {
+        label: trans('invoices.print_thermal') || 'طباعة إيصال حراري (80mm)',
+        icon: Printer,
+        variant: 'success',
+        onClick: () => printThermal(inv.id),
+        show: true
+    },
+    {
+        label: trans('invoices.print_a4') || 'طباعة فاتورة ضريبية (A4)',
+        icon: FileText,
+        onClick: () => printA4(inv.id),
+        show: true
+    },
+    {
+        label: trans('invoices.edit_invoice') || 'تعديل الفاتورة',
+        icon: Pencil,
+        variant: 'warning',
+        href: `/invoices/${inv.id}/edit`,
+        show: inv.status !== 'cancelled' && status.value !== 'trash'
+    },
+    {
+        label: trans('invoices.cancel_invoice') || 'إلغاء الفاتورة',
+        icon: Ban,
+        variant: 'danger',
+        onClick: () => openCancelModal(inv),
+        show: inv.status !== 'cancelled' && status.value !== 'trash'
+    },
+    {
+        label: trans('trash.restore_btn') || 'استعادة الفاتورة',
+        icon: RotateCcw,
+        variant: 'success',
+        onClick: () => restoreInvoice(inv),
+        show: status.value === 'trash'
+    },
+    {
+        label: trans('common.delete') || 'حذف الفاتورة',
+        icon: Trash2,
+        variant: 'danger',
+        onClick: () => confirmDelete(inv),
+        show: status.value !== 'trash'
+    }
+];
+
 const printThermal = (id) => {
     window.open(`/invoices/${id}/print/thermal`, '_blank', 'width=400,height=600');
 };
@@ -304,15 +354,15 @@ const printA4 = (id) => {
                             <button
                                 @click="paymentType = 'cash'; applyFilters();"
                                 type="button"
-                                class="h-9 px-3 rounded-xl font-bold transition cursor-pointer flex items-center gap-1 active:scale-95"
-                                :class="paymentType === 'cash' ? 'bg-emerald-500 text-slate-950 font-black shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                                class="h-9 px-3 rounded-xl font-bold transition cursor-pointer flex items-center justify-center active:scale-95"
+                                :class="paymentType === 'cash' ? 'bg-emerald-500 text-white font-black shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
-                                <span>{{ $t('invoices.payment_cash') }}</span>
+                                {{ $t('invoices.payment_cash') }}
                             </button>
                             <button
                                 @click="paymentType = 'credit'; applyFilters();"
                                 type="button"
-                                class="h-9 px-3 rounded-xl font-bold transition cursor-pointer flex items-center gap-1 active:scale-95"
+                                class="h-9 px-3 rounded-xl font-bold transition cursor-pointer flex items-center justify-center active:scale-95"
                                 :class="paymentType === 'credit' ? 'bg-rose-500 text-white font-black shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('invoices.payment_credit') }}
@@ -329,7 +379,7 @@ const printA4 = (id) => {
                             <span>{{ $t('common.filter') }}</span>
                             <span
                                 v-if="activeFiltersCount > 0"
-                                class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-mono font-black text-[11px] flex items-center justify-center"
+                                class="w-5 h-5 rounded-full bg-theme-primary text-white font-mono font-black text-[11px] flex items-center justify-center"
                             >
                                 {{ activeFiltersCount }}
                             </span>
@@ -337,26 +387,26 @@ const printA4 = (id) => {
                     </div>
                 </div>
 
-                <!-- Active Filters Chips List (Removable) -->
+                <!-- Active Filters Chips -->
                 <div v-if="activeFiltersCount > 0" class="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 text-xs">
                     <span class="text-slate-500 text-[11px] font-bold">{{ $t('dashboard.quick_filter') || 'الفلاتر النشطة' }}:</span>
 
-                    <span v-if="storeId !== 'all'" class="px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center gap-1.5 font-bold">
-                        <span>{{ $t('common.store') }}: {{ storeOptions.find(s => s.id == storeId)?.name }}</span>
+                    <span v-if="storeId !== 'all'" class="px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center gap-1.5 font-bold">
+                        <span>{{ $t('common.store') }}: {{ stores.find(s => s.id == storeId)?.name }}</span>
                         <button @click="storeId = 'all'; applyFilters();" class="hover:text-rose-400 cursor-pointer">
                             <X class="w-3 h-3" />
                         </button>
                     </span>
 
-                    <span v-if="dateFrom || dateTo" class="px-2.5 py-1 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 font-mono font-bold">
-                        <span>{{ $t('common.date') }}: {{ dateFrom || '...' }} إلى {{ dateTo || '...' }}</span>
-                        <button @click="dateFrom = ''; dateTo = ''; applyFilters();" class="hover:text-rose-400 cursor-pointer">
+                    <span v-if="paymentType !== 'all'" class="px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center gap-1.5 font-bold">
+                        <span>{{ $t('invoices.payment_type') }}: {{ paymentType === 'cash' ? $t('invoices.payment_cash') : $t('invoices.payment_credit') }}</span>
+                        <button @click="paymentType = 'all'; applyFilters();" class="hover:text-rose-400 cursor-pointer">
                             <X class="w-3 h-3" />
                         </button>
                     </span>
 
-                    <span v-if="status !== 'active'" class="px-2.5 py-1 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 flex items-center gap-1.5 font-bold">
-                        <span>{{ $t('common.status') }}: {{ statusOptions.find(s => s.id === status)?.name }}</span>
+                    <span v-if="status !== 'active'" class="px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center gap-1.5 font-bold">
+                        <span>{{ $t('common.status') }}: {{ status === 'cancelled' ? $t('invoices.status_cancelled') : status }}</span>
                         <button @click="status = 'active'; applyFilters();" class="hover:text-rose-400 cursor-pointer">
                             <X class="w-3 h-3" />
                         </button>
@@ -446,7 +496,7 @@ const printA4 = (id) => {
                                     </span>
                                 </td>
 
-                                <!-- Actions -->
+                                <!-- Actions in Desktop Table -->
                                 <td class="py-3.5 text-center">
                                     <div class="flex items-center justify-center gap-1.5">
                                         <Link
@@ -455,15 +505,6 @@ const printA4 = (id) => {
                                             :title="$t('invoices.view_invoice')"
                                         >
                                             <Eye class="w-3.5 h-3.5" />
-                                        </Link>
-
-                                        <Link
-                                            v-if="inv.status !== 'cancelled' && status !== 'trash'"
-                                            :href="`/invoices/${inv.id}/edit`"
-                                            class="p-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-600 dark:text-amber-400 transition cursor-pointer"
-                                            :title="$t('invoices.edit_invoice')"
-                                        >
-                                            <Pencil class="w-3.5 h-3.5" />
                                         </Link>
 
                                         <button
@@ -475,44 +516,11 @@ const printA4 = (id) => {
                                             <Printer class="w-3.5 h-3.5" />
                                         </button>
 
-                                        <button
-                                            @click="printA4(inv.id)"
-                                            type="button"
-                                            class="p-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 transition cursor-pointer"
-                                            :title="$t('invoices.print_a4')"
-                                        >
-                                            <FileText class="w-3.5 h-3.5" />
-                                        </button>
-
-                                        <button
-                                            v-if="inv.status !== 'cancelled' && status !== 'trash'"
-                                            @click="openCancelModal(inv)"
-                                            type="button"
-                                            class="p-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-600 dark:text-rose-400 transition cursor-pointer"
-                                            :title="$t('invoices.cancel_invoice')"
-                                        >
-                                            <Ban class="w-3.5 h-3.5" />
-                                        </button>
-
-                                        <button
-                                            v-if="status === 'trash'"
-                                            @click="restoreInvoice(inv)"
-                                            type="button"
-                                            class="p-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 transition cursor-pointer"
-                                            :title="$t('trash.restore_btn') || 'استعادة الفاتورة'"
-                                        >
-                                            <RotateCcw class="w-3.5 h-3.5" />
-                                        </button>
-
-                                        <button
-                                            v-if="status !== 'trash'"
-                                            @click="confirmDelete(inv)"
-                                            type="button"
-                                            class="p-1.5 rounded-xl bg-slate-100 hover:bg-rose-100 dark:bg-slate-800 dark:hover:bg-rose-500/20 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 transition cursor-pointer"
-                                            :title="$t('common.delete')"
-                                        >
-                                            <Trash2 class="w-3.5 h-3.5" />
-                                        </button>
+                                        <ActionMenu
+                                            :items="getInvoiceActions(inv)"
+                                            :title="`#${inv.invoice_number}`"
+                                            align="start"
+                                        />
                                     </div>
                                 </td>
                             </tr>
@@ -525,104 +533,90 @@ const printA4 = (id) => {
                     <div
                         v-for="inv in invoices.data"
                         :key="inv.id"
-                        class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-3 shadow-xs"
+                        class="p-4 rounded-3xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-3 shadow-xs"
                     >
-                        <!-- Card Header: Number + Status + Date -->
-                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-2.5">
-                            <div class="flex items-center gap-2">
-                                <Link :href="`/invoices/${inv.id}`" class="font-mono font-black text-sm text-theme-primary hover:underline">
-                                    #{{ inv.invoice_number }}
-                                </Link>
-                                <span class="px-2 py-0.5 rounded-lg text-[10px] font-black border" :class="getStatusBadge(inv.status).class">
-                                    {{ getStatusBadge(inv.status).label }}
-                                </span>
-                            </div>
-                            <span class="text-[11px] text-slate-400 font-mono">
+                        <!-- Card Header: Row 1 (Number + Status) -->
+                        <div class="flex items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800/80 pb-2.5">
+                            <Link :href="`/invoices/${inv.id}`" class="font-mono font-black text-xs sm:text-sm text-theme-primary hover:underline truncate" dir="ltr">
+                                #{{ inv.invoice_number }}
+                            </Link>
+                            <span class="px-2.5 py-0.5 rounded-xl text-[10px] font-black border shrink-0" :class="getStatusBadge(inv.status).class">
+                                {{ getStatusBadge(inv.status).label }}
+                            </span>
+                        </div>
+
+                        <!-- Card Meta: Store & Date -->
+                        <div class="flex items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+                            <span class="px-2 py-0.5 rounded-lg bg-slate-200/60 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-300 font-bold inline-flex items-center gap-1.5 truncate max-w-[60%]">
+                                <Store class="w-3.5 h-3.5 text-theme-primary shrink-0" />
+                                <span class="truncate">{{ inv.store_name }}</span>
+                            </span>
+                            <span class="font-mono text-[10.5px] shrink-0 text-slate-400">
                                 {{ inv.formatted_created_at || inv.created_at }}
                             </span>
                         </div>
 
-                        <!-- Customer & Store -->
-                        <div class="flex items-center justify-between text-xs">
-                            <div class="space-y-0.5">
-                                <p class="font-bold text-slate-900 dark:text-white">{{ inv.customer_name }}</p>
-                                <p v-if="inv.customer_phone" class="text-[11px] text-slate-400 font-mono" dir="ltr">{{ inv.customer_phone }}</p>
+                        <!-- Customer Details Block -->
+                        <div class="space-y-0.5 bg-white dark:bg-slate-900/60 p-2.5 rounded-2xl border border-slate-200/70 dark:border-slate-800/60">
+                            <div class="flex items-center justify-between gap-2">
+                                <p class="font-black text-xs sm:text-sm text-slate-900 dark:text-white truncate">
+                                    {{ inv.customer_name }}
+                                </p>
+                                <span v-if="inv.customer_phone" class="text-[11px] text-slate-400 font-mono shrink-0" dir="ltr">
+                                    📱 {{ inv.customer_phone }}
+                                </span>
                             </div>
-                            <span class="px-2 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-300 text-[11px] font-tajawal inline-flex items-center gap-1">
-                                <Store class="w-3 h-3 text-slate-400" />
-                                <span>{{ inv.store_name }}</span>
-                            </span>
                         </div>
 
-                        <!-- Financials Row -->
-                        <div class="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center font-mono">
-                            <div>
-                                <span class="text-[10px] text-slate-400 font-tajawal block">{{ $t('invoices.net_total') }}</span>
-                                <span class="text-xs font-black text-emerald-600 dark:text-emerald-400">{{ formatMoney(inv.net_total) }}</span>
+                        <!-- Financials 3-Column Bento Row -->
+                        <div class="grid grid-cols-3 gap-2 p-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center font-mono">
+                            <div class="space-y-0.5">
+                                <span class="text-[10px] text-slate-400 font-tajawal font-bold block">{{ $t('invoices.net_total') }}</span>
+                                <span class="text-xs sm:text-sm font-black text-emerald-600 dark:text-emerald-400 block truncate">{{ formatMoney(inv.net_total) }}</span>
                             </div>
-                            <div>
-                                <span class="text-[10px] text-slate-400 font-tajawal block">{{ $t('invoices.paid') }}</span>
-                                <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ formatMoney(inv.paid_amount) }}</span>
+                            <div class="space-y-0.5">
+                                <span class="text-[10px] text-slate-400 font-tajawal font-bold block">{{ $t('invoices.paid') }}</span>
+                                <span class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 block truncate">{{ formatMoney(inv.paid_amount) }}</span>
                             </div>
-                            <div>
-                                <span class="text-[10px] text-slate-400 font-tajawal block">{{ $t('invoices.remaining') }}</span>
-                                <span class="text-xs font-bold" :class="Number(inv.remaining_amount) > 0 ? 'text-rose-600 dark:text-rose-400 font-black' : 'text-slate-400'">
+                            <div class="space-y-0.5">
+                                <span class="text-[10px] text-slate-400 font-tajawal font-bold block">{{ $t('invoices.remaining') }}</span>
+                                <span class="text-xs sm:text-sm font-bold block truncate" :class="Number(inv.remaining_amount) > 0 ? 'text-rose-600 dark:text-rose-400 font-black' : 'text-slate-400'">
                                     {{ formatMoney(inv.remaining_amount) }}
                                 </span>
                             </div>
                         </div>
 
-                        <!-- Mobile Card Action Bar -->
-                        <div class="flex items-center justify-between pt-1">
-                            <span class="px-2 py-0.5 rounded-xl text-[10px] font-bold border" :class="getPaymentBadge(inv).class">
+                        <!-- Mobile Card Action Bar: Payment Badge + View CTA + Quick Thermal Print + ActionMenu Dropdown/Sheet -->
+                        <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/80 dark:border-slate-800/80">
+                            <span class="px-2.5 py-1 rounded-xl text-[10.5px] font-bold border" :class="getPaymentBadge(inv).class">
                                 {{ getPaymentBadge(inv).label }}
                             </span>
 
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-1.5">
+                                <!-- Quick View Link -->
                                 <Link
                                     :href="`/invoices/${inv.id}`"
-                                    class="w-9.5 h-9.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
-                                    :title="$t('invoices.view_invoice')"
+                                    class="h-9.5 px-3 rounded-xl bg-slate-200/80 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-black flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs"
                                 >
-                                    <Eye class="w-4.5 h-4.5" />
+                                    <Eye class="w-4 h-4 text-theme-primary" />
+                                    <span>{{ $t('invoices.view_invoice') || 'عرض' }}</span>
                                 </Link>
 
+                                <!-- Quick Thermal Print Button -->
                                 <button
                                     @click="printThermal(inv.id)"
                                     type="button"
                                     class="w-9.5 h-9.5 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
-                                    :title="$t('invoices.print_thermal')"
+                                    :title="$t('invoices.print_thermal') || 'طباعة حراري'"
                                 >
-                                    <Printer class="w-4.5 h-4.5" />
+                                    <Printer class="w-4 h-4" />
                                 </button>
 
-                                <button
-                                    @click="printA4(inv.id)"
-                                    type="button"
-                                    class="w-9.5 h-9.5 rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
-                                    :title="$t('invoices.print_a4')"
-                                >
-                                    <FileText class="w-4.5 h-4.5" />
-                                </button>
-
-                                <Link
-                                    v-if="inv.status !== 'cancelled' && status !== 'trash'"
-                                    :href="`/invoices/${inv.id}/edit`"
-                                    class="w-9.5 h-9.5 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
-                                    :title="$t('invoices.edit_invoice')"
-                                >
-                                    <Pencil class="w-4.5 h-4.5" />
-                                </Link>
-
-                                <button
-                                    v-if="inv.status !== 'cancelled' && status !== 'trash'"
-                                    @click="openCancelModal(inv)"
-                                    type="button"
-                                    class="w-9.5 h-9.5 rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
-                                    :title="$t('invoices.cancel_invoice')"
-                                >
-                                    <Ban class="w-4.5 h-4.5" />
-                                </button>
+                                <!-- Action Menu (More Options: Edit, A4 Print, Cancel, Delete, etc.) -->
+                                <ActionMenu
+                                    :items="getInvoiceActions(inv)"
+                                    :title="`#${inv.invoice_number}`"
+                                />
                             </div>
                         </div>
                     </div>
