@@ -586,17 +586,17 @@ const printA4 = (id) => {
                             </div>
                         </div>
 
-                        <!-- Mobile Card Action Bar: Payment Badge + View CTA + Quick Thermal Print + ActionMenu Dropdown/Sheet -->
-                        <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/80 dark:border-slate-800/80">
-                            <span class="px-2.5 py-1 rounded-xl text-[10.5px] font-bold border" :class="getPaymentBadge(inv).class">
+                        <!-- Mobile Card Action Bar: Payment Badge + View CTA + Quick Thermal Print + ActionMenu Dropdown (•••) -->
+                        <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
+                            <span class="px-2.5 py-1.5 rounded-xl text-[11px] font-black border shrink-0" :class="getPaymentBadge(inv).class">
                                 {{ getPaymentBadge(inv).label }}
                             </span>
 
-                            <div class="flex items-center gap-1.5">
+                            <div class="flex items-center gap-1.5 shrink-0">
                                 <!-- Quick View Link -->
                                 <Link
                                     :href="`/invoices/${inv.id}`"
-                                    class="h-9.5 px-3 rounded-xl bg-slate-200/80 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-black flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs"
+                                    class="h-10 px-3 rounded-xl bg-slate-200/80 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-black flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs"
                                 >
                                     <Eye class="w-4 h-4 text-theme-primary" />
                                     <span>{{ $t('invoices.view_invoice') || 'عرض' }}</span>
@@ -606,16 +606,18 @@ const printA4 = (id) => {
                                 <button
                                     @click="printThermal(inv.id)"
                                     type="button"
-                                    class="w-9.5 h-9.5 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
+                                    class="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
                                     :title="$t('invoices.print_thermal') || 'طباعة حراري'"
                                 >
-                                    <Printer class="w-4 h-4" />
+                                    <Printer class="w-4.5 h-4.5" />
                                 </button>
 
-                                <!-- Action Menu (More Options: Edit, A4 Print, Cancel, Delete, etc.) -->
+                                <!-- Action Menu ••• (Dropdown with all actions) -->
                                 <ActionMenu
                                     :items="getInvoiceActions(inv)"
                                     :title="`#${inv.invoice_number}`"
+                                    align="start"
+                                    buttonClass="w-10 h-10 rounded-xl bg-slate-200/80 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-200 font-black shadow-xs"
                                 />
                             </div>
                         </div>
