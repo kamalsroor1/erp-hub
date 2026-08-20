@@ -222,7 +222,7 @@ const deleteExpense = (e) => {
                             v-model="search"
                             type="text"
                             :placeholder="$t('expenses.search_placeholder')"
-                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition shadow-inner"
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
                             🔍
@@ -237,7 +237,7 @@ const deleteExpense = (e) => {
                         >
                             <span>⚙️</span>
                             <span>{{ $t('common.advanced_filter') }}</span>
-                            <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-mono font-black text-[11px] flex items-center justify-center">
+                            <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full btn-primary-theme font-mono font-black text-[11px] flex items-center justify-center">
                                 {{ activeFiltersCount }}
                             </span>
                         </button>
@@ -262,20 +262,20 @@ const deleteExpense = (e) => {
                         </thead>
                         <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
                             <tr v-for="e in expenses.data" :key="e.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
-                                <td class="py-3.5 font-mono font-bold text-amber-600 dark:text-amber-400">
+                                <td class="py-3.5 font-mono font-bold text-theme-primary">
                                     {{ e.expense_number }}
                                 </td>
 
                                 <td class="py-3.5">
                                     <div class="font-black text-slate-900 dark:text-white font-tajawal">{{ e.title }}</div>
-                                    <div v-if="e.notes" class="text-[10px] text-slate-500 font-tajawal">{{ e.notes }}</div>
+                                    <div v-if="e.notes" class="text-[10px] text-slate-500 dark:text-slate-400 font-tajawal">{{ e.notes }}</div>
                                 </td>
 
                                 <td class="py-3.5 font-tajawal">
                                     <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold border border-slate-200 dark:border-transparent">
                                         {{ e.cost_center_label }}
                                     </span>
-                                    <div class="text-[10px] text-amber-600 dark:text-amber-400/80 font-bold mt-0.5">{{ e.category }}</div>
+                                    <div class="text-[10px] text-theme-primary font-bold mt-0.5">{{ e.category }}</div>
                                 </td>
 
                                 <td class="py-3.5 font-mono text-slate-500 dark:text-slate-400 text-[11px]">
@@ -297,7 +297,7 @@ const deleteExpense = (e) => {
                                         <button
                                             @click="openEditModal(e)"
                                             type="button"
-                                            class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 text-xs font-bold transition cursor-pointer border border-slate-200 dark:border-transparent"
+                                            class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition cursor-pointer border border-slate-200 dark:border-transparent"
                                         >
                                             {{ $t('common.edit') }} ✏️
                                         </button>
@@ -322,8 +322,8 @@ const deleteExpense = (e) => {
                 </div>
 
                 <!-- Pagination -->
-                <div v-if="expenses.links && expenses.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
-                    <span class="text-xs text-slate-400 font-tajawal">
+                <div v-if="expenses.links && expenses.links.length > 3" class="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between font-sans">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-tajawal">
                         {{ $t('common.showing') }} {{ expenses.from || 0 }} {{ $t('common.to') }} {{ expenses.to || 0 }} {{ $t('common.of') }} {{ expenses.total || 0 }}
                     </span>
 
@@ -333,12 +333,12 @@ const deleteExpense = (e) => {
                                 v-if="link.url"
                                 :href="link.url"
                                 class="px-3 py-1.5 rounded-xl text-xs font-bold transition"
-                                :class="link.active ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'"
+                                :class="link.active ? 'tab-theme-active' : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'"
                                 v-html="link.label"
                             />
                             <span
                                 v-else
-                                class="px-3 py-1.5 rounded-xl text-xs text-slate-600 font-bold"
+                                class="px-3 py-1.5 rounded-xl text-xs text-slate-400 dark:text-slate-600 font-bold"
                                 v-html="link.label"
                             />
                         </template>
@@ -357,17 +357,17 @@ const deleteExpense = (e) => {
         >
             <div class="space-y-5">
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🔍 {{ $t('common.search') }}</label>
+                    <label class="text-xs font-black text-slate-700 dark:text-slate-300">🔍 {{ $t('common.search') }}</label>
                     <input
                         v-model="search"
                         type="text"
                         :placeholder="$t('expenses.search_placeholder')"
-                        class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none transition"
+                        class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none transition"
                     >
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🏢 {{ $t('expenses.cost_center') }}</label>
+                    <label class="text-xs font-black text-slate-700 dark:text-slate-300">🏢 {{ $t('expenses.cost_center') }}</label>
                     <SearchableSelect
                         v-model="costCenter"
                         :options="costCenterOptions"
@@ -376,7 +376,7 @@ const deleteExpense = (e) => {
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">💳 {{ $t('invoices.payment_method') }}</label>
+                    <label class="text-xs font-black text-slate-700 dark:text-slate-300">💳 {{ $t('invoices.payment_method') }}</label>
                     <SearchableSelect
                         v-model="paymentMethod"
                         :options="paymentMethodOptions"
@@ -386,11 +386,11 @@ const deleteExpense = (e) => {
 
                 <div class="grid grid-cols-2 gap-2">
                     <div class="space-y-1.5">
-                        <label class="text-xs font-black text-slate-300">{{ $t('common.date_from') }}</label>
+                        <label class="text-xs font-black text-slate-700 dark:text-slate-300">{{ $t('common.date_from') }}</label>
                         <DatePicker v-model="dateFrom" :placeholder="$t('common.date_from')" />
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-xs font-black text-slate-300">{{ $t('common.date_to') }}</label>
+                        <label class="text-xs font-black text-slate-700 dark:text-slate-300">{{ $t('common.date_to') }}</label>
                         <DatePicker v-model="dateTo" :placeholder="$t('common.date_to')" />
                     </div>
                 </div>
@@ -404,29 +404,29 @@ const deleteExpense = (e) => {
             class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
             dir="rtl"
         >
-            <div @click.stop class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="font-black text-base text-white">
+            <div @click.stop class="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-900 dark:text-white">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <h3 class="font-black text-base text-slate-900 dark:text-white">
                         {{ editingExpense ? $t('expenses.edit_expense') : $t('expenses.new_expense') }}
                     </h3>
-                    <button @click="showModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
+                    <button @click="showModal = false" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs dark:hover:text-white transition">✕</button>
                 </div>
 
                 <form @submit.prevent="saveExpense" class="space-y-4">
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('expenses.expense_item') }} *</label>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('expenses.expense_item') }} *</label>
                         <input
                             v-model="expenseForm.title"
                             type="text"
                             required
                             placeholder="مثال: شراء كراتين شحن / صيانة طاحونة رقم 2..."
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
                         >
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('expenses.amount') }} *</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('expenses.amount') }} *</label>
                             <input
                                 v-model.number="expenseForm.amount"
                                 type="number"
@@ -434,22 +434,22 @@ const deleteExpense = (e) => {
                                 min="0.01"
                                 required
                                 placeholder="0.00"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs font-mono font-black text-rose-400 focus:border-amber-500 focus:outline-none"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-mono font-black text-rose-600 dark:text-rose-400 focus:border-theme-primary focus:outline-none"
                             >
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('common.date') }} *</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.date') }} *</label>
                             <DatePicker v-model="expenseForm.expense_date" :placeholder="$t('common.date')" />
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('expenses.cost_center') }} *</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('expenses.cost_center') }} *</label>
                             <select
                                 v-model="expenseForm.cost_center"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
                             >
                                 <option v-for="(label, key) in cost_centers" :key="key" :value="key">
                                     {{ label }}
@@ -458,10 +458,10 @@ const deleteExpense = (e) => {
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('invoices.payment_method') }} *</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('invoices.payment_method') }} *</label>
                             <select
                                 v-model="expenseForm.payment_method"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
                             >
                                 <option value="cash">{{ $t('treasury.cash_drawer') }} 💵</option>
                                 <option value="instapay">{{ $t('treasury.instapay') }} ⚡</option>
@@ -473,7 +473,7 @@ const deleteExpense = (e) => {
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('expenses.quick_category') }}</label>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('expenses.quick_category') }}</label>
                         <div class="flex flex-wrap gap-1.5">
                             <button
                                 v-for="c in quickCategories"
@@ -489,20 +489,20 @@ const deleteExpense = (e) => {
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('invoices.notes') }}</label>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('invoices.notes') }}</label>
                         <input
                             v-model="expenseForm.notes"
                             type="text"
                             :placeholder="$t('invoices.notes')"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
                         >
                     </div>
 
-                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
                         <button
                             @click="showModal = false"
                             type="button"
-                            class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
+                            class="px-4 py-2.5 rounded-2xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                         >
                             {{ $t('common.cancel') }}
                         </button>

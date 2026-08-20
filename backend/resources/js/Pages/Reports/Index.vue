@@ -273,8 +273,8 @@ const printReport = () => {
                                     <td class="py-3 font-mono font-bold text-rose-600 dark:text-rose-400 text-left">- {{ formatMoney(summary.total_cogs) }} {{ $t('common.currency') }}</td>
                                 </tr>
                                 <tr class="py-2.5 bg-slate-50 dark:bg-slate-950/50">
-                                    <td class="py-3 font-black text-amber-600 dark:text-amber-400">{{ $t('reports.gross_profit_trade') }}</td>
-                                    <td class="py-3 font-mono font-black text-amber-600 dark:text-amber-400 text-left">{{ formatMoney(summary.gross_profit) }} {{ $t('common.currency') }}</td>
+                                    <td class="py-3 font-black text-theme-primary">{{ $t('reports.gross_profit_trade') }}</td>
+                                    <td class="py-3 font-mono font-black text-theme-primary text-left">{{ formatMoney(summary.gross_profit) }} {{ $t('common.currency') }}</td>
                                 </tr>
                                 <tr class="py-2.5">
                                     <td class="py-3 font-bold text-slate-700 dark:text-slate-300">{{ $t('reports.operating_expenses_deducted') }}</td>
@@ -314,11 +314,11 @@ const printReport = () => {
                             <tr v-for="item in item_profits" :key="item.item_id" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
                                 <td class="py-3 font-bold text-slate-900 dark:text-white font-tajawal">{{ item.name }}</td>
                                 <td class="py-3 text-slate-500 dark:text-slate-400 font-tajawal">{{ item.category || $t('common.all') }}</td>
-                                <td class="py-3 font-mono text-amber-600 dark:text-amber-400">{{ item.total_qty }} {{ item.unit }}</td>
+                                <td class="py-3 font-mono text-theme-primary font-bold">{{ item.total_qty }} {{ item.unit }}</td>
                                 <td class="py-3 font-mono font-bold text-slate-900 dark:text-white">{{ formatMoney(item.total_revenue) }} {{ $t('common.currency') }}</td>
                                 <td class="py-3 font-mono text-slate-500 dark:text-slate-400">{{ formatMoney(item.total_cogs) }} {{ $t('common.currency') }}</td>
                                 <td class="py-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">{{ formatMoney(item.profit) }} {{ $t('common.currency') }}</td>
-                                <td class="py-3 font-mono text-left font-bold text-amber-600 dark:text-amber-400">{{ item.margin }}%</td>
+                                <td class="py-3 font-mono text-left font-bold text-theme-primary">{{ item.margin }}%</td>
                             </tr>
                         </tbody>
                     </table>
@@ -350,9 +350,9 @@ const printReport = () => {
                                 <td class="py-3 font-mono font-bold text-slate-900 dark:text-white">{{ formatMoney(st.total_sales) }} {{ $t('common.currency') }}</td>
                                 <td class="py-3 font-mono text-emerald-600 dark:text-emerald-400">{{ formatMoney(st.total_paid) }} {{ $t('common.currency') }}</td>
                                 <td class="py-3 font-mono text-rose-600 dark:text-rose-400">{{ formatMoney(st.total_remaining) }} {{ $t('common.currency') }}</td>
-                                <td class="py-3 font-mono font-bold text-amber-600 dark:text-amber-400">{{ formatMoney(st.gross_profit) }} {{ $t('common.currency') }}</td>
+                                <td class="py-3 font-mono font-bold text-theme-primary">{{ formatMoney(st.gross_profit) }} {{ $t('common.currency') }}</td>
                                 <td class="py-3 font-mono text-slate-600 dark:text-slate-300">{{ st.margin }}%</td>
-                                <td class="py-3 font-mono text-left font-black text-amber-600 dark:text-amber-400">{{ st.share_pct }}%</td>
+                                <td class="py-3 font-mono text-left font-black text-theme-primary">{{ st.share_pct }}%</td>
                             </tr>
                         </tbody>
                     </table>
@@ -389,7 +389,7 @@ const printReport = () => {
                                 <td class="py-3 font-mono font-bold text-slate-900 dark:text-white">{{ formatMoney(c.total_bought) }} {{ $t('common.currency') }}</td>
                                 <td class="py-3 font-mono text-emerald-600 dark:text-emerald-400">{{ formatMoney(c.total_paid) }} {{ $t('common.currency') }}</td>
                                 <td class="py-3 font-mono text-rose-600 dark:text-rose-400">{{ formatMoney(c.total_debt_in_period) }} {{ $t('common.currency') }}</td>
-                                <td class="py-3 font-mono text-left font-black" :class="c.current_balance > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 dark:text-slate-400'">
+                                <td class="py-3 font-mono text-left font-black" :class="c.current_balance > 0 ? 'text-theme-primary' : 'text-slate-500 dark:text-slate-400'">
                                     {{ formatMoney(c.current_balance) }} {{ $t('common.currency') }}
                                 </td>
                             </tr>
@@ -438,7 +438,7 @@ const printReport = () => {
                     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 space-y-1 shadow-xs">
                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ $t('reports.stock_selling_valuation') }}</span>
                         <div class="text-2xl font-black font-mono text-slate-900 dark:text-white">
-                            {{ formatMoney(summary.stock_selling_valuation) }} <span class="text-xs font-bold text-amber-600 dark:text-amber-400">{{ $t('common.currency') }}</span>
+                            {{ formatMoney(summary.stock_selling_valuation) }} <span class="text-xs font-bold text-theme-primary">{{ $t('common.currency') }}</span>
                         </div>
                     </div>
 
@@ -461,7 +461,7 @@ const printReport = () => {
                         <button
                             @click="exportAbc"
                             type="button"
-                            class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 text-xs font-bold border border-slate-200 dark:border-slate-700 transition cursor-pointer flex items-center gap-1.5"
+                            class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-700 transition cursor-pointer flex items-center gap-1.5"
                         >
                             <span>📥</span>
                             <span>{{ $t('reports.export_abc_excel') }}</span>
@@ -474,8 +474,8 @@ const printReport = () => {
                             <div class="text-lg font-black font-mono text-slate-900 dark:text-white">{{ $t('reports.items_count', { count: abc_data?.category_a?.length || 0 }) }}</div>
                         </div>
 
-                        <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 space-y-1">
-                            <span class="text-xs font-black text-amber-600 dark:text-amber-400">{{ $t('reports.abc_class_b_title') }}</span>
+                        <div class="bg-theme-light border border-theme-primary rounded-2xl p-4 space-y-1">
+                            <span class="text-xs font-black text-theme-primary">{{ $t('reports.abc_class_b_title') }}</span>
                             <div class="text-lg font-black font-mono text-slate-900 dark:text-white">{{ $t('reports.items_count', { count: abc_data?.category_b?.length || 0 }) }}</div>
                         </div>
 
@@ -489,7 +489,7 @@ const printReport = () => {
 
             <!-- TAB 7: TREASURY & INFLOW / OUTFLOW -->
             <div v-if="currentTab === 'treasury'" class="space-y-6">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-xs">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-4 shadow-xs">
                     <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                         <h3 class="text-sm font-black text-slate-900 dark:text-white">{{ $t('reports.treasury_liquidity_title') }}</h3>
                     </div>
@@ -511,7 +511,7 @@ const printReport = () => {
 
                         <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-1">
                             <span class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ $t('reports.wallet_collections') }}</span>
-                            <div class="text-xl font-black font-mono text-amber-600 dark:text-amber-400">
+                            <div class="text-xl font-black font-mono text-theme-primary">
                                 {{ formatMoney(treasury_data?.inflows?.e_wallet || 0) }} {{ $t('common.currency') }}
                             </div>
                         </div>

@@ -275,7 +275,7 @@ const deleteReturn = (r) => {
                 <!-- Pagination -->
                 <div v-if="returns.links && returns.links.length > 3" class="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between font-sans">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-tajawal">
-                        {{ $t('common.actions') ? `عرض ${returns.from || 0} إلى ${returns.to || 0} من إجمالي ${returns.total || 0}` : `Showing ${returns.from || 0} to ${returns.to || 0} of ${returns.total || 0}` }}
+                        {{ $t('common.showing') }} {{ returns.from || 0 }} {{ $t('common.to') }} {{ returns.to || 0 }} {{ $t('common.of') }} {{ returns.total || 0 }}
                     </span>
 
                     <div class="flex items-center gap-1">
