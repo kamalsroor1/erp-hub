@@ -3,6 +3,27 @@ import { ref, computed } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { useTheme, PRESET_PALETTES } from '@/Composables/useTheme';
+import {
+    Settings,
+    Building2,
+    Palette,
+    Send,
+    HardDrive,
+    Cpu,
+    Paintbrush,
+    Eye,
+    Save,
+    Trash2,
+    Check,
+    CheckCircle2,
+    RotateCcw,
+    AlertTriangle,
+    Sun,
+    Moon,
+    Sparkles,
+    Zap,
+    RefreshCw
+} from 'lucide-vue-next';
 
 const props = defineProps({
     settings: { type: Object, required: true },
@@ -41,11 +62,11 @@ const extendedSwatches = [
 ];
 
 const form = useForm({
-    company_name: props.settings.company_name,
-    company_subtitle: props.settings.company_subtitle,
-    company_phone: props.settings.company_phone,
-    company_address: props.settings.company_address,
-    invoice_footer_note: props.settings.invoice_footer_note,
+    company_name: props.settings.company_name || 'سرور كوفي',
+    company_subtitle: props.settings.company_subtitle || 'إدارة المحامص والمخازن',
+    company_phone: props.settings.company_phone || '',
+    company_address: props.settings.company_address || '',
+    invoice_footer_note: props.settings.invoice_footer_note || '',
     show_print_company_name: props.settings.show_print_company_name,
     show_print_subtitle: props.settings.show_print_subtitle,
     show_print_logo: props.settings.show_print_logo,
@@ -174,8 +195,8 @@ const clearCache = () => {
             <!-- Header Banner -->
             <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-theme-light border border-theme-primary text-theme-primary flex items-center justify-center text-2xl font-bold">
-                        ⚙️
+                    <div class="w-12 h-12 rounded-2xl bg-theme-light border border-theme-light text-theme-primary flex items-center justify-center text-2xl font-bold shadow-xs">
+                        <Settings class="w-6 h-6" />
                     </div>
                     <div>
                         <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
@@ -191,9 +212,9 @@ const clearCache = () => {
                     <button
                         @click="clearCache"
                         type="button"
-                        class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold transition cursor-pointer flex items-center gap-1.5"
+                        class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-xs"
                     >
-                        <span>⚡</span>
+                        <RefreshCw class="w-3.5 h-3.5" />
                         <span>{{ $t('settings.clear_cache_btn') }}</span>
                     </button>
                 </div>
@@ -204,50 +225,50 @@ const clearCache = () => {
                 <button
                     @click="currentTab = 'branding'"
                     type="button"
-                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5"
+                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
                     :class="currentTab === 'branding' ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
-                    <span>🏢</span>
+                    <Building2 class="w-4 h-4" />
                     <span>{{ $t('settings.tab_branding') }}</span>
                 </button>
 
                 <button
                     @click="currentTab = 'theme'"
                     type="button"
-                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5"
+                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
                     :class="currentTab === 'theme' ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
-                    <span>🎨</span>
+                    <Palette class="w-4 h-4" />
                     <span>{{ $t('settings.tab_theme') }}</span>
                 </button>
 
                 <button
                     @click="currentTab = 'telegram'"
                     type="button"
-                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5"
+                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
                     :class="currentTab === 'telegram' ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
-                    <span>✈️</span>
+                    <Send class="w-4 h-4" />
                     <span>{{ $t('settings.tab_telegram') }}</span>
                 </button>
 
                 <button
                     @click="currentTab = 'backup'"
                     type="button"
-                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5"
+                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
                     :class="currentTab === 'backup' ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
-                    <span>💾</span>
+                    <HardDrive class="w-4 h-4" />
                     <span>{{ $t('settings.tab_backup') }}</span>
                 </button>
 
                 <button
                     @click="currentTab = 'system'"
                     type="button"
-                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5"
+                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
                     :class="currentTab === 'system' ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
-                    <span>⚡</span>
+                    <Cpu class="w-4 h-4" />
                     <span>{{ $t('settings.tab_system') }}</span>
                 </button>
             </div>
@@ -301,13 +322,14 @@ const clearCache = () => {
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
                                 <div>
                                     <h3 class="text-xs font-black text-slate-900 dark:text-white flex items-center gap-2">
-                                        <span>🖌️</span>
+                                        <Paintbrush class="w-4 h-4 text-theme-primary" />
                                         <span>{{ $t('settings.custom_color_title') }}</span>
                                     </h3>
                                     <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{{ $t('settings.custom_color_sub') }}</p>
                                 </div>
-                                <span v-if="!isPreset" class="px-2.5 py-1 rounded-xl text-[11px] font-black bg-theme-light text-theme-primary border border-theme-light self-start sm:self-auto">
-                                    ✓ {{ $t('settings.custom_color_badge') }}
+                                <span v-if="!isPreset" class="px-2.5 py-1 rounded-xl text-[11px] font-black bg-theme-light text-theme-primary border border-theme-light self-start sm:self-auto flex items-center gap-1">
+                                    <Check class="w-3.5 h-3.5" />
+                                    <span>{{ $t('settings.custom_color_badge') }}</span>
                                 </span>
                             </div>
 
@@ -366,7 +388,7 @@ const clearCache = () => {
                         <!-- Live Real-Time Preview Card -->
                         <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 space-y-4">
                             <h3 class="text-xs font-black text-slate-900 dark:text-white flex items-center gap-2">
-                                <span>👁️</span>
+                                <Eye class="w-4 h-4 text-theme-primary" />
                                 <span>{{ $t('settings.live_preview_title') }}</span>
                             </h3>
 
@@ -375,7 +397,7 @@ const clearCache = () => {
                                 <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2 shadow-xs">
                                     <div class="flex items-center justify-between">
                                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ $t('settings.preview_kpi_sales') }}</span>
-                                        <span class="text-base">💵</span>
+                                        <Zap class="w-4 h-4 text-theme-primary" />
                                     </div>
                                     <div class="text-2xl font-black font-mono text-theme-primary">
                                         24,850.00 <span class="text-xs font-bold text-slate-500">ج.م</span>
@@ -387,14 +409,14 @@ const clearCache = () => {
                                     type="button"
                                     class="h-12 px-5 rounded-2xl btn-primary-theme font-black text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
                                 >
-                                    <span>⚡</span>
+                                    <Zap class="w-4 h-4 fill-current" />
                                     <span>{{ $t('settings.preview_button_active') }} (F2)</span>
                                 </button>
 
                                 <!-- Sample Badge & Store Chip -->
                                 <div class="flex flex-col items-center sm:items-start gap-2">
                                     <span class="px-3 py-1.5 rounded-xl text-xs font-black badge-theme flex items-center gap-1.5 shadow-xs">
-                                        <span>✓</span>
+                                        <CheckCircle2 class="w-3.5 h-3.5" />
                                         <span>الفرع النشط: محمص سرور الرئيسي</span>
                                     </span>
                                 </div>
@@ -408,7 +430,7 @@ const clearCache = () => {
                                 :disabled="form.processing"
                                 class="h-12 px-8 rounded-2xl btn-primary-theme font-black text-xs transition transform active:scale-95 cursor-pointer disabled:opacity-50 flex items-center gap-2"
                             >
-                                <span>🎨</span>
+                                <Palette class="w-4 h-4" />
                                 <span>{{ form.processing ? $t('common.save') + '...' : $t('settings.save_theme_btn') }}</span>
                             </button>
                         </div>
@@ -424,7 +446,7 @@ const clearCache = () => {
                         <div class="pb-6 border-b border-slate-200 dark:border-slate-800 space-y-4">
                             <div>
                                 <h3 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
-                                    <span>🖼️</span>
+                                    <Building2 class="w-4 h-4 text-theme-primary" />
                                     <span>{{ $t('settings.company_logo') }}</span>
                                 </h3>
                                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">{{ $t('settings.logo_hint') }}</p>
@@ -443,7 +465,7 @@ const clearCache = () => {
 
                                     <div class="space-y-1.5 flex-1 min-w-0">
                                         <div class="flex items-center gap-1.5">
-                                            <span class="text-sm">☀️</span>
+                                            <Sun class="w-4 h-4 text-amber-500" />
                                             <h4 class="text-xs font-black text-slate-900 dark:text-white truncate">{{ $t('settings.company_logo_light') }}</h4>
                                         </div>
                                         <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">{{ $t('settings.logo_light_hint') }}</p>
@@ -466,7 +488,7 @@ const clearCache = () => {
 
                                     <div class="space-y-1.5 flex-1 min-w-0">
                                         <div class="flex items-center gap-1.5">
-                                            <span class="text-sm">🌙</span>
+                                            <Moon class="w-4 h-4 text-indigo-400" />
                                             <h4 class="text-xs font-black text-slate-900 dark:text-white truncate">{{ $t('settings.company_logo_dark') }}</h4>
                                         </div>
                                         <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">{{ $t('settings.logo_dark_hint') }}</p>
@@ -559,9 +581,10 @@ const clearCache = () => {
                             <button
                                 type="submit"
                                 :disabled="form.processing"
-                                class="h-12 px-8 rounded-2xl btn-primary-theme font-black text-xs transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                                class="h-12 px-8 rounded-2xl btn-primary-theme font-black text-xs transition transform active:scale-95 cursor-pointer disabled:opacity-50 flex items-center gap-2"
                             >
-                                {{ form.processing ? $t('common.save') : $t('settings.save_branding_btn') }}
+                                <Save class="w-4 h-4" />
+                                <span>{{ form.processing ? $t('common.save') : $t('settings.save_branding_btn') }}</span>
                             </button>
                         </div>
                     </div>
@@ -575,7 +598,7 @@ const clearCache = () => {
                         <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
                             <div>
                                 <h2 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
-                                    <span>✈️</span>
+                                    <Send class="w-4 h-4 text-theme-primary" />
                                     <span>{{ $t('settings.telegram_title') }}</span>
                                 </h2>
                                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ $t('settings.telegram_sub') }}</p>
@@ -616,45 +639,45 @@ const clearCache = () => {
                                 <button
                                     @click="sendTelegramTest"
                                     type="button"
-                                    class="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+                                    class="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                                 >
-                                    <span>✉️</span>
+                                    <Send class="w-4 h-4 text-theme-primary" />
                                     <span>{{ $t('settings.send_test_msg') }}</span>
                                 </button>
 
                                 <button
                                     @click="sendDailySummary"
                                     type="button"
-                                    class="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+                                    class="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                                 >
-                                    <span>📊</span>
+                                    <BarChart3 class="w-4 h-4 text-emerald-500" />
                                     <span>{{ $t('settings.send_daily_summary') }}</span>
                                 </button>
 
                                 <button
                                     @click="sendLowStock"
                                     type="button"
-                                    class="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+                                    class="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                                 >
-                                    <span>🚨</span>
+                                    <AlertTriangle class="w-4 h-4 text-rose-500" />
                                     <span>{{ $t('settings.send_low_stock') }}</span>
                                 </button>
 
                                 <button
                                     @click="sendOverdueShift"
                                     type="button"
-                                    class="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+                                    class="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                                 >
-                                    <span>⏰</span>
+                                    <RotateCcw class="w-4 h-4 text-amber-500" />
                                     <span>{{ $t('settings.send_overdue_shifts') }}</span>
                                 </button>
 
                                 <button
                                     @click="sendBackupTelegram"
                                     type="button"
-                                    class="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+                                    class="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                                 >
-                                    <span>💾</span>
+                                    <HardDrive class="w-4 h-4 text-indigo-500" />
                                     <span>{{ $t('settings.send_backup_telegram') }}</span>
                                 </button>
                             </div>
@@ -664,9 +687,10 @@ const clearCache = () => {
                             <button
                                 type="submit"
                                 :disabled="form.processing"
-                                class="h-12 px-8 rounded-2xl btn-primary-theme font-black text-xs transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                                class="h-12 px-8 rounded-2xl btn-primary-theme font-black text-xs transition transform active:scale-95 cursor-pointer disabled:opacity-50 flex items-center gap-2"
                             >
-                                {{ $t('settings.save_telegram_btn') }}
+                                <Save class="w-4 h-4" />
+                                <span>{{ $t('settings.save_telegram_btn') }}</span>
                             </button>
                         </div>
                     </div>
@@ -678,7 +702,7 @@ const clearCache = () => {
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-6">
                     <div class="border-b border-slate-200 dark:border-slate-800 pb-4">
                         <h2 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
-                            <span>💾</span>
+                            <HardDrive class="w-4 h-4 text-theme-primary" />
                             <span>{{ $t('settings.backup_title') }}</span>
                         </h2>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ $t('settings.backup_sub') }}</p>
@@ -688,7 +712,7 @@ const clearCache = () => {
                         <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-3 flex flex-col justify-between">
                             <div class="space-y-2">
                                 <h3 class="text-xs font-black text-slate-900 dark:text-white flex items-center gap-2">
-                                    <span>💻</span>
+                                    <HardDrive class="w-4 h-4 text-indigo-500" />
                                     <span>{{ $t('settings.direct_download_title') }}</span>
                                 </h3>
                                 <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
@@ -700,7 +724,7 @@ const clearCache = () => {
                                 href="/settings/backup/download"
                                 class="h-11 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-indigo-600/30 transition cursor-pointer"
                             >
-                                <span>📥</span>
+                                <HardDrive class="w-4 h-4" />
                                 <span>{{ $t('settings.download_sql_btn') }}</span>
                             </a>
                         </div>
@@ -708,7 +732,7 @@ const clearCache = () => {
                         <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-3 flex flex-col justify-between">
                             <div class="space-y-2">
                                 <h3 class="text-xs font-black text-slate-900 dark:text-white flex items-center gap-2">
-                                    <span>☁️</span>
+                                    <Send class="w-4 h-4 text-sky-500" />
                                     <span>{{ $t('settings.backup_to_telegram_title') }}</span>
                                 </h3>
                                 <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
@@ -721,7 +745,7 @@ const clearCache = () => {
                                 type="button"
                                 class="h-11 px-6 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer"
                             >
-                                <span>✈️</span>
+                                <Send class="w-4 h-4 text-sky-500" />
                                 <span>{{ $t('settings.send_to_telegram_btn') }}</span>
                             </button>
                         </div>
@@ -734,7 +758,7 @@ const clearCache = () => {
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-6">
                     <div class="border-b border-slate-200 dark:border-slate-800 pb-4">
                         <h2 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
-                            <span>⚡</span>
+                            <Cpu class="w-4 h-4 text-theme-primary" />
                             <span>{{ $t('settings.system_perf_title') }}</span>
                         </h2>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ $t('settings.system_perf_sub') }}</p>
@@ -769,7 +793,7 @@ const clearCache = () => {
                                 target="_blank"
                                 class="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-purple-600 dark:text-purple-400 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
                             >
-                                <span>📊</span>
+                                <BarChart3 class="w-4 h-4" />
                                 <span>{{ $t('settings.pulse_monitoring') }}</span>
                             </a>
 
@@ -778,7 +802,7 @@ const clearCache = () => {
                                 target="_blank"
                                 class="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-teal-600 dark:text-teal-400 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
                             >
-                                <span>🔭</span>
+                                <Cpu class="w-4 h-4" />
                                 <span>{{ $t('settings.telescope') }}</span>
                             </a>
                         </div>
@@ -786,9 +810,10 @@ const clearCache = () => {
                         <button
                             @click="clearCache"
                             type="button"
-                            class="h-11 px-6 rounded-2xl btn-primary-theme font-black text-xs transition transform active:scale-95 cursor-pointer"
+                            class="h-11 px-6 rounded-2xl btn-primary-theme font-black text-xs transition transform active:scale-95 cursor-pointer flex items-center gap-2"
                         >
-                            {{ $t('settings.clear_cache_now') }}
+                            <RefreshCw class="w-4 h-4" />
+                            <span>{{ $t('settings.clear_cache_now') }}</span>
                         </button>
                     </div>
                 </div>

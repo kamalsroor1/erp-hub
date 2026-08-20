@@ -5,6 +5,46 @@ import FeatureGate from '@/Components/FeatureGate.vue';
 import { trans } from '@/helpers/trans';
 import { useTheme } from '@/Composables/useTheme';
 import { notifySuccess, notifyError } from '@/helpers/alert';
+import {
+    LayoutDashboard,
+    Receipt,
+    Wallet,
+    Users,
+    Package,
+    Boxes,
+    Truck,
+    Store,
+    ShoppingCart,
+    Bot,
+    Building2,
+    Coins,
+    RotateCcw,
+    BarChart3,
+    Coffee,
+    ShieldCheck,
+    ClipboardList,
+    Trash2,
+    Settings,
+    Crown,
+    Menu,
+    PanelRightClose,
+    PanelRightOpen,
+    Clock,
+    Zap,
+    Bell,
+    Sun,
+    Moon,
+    ChevronDown,
+    CheckCircle2,
+    AlertTriangle,
+    XCircle,
+    X,
+    User,
+    Key,
+    LogOut,
+    Plus,
+    Building
+} from 'lucide-vue-next';
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user || {});
@@ -131,51 +171,51 @@ const logout = () => {
     router.post('/logout');
 };
 
-// Navigation Groups & Items
+// Navigation Groups & Items with Lucide Icons
 const navigationGroups = computed(() => [
     {
         title: '',
         items: [
-            { name: trans('nav.dashboard'), href: '/', icon: '📊', active: page.url === '/' || page.url === '', feature: null },
+            { name: trans('nav.dashboard'), href: '/', icon: LayoutDashboard, active: page.url === '/' || page.url === '', feature: null },
         ]
     },
     {
         title: trans('nav.group_sales'),
         items: [
-            { name: trans('nav.invoices_log'), href: '/invoices', icon: '🧾', active: page.url === '/invoices' || page.url.startsWith('/invoices/'), feature: 'invoices.create' },
-            { name: trans('nav.daily_journal'), href: '/daily-journal', icon: '💰', active: page.url.startsWith('/daily-journal') || page.url.startsWith('/shifts'), feature: 'shifts.manage' },
-            { name: trans('nav.customers'), href: '/customers', icon: '👥', active: page.url.startsWith('/customers'), feature: null },
+            { name: trans('nav.invoices_log'), href: '/invoices', icon: Receipt, active: page.url === '/invoices' || page.url.startsWith('/invoices/'), feature: 'invoices.create' },
+            { name: trans('nav.daily_journal'), href: '/daily-journal', icon: Wallet, active: page.url.startsWith('/daily-journal') || page.url.startsWith('/shifts'), feature: 'shifts.manage' },
+            { name: trans('nav.customers'), href: '/customers', icon: Users, active: page.url.startsWith('/customers'), feature: null },
         ]
     },
     {
         title: trans('nav.group_inventory'),
         items: [
-            { name: trans('nav.items_catalog'), href: '/items', icon: '📦', active: page.url.startsWith('/items'), feature: 'items.manage' },
-            { name: trans('nav.store_stocks'), href: '/store-stocks', icon: '📋', active: page.url.startsWith('/store-stocks'), feature: 'items.view' },
-            { name: trans('nav.stock_transfers'), href: '/stock-transfers', icon: '🚚', active: page.url.startsWith('/stock-transfers'), feature: 'transfers.manage' },
-            { name: trans('nav.stores'), href: '/stores', icon: '🏬', active: page.url.startsWith('/stores'), feature: null },
-            { name: trans('nav.purchases'), href: '/purchases', icon: '🚛', active: page.url.startsWith('/purchases'), feature: 'purchases.manage' },
-            { name: trans('nav.smart_reorder'), href: '/purchases/smart-reorder', icon: '🤖', active: page.url.startsWith('/purchases/smart-reorder'), feature: 'purchases.reorder' },
-            { name: trans('nav.suppliers'), href: '/suppliers', icon: '🏭', active: page.url.startsWith('/suppliers'), feature: null },
+            { name: trans('nav.items_catalog'), href: '/items', icon: Package, active: page.url.startsWith('/items'), feature: 'items.manage' },
+            { name: trans('nav.store_stocks'), href: '/store-stocks', icon: Boxes, active: page.url.startsWith('/store-stocks'), feature: 'items.view' },
+            { name: trans('nav.stock_transfers'), href: '/stock-transfers', icon: Truck, active: page.url.startsWith('/stock-transfers'), feature: 'transfers.manage' },
+            { name: trans('nav.stores'), href: '/stores', icon: Store, active: page.url.startsWith('/stores'), feature: null },
+            { name: trans('nav.purchases'), href: '/purchases', icon: ShoppingCart, active: page.url.startsWith('/purchases'), feature: 'purchases.manage' },
+            { name: trans('nav.smart_reorder'), href: '/purchases/smart-reorder', icon: Bot, active: page.url.startsWith('/purchases/smart-reorder'), feature: 'purchases.reorder' },
+            { name: trans('nav.suppliers'), href: '/suppliers', icon: Building2, active: page.url.startsWith('/suppliers'), feature: null },
         ]
     },
     {
         title: trans('nav.group_financials'),
         items: [
-            { name: trans('nav.expenses'), href: '/expenses', icon: '💸', active: page.url.startsWith('/expenses'), feature: 'expenses.manage' },
-            { name: trans('nav.returns_adjustments'), href: '/returns', icon: '↩️', active: page.url.startsWith('/returns'), feature: 'returns.manage' },
-            { name: trans('nav.reports'), href: '/reports', icon: '📈', active: page.url.startsWith('/reports'), feature: 'reports.advanced' },
-            { name: trans('nav.coffee_blender'), href: '/coffee-blender', icon: '☕', active: page.url.startsWith('/coffee-blender'), feature: 'blender.access' },
+            { name: trans('nav.expenses'), href: '/expenses', icon: Coins, active: page.url.startsWith('/expenses'), feature: 'expenses.manage' },
+            { name: trans('nav.returns_adjustments'), href: '/returns', icon: RotateCcw, active: page.url.startsWith('/returns'), feature: 'returns.manage' },
+            { name: trans('nav.reports'), href: '/reports', icon: BarChart3, active: page.url.startsWith('/reports'), feature: 'reports.advanced' },
+            { name: trans('nav.coffee_blender'), href: '/coffee-blender', icon: Coffee, active: page.url.startsWith('/coffee-blender'), feature: 'blender.access' },
         ]
     },
     {
         title: trans('nav.group_management'),
         items: [
-            { name: trans('nav.users'), href: '/users', icon: '👤', active: page.url.startsWith('/users'), feature: 'roles.manage' },
-            { name: trans('nav.roles'), href: '/roles', icon: '🛡️', active: page.url.startsWith('/roles'), feature: 'roles.manage' },
-            { name: trans('nav.audit_logs'), href: '/activity-logs', icon: '📋', active: page.url.startsWith('/activity-logs'), feature: 'audit.logs' },
-            { name: trans('nav.trash'), href: '/trash', icon: '🗑️', active: page.url.startsWith('/trash'), feature: 'trash.access' },
-            { name: trans('nav.settings'), href: '/settings', icon: '⚙️', active: page.url.startsWith('/settings'), feature: null },
+            { name: trans('nav.users'), href: '/users', icon: Users, active: page.url.startsWith('/users'), feature: 'roles.manage' },
+            { name: trans('nav.roles'), href: '/roles', icon: ShieldCheck, active: page.url.startsWith('/roles'), feature: 'roles.manage' },
+            { name: trans('nav.audit_logs'), href: '/activity-logs', icon: ClipboardList, active: page.url.startsWith('/activity-logs'), feature: 'audit.logs' },
+            { name: trans('nav.trash'), href: '/trash', icon: Trash2, active: page.url.startsWith('/trash'), feature: 'trash.access' },
+            { name: trans('nav.settings'), href: '/settings', icon: Settings, active: page.url.startsWith('/settings'), feature: null },
         ]
     }
 ]);
@@ -230,10 +270,10 @@ const getUserRoleLabel = computed(() => {
                 <div class="p-3 border-b border-slate-200 dark:border-slate-800/80 shrink-0">
                     <Link
                         href="/pos"
-                        class="w-full flex items-center justify-center gap-2 py-3 px-3.5 bg-theme-gradient text-white font-black rounded-2xl shadow-theme-primary transition-all duration-200 active:scale-95 font-tajawal cursor-pointer group"
+                        class="w-full flex items-center justify-center gap-2 py-3 px-3.5 btn-primary-theme font-black rounded-2xl shadow-theme-primary transition-all duration-200 active:scale-95 font-tajawal cursor-pointer group"
                         :title="$t('nav.new_sale_invoice_btn')"
                     >
-                        <span class="text-lg font-black shrink-0 transition-transform group-hover:rotate-90 duration-300">+</span>
+                        <Plus class="w-4 h-4 shrink-0 transition-transform group-hover:rotate-90 duration-300" />
                         <span v-if="!isSidebarCollapsed" class="truncate text-xs font-black">{{ $t('nav.new_sale_invoice_btn') }}</span>
                     </Link>
                 </div>
@@ -267,7 +307,7 @@ const getUserRoleLabel = computed(() => {
                                     ]"
                                     :title="item.name"
                                 >
-                                    <span class="text-base shrink-0 group-hover:scale-110 transition-transform">{{ item.icon }}</span>
+                                    <component :is="item.icon" class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" />
                                     <span v-if="!isSidebarCollapsed" class="truncate flex-1">{{ item.name }}</span>
                                 </Link>
                             </FeatureGate>
@@ -284,7 +324,7 @@ const getUserRoleLabel = computed(() => {
                     :class="isSidebarCollapsed ? 'justify-center px-2' : ''"
                     :title="$t('nav.super_admin')"
                 >
-                    <span>👑</span>
+                    <Crown class="w-4 h-4 shrink-0 text-purple-600 dark:text-purple-400" />
                     <span v-if="!isSidebarCollapsed" class="truncate">{{ $t('nav.super_admin') }}</span>
                 </a>
             </div>
@@ -302,7 +342,7 @@ const getUserRoleLabel = computed(() => {
             <!-- Super Admin Impersonation Alert Banner -->
             <div v-if="$page.props.auth?.is_impersonating" class="bg-gradient-to-r from-purple-900 via-indigo-950 to-purple-900 text-white px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-xs font-bold font-tajawal z-40 border-b border-purple-500/30 shadow-md shrink-0">
                 <div class="flex items-center gap-2">
-                    <span class="text-base animate-pulse">👑</span>
+                    <Crown class="w-4 h-4 text-amber-400 animate-pulse shrink-0" />
                     <span>أنت تتصفح متجر <strong class="text-amber-400 font-black">({{ tenant?.name }})</strong> حالياً كمسؤول من لوحة السوبر أدمن المركزية</span>
                 </div>
                 <button
@@ -310,7 +350,7 @@ const getUserRoleLabel = computed(() => {
                     type="button"
                     class="h-7 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition transform active:scale-95 cursor-pointer shadow-xs flex items-center gap-1.5"
                 >
-                    <span>✕</span>
+                    <X class="w-3.5 h-3.5" />
                     <span>العودة للوحة السوبر أدمن المركزية</span>
                 </button>
             </div>
@@ -325,7 +365,7 @@ const getUserRoleLabel = computed(() => {
                         type="button"
                         class="lg:hidden p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition cursor-pointer"
                     >
-                        <span class="text-xl">☰</span>
+                        <Menu class="w-5 h-5" />
                     </button>
 
                     <!-- Desktop Collapse Button -->
@@ -335,13 +375,13 @@ const getUserRoleLabel = computed(() => {
                         class="hidden lg:flex p-2 rounded-xl text-slate-500 hover:text-theme-primary hover:bg-slate-100 dark:text-slate-400 dark:hover:text-theme-primary dark:hover:bg-slate-800 transition cursor-pointer"
                         :title="$t('nav.toggle_sidebar')"
                     >
-                        <svg class="w-5 h-5 transition-transform duration-300" :class="isSidebarCollapsed ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
-                        </svg>
+                        <PanelRightClose v-if="!isSidebarCollapsed" class="w-5 h-5 transition-transform" />
+                        <PanelRightOpen v-else class="w-5 h-5 transition-transform" />
                     </button>
 
                     <!-- Live Clock & Date -->
                     <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 text-xs font-bold font-tajawal text-slate-700 dark:text-slate-300">
+                        <Clock class="w-3.5 h-3.5 text-theme-primary shrink-0" />
                         <span class="text-slate-500 dark:text-slate-400 hidden xl:inline">{{ currentDate }}</span>
                         <span class="text-slate-300 dark:text-slate-600 hidden xl:inline">|</span>
                         <span class="text-theme-primary font-mono font-bold">{{ currentTime }}</span>
@@ -358,9 +398,9 @@ const getUserRoleLabel = computed(() => {
                         :title="$t('nav.switch_store') || 'تبديل الفرع'"
                     >
                         <span class="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse shrink-0"></span>
-                        <span class="text-sm">🏬</span>
+                        <Store class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
                         <span class="max-w-[120px] sm:max-w-[160px] truncate text-start">{{ activeStore?.name || $t('common.main_store_default') }}</span>
-                        <span class="text-[9px] text-slate-400 shrink-0">▼</span>
+                        <ChevronDown class="w-3 h-3 text-slate-400 shrink-0" />
                     </button>
 
                     <!-- Shift Status Indicator -->
@@ -371,6 +411,7 @@ const getUserRoleLabel = computed(() => {
                         :title="activeShift ? 'الوردية مفتوحة ونشطة' : 'لا توجد وردية مفتوحة حالياً'"
                     >
                         <span class="w-2 h-2 rounded-full shrink-0" :class="activeShift ? 'bg-emerald-500 dark:bg-emerald-400 animate-pulse' : 'bg-rose-500 dark:bg-rose-400'"></span>
+                        <Clock class="w-3.5 h-3.5 shrink-0" />
                         <span class="hidden md:inline">
                             {{ activeShift ? $t('nav.active_shift') : $t('nav.closed_shift') }}
                         </span>
@@ -382,7 +423,7 @@ const getUserRoleLabel = computed(() => {
                             href="/pos"
                             class="h-9 px-3 rounded-xl btn-primary-theme font-black text-xs flex items-center gap-1.5 transition transform active:scale-95 cursor-pointer font-tajawal shrink-0"
                         >
-                            <span>⚡</span>
+                            <Zap class="w-3.5 h-3.5 fill-current" />
                             <span class="hidden sm:inline">{{ $t('nav.pos_fast') }}</span>
                             <span class="px-1.5 py-0.5 rounded bg-black/25 text-white text-[10px] font-mono">F2</span>
                         </Link>
@@ -396,7 +437,7 @@ const getUserRoleLabel = computed(() => {
                             class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-transparent flex items-center justify-center transition relative cursor-pointer"
                             :title="$t('nav.notifications_title')"
                         >
-                            <span class="text-sm">🔔</span>
+                            <Bell class="w-4 h-4" />
                             <span
                                 v-if="notifications.length > 0"
                                 class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white font-black text-[9px] flex items-center justify-center animate-pulse"
@@ -412,7 +453,7 @@ const getUserRoleLabel = computed(() => {
                         >
                             <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800 px-1">
                                 <span class="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
-                                    <span>🔔</span>
+                                    <Bell class="w-3.5 h-3.5 text-theme-primary" />
                                     <span>{{ $t('nav.live_notifications_center') }}</span>
                                 </span>
                                 <span class="text-[10px] text-theme-primary font-bold">
@@ -427,7 +468,7 @@ const getUserRoleLabel = computed(() => {
                                     class="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 space-y-1 hover:border-slate-300 dark:hover:border-slate-700 transition"
                                 >
                                     <div class="flex items-center gap-2">
-                                        <span class="text-sm">{{ n.icon }}</span>
+                                        <Bell class="w-3.5 h-3.5 text-theme-primary shrink-0" />
                                         <span class="text-xs font-black text-slate-900 dark:text-white">{{ n.title }}</span>
                                     </div>
                                     <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-snug">{{ n.description }}</p>
@@ -456,7 +497,8 @@ const getUserRoleLabel = computed(() => {
                         class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center transition cursor-pointer shrink-0 shadow-xs hover:text-theme-primary"
                         :title="currentTheme === 'dark' ? 'التحويل للوضع النهاري (Light)' : 'التحويل للوضع الليلي (Dark)'"
                     >
-                        <span class="text-sm">{{ currentTheme === 'dark' ? '☀️' : '🌙' }}</span>
+                        <Sun v-if="currentTheme === 'dark'" class="w-4 h-4 text-amber-400" />
+                        <Moon v-else class="w-4 h-4 text-slate-700" />
                     </button>
 
                     <!-- User Profile & Dropdown -->
@@ -472,7 +514,7 @@ const getUserRoleLabel = computed(() => {
                             <span class="text-xs font-bold hidden lg:inline max-w-[120px] truncate">
                                 {{ user.name }}
                             </span>
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400"></span>
+                            <ChevronDown class="w-3 h-3 text-slate-400 shrink-0" />
                         </button>
 
                         <!-- User Dropdown Menu -->
@@ -493,7 +535,7 @@ const getUserRoleLabel = computed(() => {
                                 @click="showUserMenu = false"
                                 class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition"
                             >
-                                <span>👤</span>
+                                <User class="w-3.5 h-3.5" />
                                 <span>{{ $t('nav.profile') }}</span>
                             </Link>
 
@@ -502,7 +544,7 @@ const getUserRoleLabel = computed(() => {
                                 href="/admin/super"
                                 class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/40 border border-purple-200 dark:border-purple-800/40 transition font-bold"
                             >
-                                <span>👑</span>
+                                <Crown class="w-3.5 h-3.5" />
                                 <span>{{ $t('nav.super_admin') }}</span>
                             </a>
 
@@ -511,7 +553,7 @@ const getUserRoleLabel = computed(() => {
                                 type="button"
                                 class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition font-bold cursor-pointer"
                             >
-                                <span>🚪</span>
+                                <LogOut class="w-3.5 h-3.5" />
                                 <span>{{ $t('nav.logout') }}</span>
                             </button>
                         </div>
@@ -522,11 +564,13 @@ const getUserRoleLabel = computed(() => {
             <!-- Main Page Content Area (Scrolls cleanly) -->
             <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
                 <!-- Flash Alert Banners -->
-                <div v-if="$page.props.flash?.success" class="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-between font-tajawal shadow-sm">
-                    <span>✓ {{ $page.props.flash.success }}</span>
+                <div v-if="$page.props.flash?.success" class="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-2 font-tajawal shadow-sm">
+                    <CheckCircle2 class="w-4 h-4 shrink-0" />
+                    <span>{{ $page.props.flash.success }}</span>
                 </div>
-                <div v-if="$page.props.flash?.error" class="p-3.5 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center justify-between font-tajawal shadow-sm">
-                    <span>⚠️ {{ $page.props.flash.error }}</span>
+                <div v-if="$page.props.flash?.error" class="p-3.5 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center gap-2 font-tajawal shadow-sm">
+                    <AlertTriangle class="w-4 h-4 shrink-0" />
+                    <span>{{ $page.props.flash.error }}</span>
                 </div>
 
                 <slot />
@@ -542,7 +586,9 @@ const getUserRoleLabel = computed(() => {
             <div @click.stop class="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-2xl space-y-3 font-tajawal text-slate-900 dark:text-white">
                 <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2.5">
                     <h3 class="font-black text-sm">{{ $t('nav.select_store_modal_title') }}</h3>
-                    <button @click="showStoreModal = false" class="w-7 h-7 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs dark:hover:text-white transition">✕</button>
+                    <button @click="showStoreModal = false" class="w-7 h-7 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs dark:hover:text-white transition flex items-center justify-center">
+                        <X class="w-4 h-4" />
+                    </button>
                 </div>
 
                 <div class="space-y-2 max-h-64 overflow-y-auto pt-1">
@@ -554,13 +600,14 @@ const getUserRoleLabel = computed(() => {
                         :class="activeStore?.id === store.id ? 'bg-theme-light border-theme-primary text-theme-primary font-black' : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'"
                     >
                         <div class="flex items-center gap-2.5">
-                            <span class="text-lg">{{ store.type === 'van' ? '🚐' : '🏬' }}</span>
+                            <Truck v-if="store.type === 'van'" class="w-4 h-4 text-theme-primary" />
+                            <Store v-else class="w-4 h-4 text-theme-primary" />
                             <div>
                                 <p class="text-xs font-bold">{{ store.name }}</p>
                                 <p class="text-[10px] text-slate-400 dark:text-slate-500 font-sans">{{ store.type === 'van' ? $t('nav.van_store') : $t('nav.branch_store') }}</p>
                             </div>
                         </div>
-                        <span v-if="activeStore?.id === store.id" class="text-sm font-bold text-theme-primary">✓</span>
+                        <CheckCircle2 v-if="activeStore?.id === store.id" class="w-4 h-4 text-theme-primary shrink-0" />
                     </div>
                 </div>
             </div>

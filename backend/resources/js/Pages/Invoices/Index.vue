@@ -7,6 +7,27 @@ import DatePicker from '@/Components/DatePicker.vue';
 import FilterDrawer from '@/Components/FilterDrawer.vue';
 import { useMoney } from '@/Composables/useMoney';
 import { trans } from '@/helpers/trans';
+import {
+    Receipt,
+    Banknote,
+    Wallet,
+    Clock,
+    Search,
+    Filter,
+    Plus,
+    Eye,
+    Pencil,
+    Printer,
+    FileText,
+    Ban,
+    RotateCcw,
+    Trash2,
+    X,
+    AlertTriangle,
+    Zap,
+    Smartphone,
+    Store
+} from 'lucide-vue-next';
 
 const props = defineProps({
     invoices: { type: Object, required: true },
@@ -78,7 +99,7 @@ const restoreInvoice = (inv) => {
     }
 };
 
-// Active filters count calculator
+// Compute Active Filters Count
 const activeFiltersCount = computed(() => {
     let count = 0;
     if (search.value) count++;
@@ -91,30 +112,25 @@ const activeFiltersCount = computed(() => {
     return count;
 });
 
-// Store Options formatted for SearchableSelect
+// Dropdown Options
 const storeOptions = computed(() => [
-    { id: 'all', name: `🏬 ${trans('common.all') || 'كافة الفروع ونقاط البيع'}` },
-    ...props.stores.map(s => ({
-        id: s.id,
-        name: `${s.type === 'van' ? '🚐' : '🏬'} ${s.name}`,
-        type: s.type,
-    }))
+    { id: 'all', name: trans('common.all_stores') || 'كافة الفروع' },
+    ...props.stores.map(s => ({ id: s.id, name: s.name })),
 ]);
 
-// Payment Types formatted for SearchableSelect
 const paymentTypeOptions = computed(() => [
-    { id: 'all', name: trans('invoices.all_payment_types') || 'الكل (كافة أنواع السداد)' },
-    { id: 'cash', name: `💵 ${trans('invoices.payment_cash') || 'كاش'}` },
-    { id: 'credit', name: `⏳ ${trans('invoices.payment_credit') || 'آجل'}` },
-    { id: 'partial', name: `📊 ${trans('invoices.payment_partial') || 'جزئي'}` },
+    { id: 'all', name: trans('invoices.all_payment_types') || 'كافة أنواع الدفع' },
+    { id: 'cash', name: trans('invoices.payment_cash') || 'نقدي (كاش)' },
+    { id: 'credit', name: trans('invoices.payment_credit') || 'آجل (ذمم)' },
+    { id: 'partial', name: trans('invoices.payment_partial') || 'سداد جزئي' },
 ]);
 
 const paymentMethodOptions = computed(() => [
-    { id: 'all', name: trans('invoices.all_payment_methods') || 'كافة وسائل التحصيل' },
-    { id: 'cash', name: trans('invoices.payment_cash') || 'نقدي (كاش)' },
-    { id: 'instapay', name: `⚡ ${trans('invoices.payment_instapay') || 'إستاباي'}` },
-    { id: 'wallet', name: `📱 ${trans('invoices.payment_wallet') || 'محفظة إلكترونية'}` },
-    { id: 'bank', name: `🏦 ${trans('invoices.payment_bank') || 'تحويل بنكي'}` },
+    { id: 'all', name: trans('invoices.all_payment_methods') || 'كافة طرق التحصيل' },
+    { id: 'cash', name: 'كاش يدوي' },
+    { id: 'instapay', name: 'إنستاباي (InstaPay)' },
+    { id: 'wallet', name: 'محفظة إلكترونية' },
+    { id: 'card', name: 'بطاقة بنكية / فيزا' },
 ]);
 
 const statusOptions = computed(() => [
@@ -166,9 +182,9 @@ const resetFilters = () => {
 
 const getPaymentBadge = (inv) => {
     if (inv.payment_type === 'cash') {
-        if (inv.payment_method === 'instapay') return { label: 'إستاباي ⚡', class: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30' };
-        if (inv.payment_method === 'wallet') return { label: 'محفظة 📱', class: 'bg-teal-500/15 text-teal-400 border-teal-500/30' };
-        return { label: trans('invoices.payment_cash') || 'كاش 💵', class: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' };
+        if (inv.payment_method === 'instapay') return { label: 'إستاباي', class: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30' };
+        if (inv.payment_method === 'wallet') return { label: 'محفظة', class: 'bg-teal-500/15 text-teal-400 border-teal-500/30' };
+        return { label: trans('invoices.payment_cash') || 'كاش', class: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' };
     }
     if (inv.payment_type === 'credit') return { label: trans('invoices.payment_credit') || 'آجل', class: 'bg-rose-500/15 text-rose-400 border-rose-500/30' };
     if (inv.payment_type === 'partial') return { label: trans('invoices.payment_partial') || 'جزئي', class: 'bg-amber-500/15 text-amber-400 border-amber-500/30' };
@@ -199,7 +215,7 @@ const printA4 = (id) => {
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="space-y-1">
                     <div class="flex items-center gap-2">
-                        <span class="text-2xl">🧾</span>
+                        <Receipt class="w-6 h-6 text-theme-primary" />
                         <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-tajawal">
                             {{ $t('invoices.title') }}
                         </h1>
@@ -213,7 +229,7 @@ const printA4 = (id) => {
                     href="/pos"
                     class="h-11 px-5 rounded-2xl btn-primary-theme font-black text-xs flex items-center justify-center gap-2 transition transform active:scale-95 font-tajawal cursor-pointer"
                 >
-                    <span class="text-base font-black">+</span>
+                    <Plus class="w-4 h-4" />
                     <span>{{ $t('invoices.new_sale_invoice') }}</span>
                 </Link>
             </div>
@@ -222,8 +238,8 @@ const printA4 = (id) => {
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 font-tajawal">
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-1 shadow-xs">
                     <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('invoices.total_invoices_count') }}</span>
-                    <div class="text-xl font-black font-mono text-slate-900 dark:text-white flex items-center gap-1.5">
-                        <span>🧾</span>
+                    <div class="text-xl font-black font-mono text-slate-900 dark:text-white flex items-center gap-2">
+                        <Receipt class="w-5 h-5 text-theme-primary" />
                         <span>{{ stats.total_count }}</span>
                         <span class="text-xs font-tajawal text-slate-400 font-normal">{{ $t('invoices.invoice_unit') }}</span>
                     </div>
@@ -231,8 +247,8 @@ const printA4 = (id) => {
 
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-1 shadow-xs">
                     <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('invoices.total_sales_net') }}</span>
-                    <div class="text-xl font-black font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                        <span>💰</span>
+                    <div class="text-xl font-black font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+                        <Banknote class="w-5 h-5 text-emerald-500" />
                         <span>{{ formatMoney(stats.total_net) }}</span>
                         <span class="text-xs font-tajawal text-slate-400 font-normal">{{ $t('common.currency') }}</span>
                     </div>
@@ -240,8 +256,8 @@ const printA4 = (id) => {
 
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-1 shadow-xs">
                     <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('invoices.total_paid_actual') }}</span>
-                    <div class="text-xl font-black font-mono text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                        <span>💵</span>
+                    <div class="text-xl font-black font-mono text-amber-600 dark:text-amber-400 flex items-center gap-2">
+                        <Wallet class="w-5 h-5 text-amber-500" />
                         <span>{{ formatMoney(stats.total_paid) }}</span>
                         <span class="text-xs font-tajawal text-slate-400 font-normal">{{ $t('common.currency') }}</span>
                     </div>
@@ -249,8 +265,8 @@ const printA4 = (id) => {
 
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-1 shadow-xs">
                     <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('invoices.total_remaining_credit') }}</span>
-                    <div class="text-xl font-black font-mono text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
-                        <span>⏳</span>
+                    <div class="text-xl font-black font-mono text-rose-600 dark:text-rose-400 flex items-center gap-2">
+                        <Clock class="w-5 h-5 text-rose-500" />
                         <span>{{ formatMoney(stats.total_remaining) }}</span>
                         <span class="text-xs font-tajawal text-slate-400 font-normal">{{ $t('common.currency') }}</span>
                     </div>
@@ -268,8 +284,8 @@ const printA4 = (id) => {
                             :placeholder="$t('invoices.search_invoices_placeholder')"
                             class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-none transition shadow-inner"
                         >
-                        <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
-                            🔍
+                        <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 pointer-events-none">
+                            <Search class="w-4 h-4" />
                         </span>
                     </div>
 
@@ -288,10 +304,10 @@ const printA4 = (id) => {
                             <button
                                 @click="paymentType = 'cash'; applyFilters();"
                                 type="button"
-                                class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
+                                class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer flex items-center gap-1"
                                 :class="paymentType === 'cash' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
-                                {{ $t('invoices.payment_cash') }} 💵
+                                <span>{{ $t('invoices.payment_cash') }}</span>
                             </button>
                             <button
                                 @click="paymentType = 'credit'; applyFilters();"
@@ -307,9 +323,9 @@ const printA4 = (id) => {
                         <button
                             @click="isDrawerOpen = true"
                             type="button"
-                            class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+                            class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer shadow-xs"
                         >
-                            <span>⚙️</span>
+                            <Filter class="w-4 h-4" />
                             <span>{{ $t('common.filter') }}</span>
                             <span
                                 v-if="activeFiltersCount > 0"
@@ -327,20 +343,26 @@ const printA4 = (id) => {
 
                     <span v-if="storeId !== 'all'" class="px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center gap-1.5 font-bold">
                         <span>{{ $t('common.store') }}: {{ storeOptions.find(s => s.id == storeId)?.name }}</span>
-                        <button @click="storeId = 'all'; applyFilters();" class="hover:text-rose-400">✕</button>
+                        <button @click="storeId = 'all'; applyFilters();" class="hover:text-rose-400 cursor-pointer">
+                            <X class="w-3 h-3" />
+                        </button>
                     </span>
 
                     <span v-if="dateFrom || dateTo" class="px-2.5 py-1 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 font-mono font-bold">
                         <span>{{ $t('common.date') }}: {{ dateFrom || '...' }} إلى {{ dateTo || '...' }}</span>
-                        <button @click="dateFrom = ''; dateTo = ''; applyFilters();" class="hover:text-rose-400">✕</button>
+                        <button @click="dateFrom = ''; dateTo = ''; applyFilters();" class="hover:text-rose-400 cursor-pointer">
+                            <X class="w-3 h-3" />
+                        </button>
                     </span>
 
                     <span v-if="status !== 'active'" class="px-2.5 py-1 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 flex items-center gap-1.5 font-bold">
                         <span>{{ $t('common.status') }}: {{ statusOptions.find(s => s.id === status)?.name }}</span>
-                        <button @click="status = 'active'; applyFilters();" class="hover:text-rose-400">✕</button>
+                        <button @click="status = 'active'; applyFilters();" class="hover:text-rose-400 cursor-pointer">
+                            <X class="w-3 h-3" />
+                        </button>
                     </span>
 
-                    <button @click="resetFilters" class="text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 text-xs underline font-bold mr-1">
+                    <button @click="resetFilters" class="text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 text-xs underline font-bold mr-1 cursor-pointer">
                         {{ $t('common.clear_all') || 'مسح كافة الفلاتر' }}
                     </button>
                 </div>
@@ -351,7 +373,7 @@ const printA4 = (id) => {
                 <div class="overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
-                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:border-slate-800 dark:text-slate-400 font-bold">
                                 <th class="pb-3">{{ $t('invoices.invoice_number') }}</th>
                                 <th class="pb-3">{{ $t('invoices.customer') }}</th>
                                 <th class="pb-3">{{ $t('invoices.store') }}</th>
@@ -381,8 +403,9 @@ const printA4 = (id) => {
 
                                 <!-- Store -->
                                 <td class="py-3.5">
-                                    <span class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-300 text-[11px] font-tajawal">
-                                        🏬 {{ inv.store_name }}
+                                    <span class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-300 text-[11px] font-tajawal inline-flex items-center gap-1">
+                                        <Store class="w-3 h-3 text-slate-400" />
+                                        <span>{{ inv.store_name }}</span>
                                     </span>
                                 </td>
 
@@ -431,7 +454,7 @@ const printA4 = (id) => {
                                             class="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition cursor-pointer"
                                             :title="$t('invoices.view_invoice')"
                                         >
-                                            👁️
+                                            <Eye class="w-3.5 h-3.5" />
                                         </Link>
 
                                         <!-- Edit Invoice (Only if not cancelled and not deleted) -->
@@ -441,7 +464,7 @@ const printA4 = (id) => {
                                             class="p-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-600 dark:text-amber-400 transition cursor-pointer"
                                             :title="$t('invoices.edit_invoice')"
                                         >
-                                            ✏️
+                                            <Pencil class="w-3.5 h-3.5" />
                                         </Link>
 
                                         <!-- Print Thermal Receipt -->
@@ -451,7 +474,7 @@ const printA4 = (id) => {
                                             class="p-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 transition cursor-pointer"
                                             :title="$t('invoices.print_thermal')"
                                         >
-                                            🖨️
+                                            <Printer class="w-3.5 h-3.5" />
                                         </button>
 
                                         <!-- Print A4 Invoice -->
@@ -461,7 +484,7 @@ const printA4 = (id) => {
                                             class="p-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 transition cursor-pointer"
                                             :title="$t('invoices.print_a4')"
                                         >
-                                            📄
+                                            <FileText class="w-3.5 h-3.5" />
                                         </button>
 
                                         <!-- Cancel Invoice Action (if not cancelled) -->
@@ -472,7 +495,7 @@ const printA4 = (id) => {
                                             class="p-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-600 dark:text-rose-400 transition cursor-pointer"
                                             :title="$t('invoices.cancel_invoice')"
                                         >
-                                            🚫
+                                            <Ban class="w-3.5 h-3.5" />
                                         </button>
 
                                         <!-- Restore from Trash -->
@@ -483,7 +506,7 @@ const printA4 = (id) => {
                                             class="p-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 transition cursor-pointer"
                                             :title="$t('trash.restore_btn') || 'استعادة الفاتورة'"
                                         >
-                                            ♻️
+                                            <RotateCcw class="w-3.5 h-3.5" />
                                         </button>
 
                                         <!-- Delete / Archive -->
@@ -494,7 +517,7 @@ const printA4 = (id) => {
                                             class="p-1.5 rounded-xl bg-slate-100 hover:bg-rose-100 dark:bg-slate-800 dark:hover:bg-rose-500/20 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 transition cursor-pointer"
                                             :title="$t('common.delete')"
                                         >
-                                            🗑️
+                                            <Trash2 class="w-3.5 h-3.5" />
                                         </button>
                                     </div>
                                 </td>
@@ -503,14 +526,14 @@ const printA4 = (id) => {
                     </table>
 
                     <!-- Empty State -->
-                    <div v-if="!invoices.data || invoices.data.length === 0" class="py-16 text-center space-y-2">
-                        <span class="text-3xl">🧾</span>
+                    <div v-if="!invoices.data || invoices.data.length === 0" class="py-16 text-center space-y-3">
+                        <Receipt class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-700" />
                         <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('invoices.no_invoices_found') }}</p>
                     </div>
                 </div>
 
                 <!-- Pagination Links -->
-                <div v-if="invoices.links && invoices.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
+                <div v-if="invoices.links && invoices.links.length > 3" class="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between font-sans">
                     <span class="text-xs text-slate-400 font-tajawal">
                         {{ $t('common.actions') ? `عرض ${invoices.from || 0} إلى ${invoices.to || 0} من إجمالي ${invoices.total || 0}` : `Showing ${invoices.from || 0} to ${invoices.to || 0} of ${invoices.total || 0}` }}
                     </span>
@@ -546,18 +569,24 @@ const printA4 = (id) => {
             <div class="space-y-5">
                 <!-- 1. Search Box -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🔍 {{ $t('invoices.search_invoices_placeholder') }}</label>
+                    <label class="text-xs font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                        <Search class="w-3.5 h-3.5" />
+                        <span>{{ $t('invoices.search_invoices_placeholder') }}</span>
+                    </label>
                     <input
                         v-model="search"
                         type="text"
                         :placeholder="$t('common.search')"
-                        class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-white placeholder:text-slate-500 focus:border-amber-500 focus:outline-none transition"
+                        class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-amber-500 focus:outline-none transition"
                     >
                 </div>
 
                 <!-- 2. Store Selection (Searchable) -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🏬 {{ $t('invoices.store') }}</label>
+                    <label class="text-xs font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                        <Store class="w-3.5 h-3.5" />
+                        <span>{{ $t('invoices.store') }}</span>
+                    </label>
                     <SearchableSelect
                         v-model="storeId"
                         :options="storeOptions"
@@ -567,7 +596,10 @@ const printA4 = (id) => {
 
                 <!-- 3. Date Range Calendar (Flatpickr) -->
                 <div class="space-y-2">
-                    <label class="text-xs font-black text-slate-300">📅 {{ $t('contacts.report_period') }}</label>
+                    <label class="text-xs font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                        <Clock class="w-3.5 h-3.5" />
+                        <span>{{ $t('contacts.report_period') }}</span>
+                    </label>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <span class="text-[11px] text-slate-500 block mb-1">{{ $t('contacts.from_date') }}:</span>
@@ -588,7 +620,10 @@ const printA4 = (id) => {
 
                 <!-- 4. Payment Type -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">💳 {{ $t('invoices.payment_type') }}</label>
+                    <label class="text-xs font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                        <Wallet class="w-3.5 h-3.5" />
+                        <span>{{ $t('invoices.payment_type') }}</span>
+                    </label>
                     <SearchableSelect
                         v-model="paymentType"
                         :options="paymentTypeOptions"
@@ -598,7 +633,10 @@ const printA4 = (id) => {
 
                 <!-- 5. Payment Method -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">⚡ {{ $t('invoices.payment_method') }}</label>
+                    <label class="text-xs font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                        <Zap class="w-3.5 h-3.5" />
+                        <span>{{ $t('invoices.payment_method') }}</span>
+                    </label>
                     <SearchableSelect
                         v-model="paymentMethod"
                         :options="paymentMethodOptions"
@@ -608,7 +646,10 @@ const printA4 = (id) => {
 
                 <!-- 6. Invoice Status -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">📋 {{ $t('common.status') }}</label>
+                    <label class="text-xs font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                        <Filter class="w-3.5 h-3.5" />
+                        <span>{{ $t('common.status') }}</span>
+                    </label>
                     <SearchableSelect
                         v-model="status"
                         :options="statusOptions"
@@ -620,25 +661,28 @@ const printA4 = (id) => {
 
         <!-- Cancel Invoice Reason Modal -->
         <div v-if="showCancelModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl font-tajawal animate-in fade-in zoom-in-95 duration-150">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="text-base font-black text-white flex items-center gap-2">
-                        <span>⚠️ {{ $t('invoices.cancel_modal_title') }}</span>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl font-tajawal animate-in fade-in zoom-in-95 duration-150">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        <AlertTriangle class="w-5 h-5 text-rose-500" />
+                        <span>{{ $t('invoices.cancel_modal_title') }}</span>
                     </h3>
-                    <button @click="showCancelModal = false" class="text-slate-400 hover:text-white font-bold cursor-pointer">✕</button>
+                    <button @click="showCancelModal = false" class="text-slate-400 hover:text-slate-700 dark:hover:text-white font-bold cursor-pointer">
+                        <X class="w-4 h-4" />
+                    </button>
                 </div>
 
-                <p class="text-xs text-slate-300">
+                <p class="text-xs text-slate-600 dark:text-slate-300">
                     {{ $t('invoices.cancel_modal_desc', { number: cancelTargetInvoice?.invoice_number }) }}
                 </p>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-slate-300">{{ $t('invoices.cancel_reason_label') }}</label>
+                    <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('invoices.cancel_reason_label') }}</label>
                     <textarea
                         v-model="cancelReason"
                         rows="3"
                         :placeholder="$t('invoices.cancel_reason_placeholder')"
-                        class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white placeholder:text-slate-500 focus:border-rose-500 focus:outline-none"
+                        class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-rose-500 focus:outline-none"
                     ></textarea>
                 </div>
 
@@ -646,7 +690,7 @@ const printA4 = (id) => {
                     <button
                         @click="showCancelModal = false"
                         type="button"
-                        class="flex-1 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
+                        class="flex-1 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition cursor-pointer"
                     >
                         {{ $t('common.cancel') }}
                     </button>

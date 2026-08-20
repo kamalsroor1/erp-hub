@@ -5,6 +5,22 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import SearchableSelect from '@/Components/SearchableSelect.vue';
 import FilterDrawer from '@/Components/FilterDrawer.vue';
 import { useMoney } from '@/Composables/useMoney';
+import { trans } from '@/helpers/trans';
+import {
+    Package,
+    Plus,
+    AlertTriangle,
+    Search,
+    Filter,
+    Pencil,
+    Trash2,
+    History,
+    X,
+    Check,
+    Boxes,
+    Barcode,
+    FolderTree
+} from 'lucide-vue-next';
 
 const props = defineProps({
     items: { type: Object, required: true },
@@ -14,8 +30,6 @@ const props = defineProps({
 });
 
 const { formatMoney } = useMoney();
-
-import { trans } from '@/helpers/trans';
 
 // Search & Filter state
 const search = ref(props.filters.search || '');
@@ -42,9 +56,9 @@ const categoryOptions = computed(() => [
 
 const stockStatusOptions = computed(() => [
     { id: 'all', name: trans('inventory.all_stock') || 'كافة حالات المخزون' },
-    { id: 'low', name: trans('inventory.low_stock_only') || 'الأصناف الحرجة والنواقص 🚨' },
-    { id: 'out', name: trans('inventory.out_of_stock_only') || 'أصناف نفدت من المخزن (رصيد 0) ❌' },
-    { id: 'in_stock', name: trans('inventory.available_only') || 'أصناف متوفرة بالمخزن ✅' },
+    { id: 'low', name: trans('inventory.low_stock_only') || 'الأصناف الحرجة والنواقص' },
+    { id: 'out', name: trans('inventory.out_of_stock_only') || 'أصناف نفدت من المخزن (رصيد 0)' },
+    { id: 'in_stock', name: trans('inventory.available_only') || 'أصناف متوفرة بالمخزن' },
 ]);
 
 const statusOptions = computed(() => [
@@ -161,7 +175,7 @@ const deleteItem = (item) => {
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="space-y-1">
                     <div class="flex items-center gap-2">
-                        <span class="text-2xl">📦</span>
+                        <Package class="w-6 h-6 text-theme-primary" />
                         <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                             {{ $t('inventory.title') }}
                         </h1>
@@ -177,7 +191,7 @@ const deleteItem = (item) => {
                         type="button"
                         class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
                     >
-                        <span class="text-base font-black">+</span>
+                        <Plus class="w-4 h-4" />
                         <span>{{ $t('inventory.add_new_item') }}</span>
                     </button>
                 </div>
@@ -187,14 +201,17 @@ const deleteItem = (item) => {
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('inventory.total_items_count') }}</span>
-                    <div class="text-2xl font-black font-mono text-slate-900 dark:text-white">
-                        {{ metrics.total_items || 0 }} <span class="text-xs text-slate-400 font-tajawal">{{ $t('inventory.item_unit') }}</span>
+                    <div class="text-2xl font-black font-mono text-slate-900 dark:text-white flex items-center gap-2">
+                        <Package class="w-5 h-5 text-theme-primary" />
+                        <span>{{ metrics.total_items || 0 }}</span>
+                        <span class="text-xs text-slate-400 font-tajawal">{{ $t('inventory.item_unit') }}</span>
                     </div>
                 </div>
 
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('inventory.low_stock_count') }}</span>
                     <div class="text-2xl font-black font-mono text-rose-600 dark:text-rose-400 flex items-center gap-2">
+                        <AlertTriangle class="w-5 h-5 text-rose-500" />
                         <span>{{ metrics.low_stock_count || 0 }}</span>
                         <span v-if="metrics.low_stock_count > 0" class="text-xs px-2 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 font-tajawal">
                             {{ $t('inventory.low_stock_warning') }}
@@ -204,8 +221,10 @@ const deleteItem = (item) => {
 
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('inventory.total_inventory_value') }}</span>
-                    <div class="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
-                        {{ formatMoney(metrics.total_stock_value) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
+                    <div class="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+                        <Boxes class="w-5 h-5 text-emerald-500" />
+                        <span>{{ formatMoney(metrics.total_stock_value) }}</span>
+                        <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
             </div>
@@ -220,8 +239,8 @@ const deleteItem = (item) => {
                             :placeholder="$t('inventory.search_item_placeholder')"
                             class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner"
                         >
-                        <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
-                            🔍
+                        <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 pointer-events-none">
+                            <Search class="w-4 h-4" />
                         </span>
                     </div>
 
@@ -250,9 +269,9 @@ const deleteItem = (item) => {
                         <button
                             @click="isDrawerOpen = true"
                             type="button"
-                            class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+                            class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer shadow-xs"
                         >
-                            <span>⚙️</span>
+                            <Filter class="w-4 h-4" />
                             <span>{{ $t('common.filter') }}</span>
                             <span
                                 v-if="activeFiltersCount > 0"
@@ -270,10 +289,12 @@ const deleteItem = (item) => {
 
                     <span v-if="category !== 'all'" class="px-2.5 py-1 rounded-xl bg-theme-light border border-theme-light text-theme-primary flex items-center gap-1.5 font-bold">
                         <span>{{ $t('inventory.category') }}: {{ category }}</span>
-                        <button @click="category = 'all'; applyFilters();" class="hover:text-rose-400">✕</button>
+                        <button @click="category = 'all'; applyFilters();" class="hover:text-rose-400 cursor-pointer">
+                            <X class="w-3 h-3" />
+                        </button>
                     </span>
 
-                    <button @click="resetFilters" class="text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 text-xs underline font-bold mr-1">
+                    <button @click="resetFilters" class="text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 text-xs underline font-bold mr-1 cursor-pointer">
                         {{ $t('common.clear_all') || 'مسح كافة الفلاتر' }}
                     </button>
                 </div>
@@ -355,7 +376,7 @@ const deleteItem = (item) => {
                                             class="p-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 transition"
                                             :title="$t('inventory.view_movements')"
                                         >
-                                            📜
+                                            <History class="w-3.5 h-3.5" />
                                         </Link>
 
                                         <!-- Edit Button -->
@@ -365,7 +386,7 @@ const deleteItem = (item) => {
                                             class="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 transition cursor-pointer"
                                             :title="$t('common.edit')"
                                         >
-                                            ✏️
+                                            <Pencil class="w-3.5 h-3.5" />
                                         </button>
 
                                         <!-- Delete Button -->
@@ -376,7 +397,7 @@ const deleteItem = (item) => {
                                             :class="!item.can_be_deleted ? 'opacity-40 cursor-not-allowed' : ''"
                                             :title="item.can_be_deleted ? $t('common.delete') : item.deletion_blockers.join(', ')"
                                         >
-                                            🗑️
+                                            <Trash2 class="w-3.5 h-3.5" />
                                         </button>
                                     </div>
                                 </td>
@@ -384,14 +405,14 @@ const deleteItem = (item) => {
                         </tbody>
                     </table>
 
-                    <div v-if="!items.data || items.data.length === 0" class="py-16 text-center space-y-2">
-                        <span class="text-3xl">📦</span>
+                    <div v-if="!items.data || items.data.length === 0" class="py-16 text-center space-y-3">
+                        <Package class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-700" />
                         <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_items_found') }}</p>
                     </div>
                 </div>
 
                 <!-- Pagination -->
-                <div v-if="items.links && items.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
+                <div v-if="items.links && items.links.length > 3" class="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between font-sans">
                     <span class="text-xs text-slate-400 font-tajawal">
                         {{ $t('common.actions') ? `عرض ${items.from || 0} إلى ${items.to || 0} من إجمالي ${items.total || 0}` : `Showing ${items.from || 0} to ${items.to || 0} of ${items.total || 0}` }}
                     </span>
@@ -426,17 +447,23 @@ const deleteItem = (item) => {
         >
             <div class="space-y-5">
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🔍 {{ $t('inventory.search_item_placeholder') }}</label>
+                    <label class="text-xs font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                        <Search class="w-3.5 h-3.5" />
+                        <span>{{ $t('inventory.search_item_placeholder') }}</span>
+                    </label>
                     <input
                         v-model="search"
                         type="text"
                         :placeholder="$t('common.search')"
-                        class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none transition"
+                        class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none transition"
                     >
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🗂️ {{ $t('inventory.category') }}</label>
+                    <label class="text-xs font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                        <FolderTree class="w-3.5 h-3.5" />
+                        <span>{{ $t('inventory.category') }}</span>
+                    </label>
                     <SearchableSelect
                         v-model="category"
                         :options="categoryOptions"
@@ -445,7 +472,10 @@ const deleteItem = (item) => {
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🚨 {{ $t('inventory.stock_status') }}</label>
+                    <label class="text-xs font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                        <AlertTriangle class="w-3.5 h-3.5" />
+                        <span>{{ $t('inventory.stock_status') }}</span>
+                    </label>
                     <SearchableSelect
                         v-model="stockStatus"
                         :options="stockStatusOptions"
@@ -454,7 +484,10 @@ const deleteItem = (item) => {
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">⚙️ {{ $t('common.status') }}</label>
+                    <label class="text-xs font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                        <Filter class="w-3.5 h-3.5" />
+                        <span>{{ $t('common.status') }}</span>
+                    </label>
                     <SearchableSelect
                         v-model="status"
                         :options="statusOptions"
@@ -471,58 +504,60 @@ const deleteItem = (item) => {
             class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
             dir="rtl"
         >
-            <div @click.stop class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div @click.stop class="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                     <div class="flex items-center gap-2">
-                        <span class="text-lg">📦</span>
-                        <h3 class="font-black text-base text-white">
+                        <Package class="w-5 h-5 text-theme-primary" />
+                        <h3 class="font-black text-base text-slate-900 dark:text-white">
                             {{ editingItem ? $t('inventory.item_updated') : $t('inventory.add_new_item') }}
                         </h3>
                     </div>
-                    <button @click="showItemModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
+                    <button @click="showItemModal = false" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-400 text-xs hover:text-slate-900 dark:hover:text-white cursor-pointer flex items-center justify-center">
+                        <X class="w-4 h-4" />
+                    </button>
                 </div>
 
                 <form @submit.prevent="saveItem" class="space-y-4">
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('inventory.item_name') }} *</label>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('inventory.item_name') }} *</label>
                         <input
                             v-model="itemForm.name"
                             type="text"
                             required
                             :placeholder="$t('inventory.item_name')"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none"
                         >
                         <p v-if="itemForm.errors.name" class="text-rose-400 text-[10px]">{{ itemForm.errors.name }}</p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.item_code') }} / {{ $t('inventory.barcode') }}</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('inventory.item_code') }} / {{ $t('inventory.barcode') }}</label>
                             <input
                                 v-model="itemForm.code"
                                 type="text"
                                 :placeholder="$t('inventory.barcode_placeholder')"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-amber-500 focus:outline-none"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono focus:border-amber-500 focus:outline-none"
                             >
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.category') }}</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('inventory.category') }}</label>
                             <input
                                 v-model="itemForm.category"
                                 type="text"
                                 :placeholder="$t('inventory.category_placeholder')"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none"
                             >
                         </div>
                     </div>
 
                     <div class="grid grid-cols-3 gap-3">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.unit') }} *</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('inventory.unit') }} *</label>
                             <select
                                 v-model="itemForm.unit"
-                                class="w-full px-3 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                                class="w-full px-3 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none"
                             >
                                 <option value="كجم">{{ $t('inventory.unit_weight_short') }} (كجم)</option>
                                 <option value="جرام">جرام</option>
@@ -532,52 +567,52 @@ const deleteItem = (item) => {
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.purchase_price') }} *</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('inventory.purchase_price') }} *</label>
                             <input
                                 v-model="itemForm.cost_price"
                                 type="number"
                                 step="0.001"
                                 required
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-amber-500 focus:outline-none"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono focus:border-amber-500 focus:outline-none"
                             >
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.retail_price') }} *</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('inventory.retail_price') }} *</label>
                             <input
                                 v-model="itemForm.selling_price"
                                 type="number"
                                 step="0.001"
                                 required
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-amber-500 focus:outline-none"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono focus:border-amber-500 focus:outline-none"
                             >
                         </div>
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('inventory.min_stock_level') }}</label>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('inventory.min_stock_level') }}</label>
                         <input
                             v-model="itemForm.min_stock_level"
                             type="number"
                             step="0.001"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-amber-500 focus:outline-none"
+                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono focus:border-amber-500 focus:outline-none"
                         >
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('common.notes') }}</label>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.notes') }}</label>
                         <textarea
                             v-model="itemForm.notes"
                             rows="2"
-                            class="w-full px-3.5 py-2 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                            class="w-full px-3.5 py-2 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none"
                         ></textarea>
                     </div>
 
-                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
                         <button
                             @click="showItemModal = false"
                             type="button"
-                            class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
+                            class="px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                         >
                             {{ $t('common.cancel') }}
                         </button>
