@@ -44,4 +44,6 @@ return [
     'outflows'                  => 'إجمالي المدفوعات والمصاريف',
     'net_cash_today'            => 'صافي حركة النقدية اليوم',
     'expected_in_drawer'        => 'المفروض يكون في الدرج نقدًا',
+    'shift_opened_success'      => 'تم فتح وردية الخزينة بنجاح',
+    'shift_closed_success'      => 'تم إغلاق الوردية واعتماد تقرير Z-Report بنجاح',
 ];

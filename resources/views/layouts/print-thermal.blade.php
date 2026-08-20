@@ -100,10 +100,10 @@
     <table>
         <thead>
             <tr class="border-b">
-                <th class="text-right">الصنف</th>
-                <th class="text-center">الكمية</th>
-                <th class="text-center">السعر</th>
-                <th class="text-left">الإجمالي</th>
+                <th class="text-right">{{ __('common.actions') ? 'الصنف' : 'Item' }}</th>
+                <th class="text-center">{{ __('common.quantity') }}</th>
+                <th class="text-center">{{ __('common.unit_price') }}</th>
+                <th class="text-left">{{ __('common.total') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -123,13 +123,13 @@
     <!-- Totals -->
     <div class="border-t py-1 my-2">
         <div style="display: flex; justify-content: space-between;">
-            <span>المجموع:</span>
-            <span style="font-weight: 800;">{{ number_format($invoice->subtotal, 2) }} ج.م</span>
+            <span>{{ __('common.subtotal') }}:</span>
+            <span style="font-weight: 800;">{{ number_format($invoice->subtotal, 2) }} {{ __('common.currency') }}</span>
         </div>
         @if(bccomp($invoice->discount_amount, '0.000', 3) > 0)
         <div style="display: flex; justify-content: space-between;">
-            <span>الخصم:</span>
-            <span>-{{ number_format($invoice->discount_amount, 2) }} ج.م</span>
+            <span>{{ __('common.discount') }}:</span>
+            <span>-{{ number_format($invoice->discount_amount, 2) }} {{ __('common.currency') }}</span>
         </div>
         @endif
 
@@ -141,27 +141,27 @@
             @foreach($customerExpenses as $cExp)
             <div style="display: flex; justify-content: space-between;">
                 <span>+ {{ $cExp->title }}:</span>
-                <span style="font-weight: 800;">+{{ number_format($cExp->amount, 2) }} ج.م</span>
+                <span style="font-weight: 800;">+{{ number_format($cExp->amount, 2) }} {{ __('common.currency') }}</span>
             </div>
             @endforeach
         @elseif(bccomp($invoice->shipping_cost, '0.000', 3) > 0)
             <div style="display: flex; justify-content: space-between;">
                 <span>+ الشحن / التوصيل:</span>
-                <span style="font-weight: 800;">+{{ number_format($invoice->shipping_cost, 2) }} ج.م</span>
+                <span style="font-weight: 800;">+{{ number_format($invoice->shipping_cost, 2) }} {{ __('common.currency') }}</span>
             </div>
         @endif
 
         <div style="display: flex; justify-content: space-between; font-size: 14px;" class="font-black">
-            <span>الصافي:</span>
-            <span>{{ number_format($invoice->net_total, 2) }} ج.م</span>
+            <span>{{ __('common.net') }}:</span>
+            <span>{{ number_format($invoice->net_total, 2) }} {{ __('common.currency') }}</span>
         </div>
         <div style="display: flex; justify-content: space-between;">
-            <span>المدفوع:</span>
-            <span>{{ number_format($invoice->paid_amount, 2) }} ج.م</span>
+            <span>{{ __('common.paid') }}:</span>
+            <span>{{ number_format($invoice->paid_amount, 2) }} {{ __('common.currency') }}</span>
         </div>
         <div style="display: flex; justify-content: space-between;" class="font-bold">
-            <span>المتبقي:</span>
-            <span>{{ number_format($invoice->remaining_amount, 2) }} ج.م</span>
+            <span>{{ __('common.remaining') }}:</span>
+            <span>{{ number_format($invoice->remaining_amount, 2) }} {{ __('common.currency') }}</span>
         </div>
 
         @php

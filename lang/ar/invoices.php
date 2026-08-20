@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'title'              => 'فواتير المبيعات',
@@ -25,4 +25,8 @@ return [
     'payment_instapay'   => 'إنستاباي',
     'payment_wallet'     => 'محفظة ذكية',
     'payment_card'       => 'فيزا / ماكينة',
+    'updated_success'    => 'تم تعديل الفاتورة رقم :number بنجاح',
+    'cancelled_success'  => 'تم إلغاء الفاتورة رقم :number وعكس أثرها المخزني والمالي بنجاح',
+    'deleted_success'    => 'تم حذف الفاتورة رقم :number وإرجاع المخزون بنجاح',
+    'restored_success'   => 'تم استعادة الفاتورة رقم :number بنجاح',
 ];

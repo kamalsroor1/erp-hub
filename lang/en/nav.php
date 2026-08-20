@@ -58,4 +58,9 @@ return [
     'switch_to_dark' => 'Switch to Dark Mode',
     'van_store' => 'Distribution Van',
     'branch_store' => 'Branch Store',
+    'settings_saved_success' => 'System, branding, and printing settings saved successfully',
+    'telegram_daily_summary_sent' => 'Daily summary report sent to Telegram successfully',
+    'telegram_low_stock_sent' => 'Low stock alert sent to Telegram successfully',
+    'telegram_overdue_shift_sent' => 'Overdue shift alert sent to Telegram successfully',
+    'telegram_backup_sent' => 'Database backup sent to Telegram successfully',
 ];

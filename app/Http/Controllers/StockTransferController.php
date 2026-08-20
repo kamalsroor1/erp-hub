@@ -99,6 +99,6 @@ final class StockTransferController extends Controller
 
         $transfer = $transferService->createTransfer($validated);
 
-        return redirect()->route('stock-transfers.index')->with('success', "تم تنفيذ إذن التحويل المخزني رقم {$transfer->transfer_number} بنجاح");
+        return redirect()->route('stock-transfers.index')->with('success', __('inventory.confirm_transfer') ?? "تم تنفيذ إذن التحويل المخزني رقم {$transfer->transfer_number} بنجاح");
     }
 }

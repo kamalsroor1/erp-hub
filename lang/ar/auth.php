@@ -29,4 +29,13 @@ return [
     'super_admin_2' => 'المدير العام 2 (سوبر أدمن 2)',
     'login_success' => 'تم تسجيل الدخول بنجاح إلى منظومة ERP.',
     'logout_success' => 'تم تسجيل الخروج بنجاح.',
+    'admin_role_full_access' => 'دور مدير النظام يمتلك كافة الصلاحيات تلقائياً',
+    'role_permissions_updated' => 'تم حفظ وتحديث صلاحيات الدور بنجاح',
+    'current_password_incorrect' => 'كلمة المرور الحالية غير صحيحة',
+    'profile_updated' => 'تم تحديث بيانات ملفك الشخصي بنجاح',
+    'user_created_success' => 'تم إنشاء حساب المستخدم وتعيين الصلاحيات بنجاح',
+    'user_updated_success' => 'تم تحديث بيانات المستخدم بنجاح',
+    'cannot_delete_own_account' => 'لا يمكنك حذف حسابك الشخصي الحالي',
+    'user_deleted_success' => 'تم حذف حساب المستخدم بنجاح',
+    'user_status_updated_success' => 'تم تحديث حالة حساب المستخدم بنجاح',
 ];

@@ -134,7 +134,7 @@ final class DailyJournalController extends Controller
             ]);
         });
 
-        return redirect()->back()->with('success', 'تم فتح وردية الخزينة بنجاح');
+        return redirect()->back()->with('success', __('treasury.shift_opened_success'));
     }
 
     public function closeShift(Request $request, int $id)
@@ -183,7 +183,7 @@ final class DailyJournalController extends Controller
             ]);
         });
 
-        return redirect()->back()->with('success', 'تم إغلاق الوردية واعتماد تقرير Z-Report بنجاح');
+        return redirect()->back()->with('success', __('treasury.shift_closed_success'));
     }
 
     public function storeExpense(Request $request)
@@ -215,6 +215,6 @@ final class DailyJournalController extends Controller
             ]);
         });
 
-        return redirect()->back()->with('success', 'تم تسجيل المصروف التشغيلي بنجاح');
+        return redirect()->back()->with('success', __('expenses.recorded_success'));
     }
 }

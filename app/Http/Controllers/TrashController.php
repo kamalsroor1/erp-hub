@@ -119,7 +119,7 @@ final class TrashController extends Controller
 
         $model->restore();
 
-        return redirect()->back()->with('success', 'تم استعادة السجل المحذوف بنجاح');
+        return redirect()->back()->with('success', __('common.restored_success'));
     }
 
     public function forceDelete(string $type, int $id)
@@ -136,6 +136,6 @@ final class TrashController extends Controller
 
         $model->forceDelete();
 
-        return redirect()->back()->with('success', 'تم حذف السجل نهائياً من قاعدة البيانات');
+        return redirect()->back()->with('success', __('common.force_deleted_success'));
     }
 }

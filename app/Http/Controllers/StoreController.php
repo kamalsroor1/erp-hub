@@ -77,7 +77,7 @@ final class StoreController extends Controller
             }
         });
 
-        return redirect()->back()->with('success', 'تم إضافة الفرع / عربية التوزيع بنجاح');
+        return redirect()->back()->with('success', __('inventory.store_added') ?? 'تم إضافة الفرع / عربية التوزيع بنجاح');
     }
 
     public function update(Request $request, int $id)
@@ -111,20 +111,19 @@ final class StoreController extends Controller
             ]);
         });
 
-        return redirect()->back()->with('success', 'تم تعديل بيانات الفرع بنجاح');
+        return redirect()->back()->with('success', __('inventory.store_updated') ?? 'تم تعديل بيانات الفرع بنجاح');
     }
 
     public function toggleActive(int $id)
     {
         $store = Store::findOrFail($id);
         if ($store->is_main && $store->is_active) {
-            return redirect()->back()->with('error', 'لا يمكن تعطيل الفرع الرئيسي للمنشأة');
+            return redirect()->back()->with('error', __('inventory.cannot_disable_main_store') ?? 'لا يمكن تعطيل الفرع الرئيسي للمنشأة');
         }
 
         $store->update(['is_active' => !$store->is_active]);
 
-        $statusMsg = $store->is_active ? 'تفعيل' : 'تعطيل';
-        return redirect()->back()->with('success', "تم {$statusMsg} الفرع ({$store->name}) بنجاح");
+        return redirect()->back()->with('success', __('inventory.store_status_updated') ?? "تم تحديث حالة الفرع ({$store->name}) بنجاح");
     }
 
     public function assignUsers(Request $request, int $id)
@@ -137,7 +136,7 @@ final class StoreController extends Controller
 
         $store->users()->sync($validated['user_ids'] ?? []);
 
-        return redirect()->back()->with('success', "تم تحديث تعيينات الموظفين لفرع ({$store->name}) بنجاح");
+        return redirect()->back()->with('success', __('inventory.store_users_updated') ?? "تم تحديث تعيينات الموظفين لفرع ({$store->name}) بنجاح");
     }
 
     public function destroy(int $id)
@@ -151,7 +150,7 @@ final class StoreController extends Controller
 
         $store->delete();
 
-        return redirect()->back()->with('success', "تم نقل الفرع ({$store->name}) إلى سلة المحذوفات بنجاح");
+        return redirect()->back()->with('success', __('inventory.store_deleted') ?? "تم نقل الفرع ({$store->name}) إلى سلة المحذوفات بنجاح");
     }
 
     public function stocks(Request $request): Response

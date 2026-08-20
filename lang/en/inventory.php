@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'title'                     => 'Inventory & Item Management',
@@ -28,4 +28,8 @@ return [
     'confirm_transfer'          => 'Confirm & Transfer Stock 📦',
     'assembly_blends'           => 'Blending & Coffee Recipe Formulation',
     'assembly_blends_sub'       => 'Combine ingredients and raw coffee to formulate recipes and deduct stock atomically',
+    'item_added'                => 'Item added successfully',
+    'item_updated'              => 'Item updated successfully',
+    'item_deleted'              => 'Item deleted successfully',
+    'cannot_delete_has_movements' => 'Cannot delete item with linked financial or inventory movements',
 ];

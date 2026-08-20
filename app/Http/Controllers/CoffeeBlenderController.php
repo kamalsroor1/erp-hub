@@ -71,6 +71,6 @@ final class CoffeeBlenderController extends Controller
             'notes' => $notesStr,
         ]);
 
-        return redirect()->route('invoices.show', $invoice->id)->with('success', 'تم إنشاء وتأكيد فاتورة التوليفة بنجاح');
+        return redirect()->route('invoices.show', $invoice->id)->with('success', __('inventory.assembly_blends_sub') ?? 'تم إنشاء وتأكيد فاتورة التوليفة بنجاح');
     }
 }

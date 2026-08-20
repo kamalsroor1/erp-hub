@@ -94,7 +94,7 @@ final class UserController extends Controller
             $user->syncRoles([$validated['role']]);
         });
 
-        return redirect()->back()->with('success', 'تم إنشاء حساب المستخدم وتعيين الصلاحيات بنجاح');
+        return redirect()->back()->with('success', __('auth.user_created_success'));
     }
 
     public function update(Request $request, int $id)
@@ -128,18 +128,18 @@ final class UserController extends Controller
             $user->syncRoles([$validated['role']]);
         });
 
-        return redirect()->back()->with('success', 'تم تحديث بيانات المستخدم بنجاح');
+        return redirect()->back()->with('success', __('auth.user_updated_success'));
     }
 
     public function destroy(int $id)
     {
         $user = User::findOrFail($id);
         if ($user->id === auth()->id()) {
-            return redirect()->back()->with('error', 'لا يمكنك حذف حسابك الشخصي الحالي');
+            return redirect()->back()->with('error', __('auth.cannot_delete_own_account'));
         }
 
         $user->delete();
-        return redirect()->back()->with('success', 'تم نقل المستخدم إلى سلة المحذوفات بنجاح');
+        return redirect()->back()->with('success', __('auth.user_deleted_success'));
     }
 
     public function toggleActive(int $id)
@@ -147,6 +147,6 @@ final class UserController extends Controller
         $user = User::findOrFail($id);
         $user->update(['is_active' => !$user->is_active]);
 
-        return redirect()->back()->with('success', 'تم تغيير حالة الحساب بنجاح');
+        return redirect()->back()->with('success', __('auth.user_status_updated_success'));
     }
 }

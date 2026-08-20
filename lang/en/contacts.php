@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'customers_title'           => 'Customers Directory',
@@ -23,4 +23,15 @@ return [
     'add_payment'               => '+ Record New Payment',
     'opening_balance'           => 'Opening Balance',
     'credit_limit'              => 'Credit Limit',
+    'customer_added'            => 'Customer added successfully',
+    'customer_updated'          => 'Customer details updated successfully',
+    'customer_deleted'          => 'Customer deleted successfully',
+    'customer_status_updated'   => 'Customer status updated successfully',
+    'supplier_added'            => 'Supplier added successfully',
+    'supplier_updated'          => 'Supplier details updated successfully',
+    'supplier_deleted'          => 'Supplier deleted successfully',
+    'supplier_status_updated'   => 'Supplier status updated successfully',
+    'payment_recorded'          => 'Payment collected and recorded successfully',
+    'supplier_payment_recorded' => 'Payment voucher disbursed successfully',
+    'cannot_delete_has_balance' => 'Cannot delete record with outstanding balance or associated transactions',
 ];

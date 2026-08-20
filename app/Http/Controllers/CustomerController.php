@@ -92,7 +92,7 @@ final class CustomerController extends Controller
             ]);
         });
 
-        return redirect()->back()->with('success', 'تم إضافة العميل بنجاح');
+        return redirect()->back()->with('success', __('contacts.customer_added'));
     }
 
     public function update(Request $request, int $id)
@@ -111,7 +111,7 @@ final class CustomerController extends Controller
             $customer->update($validated);
         });
 
-        return redirect()->back()->with('success', 'تم تعديل بيانات العميل بنجاح');
+        return redirect()->back()->with('success', __('contacts.customer_updated'));
     }
 
     public function collectPayment(Request $request, int $id, \App\Services\PaymentService $paymentService)
@@ -130,10 +130,10 @@ final class CustomerController extends Controller
             'amount'         => (string)$validated['amount'],
             'payment_method' => $validated['payment_method'],
             'payment_date'   => $validated['payment_date'],
-            'notes'          => $validated['notes'] ?? 'تحصيل دفعة نقدية من الحساب',
+            'notes'          => $validated['notes'] ?? __('contacts.receipt_voucher'),
         ]);
 
-        return redirect()->back()->with('success', 'تم تسجيل سند التحصيل وقيد الدفعة بنجاح');
+        return redirect()->back()->with('success', __('contacts.payment_recorded'));
     }
 
     public function statement(Request $request, int $id, \App\Services\CustomerBalanceService $balanceService): Response
@@ -182,8 +182,7 @@ final class CustomerController extends Controller
         $customer->is_active = !$customer->is_active;
         $customer->save();
 
-        $statusText = $customer->is_active ? 'تفعيل' : 'تعطيل';
-        return redirect()->back()->with('success', "تم {$statusText} العميل [{$customer->name}] بنجاح");
+        return redirect()->back()->with('success', __('contacts.customer_status_updated'));
     }
 
     public function destroy(int $id)
@@ -191,13 +190,13 @@ final class CustomerController extends Controller
         $customer = Customer::findOrFail($id);
 
         if (!$customer->canBeDeleted()) {
-            return redirect()->back()->with('error', 'لا يمكن حذف العميل لوجود رصيد أو فواتير مسجلة بحسابه');
+            return redirect()->back()->with('error', __('contacts.cannot_delete_has_balance'));
         }
 
         DB::transaction(function () use ($customer) {
             $customer->delete();
         });
 
-        return redirect()->back()->with('success', 'تم حذف العميل بنجاح');
+        return redirect()->back()->with('success', __('contacts.customer_deleted'));
     }
 }

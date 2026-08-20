@@ -43,7 +43,7 @@ final class ProfileController extends Controller
 
         if (!empty($validated['new_password'])) {
             if (!Hash::check($validated['current_password'], $user->password)) {
-                return redirect()->back()->withErrors(['current_password' => 'كلمة المرور الحالية غير صحيحة']);
+                return redirect()->back()->withErrors(['current_password' => __('auth.current_password_incorrect')]);
             }
             $user->password = Hash::make($validated['new_password']);
         }
@@ -54,6 +54,6 @@ final class ProfileController extends Controller
         $user->theme_preference = $validated['theme_preference'];
         $user->save();
 
-        return redirect()->back()->with('success', 'تم تحديث بيانات ملفك الشخصي بنجاح');
+        return redirect()->back()->with('success', __('auth.profile_updated'));
     }
 }

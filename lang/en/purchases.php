@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'title'                     => 'New Purchase & Stock Supply Invoice',
@@ -49,4 +49,6 @@ return [
     'stockout_alert'            => 'Stockout Warning: Will run out soon',
     'stock_safe'                => 'Stock in safe zone',
     'create_po_btn'             => '➕ Create Purchase Invoice from Suggestions',
+    'created_success'           => 'Purchase invoice #:number recorded and stock added successfully',
+    'cancelled_success'         => 'Purchase invoice #:number cancelled and stock/financial effects reversed successfully',
 ];

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'title'              => 'Sales Invoices',
@@ -25,4 +25,8 @@ return [
     'payment_instapay'   => 'InstaPay',
     'payment_wallet'     => 'E-Wallet',
     'payment_card'       => 'Visa / POS Card',
+    'updated_success'    => 'Invoice #:number updated successfully',
+    'cancelled_success'  => 'Invoice #:number cancelled and stock/financial effects reversed successfully',
+    'deleted_success'    => 'Invoice #:number deleted and stock returned successfully',
+    'restored_success'   => 'Invoice #:number restored successfully',
 ];

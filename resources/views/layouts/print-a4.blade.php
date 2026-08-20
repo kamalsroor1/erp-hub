@@ -193,9 +193,9 @@
             @endif
 
             <div class="invoice-meta" style="{{ !$hasBrandHeader ? 'text-align: center; width: 100%; margin: 0 auto;' : '' }}">
-                <h2 class="invoice-title" style="{{ !$hasBrandHeader ? 'font-size: 24px; text-decoration: underline; margin-bottom: 4px;' : '' }}">فاتورة مبيعات</h2>
+                <h2 class="invoice-title" style="{{ !$hasBrandHeader ? 'font-size: 24px; text-decoration: underline; margin-bottom: 4px;' : '' }}">{{ __('invoices.sales_invoice') }}</h2>
                 <p class="invoice-num" style="{{ !$hasBrandHeader ? 'font-size: 16px; margin: 4px 0;' : '' }}">{{ $invoice->invoice_number }}</p>
-                <p class="invoice-date" style="{{ !$hasBrandHeader ? 'font-size: 13px;' : '' }}">التاريخ: {{ $invoice->invoice_date->format('Y-m-d') }}</p>
+                <p class="invoice-date" style="{{ !$hasBrandHeader ? 'font-size: 13px;' : '' }}">{{ __('common.date') }}: {{ $invoice->invoice_date->format('Y-m-d') }}</p>
             </div>
         </div>
 
@@ -203,18 +203,18 @@
         <div style="margin-bottom: 16px;">
             <div class="customer-card" style="margin-bottom: 0;">
                 <div>
-                    <span style="font-size: 13px; font-weight: 900; color: #000;">العميل:</span>
+                    <span style="font-size: 13px; font-weight: 900; color: #000;">{{ __('invoices.customer') }}:</span>
                     <span style="font-size: 15px; font-weight: 900; color: #000; margin-right: 6px;">{{ $invoice->customer->name }}</span>
                 </div>
                 @if($invoice->customer->phone)
                 <div>
-                    <span style="font-size: 12px; font-weight: 900;">الهاتف:</span>
+                    <span style="font-size: 12px; font-weight: 900;">{{ __('common.phone') }}:</span>
                     <span style="font-size: 13px; font-weight: 800; font-family: monospace;" dir="ltr">{{ $invoice->customer->phone }}</span>
                 </div>
                 @endif
                 @if($invoice->customer->address)
                 <div>
-                    <span style="font-size: 12px; font-weight: 900;">العنوان:</span>
+                    <span style="font-size: 12px; font-weight: 900;">{{ __('common.address') }}:</span>
                     <span style="font-size: 13px; font-weight: 700;">{{ $invoice->customer->address }}</span>
                 </div>
                 @endif
@@ -226,11 +226,11 @@
             <thead>
                 <tr>
                     <th style="width: 40px; text-align: center;">#</th>
-                    <th>الصنف والوصف</th>
-                    <th style="text-align: center; width: 100px;">الكمية</th>
-                    <th style="text-align: center; width: 110px;">سعر الوحدة</th>
-                    <th style="text-align: center; width: 90px;">الخصم</th>
-                    <th style="text-align: left; width: 130px;">الإجمالي</th>
+                    <th>{{ __('invoices.item_description') }}</th>
+                    <th style="text-align: center; width: 100px;">{{ __('common.quantity') }}</th>
+                    <th style="text-align: center; width: 110px;">{{ __('common.unit_price') }}</th>
+                    <th style="text-align: center; width: 90px;">{{ __('common.discount') }}</th>
+                    <th style="text-align: left; width: 130px;">{{ __('common.total') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -240,7 +240,7 @@
                     <td>
                         <strong style="font-size: 14px; font-weight: 900;">{{ $item->item->name }}</strong>
                         @if($item->item->code)
-                            <div style="font-size: 11px; font-weight: 700;">كود: {{ $item->item->code }}</div>
+                            <div style="font-size: 11px; font-weight: 700;">{{ __('inventory.item_code') }}: {{ $item->item->code }}</div>
                         @endif
                     </td>
                     <td style="text-align: center; font-weight: 800;">
@@ -253,7 +253,7 @@
                         {{ number_format($item->discount_amount, 2) }}
                     </td>
                     <td style="text-align: left; font-weight: 900; font-size: 14px;">
-                        {{ number_format($item->total_price, 2) }} ج.م
+                        {{ number_format($item->total_price, 2) }} {{ __('common.currency') }}
                     </td>
                 </tr>
                 @endforeach
@@ -263,13 +263,13 @@
         <!-- Totals Card -->
         <div class="totals-card">
             <div class="totals-row">
-                <span>المجموع الفرعي:</span>
-                <span>{{ number_format($invoice->subtotal, 2) }} ج.م</span>
+                <span>{{ __('common.subtotal') }}:</span>
+                <span>{{ number_format($invoice->subtotal, 2) }} {{ __('common.currency') }}</span>
             </div>
             @if(bccomp($invoice->discount_amount, '0.000', 3) > 0)
             <div class="totals-row">
-                <span>إجمالي الخصم:</span>
-                <span>-{{ number_format($invoice->discount_amount, 2) }} ج.م</span>
+                <span>{{ __('common.discount') }}:</span>
+                <span>-{{ number_format($invoice->discount_amount, 2) }} {{ __('common.currency') }}</span>
             </div>
             @endif
 
@@ -281,27 +281,27 @@
                 @foreach($customerExpenses as $cExp)
                 <div class="totals-row">
                     <span>+ {{ $cExp->title }}:</span>
-                    <span>+{{ number_format($cExp->amount, 2) }} ج.م</span>
+                    <span>+{{ number_format($cExp->amount, 2) }} {{ __('common.currency') }}</span>
                 </div>
                 @endforeach
             @elseif(bccomp($invoice->shipping_cost, '0.000', 3) > 0)
                 <div class="totals-row">
-                    <span>+ مصاريف الشحن والتوصيل:</span>
-                    <span>+{{ number_format($invoice->shipping_cost, 2) }} ج.م</span>
+                    <span>+ {{ __('invoices.shipping_cost') }}:</span>
+                    <span>+{{ number_format($invoice->shipping_cost, 2) }} {{ __('common.currency') }}</span>
                 </div>
             @endif
 
             <div class="totals-row final-net">
-                <span>الصافي المطلوب:</span>
-                <span>{{ number_format($invoice->net_total, 2) }} ج.م</span>
+                <span>{{ __('common.net') }}:</span>
+                <span>{{ number_format($invoice->net_total, 2) }} {{ __('common.currency') }}</span>
             </div>
             <div class="totals-row">
-                <span>المدفوع:</span>
-                <span>{{ number_format($invoice->paid_amount, 2) }} ج.م</span>
+                <span>{{ __('common.paid') }}:</span>
+                <span>{{ number_format($invoice->paid_amount, 2) }} {{ __('common.currency') }}</span>
             </div>
             <div class="totals-row" style="border-top: 1px solid #000; margin-top: 4px; padding-top: 4px;">
-                <span>المتبقي:</span>
-                <span style="font-weight: 900;">{{ number_format($invoice->remaining_amount, 2) }} ج.م</span>
+                <span>{{ __('common.remaining') }}:</span>
+                <span style="font-weight: 900;">{{ number_format($invoice->remaining_amount, 2) }} {{ __('common.currency') }}</span>
             </div>
         </div>
 

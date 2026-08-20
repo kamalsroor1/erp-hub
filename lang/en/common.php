@@ -51,4 +51,6 @@ return [
     'reset_filters'      => 'Reset Filters',
     'apply_filters'      => 'Apply Filters',
     'active_count'       => 'Active',
+    'restored_success'   => 'Record restored successfully',
+    'force_deleted_success' => 'Record permanently deleted from database',
 ];

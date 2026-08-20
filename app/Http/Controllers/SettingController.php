@@ -82,7 +82,7 @@ final class SettingController extends Controller
 
         Setting::clearCache();
 
-        return redirect()->back()->with('success', 'تم حفظ إعدادات النظام والهوية والطباعة بنجاح');
+        return redirect()->back()->with('success', __('nav.settings_saved_success'));
     }
 
     public function sendTestTelegram(Request $request, TelegramService $telegramService)
@@ -105,7 +105,7 @@ final class SettingController extends Controller
     {
         $res = $telegramService->sendDailySummaryNotification();
         if ($res['success']) {
-            return redirect()->back()->with('success', 'تم إرسال تقرير اليومية الشامل إلى تيليجرام بنجاح');
+            return redirect()->back()->with('success', __('nav.telegram_daily_summary_sent'));
         }
         return redirect()->back()->with('error', $res['message']);
     }
@@ -114,7 +114,7 @@ final class SettingController extends Controller
     {
         $res = $telegramService->sendLowStockNotification(previewSample: true);
         if ($res['success']) {
-            return redirect()->back()->with('success', 'تم إرسال إنذار النواقص إلى تيليجرام بنجاح');
+            return redirect()->back()->with('success', __('nav.telegram_low_stock_sent'));
         }
         return redirect()->back()->with('error', $res['message']);
     }
@@ -123,7 +123,7 @@ final class SettingController extends Controller
     {
         $res = $telegramService->sendOverdueShiftNotification(previewSample: true);
         if ($res['success']) {
-            return redirect()->back()->with('success', 'تم إرسال إنذار الشفتات المفتوحة إلى تيليجرام بنجاح');
+            return redirect()->back()->with('success', __('nav.telegram_overdue_shift_sent'));
         }
         return redirect()->back()->with('error', $res['message']);
     }
@@ -132,7 +132,7 @@ final class SettingController extends Controller
     {
         $res = $telegramService->sendDatabaseBackupNotification();
         if ($res['success']) {
-            return redirect()->back()->with('success', 'تم إرسال النسخة الاحتياطية لقاعدة البيانات إلى تيليجرام بنجاح');
+            return redirect()->back()->with('success', __('nav.telegram_backup_sent'));
         }
         return redirect()->back()->with('error', $res['message']);
     }

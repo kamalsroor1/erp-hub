@@ -123,7 +123,7 @@ final class ItemController extends Controller
             ]);
         });
 
-        return redirect()->back()->with('success', 'تم إضافة الصنف الجديد بنجاح');
+        return redirect()->back()->with('success', __('inventory.item_added'));
     }
 
     public function update(Request $request, int $id)
@@ -146,7 +146,7 @@ final class ItemController extends Controller
             $item->update($validated);
         });
 
-        return redirect()->back()->with('success', 'تم تعديل بيانات الصنف بنجاح');
+        return redirect()->back()->with('success', __('inventory.item_updated'));
     }
 
     public function destroy(int $id)
@@ -154,14 +154,14 @@ final class ItemController extends Controller
         $item = Item::findOrFail($id);
 
         if (!$item->canBeDeleted()) {
-            return redirect()->back()->with('error', 'لا يمكن حذف الصنف لوجود حركات مالية أو مخزنية مرتبطة به');
+            return redirect()->back()->with('error', __('inventory.cannot_delete_has_movements'));
         }
 
         DB::transaction(function () use ($item) {
             $item->delete();
         });
 
-        return redirect()->back()->with('success', 'تم حذف الصنف بنجاح');
+        return redirect()->back()->with('success', __('inventory.item_deleted'));
     }
 
     public function movements(int $id, Request $request): Response

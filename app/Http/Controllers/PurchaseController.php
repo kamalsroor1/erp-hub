@@ -159,16 +159,16 @@ final class PurchaseController extends Controller
 
         $purchase = $purchaseService->createPurchase($validated);
 
-        return redirect()->route('purchases.index')->with('success', "تم تسجيل وتأكيد فاتورة الشراء رقم {$purchase->purchase_number} وإيداع الكميات في المخزون بنجاح");
+        return redirect()->route('purchases.index')->with('success', __('purchases.created_success', ['number' => $purchase->purchase_number]));
     }
 
     public function cancel(int $id, PurchaseService $purchaseService)
     {
         $purchase = Purchase::findOrFail($id);
 
-        $purchaseService->cancelPurchase($purchase, 'إلغاء من خلال لوحة التحكم');
+        $purchaseService->cancelPurchase($purchase, __('purchases.cancelled_via_dashboard') ?? 'إلغاء من لوحة التحكم');
 
-        return redirect()->back()->with('success', "تم إلغاء فاتورة الشراء رقم {$purchase->purchase_number} وعكس أثرها المالي والمخزني بنجاح");
+        return redirect()->back()->with('success', __('purchases.cancelled_success', ['number' => $purchase->purchase_number]));
     }
 
     public function smartReorder(Request $request, \App\Services\ReorderAssistantService $reorderService): Response

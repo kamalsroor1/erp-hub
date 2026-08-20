@@ -234,7 +234,7 @@ final class InvoiceController extends Controller
 
         $updated = $invoiceService->updateInvoice($invoice, $validated);
 
-        return redirect()->route('invoices.show', $updated->id)->with('success', "تم تعديل الفاتورة رقم {$updated->invoice_number} بنجاح");
+        return redirect()->route('invoices.show', $updated->id)->with('success', __('invoices.updated_success', ['number' => $updated->invoice_number]));
     }
 
     /**
@@ -242,7 +242,7 @@ final class InvoiceController extends Controller
      */
     public function cancel(Request $request, int $id, \App\Services\InvoiceService $invoiceService)
     {
-        abort_if(!auth()->user()?->can('invoices.cancel'), 403, 'غير مصرح لك بإلغاء الفواتير');
+        abort_if(!auth()->user()?->can('invoices.cancel'), 403, __('invoices.unauthorized_cancel') ?? 'غير مصرح لك بإلغاء الفواتير');
 
         $validated = $request->validate([
             'reason' => 'required|string|min:3|max:500',
@@ -251,7 +251,7 @@ final class InvoiceController extends Controller
         $invoice = Invoice::findOrFail($id);
         $invoiceService->cancelInvoice($invoice, $validated['reason']);
 
-        return redirect()->back()->with('success', "تم إلغاء الفاتورة رقم {$invoice->invoice_number} وعكس أثرها المخزني والمالي بنجاح.");
+        return redirect()->back()->with('success', __('invoices.cancelled_success', ['number' => $invoice->invoice_number]));
     }
 
     /**
@@ -259,13 +259,13 @@ final class InvoiceController extends Controller
      */
     public function destroy(int $id, \App\Services\InvoiceService $invoiceService)
     {
-        abort_if(!auth()->user()?->can('invoices.delete'), 403, 'غير مصرح لك بحذف الفواتير');
+        abort_if(!auth()->user()?->can('invoices.delete'), 403, __('invoices.unauthorized_delete') ?? 'غير مصرح لك بحذف الفواتير');
 
         $invoice = Invoice::findOrFail($id);
         $num = $invoice->invoice_number;
         $invoiceService->deleteInvoice($invoice);
 
-        return redirect()->back()->with('success', "تم حذف الفاتورة رقم {$num} وإرجاع المخزون بنجاح.");
+        return redirect()->back()->with('success', __('invoices.deleted_success', ['number' => $num]));
     }
 
     /**
@@ -273,11 +273,11 @@ final class InvoiceController extends Controller
      */
     public function restore(int $id)
     {
-        abort_if(!auth()->user()?->can('trash.access'), 403, 'غير مصرح لك باسترجاع الفواتير المحذوفة');
+        abort_if(!auth()->user()?->can('trash.access'), 403, __('common.unauthorized') ?? 'غير مصرح لك باسترجاع الفواتير المحذوفة');
 
         $invoice = Invoice::onlyTrashed()->findOrFail($id);
         $invoice->restore();
 
-        return redirect()->back()->with('success', "تم استعادة الفاتورة رقم {$invoice->invoice_number} بنجاح.");
+        return redirect()->back()->with('success', __('invoices.restored_success', ['number' => $invoice->invoice_number]));
     }
 }

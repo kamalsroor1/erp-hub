@@ -120,24 +120,20 @@ final class ExpenseController extends Controller
         $storeId = $request->session()->get('active_store_id') ?: Store::first()?->id;
 
         DB::transaction(function () use ($validated, $storeId) {
-            $count = Expense::count() + 1;
-            $expNumber = 'EXP-' . date('Ymd') . '-' . str_pad((string)$count, 4, '0', STR_PAD_LEFT);
-
             Expense::create([
-                'expense_number' => $expNumber,
                 'title' => $validated['title'],
                 'category' => $validated['category'],
                 'cost_center' => $validated['cost_center'],
                 'amount' => $validated['amount'],
                 'expense_date' => $validated['expense_date'],
                 'payment_method' => $validated['payment_method'],
-                'user_id' => Auth::id() ?? 1,
+                'created_by' => auth()->id(),
                 'store_id' => $storeId,
                 'notes' => $validated['notes'] ?? null,
             ]);
         });
 
-        return redirect()->back()->with('success', 'تم قيد المصروف في الحسابات بنجاح');
+        return redirect()->back()->with('success', __('expenses.recorded_success'));
     }
 
     public function update(Request $request, int $id)
@@ -158,7 +154,7 @@ final class ExpenseController extends Controller
             $expense->update($validated);
         });
 
-        return redirect()->back()->with('success', 'تم تعديل بيانات المصروف بنجاح');
+        return redirect()->back()->with('success', __('expenses.updated_success'));
     }
 
     public function destroy(int $id)
@@ -166,6 +162,6 @@ final class ExpenseController extends Controller
         $expense = Expense::findOrFail($id);
         $expense->delete();
 
-        return redirect()->back()->with('success', 'تم نقل المصروف إلى سلة المحذوفات بنجاح');
+        return redirect()->back()->with('success', __('expenses.deleted_success'));
     }
 }

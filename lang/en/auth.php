@@ -34,4 +34,13 @@ return [
     'super_admin_2' => 'General Manager 2 (Super Admin 2)',
     'login_success' => 'Logged in successfully to ERP System.',
     'logout_success' => 'Logged out successfully.',
+    'admin_role_full_access' => 'Administrator role automatically possesses all system permissions',
+    'role_permissions_updated' => 'Role permissions saved and updated successfully',
+    'current_password_incorrect' => 'Current password is incorrect',
+    'profile_updated' => 'Your profile information has been updated successfully',
+    'user_created_success' => 'User account created and role assigned successfully',
+    'user_updated_success' => 'User details updated successfully',
+    'cannot_delete_own_account' => 'You cannot delete your own account',
+    'user_deleted_success' => 'User account deleted successfully',
+    'user_status_updated_success' => 'User status updated successfully',
 ];

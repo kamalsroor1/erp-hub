@@ -137,13 +137,13 @@ final class RoleController extends Controller
         if ($role->name === 'admin') {
             $role->syncPermissions(Permission::all());
             app(PermissionRegistrar::class)->forgetCachedPermissions();
-            return redirect()->back()->with('info', 'دور مدير النظام يمتلك كافة الصلاحيات تلقائياً');
+            return redirect()->back()->with('info', __('auth.admin_role_full_access'));
         }
 
         $permissions = $request->input('permissions', []);
         $role->syncPermissions($permissions);
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        return redirect()->back()->with('success', 'تم حفظ وتحديث صلاحيات الدور بنجاح');
+        return redirect()->back()->with('success', __('auth.role_permissions_updated'));
     }
 }

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'title'                     => 'Operational Expenses & Cost Centers',
@@ -47,4 +47,7 @@ return [
     'cc_marketing'              => 'Marketing & Advertising',
     'cc_shipping'               => 'Freight & External Shipping',
     'cc_operational'            => 'General Operating Expenses',
+    'recorded_success'          => 'Expense recorded in accounts successfully',
+    'updated_success'           => 'Expense details updated successfully',
+    'deleted_success'           => 'Expense moved to trash successfully',
 ];

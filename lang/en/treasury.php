@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'title'                     => 'Treasury & Payment Accounts',
@@ -38,4 +38,6 @@ return [
     'outflows'                  => 'Total Cash Outflows & Expenses',
     'net_cash_today'            => 'Net Cash Movement Today',
     'expected_in_drawer'        => 'Expected Drawer Cash',
+    'shift_opened_success'      => 'Cash shift opened successfully',
+    'shift_closed_success'      => 'Shift closed and Z-Report approved successfully',
 ];

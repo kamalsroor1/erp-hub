@@ -89,7 +89,7 @@ final class SupplierController extends Controller
             ]);
         });
 
-        return redirect()->back()->with('success', 'تم إضافة المورد بنجاح');
+        return redirect()->back()->with('success', __('contacts.supplier_added'));
     }
 
     public function update(Request $request, int $id)
@@ -108,7 +108,7 @@ final class SupplierController extends Controller
             $supplier->update($validated);
         });
 
-        return redirect()->back()->with('success', 'تم تعديل بيانات المورد بنجاح');
+        return redirect()->back()->with('success', __('contacts.supplier_updated'));
     }
 
     public function pay(Request $request, int $id, \App\Services\PaymentService $paymentService)
@@ -127,10 +127,10 @@ final class SupplierController extends Controller
             'amount'         => (string)$validated['amount'],
             'payment_method' => $validated['payment_method'],
             'payment_date'   => $validated['payment_date'],
-            'notes'          => $validated['notes'] ?? 'سداد دفعة نقدية للمورد',
+            'notes'          => $validated['notes'] ?? __('contacts.payment_voucher'),
         ]);
 
-        return redirect()->back()->with('success', 'تم تسجيل سند الصرف وسداد الدفعة بنجاح');
+        return redirect()->back()->with('success', __('contacts.supplier_payment_recorded'));
     }
 
     public function toggleActive(int $id)
@@ -139,8 +139,7 @@ final class SupplierController extends Controller
         $supplier->is_active = !$supplier->is_active;
         $supplier->save();
 
-        $status = $supplier->is_active ? 'تفعيل' : 'تعطيل';
-        return redirect()->back()->with('success', "تم {$status} حساب المورد بنجاح");
+        return redirect()->back()->with('success', __('contacts.supplier_status_updated'));
     }
 
     public function destroy(int $id)
@@ -148,14 +147,14 @@ final class SupplierController extends Controller
         $supplier = Supplier::findOrFail($id);
 
         if (!$supplier->canBeDeleted()) {
-            return redirect()->back()->with('error', 'لا يمكن حذف المورد لوجود فواتير أو مستحقات مالية مسجلة');
+            return redirect()->back()->with('error', __('contacts.cannot_delete_has_balance'));
         }
 
         DB::transaction(function () use ($supplier) {
             $supplier->delete();
         });
 
-        return redirect()->back()->with('success', 'تم حذف المورد بنجاح');
+        return redirect()->back()->with('success', __('contacts.supplier_deleted'));
     }
 
     public function statement(int $id, Request $request, \App\Services\SupplierBalanceService $balanceService): Response
