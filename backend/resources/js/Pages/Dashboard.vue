@@ -59,39 +59,39 @@ const getPaymentTypeBadge = (type) => {
     <AppLayout>
         <div class="space-y-6 font-tajawal">
             <!-- Welcome Header Banner -->
-            <div class="bg-gradient-to-l from-slate-100 via-white to-slate-50 dark:from-slate-900/90 dark:via-slate-900 dark:to-slate-950 rounded-3xl p-6 lg:p-8 border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-colors">
-                <div class="space-y-2">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-2xl bg-theme-light border border-theme-light text-theme-primary flex items-center justify-center shadow-xs">
-                            <Coffee class="w-6 h-6" />
+            <div class="bg-gradient-to-l from-slate-100 via-white to-slate-50 dark:from-slate-900/90 dark:via-slate-900 dark:to-slate-950 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 transition-colors">
+                <div class="space-y-1.5 sm:space-y-2">
+                    <div class="flex items-center gap-2.5 sm:gap-3">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-theme-light border border-theme-light text-theme-primary flex items-center justify-center shadow-xs shrink-0">
+                            <Coffee class="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
-                        <h1 class="text-2xl lg:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                        <h1 class="text-base sm:text-2xl lg:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                             {{ $t('dashboard.welcome_banner_title') }}
                         </h1>
                     </div>
-                    <p class="text-sm lg:text-base text-slate-600 dark:text-slate-300 font-bold flex flex-wrap items-center gap-2">
+                    <p class="text-xs sm:text-sm lg:text-base text-slate-600 dark:text-slate-300 font-bold flex flex-wrap items-center gap-1.5 sm:gap-2">
                         <span>{{ $t('dashboard.current_branch_label') }}</span>
-                        <span class="px-2.5 py-0.5 rounded-xl bg-theme-light text-theme-primary border border-theme-light font-black">
+                        <span class="px-2 sm:px-2.5 py-0.5 rounded-xl bg-theme-light text-theme-primary border border-theme-light font-black text-xs sm:text-sm">
                             {{ activeStore?.name || $t('common.main_store_default') }}
                         </span>
                         <span class="text-slate-400 dark:text-slate-500 hidden sm:inline">•</span>
-                        <span class="text-slate-500 dark:text-slate-400">{{ $t('dashboard.overview_subtitle') }}</span>
+                        <span class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm hidden sm:inline">{{ $t('dashboard.overview_subtitle') }}</span>
                     </p>
                 </div>
 
-                <div class="flex items-center gap-3 w-full md:w-auto">
+                <div class="flex items-center gap-2.5 w-full md:w-auto">
                     <Link
                         href="/pos"
-                        class="flex-1 md:flex-none h-12 px-6 rounded-2xl btn-primary-theme font-black text-sm flex items-center justify-center gap-2.5 transition transform active:scale-95 cursor-pointer"
+                        class="flex-1 md:flex-none h-10 sm:h-12 px-4 sm:px-6 rounded-2xl btn-primary-theme font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer shadow-theme-primary"
                     >
                         <Zap class="w-4 h-4 fill-current" />
                         <span>{{ $t('dashboard.pos_fast_btn') }}</span>
-                        <span class="px-2 py-0.5 rounded-lg bg-black/20 text-xs font-mono font-black">F2</span>
+                        <span class="px-1.5 py-0.5 rounded-lg bg-black/20 text-[10px] sm:text-xs font-mono font-black">F2</span>
                     </Link>
 
                     <Link
                         href="/purchases/create"
-                        class="h-12 px-5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-black text-sm flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-xs"
+                        class="h-10 sm:h-12 px-3.5 sm:px-5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-black text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-xs shrink-0"
                     >
                         <Truck class="w-4 h-4" />
                         <span class="hidden sm:inline">{{ $t('dashboard.supply_invoice_btn') }}</span>
@@ -99,79 +99,79 @@ const getPaymentTypeBadge = (type) => {
                 </div>
             </div>
 
-            <!-- 4 Key Metrics Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- 4 Key Metrics Cards (2-Column Bento Grid on Mobile, 4-Column on Desktop) -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
                 <!-- Card 1: Today Sales -->
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-3 relative overflow-hidden group hover:border-emerald-500/40 transition">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-2 sm:space-y-3 relative overflow-hidden group hover:border-emerald-500/40 transition">
                     <div class="flex items-center justify-between">
-                        <span class="text-sm font-bold text-slate-600 dark:text-slate-300">{{ $t('dashboard.today_sales_card') }}</span>
-                        <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg font-black">
-                            <Banknote class="w-5 h-5" />
+                        <span class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 truncate">{{ $t('dashboard.today_sales_card') }}</span>
+                        <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                            <Banknote class="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                         </div>
                     </div>
                     <div>
-                        <div class="text-3xl lg:text-4xl font-black font-mono text-slate-900 dark:text-white tracking-tight">
-                            {{ formatMoney(summary?.total_sales) }} <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ $t('common.currency') }}</span>
+                        <div class="text-base sm:text-2xl lg:text-3xl font-black font-mono text-slate-900 dark:text-white tracking-tight">
+                            {{ formatMoney(summary?.total_sales) }} <span class="text-[10px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400">{{ $t('common.currency') }}</span>
                         </div>
-                        <div class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-1.5 flex items-center gap-1.5">
-                            <Receipt class="w-3.5 h-3.5 text-slate-400" />
+                        <div class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-bold mt-1 flex items-center gap-1 truncate">
+                            <Receipt class="w-3 h-3 text-slate-400 shrink-0" />
                             <span>{{ summary?.invoices_count || 0 }} {{ $t('dashboard.today_invoices_count', { count: '' }).replace(':count', '') }}</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Card 2: Monthly Profit Margin -->
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-3 relative overflow-hidden group hover:border-theme-primary transition">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-2 sm:space-y-3 relative overflow-hidden group hover:border-theme-primary transition">
                     <div class="flex items-center justify-between">
-                        <span class="text-sm font-bold text-slate-600 dark:text-slate-300">{{ $t('dashboard.monthly_gross_profit_card') }}</span>
-                        <div class="w-10 h-10 rounded-2xl bg-theme-light text-theme-primary flex items-center justify-center text-lg font-black">
-                            <TrendingUp class="w-5 h-5" />
+                        <span class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 truncate">{{ $t('dashboard.monthly_gross_profit_card') }}</span>
+                        <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-theme-light text-theme-primary flex items-center justify-center shrink-0">
+                            <TrendingUp class="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                         </div>
                     </div>
                     <div>
-                        <div class="text-3xl lg:text-4xl font-black font-mono text-theme-primary tracking-tight">
-                            {{ formatMoney(summary?.monthly_gross_profit) }} <span class="text-sm font-bold text-slate-900 dark:text-white">{{ $t('common.currency') }}</span>
+                        <div class="text-base sm:text-2xl lg:text-3xl font-black font-mono text-theme-primary tracking-tight">
+                            {{ formatMoney(summary?.monthly_gross_profit) }} <span class="text-[10px] sm:text-xs font-bold text-slate-900 dark:text-white">{{ $t('common.currency') }}</span>
                         </div>
-                        <div class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-1.5 flex items-center gap-1.5">
+                        <div class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-bold mt-1 flex items-center gap-1 truncate">
                             <span>{{ $t('dashboard.profit_margin_label') }}</span>
-                            <span class="text-emerald-600 dark:text-emerald-400 font-mono font-black text-sm">{{ summary?.monthly_margin || '0.00' }}%</span>
+                            <span class="text-emerald-600 dark:text-emerald-400 font-mono font-black text-xs sm:text-sm">{{ summary?.monthly_margin || '0.00' }}%</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Card 3: Customers Debt -->
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-3 relative overflow-hidden group hover:border-rose-500/40 transition">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-2 sm:space-y-3 relative overflow-hidden group hover:border-rose-500/40 transition">
                     <div class="flex items-center justify-between">
-                        <span class="text-sm font-bold text-slate-600 dark:text-slate-300">{{ $t('dashboard.customers_debt_card') }}</span>
-                        <div class="w-10 h-10 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-lg font-black">
-                            <Users class="w-5 h-5" />
+                        <span class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 truncate">{{ $t('dashboard.customers_debt_card') }}</span>
+                        <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                            <Users class="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                         </div>
                     </div>
                     <div>
-                        <div class="text-3xl lg:text-4xl font-black font-mono text-rose-600 dark:text-rose-400 tracking-tight">
-                            {{ formatMoney(summary?.total_customers_debt) }} <span class="text-sm font-bold text-slate-900 dark:text-white">{{ $t('common.currency') }}</span>
+                        <div class="text-base sm:text-2xl lg:text-3xl font-black font-mono text-rose-600 dark:text-rose-400 tracking-tight">
+                            {{ formatMoney(summary?.total_customers_debt) }} <span class="text-[10px] sm:text-xs font-bold text-slate-900 dark:text-white">{{ $t('common.currency') }}</span>
                         </div>
-                        <div class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-1.5 flex items-center gap-1.5">
-                            <Clock class="w-3.5 h-3.5 text-rose-500" />
+                        <div class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-bold mt-1 flex items-center gap-1 truncate">
+                            <Clock class="w-3 h-3 text-rose-500 shrink-0" />
                             <span>{{ $t('dashboard.due_collections_label') }}</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Card 4: Monthly Sales -->
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-3 relative overflow-hidden group hover:border-indigo-500/40 transition">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-2 sm:space-y-3 relative overflow-hidden group hover:border-indigo-500/40 transition">
                     <div class="flex items-center justify-between">
-                        <span class="text-sm font-bold text-slate-600 dark:text-slate-300">{{ $t('dashboard.monthly_sales_card') }}</span>
-                        <div class="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg font-black">
-                            <BarChart3 class="w-5 h-5" />
+                        <span class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 truncate">{{ $t('dashboard.monthly_sales_card') }}</span>
+                        <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                            <BarChart3 class="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                         </div>
                     </div>
                     <div>
-                        <div class="text-3xl lg:text-4xl font-black font-mono text-indigo-600 dark:text-indigo-300 tracking-tight">
-                            {{ formatMoney(summary?.monthly_sales) }} <span class="text-sm font-bold text-slate-900 dark:text-white">{{ $t('common.currency') }}</span>
+                        <div class="text-base sm:text-2xl lg:text-3xl font-black font-mono text-indigo-600 dark:text-indigo-300 tracking-tight">
+                            {{ formatMoney(summary?.monthly_sales) }} <span class="text-[10px] sm:text-xs font-bold text-slate-900 dark:text-white">{{ $t('common.currency') }}</span>
                         </div>
-                        <div class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-1.5 flex items-center gap-1.5">
-                            <Calendar class="w-3.5 h-3.5 text-indigo-400" />
+                        <div class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-bold mt-1 flex items-center gap-1 truncate">
+                            <Calendar class="w-3 h-3 text-indigo-400 shrink-0" />
                             <span>{{ $t('dashboard.monthly_net_operations') }}</span>
                         </div>
                     </div>

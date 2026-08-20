@@ -3,9 +3,12 @@
 return [
     'group_sales' => 'Sales & Invoices',
     'dashboard' => 'Dashboard',
+    'dashboard_short' => 'Home',
     'new_sale_invoice_btn' => 'New Sale Invoice (F2)',
     'pos_fast' => 'Fast POS Cashier',
+    'pos_short' => 'POS',
     'invoices_log' => 'Sales Invoices',
+    'invoices_short' => 'Invoices',
     'returns_adjustments' => 'Returns Registry',
     
     'group_inventory' => 'Inventory & Branches',

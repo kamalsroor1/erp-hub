@@ -373,10 +373,18 @@ const getUserRoleLabel = computed(() => {
                     <button
                         @click="isSidebarOpen = true"
                         type="button"
-                        class="lg:hidden p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition cursor-pointer"
+                        class="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition cursor-pointer"
                     >
                         <Menu class="w-5 h-5" />
                     </button>
+
+                    <!-- Mobile Mini Brand Logo -->
+                    <div class="flex lg:hidden items-center gap-2">
+                        <Link href="/" class="w-8 h-8 rounded-xl bg-white dark:bg-slate-800 p-0.5 border border-slate-200 dark:border-slate-700 shadow-xs flex items-center justify-center">
+                            <img :src="logoLightSrc" alt="Logo" class="w-full h-full object-contain dark:hidden">
+                            <img :src="logoDarkSrc" alt="Logo" class="w-full h-full object-contain hidden dark:block">
+                        </Link>
+                    </div>
 
                     <!-- Desktop Collapse Button -->
                     <button
@@ -399,24 +407,24 @@ const getUserRoleLabel = computed(() => {
                 </div>
 
                 <!-- End Section (in RTL: Left) -->
-                <div class="flex items-center gap-2 sm:gap-2.5">
+                <div class="flex items-center gap-1.5 sm:gap-2.5">
                     <!-- Single Interactive Store Switcher Button -->
                     <button
                         @click="showStoreModal = true"
                         type="button"
-                        class="h-9 px-3 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800/90 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 transition cursor-pointer font-tajawal shadow-xs"
+                        class="h-8.5 sm:h-9 px-2 sm:px-3 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800/90 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 sm:gap-2 transition cursor-pointer font-tajawal shadow-xs max-w-[120px] sm:max-w-[170px]"
                         :title="$t('nav.switch_store') || 'تبديل الفرع'"
                     >
                         <span class="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse shrink-0"></span>
-                        <Store class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
-                        <span class="max-w-[120px] sm:max-w-[160px] truncate text-start">{{ activeStore?.name || $t('common.main_store_default') }}</span>
+                        <Store class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300 shrink-0" />
+                        <span class="truncate text-start text-[11px] sm:text-xs">{{ activeStore?.name || $t('common.main_store_default') }}</span>
                         <ChevronDown class="w-3 h-3 text-slate-400 shrink-0" />
                     </button>
 
-                    <!-- Shift Status Indicator -->
+                    <!-- Shift Status Indicator (Compact on Mobile) -->
                     <Link
                         href="/daily-journal"
-                        class="h-9 px-2.5 sm:px-3 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition font-tajawal shadow-xs shrink-0"
+                        class="h-8.5 sm:h-9 px-2 sm:px-3 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition font-tajawal shadow-xs shrink-0"
                         :class="activeShift ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20' : 'bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20'"
                         :title="activeShift ? 'الوردية مفتوحة ونشطة' : 'لا توجد وردية مفتوحة حالياً'"
                     >
@@ -427,11 +435,11 @@ const getUserRoleLabel = computed(() => {
                         </span>
                     </Link>
 
-                    <!-- Quick POS Fast Action Button -->
+                    <!-- Quick POS Fast Action Button (Desktop Only) -->
                     <FeatureGate feature="pos.access">
                         <Link
                             href="/pos"
-                            class="h-9 px-3 rounded-xl btn-primary-theme font-black text-xs flex items-center gap-1.5 transition transform active:scale-95 cursor-pointer font-tajawal shrink-0"
+                            class="hidden md:flex h-9 px-3 rounded-xl btn-primary-theme font-black text-xs items-center gap-1.5 transition transform active:scale-95 cursor-pointer font-tajawal shrink-0 shadow-theme-primary"
                         >
                             <Zap class="w-3.5 h-3.5 fill-current" />
                             <span class="hidden sm:inline">{{ $t('nav.pos_fast') }}</span>
@@ -439,8 +447,8 @@ const getUserRoleLabel = computed(() => {
                         </Link>
                     </FeatureGate>
 
-                    <!-- Notification Center Dropdown -->
-                    <div class="relative" @click.stop>
+                    <!-- Notification Center Dropdown (Desktop Only) -->
+                    <div class="hidden md:block relative" @click.stop>
                         <button
                             @click="showNotifications = !showNotifications; showUserMenu = false"
                             type="button"
@@ -504,7 +512,7 @@ const getUserRoleLabel = computed(() => {
                     <button
                         @click="toggleTheme"
                         type="button"
-                        class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center transition cursor-pointer shrink-0 shadow-xs hover:text-theme-primary"
+                        class="w-8.5 h-8.5 sm:w-9 sm:h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center transition cursor-pointer shrink-0 shadow-xs hover:text-theme-primary"
                         :title="currentTheme === 'dark' ? 'التحويل للوضع النهاري (Light)' : 'التحويل للوضع الليلي (Dark)'"
                     >
                         <Sun v-if="currentTheme === 'dark'" class="w-4 h-4 text-amber-400" />
@@ -518,50 +526,38 @@ const getUserRoleLabel = computed(() => {
                             type="button"
                             class="flex items-center gap-2 p-1.5 pr-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition cursor-pointer text-slate-800 dark:text-slate-200"
                         >
-                            <div class="w-7 h-7 rounded-lg bg-theme-light border border-theme-light text-theme-primary font-bold text-xs flex items-center justify-center">
-                                {{ user.name ? user.name.charAt(0) : 'U' }}
+                            <div class="w-7 h-7 rounded-lg bg-theme-primary text-white flex items-center justify-center text-xs font-black shadow-theme-primary shrink-0">
+                                {{ user.name?.charAt(0) || 'U' }}
                             </div>
-                            <span class="text-xs font-bold hidden lg:inline max-w-[120px] truncate">
-                                {{ user.name }}
-                            </span>
-                            <ChevronDown class="w-3 h-3 text-slate-400 shrink-0" />
+                            <div class="hidden xl:block text-right">
+                                <p class="text-xs font-black truncate max-w-[100px] text-slate-900 dark:text-white leading-tight">{{ user.name }}</p>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 truncate">{{ user.roles?.[0] || $t('common.user') }}</p>
+                            </div>
+                            <ChevronDown class="w-3.5 h-3.5 text-slate-400 hidden sm:inline shrink-0" />
                         </button>
 
-                        <!-- User Dropdown Menu -->
+                        <!-- User Profile Dropdown Menu -->
                         <div
                             v-if="showUserMenu"
-                            class="absolute left-0 mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-2 z-50 space-y-1 font-tajawal text-slate-800 dark:text-slate-200"
+                            class="absolute left-0 mt-2 w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-2 z-50 space-y-1 font-tajawal text-slate-800 dark:text-slate-200"
                         >
-                            <div class="p-2 border-b border-slate-200 dark:border-slate-800">
+                            <div class="p-2 border-b border-slate-100 dark:border-slate-800">
                                 <p class="text-xs font-black text-slate-900 dark:text-white truncate">{{ user.name }}</p>
-                                <p class="text-[11px] text-theme-primary font-mono mt-0.5">{{ user.phone }}</p>
-                                <span class="mt-1.5 inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-theme-light text-theme-primary border border-theme-light">
-                                    {{ getUserRoleLabel }}
-                                </span>
+                                <p class="text-[10px] text-slate-400 truncate">{{ user.email || user.phone }}</p>
                             </div>
 
                             <Link
-                                href="/profile"
-                                @click="showUserMenu = false"
-                                class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition"
+                                href="/settings"
+                                class="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                             >
-                                <User class="w-3.5 h-3.5" />
-                                <span>{{ $t('nav.profile') }}</span>
+                                <Settings class="w-3.5 h-3.5" />
+                                <span>{{ $t('nav.settings') }}</span>
                             </Link>
-
-                            <a
-                                v-if="isAdmin"
-                                href="/admin/super"
-                                class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/40 border border-purple-200 dark:border-purple-800/40 transition font-bold"
-                            >
-                                <Crown class="w-3.5 h-3.5" />
-                                <span>{{ $t('nav.super_admin') }}</span>
-                            </a>
 
                             <button
                                 @click="logout"
                                 type="button"
-                                class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition font-bold cursor-pointer"
+                                class="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
                             >
                                 <LogOut class="w-3.5 h-3.5" />
                                 <span>{{ $t('nav.logout') }}</span>
@@ -571,9 +567,9 @@ const getUserRoleLabel = computed(() => {
                 </div>
             </header>
 
-            <!-- Main Page Content Area (Scrolls cleanly with bottom padding for mobile bar) -->
-            <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 space-y-6 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
-                <!-- Flash Alert Banners -->
+            <!-- Main Dynamic Page Content Container -->
+            <main class="flex-1 p-3.5 sm:p-5 lg:p-8 space-y-4 sm:space-y-6 overflow-y-auto pb-24 lg:pb-8">
+                <!-- Global Flash Messages Notification -->
                 <div v-if="$page.props.flash?.success" class="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-2 font-tajawal shadow-sm">
                     <CheckCircle2 class="w-4 h-4 shrink-0" />
                     <span>{{ $page.props.flash.success }}</span>
@@ -587,26 +583,26 @@ const getUserRoleLabel = computed(() => {
             </main>
 
             <!-- Fixed Mobile Bottom Navigation Bar (Visible only on screens < lg) -->
-            <nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-2 py-1.5 flex items-center justify-around font-tajawal shadow-2xl safe-bottom select-none">
+            <nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/90 dark:border-slate-800/90 px-3 py-1.5 flex items-center justify-between font-tajawal shadow-2xl safe-bottom select-none">
                 <!-- 1. Home / Dashboard -->
                 <Link
                     href="/"
-                    class="flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition duration-150 active:scale-95"
-                    :class="page.url === '/' ? 'text-theme-primary font-black' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                    class="flex-1 flex flex-col items-center justify-center py-1 rounded-2xl transition-all duration-150 active:scale-90"
+                    :class="page.url === '/' ? 'text-theme-primary font-black scale-105' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white'"
                 >
                     <LayoutDashboard class="w-5 h-5 mb-0.5" />
-                    <span class="text-[10px]">{{ $t('nav.dashboard') }}</span>
+                    <span class="text-[10px] tracking-tight">{{ $t('nav.dashboard_short') }}</span>
                 </Link>
 
                 <!-- 2. Invoices / Sales -->
                 <FeatureGate feature="invoices.create">
                     <Link
                         href="/invoices"
-                        class="flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition duration-150 active:scale-95"
-                        :class="page.url.startsWith('/invoices') && !page.url.startsWith('/invoices/create') ? 'text-theme-primary font-black' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                        class="flex-1 flex flex-col items-center justify-center py-1 rounded-2xl transition-all duration-150 active:scale-90"
+                        :class="page.url.startsWith('/invoices') && !page.url.startsWith('/invoices/create') ? 'text-theme-primary font-black scale-105' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white'"
                     >
                         <Receipt class="w-5 h-5 mb-0.5" />
-                        <span class="text-[10px]">{{ $t('nav.invoices_log') }}</span>
+                        <span class="text-[10px] tracking-tight">{{ $t('nav.invoices_short') }}</span>
                     </Link>
                 </FeatureGate>
 
@@ -614,7 +610,7 @@ const getUserRoleLabel = computed(() => {
                 <FeatureGate feature="pos.access">
                     <Link
                         href="/pos"
-                        class="relative -top-3.5 w-12 h-12 rounded-2xl btn-primary-theme flex items-center justify-center shadow-theme-primary transition-transform duration-200 active:scale-90 cursor-pointer"
+                        class="relative -top-4 w-13 h-13 rounded-2xl btn-primary-theme flex items-center justify-center shadow-theme-primary transition-all duration-200 active:scale-90 cursor-pointer ring-4 ring-white dark:ring-slate-900"
                         :title="$t('nav.pos_fast')"
                     >
                         <Zap class="w-6 h-6 fill-current text-white" />
@@ -625,28 +621,28 @@ const getUserRoleLabel = computed(() => {
                 <button
                     @click="showNotificationsSheet = true"
                     type="button"
-                    class="relative flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition duration-150 active:scale-95 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                    class="flex-1 relative flex flex-col items-center justify-center py-1 rounded-2xl transition-all duration-150 active:scale-90 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
                 >
                     <div class="relative">
                         <Bell class="w-5 h-5 mb-0.5" />
                         <span
                             v-if="notifications.length > 0"
-                            class="absolute -top-1 -right-1.5 w-4 h-4 rounded-full bg-rose-500 text-white font-black text-[9px] flex items-center justify-center animate-pulse"
+                            class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-rose-500 text-white font-black text-[8px] flex items-center justify-center animate-pulse"
                         >
                             {{ notifications.length }}
                         </span>
                     </div>
-                    <span class="text-[10px]">{{ $t('nav.notifications_title') }}</span>
+                    <span class="text-[10px] tracking-tight">{{ $t('nav.notifications_title') }}</span>
                 </button>
 
                 <!-- 5. More / Sidebar Drawer Toggle -->
                 <button
                     @click="isSidebarOpen = true"
                     type="button"
-                    class="flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition duration-150 active:scale-95 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                    class="flex-1 flex flex-col items-center justify-center py-1 rounded-2xl transition-all duration-150 active:scale-90 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
                 >
                     <Menu class="w-5 h-5 mb-0.5" />
-                    <span class="text-[10px]">{{ $t('common.more') || 'المزيد' }}</span>
+                    <span class="text-[10px] tracking-tight">{{ $t('common.more') }}</span>
                 </button>
             </nav>
         </div>

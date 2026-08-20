@@ -51,6 +51,7 @@ return [
     'reset_filters'      => 'إعادة تعيين',
     'apply_filters'      => 'تطبيق الفلاتر',
     'active_count'       => 'نشط',
+    'more'               => 'المزيد',
     'restored_success'   => 'تم استعادة السجل المحذوف بنجاح',
     'force_deleted_success' => 'تم حذف السجل نهائياً من قاعدة البيانات',
 ];

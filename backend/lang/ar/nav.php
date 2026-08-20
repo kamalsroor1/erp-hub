@@ -2,10 +2,13 @@
 
 return [
     'group_sales' => 'المبيعات والفواتير',
-    'dashboard' => 'لوحة التحكم (Dashboard)',
+    'dashboard' => 'لوحة التحكم',
+    'dashboard_short' => 'الرئيسية',
     'new_sale_invoice_btn' => 'فاتورة بيع جديدة (F2)',
     'pos_fast' => 'كاشير POS السريع',
+    'pos_short' => 'الكاشير',
     'invoices_log' => 'فواتير المبيعات',
+    'invoices_short' => 'الفواتير',
     'returns_adjustments' => 'سجل المرتجعات',
     
     'group_inventory' => 'المخزون والفروع والتوزيع',
