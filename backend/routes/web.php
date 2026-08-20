@@ -4,6 +4,22 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Invoice;
 
+$centralDomains = config('tenancy.central_domains', ['localhost', '127.0.0.1', 'makhzani.localhost', 'super.localhost', 'makhzani.test', 'super.makhzani.test', 'admin.makhzani.test']);
+
+foreach ($centralDomains as $centralDomain) {
+    Route::domain($centralDomain)->group(function () {
+        Route::get('/login', function () {
+            return redirect()->route('super.login');
+        });
+        Route::get('/', function () {
+            if (Auth::check()) {
+                return redirect()->route('super.dashboard');
+            }
+            return redirect()->route('super.login');
+        });
+    });
+}
+
 // 1. Guest Authentication Routes (Inertia.js + Vue 3)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'create'])->name('login');

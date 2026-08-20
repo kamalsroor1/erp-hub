@@ -1,8 +1,9 @@
 import { ref } from 'vue';
 import axios from 'axios';
 
-export function useTheme(defaultTheme = 'dark') {
+export function useTheme(defaultTheme = 'dark', defaultColor = 'amber') {
     const currentTheme = ref(localStorage.getItem('theme_preference') || defaultTheme);
+    const currentColor = ref(localStorage.getItem('system_theme_color') || defaultColor);
 
     const applyTheme = (theme) => {
         if (theme === 'dark') {
@@ -22,6 +23,18 @@ export function useTheme(defaultTheme = 'dark') {
         }
     };
 
+    const applyColorTheme = (color) => {
+        if (!color) return;
+        currentColor.value = color;
+        document.documentElement.setAttribute('data-theme-color', color);
+        if (document.body) {
+            document.body.setAttribute('data-theme-color', color);
+        }
+        try {
+            localStorage.setItem('system_theme_color', color);
+        } catch (e) {}
+    };
+
     const toggleTheme = () => {
         currentTheme.value = currentTheme.value === 'dark' ? 'light' : 'dark';
         applyTheme(currentTheme.value);
@@ -35,13 +48,20 @@ export function useTheme(defaultTheme = 'dark') {
         } catch (e) {}
     };
 
-    const initTheme = () => {
+    const initTheme = (initialColor) => {
         applyTheme(currentTheme.value);
+        if (initialColor) {
+            applyColorTheme(initialColor);
+        } else {
+            applyColorTheme(currentColor.value);
+        }
     };
 
     return {
         currentTheme,
+        currentColor,
         toggleTheme,
+        applyColorTheme,
         initTheme,
         applyTheme,
     };

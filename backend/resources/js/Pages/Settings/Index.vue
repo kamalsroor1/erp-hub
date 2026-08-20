@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { useTheme } from '@/Composables/useTheme';
 
 const props = defineProps({
     settings: { type: Object, required: true },
@@ -10,6 +11,19 @@ const props = defineProps({
 });
 
 const currentTab = ref(props.active_tab || 'branding');
+
+const { applyColorTheme } = useTheme();
+
+const palettes = [
+    { id: 'amber', name: 'الكهرمان / الذهبي الأصيل', sub: 'الهوية الرسمية الافتراضية لسرور كوفي', hex: '#f59e0b', ring: 'ring-amber-500', bg: 'bg-amber-500', icon: '🌟' },
+    { id: 'emerald', name: 'الأخضر الزمردي الملكي', sub: 'طابع مالي فاخر ونقاء عالي', hex: '#10b981', ring: 'ring-emerald-500', bg: 'bg-emerald-500', icon: '🌿' },
+    { id: 'blue', name: 'الأزرق الملكي (Sapphire)', sub: 'أناقة كلاسيكية احترافية للمؤسسات', hex: '#3b82f6', ring: 'ring-blue-500', bg: 'bg-blue-500', icon: '🔵' },
+    { id: 'purple', name: 'البنفسجي الإمبراطوري', sub: 'فخامة وتميز إداري جذاب', hex: '#a855f7', ring: 'ring-purple-500', bg: 'bg-purple-500', icon: '🟣' },
+    { id: 'rose', name: 'الياقوتي القرمزي (Ruby Rose)', sub: 'طاقة وحيوية واضحة للشاشات', hex: '#f43f5e', ring: 'ring-rose-500', bg: 'bg-rose-500', icon: '🌹' },
+    { id: 'orange', name: 'البرتقالي الدافئ / بن محمص', sub: 'دفء الكافيهات وحبوب القهوة المحمصة', hex: '#f97316', ring: 'ring-orange-500', bg: 'bg-orange-500', icon: '☕' },
+    { id: 'teal', name: 'السماوي التركوازي (Ocean Teal)', sub: 'طابع عصري متجدد ومريح للعين', hex: '#14b8a6', ring: 'ring-teal-500', bg: 'bg-teal-500', icon: '🌊' },
+    { id: 'indigo', name: 'النيلي الداكن (Deep Indigo)', sub: 'هدوء تكنولوجي عصري حديث', hex: '#6366f1', ring: 'ring-indigo-500', bg: 'bg-indigo-500', icon: '🌌' },
+];
 
 const form = useForm({
     company_name: props.settings.company_name,
@@ -23,11 +37,17 @@ const form = useForm({
     thermal_show_customer_balance: props.settings.thermal_show_customer_balance,
     print_show_qr: props.settings.print_show_qr,
     invoice_primary_color: props.settings.invoice_primary_color || 'amber',
+    system_theme_color: props.settings.system_theme_color || 'amber',
     telegram_bot_token: props.settings.telegram_bot_token || '',
     telegram_chat_id: props.settings.telegram_chat_id || '',
     telegram_notifications_enabled: props.settings.telegram_notifications_enabled,
     logo_file: null,
 });
+
+const selectPalette = (paletteId) => {
+    form.system_theme_color = paletteId;
+    applyColorTheme(paletteId);
+};
 
 const logoPreview = ref(null);
 
@@ -113,12 +133,12 @@ const clearCache = () => {
                 </div>
             </div>
 
-            <!-- Navigation Tabs (4 Tabs) -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-950 p-1.5 rounded-2xl border border-slate-800">
+            <!-- Navigation Tabs (5 Tabs) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 bg-slate-950 p-1.5 rounded-2xl border border-slate-800">
                 <button
                     @click="currentTab = 'branding'"
                     type="button"
-                    class="py-3 px-4 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
+                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5"
                     :class="currentTab === 'branding' ? 'bg-amber-500 text-slate-950 font-black shadow-md' : 'text-slate-400 hover:text-white'"
                 >
                     <span>🏢</span>
@@ -126,9 +146,19 @@ const clearCache = () => {
                 </button>
 
                 <button
+                    @click="currentTab = 'theme'"
+                    type="button"
+                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5"
+                    :class="currentTab === 'theme' ? 'bg-amber-500 text-slate-950 font-black shadow-md' : 'text-slate-400 hover:text-white'"
+                >
+                    <span>🎨</span>
+                    <span>{{ $t('settings.tab_theme') }}</span>
+                </button>
+
+                <button
                     @click="currentTab = 'telegram'"
                     type="button"
-                    class="py-3 px-4 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
+                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5"
                     :class="currentTab === 'telegram' ? 'bg-amber-500 text-slate-950 font-black shadow-md' : 'text-slate-400 hover:text-white'"
                 >
                     <span>✈️</span>
@@ -138,7 +168,7 @@ const clearCache = () => {
                 <button
                     @click="currentTab = 'backup'"
                     type="button"
-                    class="py-3 px-4 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
+                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5"
                     :class="currentTab === 'backup' ? 'bg-amber-500 text-slate-950 font-black shadow-md' : 'text-slate-400 hover:text-white'"
                 >
                     <span>💾</span>
@@ -148,12 +178,117 @@ const clearCache = () => {
                 <button
                     @click="currentTab = 'system'"
                     type="button"
-                    class="py-3 px-4 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
+                    class="py-3 px-3 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5"
                     :class="currentTab === 'system' ? 'bg-amber-500 text-slate-950 font-black shadow-md' : 'text-slate-400 hover:text-white'"
                 >
                     <span>⚡</span>
                     <span>{{ $t('settings.tab_system') }}</span>
                 </button>
+            </div>
+
+            <!-- Tab: Theme & Colors Customization -->
+            <div v-if="currentTab === 'theme'" class="space-y-6">
+                <form @submit.prevent="saveSettings" class="space-y-6">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-6">
+                        <div class="border-b border-slate-200 dark:border-slate-800 pb-4">
+                            <h2 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                                <span>🎨</span>
+                                <span>{{ $t('settings.theme_title') }}</span>
+                            </h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">{{ $t('settings.theme_sub') }}</p>
+                        </div>
+
+                        <!-- Palettes Grid -->
+                        <div class="space-y-3">
+                            <h3 class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('settings.palette_select_title') }}</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                                <div
+                                    v-for="p in palettes"
+                                    :key="p.id"
+                                    @click="selectPalette(p.id)"
+                                    class="p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 relative group flex flex-col justify-between gap-3 shadow-xs"
+                                    :class="form.system_theme_color === p.id
+                                        ? 'border-amber-500 dark:border-amber-500 bg-amber-500/10 dark:bg-amber-500/10 ring-2 ring-amber-500/20'
+                                        : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 hover:border-slate-300 dark:hover:border-slate-700'"
+                                >
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2.5">
+                                            <span class="text-xl">{{ p.icon }}</span>
+                                            <div class="w-6 h-6 rounded-full shadow-sm border border-white/20 shrink-0" :style="{ backgroundColor: p.hex }"></div>
+                                        </div>
+                                        <span v-if="form.system_theme_color === p.id" class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-black text-xs flex items-center justify-center shadow-xs">
+                                            ✓
+                                        </span>
+                                    </div>
+
+                                    <div>
+                                        <h4 class="font-black text-xs text-slate-900 dark:text-white">{{ p.name }}</h4>
+                                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">{{ p.sub }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Live Real-Time Preview Card -->
+                        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 space-y-4">
+                            <h3 class="text-xs font-black text-slate-900 dark:text-white flex items-center gap-2">
+                                <span>👁️</span>
+                                <span>{{ $t('settings.live_preview_title') }}</span>
+                            </h3>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                                <!-- Sample KPI Card -->
+                                <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2 shadow-xs">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ $t('settings.preview_kpi_sales') }}</span>
+                                        <span class="text-base">💵</span>
+                                    </div>
+                                    <div class="text-2xl font-black font-mono" :style="{ color: palettes.find(p => p.id === form.system_theme_color)?.hex || '#f59e0b' }">
+                                        24,850.00 <span class="text-xs font-bold text-slate-500">ج.م</span>
+                                    </div>
+                                </div>
+
+                                <!-- Sample Action Button -->
+                                <button
+                                    type="button"
+                                    class="h-12 px-5 rounded-2xl text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg transition transform active:scale-95 cursor-pointer"
+                                    :style="{
+                                        backgroundColor: palettes.find(p => p.id === form.system_theme_color)?.hex || '#f59e0b',
+                                        boxShadow: `0 10px 20px -5px ${palettes.find(p => p.id === form.system_theme_color)?.hex}40`
+                                    }"
+                                >
+                                    <span>⚡</span>
+                                    <span>{{ $t('settings.preview_button_active') }} (F2)</span>
+                                </button>
+
+                                <!-- Sample Badge & Store Chip -->
+                                <div class="flex flex-col items-center sm:items-start gap-2">
+                                    <span
+                                        class="px-3 py-1 rounded-xl text-xs font-black border"
+                                        :style="{
+                                            backgroundColor: `${palettes.find(p => p.id === form.system_theme_color)?.hex}20`,
+                                            borderColor: `${palettes.find(p => p.id === form.system_theme_color)?.hex}50`,
+                                            color: palettes.find(p => p.id === form.system_theme_color)?.hex || '#f59e0b'
+                                        }"
+                                    >
+                                        ✓ الفرع النشط: محمص سرور الرئيسي
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-end">
+                            <button
+                                type="submit"
+                                :disabled="form.processing"
+                                class="h-12 px-8 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-black text-xs shadow-lg shadow-emerald-500/25 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                            >
+                                {{ form.processing ? $t('common.save') + '...' : $t('settings.save_theme_btn') }}
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
 
             <!-- Tab 1: Branding & Printing -->

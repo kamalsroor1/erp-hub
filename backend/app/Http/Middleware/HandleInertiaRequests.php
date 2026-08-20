@@ -75,6 +75,7 @@ class HandleInertiaRequests extends Middleware
                 'is_impersonating' => (bool)session('is_impersonating', false),
             ],
             'tenant' => $tenant ? (new \App\Http\Resources\TenantResource($tenant))->resolve() : null,
+            'system_theme_color' => fn () => \App\Models\Setting::get('system_theme_color', 'amber'),
             'activeStore' => $activeStore ? [
                 'id' => $activeStore->id,
                 'name' => $activeStore->name,

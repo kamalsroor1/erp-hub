@@ -19,6 +19,9 @@
                     document.documentElement.classList.add('light');
                     document.documentElement.classList.remove('dark');
                 }
+
+                const storedColor = localStorage.getItem('system_theme_color') || 'amber';
+                document.documentElement.setAttribute('data-theme-color', storedColor);
             } catch (e) {
                 document.documentElement.classList.add('dark');
             }

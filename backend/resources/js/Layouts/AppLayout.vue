@@ -26,7 +26,8 @@ const showStoreModal = ref(false);
 const notifications = computed(() => page.props.system_notifications || []);
 
 // Theme Composable
-const { currentTheme, toggleTheme, initTheme } = useTheme(user.value.theme_preference || 'dark');
+const systemThemeColor = computed(() => page.props.system_theme_color || 'amber');
+const { currentTheme, currentColor, toggleTheme, applyColorTheme, initTheme } = useTheme(user.value.theme_preference || 'dark', systemThemeColor.value);
 
 // Live Arabic Clock & Date
 const currentTime = ref('');
@@ -80,9 +81,15 @@ onMounted(() => {
     timerInterval = setInterval(updateClock, 1000);
     window.addEventListener('keydown', handleKeydown);
 
+    initTheme(systemThemeColor.value);
+
     // Initial Flash Check
     if (page.props.flash?.success) notifySuccess(page.props.flash.success);
     if (page.props.flash?.error) notifyError(page.props.flash.error);
+});
+
+watch(systemThemeColor, (newColor) => {
+    if (newColor) applyColorTheme(newColor);
 });
 
 watch(() => page.props.flash, (newFlash) => {
