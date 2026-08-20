@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, computed, watch } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -283,14 +283,14 @@ const deleteItem = (item) => {
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-3">كود الصنف</th>
-                                <th class="pb-3">اسم الصنف</th>
-                                <th class="pb-3">القسم</th>
-                                <th class="pb-3 font-mono">الرصيد الإجمالي</th>
-                                <th class="pb-3 font-mono">سعر التكلفة</th>
-                                <th class="pb-3 font-mono">سعر البيع</th>
-                                <th class="pb-3 font-mono">حد الأمان</th>
-                                <th class="pb-3 text-center">الإجراءات</th>
+                                <th class="pb-3">{{ $t('inventory.item_code') }}</th>
+                                <th class="pb-3">{{ $t('inventory.item_name') }}</th>
+                                <th class="pb-3">{{ $t('inventory.category') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('inventory.current_stock') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('common.unit_cost') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('common.unit_price') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('inventory.min_stock_level') }}</th>
+                                <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">

@@ -299,17 +299,17 @@ useKeyboardShortcuts({
                     </div>
                     <div>
                         <h1 class="text-sm font-black text-white flex items-center gap-2">
-                            <span>نقطة البيع والكاشير السريع (Touch POS)</span>
+                            <span>{{ $t('pos.title') }}</span>
                         </h1>
                         <div class="flex items-center gap-2 mt-0.5 text-[11px] text-slate-400">
-                            <span>الفرع:</span>
-                            <span class="text-amber-400 font-bold font-mono">{{ active_store?.name || 'المخزن الرئيسي' }}</span>
+                            <span>{{ $t('common.store') }}:</span>
+                            <span class="text-amber-400 font-bold font-mono">{{ active_store?.name || $t('common.main_store_default') }}</span>
                             <span>•</span>
                             <span
                                 class="px-2 py-0.2 rounded-md font-mono font-bold"
                                 :class="active_shift ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'"
                             >
-                                {{ active_shift ? `شفت مفتوح #${active_shift.shift_number || active_shift.id}` : 'الشفت مغلق' }}
+                                {{ active_shift ? `${$t('nav.active_shift')} #${active_shift.shift_number || active_shift.id}` : $t('nav.closed_shift') }}
                             </span>
                         </div>
                     </div>
@@ -323,7 +323,7 @@ useKeyboardShortcuts({
                         :class="showNumpad ? 'bg-amber-500 text-slate-950 font-black border-amber-400 shadow-md' : 'bg-slate-950 border-slate-800 text-slate-300 hover:text-white'"
                     >
                         <span>🔢</span>
-                        <span>لوحة أرقام اللمس</span>
+                        <span>{{ $t('pos.numpad') }}</span>
                     </button>
 
                     <Link
@@ -331,7 +331,7 @@ useKeyboardShortcuts({
                         class="h-9 px-3 rounded-xl bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-bold flex items-center gap-1.5 transition"
                     >
                         <span>🧾</span>
-                        <span>سجل الفواتير</span>
+                        <span>{{ $t('pos.invoices_list') }}</span>
                     </Link>
                 </div>
             </div>
@@ -494,19 +494,19 @@ useKeyboardShortcuts({
                         <!-- Subtotal & Discount -->
                         <div class="space-y-1 text-xs text-slate-400">
                             <div class="flex items-center justify-between">
-                                <span>الإجمالي الفرعي:</span>
-                                <span class="font-mono font-bold text-white">{{ formatMoney(subtotal) }} ج.م</span>
+                                <span>{{ $t('common.subtotal') }}:</span>
+                                <span class="font-mono font-bold text-white">{{ formatMoney(subtotal) }} {{ $t('common.currency') }}</span>
                             </div>
 
                             <div class="flex items-center justify-between gap-2">
-                                <span>الخصم الممنوح:</span>
+                                <span>{{ $t('common.discount') }}:</span>
                                 <div class="flex items-center gap-1.5">
                                     <button
                                         @click="discountType = discountType === 'fixed' ? 'percentage' : 'fixed'"
                                         type="button"
                                         class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px] font-black text-amber-400"
                                     >
-                                        {{ discountType === 'fixed' ? 'ج.م' : '%' }}
+                                        {{ discountType === 'fixed' ? $t('common.currency') : '%' }}
                                     </button>
                                     <input
                                         v-model.number="discountValue"
@@ -520,8 +520,8 @@ useKeyboardShortcuts({
 
                             <!-- Net Total -->
                             <div class="flex items-center justify-between pt-1 border-t border-slate-800 text-sm">
-                                <span class="font-black text-white">الصافي النهائي:</span>
-                                <span class="font-mono font-black text-lg text-emerald-400">{{ formatMoney(netTotal) }} ج.م</span>
+                                <span class="font-black text-white">{{ $t('common.net') }}:</span>
+                                <span class="font-mono font-black text-lg text-emerald-400">{{ formatMoney(netTotal) }} {{ $t('common.currency') }}</span>
                             </div>
                         </div>
 
@@ -533,7 +533,7 @@ useKeyboardShortcuts({
                                 class="py-1.5 rounded-xl font-black transition text-center cursor-pointer"
                                 :class="paymentType === 'cash' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'"
                             >
-                                نقدي (F4)
+                                {{ $t('pos.payment_cash') }} (F4)
                             </button>
                             <button
                                 @click="paymentType = 'partial'; autoSetCashPaid()"
@@ -541,7 +541,7 @@ useKeyboardShortcuts({
                                 class="py-1.5 rounded-xl font-black transition text-center cursor-pointer"
                                 :class="paymentType === 'partial' ? 'bg-amber-500 text-slate-950 shadow-md' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'"
                             >
-                                جزئي (F8)
+                                {{ $t('pos.payment_partial') }} (F8)
                             </button>
                             <button
                                 @click="paymentType = 'credit'; paidAmount = 0"
@@ -549,7 +549,7 @@ useKeyboardShortcuts({
                                 class="py-1.5 rounded-xl font-black transition text-center cursor-pointer"
                                 :class="paymentType === 'credit' ? 'bg-rose-500 text-white shadow-md' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'"
                             >
-                                آجل (F9)
+                                {{ $t('pos.payment_credit') }} (F9)
                             </button>
                         </div>
 
@@ -561,7 +561,7 @@ useKeyboardShortcuts({
                                 class="py-1 rounded-lg border transition text-center cursor-pointer"
                                 :class="paymentMethod === 'cash' ? 'bg-slate-800 border-amber-500 text-amber-400 font-black' : 'bg-slate-900 border-slate-800 text-slate-400'"
                             >
-                                💵 كاش
+                                {{ $t('treasury.cash_drawer') }}
                             </button>
                             <button
                                 @click="paymentMethod = 'instapay'"
@@ -569,7 +569,7 @@ useKeyboardShortcuts({
                                 class="py-1 rounded-lg border transition text-center cursor-pointer"
                                 :class="paymentMethod === 'instapay' ? 'bg-slate-800 border-purple-500 text-purple-400 font-black' : 'bg-slate-900 border-slate-800 text-slate-400'"
                             >
-                                ⚡ انستاباي
+                                {{ $t('treasury.instapay') }}
                             </button>
                             <button
                                 @click="paymentMethod = 'visa'"
@@ -577,7 +577,7 @@ useKeyboardShortcuts({
                                 class="py-1 rounded-lg border transition text-center cursor-pointer"
                                 :class="paymentMethod === 'visa' ? 'bg-slate-800 border-cyan-500 text-cyan-400 font-black' : 'bg-slate-900 border-slate-800 text-slate-400'"
                             >
-                                💳 فيزا
+                                {{ $t('treasury.visa') }}
                             </button>
                             <button
                                 @click="paymentMethod = 'e_wallet'"
@@ -585,14 +585,14 @@ useKeyboardShortcuts({
                                 class="py-1 rounded-lg border transition text-center cursor-pointer"
                                 :class="paymentMethod === 'e_wallet' ? 'bg-slate-800 border-rose-500 text-rose-400 font-black' : 'bg-slate-900 border-slate-800 text-slate-400'"
                             >
-                                📱 محفظة
+                                {{ $t('treasury.e_wallet') }}
                             </button>
                         </div>
 
                         <!-- Paid Amount & Change Due -->
                         <div v-if="paymentType !== 'credit'" class="flex items-center justify-between gap-2 text-xs">
                             <div class="flex items-center gap-1.5 flex-1">
-                                <span class="text-slate-400">المدفوع:</span>
+                                <span class="text-slate-400">{{ $t('common.paid') }}:</span>
                                 <input
                                     v-model.number="paidAmount"
                                     type="number"
@@ -602,14 +602,14 @@ useKeyboardShortcuts({
                             </div>
 
                             <div v-if="changeDue > 0" class="px-2.5 py-1 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono font-black text-xs">
-                                الباقي: {{ formatMoney(changeDue) }} ج.م
+                                {{ $t('pos.change_due') }}: {{ formatMoney(changeDue) }} {{ $t('common.currency') }}
                             </div>
                         </div>
 
                         <!-- Quick Cash Amount Chips -->
                         <div v-if="paymentType !== 'credit'" class="flex items-center gap-1 overflow-x-auto text-[10px] font-mono">
-                            <span class="text-slate-500 text-[9px] px-1 font-tajawal">سداد:</span>
-                            <button @click="quickSetPaidExact" type="button" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-amber-400 font-bold transition">الصافي</button>
+                            <span class="text-slate-500 text-[9px] px-1 font-tajawal">{{ $t('contacts.voucher_amount') }}:</span>
+                            <button @click="quickSetPaidExact" type="button" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-amber-400 font-bold transition">{{ $t('common.net') }}</button>
                             <button v-for="amt in [50, 100, 200, 500]" :key="amt" @click="quickSetPaidAmount(amt)" type="button" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 transition">{{ amt }}</button>
                         </div>
 
@@ -619,7 +619,7 @@ useKeyboardShortcuts({
                                 @click="handleClearCart"
                                 type="button"
                                 class="w-11 h-11 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-rose-400 font-black text-sm flex items-center justify-center transition border border-slate-800 shrink-0 cursor-pointer"
-                                title="تفريغ السلة"
+                                :title="$t('pos.clear_cart')"
                             >
                                 🗑️
                             </button>
@@ -631,7 +631,7 @@ useKeyboardShortcuts({
                                 class="flex-1 h-11 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 disabled:opacity-50 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 transition transform active:scale-95 cursor-pointer"
                             >
                                 <span>⚡</span>
-                                <span>{{ isSubmitting ? 'جاري الاعتماد...' : 'اعتماد وحفظ الفاتورة (Enter)' }}</span>
+                                <span>{{ isSubmitting ? $t('common.save') + '...' : $t('pos.confirm_invoice') + ' (Enter)' }}</span>
                             </button>
                         </div>
                     </div>

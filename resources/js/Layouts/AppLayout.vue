@@ -252,7 +252,7 @@ const getUserRoleLabel = computed(() => {
                         @click="showNotifications = !showNotifications; showUserMenu = false"
                         type="button"
                         class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition relative cursor-pointer"
-                        title="مركز التنبيهات والإشعارات"
+                        :title="$t('nav.notifications_title')"
                     >
                         <span class="text-sm">🔔</span>
                         <span
@@ -271,10 +271,10 @@ const getUserRoleLabel = computed(() => {
                         <div class="flex items-center justify-between pb-2 border-b border-slate-800 px-1">
                             <span class="text-xs font-black text-white flex items-center gap-1.5">
                                 <span>🔔</span>
-                                <span>مركز التنبيهات المباشرة</span>
+                                <span>{{ $t('nav.live_notifications_center') }}</span>
                             </span>
                             <span class="text-[10px] text-amber-400 font-bold">
-                                {{ notifications.length }} إشعار
+                                {{ notifications.length }} {{ $t('nav.notifications_count') }}
                             </span>
                         </div>
 
@@ -301,7 +301,7 @@ const getUserRoleLabel = computed(() => {
                             </div>
 
                             <div v-if="notifications.length === 0" class="py-6 text-center text-xs text-slate-500 font-bold">
-                                ✨ لا توجد تنبيهات عاجلة، كل شيء يسير بانتظام!
+                                {{ $t('nav.no_urgent_notifications') }}
                             </div>
                         </div>
                     </div>
@@ -312,7 +312,7 @@ const getUserRoleLabel = computed(() => {
                     @click="toggleTheme"
                     type="button"
                     class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition cursor-pointer"
-                    :title="currentTheme === 'dark' ? 'التبديل للوضع الفاتح' : 'التبديل للوضع الداكن'"
+                    :title="currentTheme === 'dark' ? $t('nav.switch_to_light') : $t('nav.switch_to_dark')"
                 >
                     <span>{{ currentTheme === 'dark' ? '☀️' : '🌙' }}</span>
                 </button>
@@ -514,7 +514,7 @@ const getUserRoleLabel = computed(() => {
                             <span class="text-lg">{{ store.type === 'van' ? '🚐' : '🏬' }}</span>
                             <div>
                                 <p class="text-xs font-bold">{{ store.name }}</p>
-                                <p class="text-[10px] text-slate-500 font-sans">{{ store.type === 'van' ? 'عربة توزيع' : 'فرع ومخزن' }}</p>
+                                <p class="text-[10px] text-slate-500 font-sans">{{ store.type === 'van' ? $t('nav.van_store') : $t('nav.branch_store') }}</p>
                             </div>
                         </div>
                         <span v-if="activeStore?.id === store.id" class="text-sm font-bold text-amber-400">✓</span>

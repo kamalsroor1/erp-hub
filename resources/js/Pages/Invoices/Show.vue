@@ -89,7 +89,7 @@ const getPaymentBadge = computed(() => {
                         class="px-4 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition cursor-pointer"
                     >
                         <span>✏️</span>
-                        <span>تعديل الفاتورة</span>
+                        <span>{{ $t('invoices.edit_invoice') }}</span>
                     </Link>
 
                     <button
@@ -98,26 +98,26 @@ const getPaymentBadge = computed(() => {
                         class="px-4 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-emerald-500/20 transition cursor-pointer"
                     >
                         <span>🖨️</span>
-                        <span>إيصال حراري (80mm)</span>
+                        <span>{{ $t('pos.print_thermal') }}</span>
                     </button>
 
                     <button
                         @click="printA4"
                         type="button"
-                        class="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-indigo-600/20 transition cursor-pointer"
+                        class="px-4 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center gap-1.5 border border-slate-700 transition cursor-pointer"
                     >
                         <span>📄</span>
-                        <span>فاتورة رسمية A4</span>
+                        <span>{{ $t('pos.print_a4') }}</span>
                     </button>
 
                     <button
                         v-if="invoice.status !== 'cancelled'"
-                        @click="showCancelModal = true; cancelReason = '';"
+                        @click="showCancelModal = true"
                         type="button"
-                        class="px-3 py-2.5 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold text-xs transition cursor-pointer"
-                        title="إلغاء الفاتورة"
+                        class="px-4 py-2.5 rounded-2xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 text-rose-400 font-black text-xs flex items-center gap-1.5 transition cursor-pointer"
                     >
-                        <span>🚫 إلغاء</span>
+                        <span>⚠️</span>
+                        <span>{{ $t('invoices.cancel_invoice') }}</span>
                     </button>
                 </div>
             </div>

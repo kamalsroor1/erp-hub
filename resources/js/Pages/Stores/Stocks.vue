@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, computed } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -166,12 +166,12 @@ const lowStockCount = computed(() => {
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-3">الصنف / الخامة</th>
-                                <th class="pb-3 font-mono">الرصيد المتوفر بالفرع</th>
-                                <th class="pb-3 font-mono">حد الأمان الأدنى</th>
-                                <th class="pb-3 font-mono">سعر التكلفة</th>
-                                <th class="pb-3 font-mono">إجمالي تقييم الرصيد</th>
-                                <th class="pb-3 text-center">حالة المخزون</th>
+                                <th class="pb-3">{{ $t('inventory.item_name') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('inventory.current_stock') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('inventory.min_stock_level') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('common.unit_cost') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('reports.sales_summary') }}</th>
+                                <th class="pb-3 text-center">{{ $t('common.status') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">

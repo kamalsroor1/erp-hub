@@ -50,7 +50,7 @@ onUnmounted(() => {
                                     <div class="flex items-center gap-2">
                                         <h3 class="font-black text-sm text-white">{{ title }}</h3>
                                         <span v-if="activeCount > 0" class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500 text-slate-950">
-                                            {{ activeCount }} نشط
+                                            {{ activeCount }} {{ $t('common.active_count') }}
                                         </span>
                                     </div>
                                     <p class="text-[11px] text-slate-400 mt-0.5">{{ subtitle }}</p>
@@ -79,7 +79,7 @@ onUnmounted(() => {
                                 class="px-4 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5"
                             >
                                 <span>🔄</span>
-                                <span>إعادة تعيين</span>
+                                <span>{{ $t('common.reset_filters') }}</span>
                             </button>
 
                             <div class="flex items-center gap-2">
@@ -88,7 +88,7 @@ onUnmounted(() => {
                                     type="button"
                                     class="px-4 py-2.5 rounded-2xl border border-slate-700 hover:bg-slate-800 text-slate-300 text-xs font-bold transition cursor-pointer"
                                 >
-                                    إلغاء
+                                    {{ $t('common.cancel') }}
                                 </button>
 
                                 <button
@@ -97,7 +97,7 @@ onUnmounted(() => {
                                     class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white text-xs font-black shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer flex items-center gap-1.5"
                                 >
                                     <span>🚀</span>
-                                    <span>تطبيق الفلاتر</span>
+                                    <span>{{ $t('common.apply_filters') }}</span>
                                 </button>
                             </div>
                         </div>

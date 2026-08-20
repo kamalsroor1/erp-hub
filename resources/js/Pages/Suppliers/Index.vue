@@ -274,12 +274,12 @@ const toggleActive = (s) => {
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-3">المورد / المسؤول</th>
-                                <th class="pb-3">الشركة / النشاط</th>
-                                <th class="pb-3">رقم الهاتف</th>
-                                <th class="pb-3">العنوان</th>
-                                <th class="pb-3 font-mono">المستحقات الحالية</th>
-                                <th class="pb-3 text-center">الإجراءات</th>
+                                <th class="pb-3">{{ $t('purchases.supplier') }}</th>
+                                <th class="pb-3">{{ $t('contacts.company_name') }}</th>
+                                <th class="pb-3">{{ $t('contacts.phone') }}</th>
+                                <th class="pb-3">{{ $t('contacts.address') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('contacts.current_balance') }}</th>
+                                <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">

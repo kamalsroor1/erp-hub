@@ -257,14 +257,14 @@ const getModuleBadge = (module) => {
                     <thead>
                         <tr class="border-b border-slate-800 text-slate-400 font-bold">
                             <th class="pb-3 font-mono">#</th>
-                            <th class="pb-3">التاريخ والوقت</th>
-                            <th class="pb-3">المستخدم</th>
-                            <th class="pb-3">الفرع</th>
-                            <th class="pb-3">القسم</th>
-                            <th class="pb-3">الإجراء</th>
-                            <th class="pb-3">الوصف والتفاصيل</th>
+                            <th class="pb-3">{{ $t('common.date') }} & {{ $t('common.time') }}</th>
+                            <th class="pb-3">{{ $t('common.user') }}</th>
+                            <th class="pb-3">{{ $t('common.store') }}</th>
+                            <th class="pb-3">{{ $t('inventory.category') }}</th>
+                            <th class="pb-3">{{ $t('common.actions') }}</th>
+                            <th class="pb-3">{{ $t('common.notes') }}</th>
                             <th class="pb-3">عنوان IP</th>
-                            <th class="pb-3 text-left">التفاصيل</th>
+                            <th class="pb-3 text-left">{{ $t('common.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-800/60 font-sans">

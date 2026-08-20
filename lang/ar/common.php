@@ -48,4 +48,7 @@ return [
     'cashier'            => 'الكاشير',
     'created_at'         => 'تاريخ الإنشاء',
     'main_store_default' => 'الفرع والمخزن الرئيسي',
+    'reset_filters'      => 'إعادة تعيين',
+    'apply_filters'      => 'تطبيق الفلاتر',
+    'active_count'       => 'نشط',
 ];

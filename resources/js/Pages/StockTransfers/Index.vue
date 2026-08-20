@@ -78,13 +78,13 @@ const openDetailsModal = (t) => {
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-3">رقم الإذن</th>
-                                <th class="pb-3">من مخزن / فرع</th>
-                                <th class="pb-3">إلى مخزن / عربية</th>
-                                <th class="pb-3">التاريخ</th>
-                                <th class="pb-3">الأصناف</th>
-                                <th class="pb-3 text-center">الحالة</th>
-                                <th class="pb-3 text-center">الإجراءات</th>
+                                <th class="pb-3">{{ $t('invoices.invoice_number') }}</th>
+                                <th class="pb-3">{{ $t('inventory.from_store') }}</th>
+                                <th class="pb-3">{{ $t('inventory.to_store') }}</th>
+                                <th class="pb-3">{{ $t('common.date') }}</th>
+                                <th class="pb-3">{{ $t('inventory.transfer_items') }}</th>
+                                <th class="pb-3 text-center">{{ $t('common.status') }}</th>
+                                <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">

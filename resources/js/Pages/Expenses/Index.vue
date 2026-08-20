@@ -249,13 +249,13 @@ const deleteExpense = (e) => {
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-3">رقم الإذن</th>
-                                <th class="pb-3">البيان / عنوان المصروف</th>
-                                <th class="pb-3">مركز التكلفة والتصنيف</th>
-                                <th class="pb-3">التاريخ</th>
-                                <th class="pb-3 font-mono">المبلغ</th>
-                                <th class="pb-3">طريقة الدفع</th>
-                                <th class="pb-3 text-center">الإجراءات</th>
+                                <th class="pb-3">{{ $t('invoices.invoice_number') }}</th>
+                                <th class="pb-3">{{ $t('expenses.title') }}</th>
+                                <th class="pb-3">{{ $t('expenses.cost_center') }} & {{ $t('expenses.category') }}</th>
+                                <th class="pb-3">{{ $t('common.date') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('contacts.voucher_amount') }}</th>
+                                <th class="pb-3">{{ $t('invoices.payment_method') }}</th>
+                                <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">

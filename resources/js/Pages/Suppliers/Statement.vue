@@ -211,13 +211,13 @@ const savePayment = () => {
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-3">التاريخ</th>
-                                <th class="pb-3">نوع العملية</th>
-                                <th class="pb-3">رقم السند / الفاتورة</th>
+                                <th class="pb-3">{{ $t('common.date') }}</th>
+                                <th class="pb-3">{{ $t('common.actions') }}</th>
+                                <th class="pb-3">{{ $t('invoices.invoice_number') }}</th>
                                 <th class="pb-3 font-mono text-white">دائن (+) [شراء]</th>
                                 <th class="pb-3 font-mono text-emerald-400">مدين (-) [سداد]</th>
-                                <th class="pb-3 font-mono text-amber-400">الرصيد بعد الحركة</th>
-                                <th class="pb-3">ملاحظات</th>
+                                <th class="pb-3 font-mono text-amber-400">{{ $t('contacts.current_balance') }}</th>
+                                <th class="pb-3">{{ $t('common.notes') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">

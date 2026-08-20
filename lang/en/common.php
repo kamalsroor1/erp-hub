@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'app_name'           => 'Sales, Inventory & Accounting ERP System',
@@ -48,4 +48,7 @@ return [
     'cashier'            => 'Cashier',
     'created_at'         => 'Created Date',
     'main_store_default' => 'Headquarters Store',
+    'reset_filters'      => 'Reset Filters',
+    'apply_filters'      => 'Apply Filters',
+    'active_count'       => 'Active',
 ];

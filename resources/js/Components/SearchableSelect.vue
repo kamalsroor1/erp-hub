@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 
 const props = defineProps({
@@ -148,7 +148,7 @@ onUnmounted(() => {
                     @click="clearSelection"
                     type="button"
                     class="w-5 h-5 rounded-full hover:bg-slate-800 text-slate-400 hover:text-rose-400 flex items-center justify-center text-[10px] transition"
-                    title="إلغاء التحديد"
+                    :title="$t('common.cancel')"
                 >
                     ✕
                 </button>
@@ -210,7 +210,7 @@ onUnmounted(() => {
 
                 <!-- Empty State -->
                 <div v-if="filteredOptions.length === 0" class="py-6 text-center text-slate-500 text-xs font-bold">
-                    لا توجد نتائج مطابقة
+                    {{ $t('common.no_data') }}
                 </div>
             </div>
         </div>

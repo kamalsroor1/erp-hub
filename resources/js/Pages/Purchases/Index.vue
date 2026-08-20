@@ -223,14 +223,14 @@ const cancelPurchase = (p) => {
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-3">رقم الفاتورة</th>
-                                <th class="pb-3">المورد / الشركة</th>
-                                <th class="pb-3">التاريخ</th>
-                                <th class="pb-3 font-mono">إجمالي التكلفة</th>
-                                <th class="pb-3 font-mono">المدفوع</th>
-                                <th class="pb-3 font-mono">المتبقي (آجل)</th>
-                                <th class="pb-3 text-center">الحالة</th>
-                                <th class="pb-3 text-center">الإجراءات</th>
+                                <th class="pb-3">{{ $t('invoices.invoice_number') }}</th>
+                                <th class="pb-3">{{ $t('purchases.supplier') }}</th>
+                                <th class="pb-3">{{ $t('common.date') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('purchases.total_cost') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('common.paid') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('common.remaining') }}</th>
+                                <th class="pb-3 text-center">{{ $t('common.status') }}</th>
+                                <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">

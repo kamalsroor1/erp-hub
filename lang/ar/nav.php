@@ -49,4 +49,13 @@ return [
     'storekeeper_role' => 'أمين مخزن',
     'user_role' => 'مستخدم',
     'profile' => 'الملف الشخصي',
+
+    'notifications_title' => 'مركز التنبيهات والإشعارات',
+    'live_notifications_center' => 'مركز التنبيهات المباشرة',
+    'notifications_count' => 'إشعار',
+    'no_urgent_notifications' => '✨ لا توجد تنبيهات عاجلة، كل شيء يسير بانتظام!',
+    'switch_to_light' => 'التبديل للوضع الفاتح',
+    'switch_to_dark' => 'التبديل للوضع الداكن',
+    'van_store' => 'عربة توزيع',
+    'branch_store' => 'فرع ومخزن',
 ];

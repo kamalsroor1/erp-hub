@@ -237,13 +237,13 @@ const getMovementBadge = (type) => {
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-3">التاريخ والوقت</th>
-                                <th class="pb-3">نوع الحركة</th>
-                                <th class="pb-3">رقم السند / الفاتورة</th>
-                                <th class="pb-3 font-mono">الكمية</th>
-                                <th class="pb-3 font-mono">الرصيد قبل</th>
-                                <th class="pb-3 font-mono">الرصيد بعد</th>
-                                <th class="pb-3">الفرع والمستخدم</th>
+                                <th class="pb-3">{{ $t('common.date') }} & {{ $t('common.time') }}</th>
+                                <th class="pb-3">{{ $t('common.status') }}</th>
+                                <th class="pb-3">{{ $t('invoices.invoice_number') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('common.quantity') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('inventory.current_stock') }} (قبل)</th>
+                                <th class="pb-3 font-mono">{{ $t('inventory.current_stock') }} (بعد)</th>
+                                <th class="pb-3">{{ $t('common.store') }} / {{ $t('common.user') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">

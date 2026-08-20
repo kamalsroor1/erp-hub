@@ -180,12 +180,12 @@ const deleteUser = (u) => {
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-bold">
-                                <th class="pb-3">الاسم والبيانات</th>
-                                <th class="pb-3">رقم الهاتف للدخول</th>
-                                <th class="pb-3">الدور والوظيفة</th>
-                                <th class="pb-3">الفرع / المخزن الافتراضي</th>
-                                <th class="pb-3 text-center">حالة الحساب</th>
-                                <th class="pb-3 text-center">الإجراءات</th>
+                                <th class="pb-3">{{ $t('auth.name') }}</th>
+                                <th class="pb-3">{{ $t('auth.phone') }}</th>
+                                <th class="pb-3">{{ $t('common.user') }}</th>
+                                <th class="pb-3">{{ $t('common.store') }}</th>
+                                <th class="pb-3 text-center">{{ $t('common.status') }}</th>
+                                <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">

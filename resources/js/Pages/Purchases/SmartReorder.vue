@@ -258,14 +258,14 @@ const createPurchaseFromSelected = () => {
                                         class="rounded accent-amber-500 w-4 h-4 cursor-pointer"
                                     >
                                 </th>
-                                <th class="pb-3">الصنف / الخامة</th>
-                                <th class="pb-3 font-mono">الرصيد الحالي</th>
+                                <th class="pb-3">{{ $t('inventory.item_name') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('inventory.current_stock') }}</th>
                                 <th class="pb-3 font-mono">المبيعات ({{ analysisDays }} يوم)</th>
-                                <th class="pb-3 font-mono">الاستهلاك اليومي</th>
+                                <th class="pb-3 font-mono">{{ $t('purchases.daily_usage') }}</th>
                                 <th class="pb-3 font-mono">أيام كفاية المخزون</th>
-                                <th class="pb-3 font-mono text-amber-400">الكمية المقترحة للطلب</th>
-                                <th class="pb-3 font-mono">التكلفة التقديرية</th>
-                                <th class="pb-3 text-center">مستوى الخطورة</th>
+                                <th class="pb-3 font-mono text-amber-400">{{ $t('purchases.suggested_qty') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('purchases.estimated_cost') }}</th>
+                                <th class="pb-3 text-center">{{ $t('common.status') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 font-sans">
