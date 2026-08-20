@@ -415,6 +415,16 @@ const getUserRoleLabel = computed(() => {
                         </div>
                     </div>
 
+                    <!-- Theme Toggle Switch Button -->
+                    <button
+                        @click="toggleTheme"
+                        type="button"
+                        class="w-9 h-9 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-slate-300 flex items-center justify-center transition cursor-pointer shrink-0 shadow-sm hover:text-amber-400"
+                        :title="currentTheme === 'dark' ? 'التحويل للوضع النهاري (Light)' : 'التحويل للوضع الليلي (Dark)'"
+                    >
+                        <span class="text-sm">{{ currentTheme === 'dark' ? '☀️' : '🌙' }}</span>
+                    </button>
+
                     <!-- User Profile & Dropdown -->
                     <div class="relative" @click.stop>
                         <button
