@@ -3,8 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "concurrently --kill-others-on-fail --prefix-colors \"bgBlue.bold,bgGreen.bold,bgMagenta.bold\" --names \"SERVER,FRONTEND,MOBILE\" \"npm:serve:backend\" \"npm:dev:backend\" \"npm:dev:mobile\"",
+    "serve:backend": "cd backend && php artisan serve --port=8000",
     "dev:backend": "npm --prefix backend run dev",
     "dev:mobile": "npm --prefix mobile run dev",
+    "build": "concurrently \"npm:build:backend\" \"npm:build:mobile\"",
     "build:backend": "npm --prefix backend run build",
     "build:mobile": "npm --prefix mobile run build",
     "test:fresh": "playwright test tests/e2e/specs/unified_fresh_journey.spec.js --headed --project=Mobile-Pixel-7",
@@ -21,6 +24,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
+    "concurrently": "^9.1.2",
     "puppeteer": "^25.7.0"
   }
 }

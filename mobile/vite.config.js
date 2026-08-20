@@ -25,4 +25,7 @@ export default defineConfig({
             '@': path.resolve(import.meta.dirname, './resources/js'),
         },
     },
+    server: {
+        port: 5174,
+    },
 });
