@@ -167,8 +167,8 @@ const getUserRoleLabel = computed(() => {
     <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-white" dir="rtl">
         <!-- Top App Bar -->
         <header class="h-16 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40 shrink-0 shadow-sm">
-            <!-- Right Section (in RTL) -->
-            <div class="flex items-center gap-3">
+            <!-- Right Section (in RTL: Start) -->
+            <div class="flex items-center gap-2 sm:gap-3">
                 <!-- Mobile Hamburger -->
                 <button
                     @click="isSidebarOpen = true"
@@ -190,59 +190,51 @@ const getUserRoleLabel = computed(() => {
                     </svg>
                 </button>
 
-                <!-- Live Arabic Date & Clock -->
-                <div class="text-xs font-bold text-slate-400 hidden sm:flex items-center gap-2 font-tajawal">
-                    <span>📅 {{ currentDate }}</span>
-                    <span class="text-slate-600">|</span>
+                <!-- Live Arabic Date & Clock (Clean compact chip) -->
+                <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-xs font-bold font-tajawal text-slate-300">
+                    <span class="text-slate-400 hidden xl:inline">{{ currentDate }}</span>
+                    <span class="text-slate-600 hidden xl:inline">|</span>
                     <span class="text-amber-400 font-mono font-bold">{{ currentTime }}</span>
-                </div>
-
-                <!-- Active Store Status Badge -->
-                <div class="hidden md:flex items-center gap-2 pr-2 border-r border-slate-800">
-                    <span class="px-2.5 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>{{ $t('nav.store_open') }}</span>
-                    </span>
-                    <span class="px-2.5 py-1 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold">
-                        🏬 {{ activeStore?.name || $t('common.main_store_default') }}
-                    </span>
                 </div>
             </div>
 
-            <!-- Left Section (in RTL) -->
-            <div class="flex items-center gap-2 sm:gap-3">
-                <!-- Shift Indicator -->
-                <Link
-                    href="/daily-journal"
-                    class="h-9 px-3 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition"
-                    :class="activeShift ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20' : 'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20'"
-                >
-                    <span class="w-2 h-2 rounded-full" :class="activeShift ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'"></span>
-                    <span class="hidden sm:inline font-tajawal">
-                        {{ activeShift ? $t('nav.active_shift') : $t('nav.closed_shift') }}
-                    </span>
-                </Link>
-
-                <!-- Store Switcher Button -->
+            <!-- Left Section (in RTL: End Actions) -->
+            <div class="flex items-center gap-2 sm:gap-2.5">
+                <!-- Single Interactive Store Switcher Button -->
                 <button
                     @click="showStoreModal = true"
                     type="button"
-                    class="h-9 px-3 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-slate-200 flex items-center gap-1.5 transition cursor-pointer font-tajawal"
+                    class="h-9 px-3 rounded-xl bg-slate-800/90 hover:bg-slate-700/80 border border-slate-700 text-xs font-bold text-slate-200 flex items-center gap-2 transition cursor-pointer font-tajawal shadow-sm"
+                    :title="$t('nav.switch_store') || 'تبديل الفرع'"
                 >
-                    <span>🏬</span>
-                    <span class="hidden md:inline">{{ activeStore?.name || $t('common.main_store_default') }}</span>
-                    <span class="text-[10px] text-slate-400">▼</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                    <span class="text-sm">🏬</span>
+                    <span class="max-w-[130px] sm:max-w-[170px] truncate text-start">{{ activeStore?.name || $t('common.main_store_default') }}</span>
+                    <span class="text-[9px] text-slate-400 shrink-0">▼</span>
                 </button>
+
+                <!-- Shift Status Indicator -->
+                <Link
+                    href="/daily-journal"
+                    class="h-9 px-2.5 sm:px-3 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition font-tajawal shadow-sm shrink-0"
+                    :class="activeShift ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20' : 'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20'"
+                    :title="activeShift ? 'الوردية مفتوحة ونشطة' : 'لا توجد وردية مفتوحة حالياً'"
+                >
+                    <span class="w-2 h-2 rounded-full shrink-0" :class="activeShift ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'"></span>
+                    <span class="hidden md:inline">
+                        {{ activeShift ? $t('nav.active_shift') : $t('nav.closed_shift') }}
+                    </span>
+                </Link>
 
                 <!-- Quick POS Fast Action Button -->
                 <FeatureGate feature="pos.access">
                     <Link
                         href="/pos"
-                        class="h-9 px-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-emerald-500/20 transition transform active:scale-95 cursor-pointer font-tajawal"
+                        class="h-9 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-emerald-500/20 transition transform active:scale-95 cursor-pointer font-tajawal shrink-0"
                     >
                         <span>⚡</span>
-                        <span class="hidden md:inline">{{ $t('nav.pos_fast') }}</span>
-                        <span class="px-1.5 py-0.2 rounded bg-slate-950/25 text-white text-[10px] font-mono">F2</span>
+                        <span class="hidden sm:inline">{{ $t('nav.pos_fast') }}</span>
+                        <span class="px-1.5 py-0.5 rounded bg-slate-950/25 text-white text-[10px] font-mono">F2</span>
                     </Link>
                 </FeatureGate>
 
