@@ -256,7 +256,7 @@ const getUserRoleLabel = computed(() => {
                     <Link
                         href="/"
                         class="rounded-2xl bg-white dark:bg-slate-800 p-1 flex items-center justify-center shadow-xs border border-slate-200 dark:border-slate-700/80 shrink-0 transition-transform duration-200 hover:scale-105 group"
-                        :class="isSidebarCollapsed ? 'w-12 h-12' : 'w-14 h-14'"
+                        :class="isSidebarCollapsed ? 'w-14 h-14 lg:w-12 lg:h-12' : 'w-14 h-14'"
                         :title="tenant?.name || 'سرور كوفي'"
                     >
                         <!-- Light Mode Logo -->
@@ -264,7 +264,10 @@ const getUserRoleLabel = computed(() => {
                         <!-- Dark Mode Logo -->
                         <img :src="logoDarkSrc" alt="Logo" class="w-full h-full object-contain filter drop-shadow-xs group-hover:brightness-105 hidden dark:block">
                     </Link>
-                    <div v-if="!isSidebarCollapsed" class="truncate min-w-0">
+                    <div
+                        class="truncate min-w-0"
+                        :class="{ 'lg:hidden': isSidebarCollapsed }"
+                    >
                         <h1 class="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white font-tajawal line-clamp-1 leading-snug">
                             {{ tenant?.name || 'سرور كوفي' }}
                         </h1>
@@ -290,7 +293,7 @@ const getUserRoleLabel = computed(() => {
                         :title="$t('nav.new_sale_invoice_btn')"
                     >
                         <Plus class="w-4.5 h-4.5 shrink-0 transition-transform group-hover:rotate-90 duration-300" />
-                        <span v-if="!isSidebarCollapsed" class="truncate text-xs font-black">{{ $t('nav.new_sale_invoice_btn') }}</span>
+                        <span :class="{ 'lg:hidden': isSidebarCollapsed }" class="truncate text-xs font-black">{{ $t('nav.new_sale_invoice_btn') }}</span>
                     </Link>
                 </div>
             </FeatureGate>
@@ -300,12 +303,13 @@ const getUserRoleLabel = computed(() => {
                 <div v-for="(group, gIdx) in navigationGroups" :key="gIdx" class="space-y-1">
                     <!-- Group Header -->
                     <div
-                        v-if="group.title && !isSidebarCollapsed"
+                        v-if="group.title"
                         class="pt-2 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 truncate"
+                        :class="{ 'lg:hidden': isSidebarCollapsed }"
                     >
                         {{ group.title }}
                     </div>
-                    <div v-if="group.title && isSidebarCollapsed" class="my-1.5 border-t border-slate-200 dark:border-slate-800 mx-1"></div>
+                    <div v-if="group.title && isSidebarCollapsed" class="hidden lg:block my-1.5 border-t border-slate-200 dark:border-slate-800 mx-1"></div>
 
                     <!-- Group Items -->
                     <div class="space-y-1">
@@ -319,12 +323,12 @@ const getUserRoleLabel = computed(() => {
                                         item.active
                                             ? 'bg-theme-light text-theme-primary border border-theme-light shadow-xs font-black'
                                             : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-white',
-                                        isSidebarCollapsed ? 'justify-center px-2' : ''
+                                        isSidebarCollapsed ? 'lg:justify-center lg:px-2' : ''
                                     ]"
                                     :title="item.name"
                                 >
                                     <component :is="item.icon" class="w-4.5 h-4.5 shrink-0 transition-transform group-hover:scale-110" />
-                                    <span v-if="!isSidebarCollapsed" class="truncate flex-1">{{ item.name }}</span>
+                                    <span :class="{ 'lg:hidden': isSidebarCollapsed }" class="truncate flex-1">{{ item.name }}</span>
                                 </Link>
                             </FeatureGate>
                         </template>
@@ -337,11 +341,11 @@ const getUserRoleLabel = computed(() => {
                 <a
                     href="/admin/super"
                     class="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/60 dark:hover:bg-purple-900 border border-purple-200 dark:border-purple-800/80 text-purple-700 dark:text-purple-300 text-xs font-bold transition font-tajawal shadow-xs"
-                    :class="isSidebarCollapsed ? 'justify-center px-2' : ''"
+                    :class="isSidebarCollapsed ? 'lg:justify-center lg:px-2' : ''"
                     :title="$t('nav.super_admin')"
                 >
                     <Crown class="w-4 h-4 shrink-0 text-purple-600 dark:text-purple-400" />
-                    <span v-if="!isSidebarCollapsed" class="truncate">{{ $t('nav.super_admin') }}</span>
+                    <span :class="{ 'lg:hidden': isSidebarCollapsed }" class="truncate">{{ $t('nav.super_admin') }}</span>
                 </a>
             </div>
         </aside>
