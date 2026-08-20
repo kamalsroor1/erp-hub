@@ -1,9 +1,10 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { Link, usePage, router } from '@inertiajs/vue3';
 import FeatureGate from '@/Components/FeatureGate.vue';
 import { trans } from '@/helpers/trans';
 import { useTheme } from '@/Composables/useTheme';
+import { notifySuccess, notifyError } from '@/helpers/alert';
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user || {});
@@ -78,7 +79,20 @@ onMounted(() => {
     updateClock();
     timerInterval = setInterval(updateClock, 1000);
     window.addEventListener('keydown', handleKeydown);
+
+    // Initial Flash Check
+    if (page.props.flash?.success) notifySuccess(page.props.flash.success);
+    if (page.props.flash?.error) notifyError(page.props.flash.error);
 });
+
+watch(() => page.props.flash, (newFlash) => {
+    if (newFlash?.success) {
+        notifySuccess(newFlash.success);
+    }
+    if (newFlash?.error) {
+        notifyError(newFlash.error);
+    }
+}, { deep: true });
 
 onUnmounted(() => {
     if (timerInterval) clearInterval(timerInterval);
