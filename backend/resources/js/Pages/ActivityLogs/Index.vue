@@ -107,9 +107,9 @@ const getModuleBadge = (module) => {
     <AppLayout>
         <div class="space-y-6 font-tajawal">
             <!-- Header Banner -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-theme-light border border-theme-primary text-theme-primary flex items-center justify-center text-2xl font-bold">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-theme-light border border-theme-primary text-theme-primary flex items-center justify-center text-2xl font-bold shrink-0">
                         🛡️
                     </div>
                     <div>
@@ -122,12 +122,12 @@ const getModuleBadge = (module) => {
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2.5 w-full sm:w-auto">
+                <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
                     <!-- Export CSV -->
                     <button
                         @click="exportCsv"
                         type="button"
-                        class="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5 cursor-pointer"
+                        class="flex-1 sm:flex-none h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 transition flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer shadow-xs"
                     >
                         <span>📥</span>
                         <span>{{ $t('activity.export_excel') }}</span>
@@ -137,7 +137,7 @@ const getModuleBadge = (module) => {
                     <button
                         @click="isFilterOpen = true"
                         type="button"
-                        class="px-4 py-2.5 rounded-2xl btn-primary-theme font-black text-xs transition transform active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                        class="flex-1 sm:flex-none h-11 px-5 rounded-2xl btn-primary-theme font-black text-xs transition transform active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer shadow-theme-primary"
                     >
                         <span>⚡</span>
                         <span>{{ $t('activity.advanced_filter') }}</span>
@@ -145,34 +145,34 @@ const getModuleBadge = (module) => {
                 </div>
             </div>
 
-            <!-- 4 KPI Summary Cards -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-1 shadow-xs">
+            <!-- 4 KPI Summary Cards (Bento 2x2 on Mobile) -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 font-tajawal">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 space-y-1 shadow-xs">
                     <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">{{ $t('activity.today_total') }}</span>
-                    <div class="text-xl font-black font-mono text-slate-900 dark:text-white">{{ stats.today_total || 0 }}</div>
+                    <div class="text-xl sm:text-2xl font-black font-mono text-slate-900 dark:text-white">{{ stats.today_total || 0 }}</div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-1 shadow-xs">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 space-y-1 shadow-xs">
                     <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">{{ $t('activity.today_critical') }}</span>
-                    <div class="text-xl font-black font-mono text-rose-600 dark:text-rose-400">{{ stats.today_critical || 0 }}</div>
+                    <div class="text-xl sm:text-2xl font-black font-mono text-rose-600 dark:text-rose-400">{{ stats.today_critical || 0 }}</div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-1 shadow-xs">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 space-y-1 shadow-xs">
                     <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">{{ $t('activity.today_users') }}</span>
-                    <div class="text-xl font-black font-mono text-emerald-600 dark:text-emerald-400">{{ stats.today_users || 0 }}</div>
+                    <div class="text-xl sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">{{ stats.today_users || 0 }}</div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-1 shadow-xs">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4 space-y-1 shadow-xs">
                     <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">{{ $t('activity.today_stores') }}</span>
-                    <div class="text-xl font-black font-mono text-theme-primary">{{ stats.today_stores || 0 }}</div>
+                    <div class="text-xl sm:text-2xl font-black font-mono text-theme-primary">{{ stats.today_stores || 0 }}</div>
                 </div>
             </div>
 
             <!-- Quick Presets Bar & View Switcher -->
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 rounded-2xl shadow-xs">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 sm:p-3 rounded-2xl shadow-xs font-tajawal">
                 <!-- Date Presets -->
                 <div class="flex flex-wrap items-center gap-1.5 text-xs">
-                    <span class="text-slate-500 dark:text-slate-400 font-bold text-[11px] px-2">{{ $t('activity.period') }}</span>
+                    <span class="text-slate-500 dark:text-slate-400 font-bold text-[11px] px-1">{{ $t('activity.period') }}:</span>
                     <button
                         v-for="p in [
                             { id: 'all', label: $t('common.all') || 'الكل' },
@@ -182,7 +182,7 @@ const getModuleBadge = (module) => {
                         ]"
                         :key="p.id"
                         @click="setPreset(p.id)"
-                        class="px-3 py-1 rounded-xl font-bold transition cursor-pointer text-xs"
+                        class="h-9 px-3 rounded-xl font-bold transition active:scale-95 cursor-pointer text-xs"
                         :class="filterForm.preset === p.id ? 'tab-theme-active shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'"
                     >
                         {{ p.label }}
@@ -193,7 +193,7 @@ const getModuleBadge = (module) => {
                 <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
                     <button
                         @click="viewMode = 'timeline'"
-                        class="px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1"
+                        class="flex-1 sm:flex-none h-9 px-3 rounded-lg text-xs font-bold transition active:scale-95 cursor-pointer flex items-center justify-center gap-1"
                         :class="viewMode === 'timeline' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs' : 'text-slate-500 dark:text-slate-400'"
                     >
                         <span>⏱️</span>
@@ -201,7 +201,7 @@ const getModuleBadge = (module) => {
                     </button>
                     <button
                         @click="viewMode = 'table'"
-                        class="px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1"
+                        class="flex-1 sm:flex-none h-9 px-3 rounded-lg text-xs font-bold transition active:scale-95 cursor-pointer flex items-center justify-center gap-1"
                         :class="viewMode === 'table' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs' : 'text-slate-500 dark:text-slate-400'"
                     >
                         <span>📋</span>
@@ -211,20 +211,20 @@ const getModuleBadge = (module) => {
             </div>
 
             <!-- TIMELINE VIEW -->
-            <div v-if="viewMode === 'timeline'" class="space-y-3">
+            <div v-if="viewMode === 'timeline'" class="space-y-3 font-tajawal">
                 <div
                     v-for="log in logs.data"
                     :key="log.id"
                     @click="selectedLog = log"
-                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-theme-primary rounded-3xl p-4.5 transition cursor-pointer shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3 group"
+                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-theme-primary rounded-3xl p-4 sm:p-5 transition cursor-pointer shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3 group active:scale-99"
                 >
-                    <div class="flex items-start gap-3.5">
-                        <div class="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-lg shrink-0 mt-0.5 group-hover:border-theme-primary">
+                    <div class="flex items-start gap-3 sm:gap-3.5">
+                        <div class="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-lg shrink-0 mt-0.5 group-hover:border-theme-primary shadow-xs">
                             🛡️
                         </div>
 
                         <div class="space-y-1">
-                            <div class="flex flex-wrap items-center gap-2">
+                            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
                                 <span class="px-2 py-0.5 rounded-full text-[10px] font-black" :class="getActionBadge(log.action).class">
                                     {{ getActionBadge(log.action).label }}
                                 </span>
@@ -241,7 +241,7 @@ const getModuleBadge = (module) => {
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between md:justify-end gap-3 text-[11px] text-slate-500 dark:text-slate-400 font-mono shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-200 dark:border-slate-800">
+                    <div class="flex items-center justify-between md:justify-end gap-3 text-[11px] text-slate-500 dark:text-slate-400 font-mono shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-slate-800">
                         <span class="bg-slate-100 dark:bg-slate-950 px-2 py-0.5 rounded-lg border border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-300">{{ log.ip_address || '127.0.0.1' }}</span>
                         <span>{{ log.time_ago }} ({{ log.created_at }})</span>
                     </div>
@@ -252,51 +252,89 @@ const getModuleBadge = (module) => {
                 </div>
             </div>
 
-            <!-- TABLE VIEW -->
-            <div v-else class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 overflow-x-auto shadow-xs">
-                <table class="w-full text-right text-xs">
-                    <thead>
-                        <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
-                            <th class="pb-3 font-mono">#</th>
-                            <th class="pb-3">{{ $t('common.date') }} & {{ $t('common.time') }}</th>
-                            <th class="pb-3">{{ $t('common.user') }}</th>
-                            <th class="pb-3">{{ $t('common.store') }}</th>
-                            <th class="pb-3">{{ $t('inventory.category') }}</th>
-                            <th class="pb-3">{{ $t('common.actions') }}</th>
-                            <th class="pb-3">{{ $t('common.notes') }}</th>
-                            <th class="pb-3">{{ $t('activity.ip_address') }}</th>
-                            <th class="pb-3 text-left">{{ $t('common.actions') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
-                        <tr v-for="log in logs.data" :key="log.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
-                            <td class="py-3 font-mono text-slate-400">{{ log.id }}</td>
-                            <td class="py-3 font-mono text-slate-600 dark:text-slate-300">{{ log.created_at }}</td>
-                            <td class="py-3 font-bold text-slate-900 dark:text-white font-tajawal">{{ log.user_name }}</td>
-                            <td class="py-3 text-slate-600 dark:text-slate-300 font-tajawal">{{ log.store_name }}</td>
-                            <td class="py-3 font-tajawal">
-                                <span class="px-2 py-0.5 rounded-full text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                                    {{ getModuleBadge(log.module) }}
-                                </span>
-                            </td>
-                            <td class="py-3 font-tajawal">
+            <!-- TABLE VIEW & MOBILE CARDS -->
+            <div v-else class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xs font-tajawal">
+                <!-- Desktop Table -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="w-full text-right text-xs">
+                        <thead>
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
+                                <th class="pb-3 font-mono">#</th>
+                                <th class="pb-3">{{ $t('common.date') }} & {{ $t('common.time') }}</th>
+                                <th class="pb-3">{{ $t('common.user') }}</th>
+                                <th class="pb-3">{{ $t('common.store') }}</th>
+                                <th class="pb-3">{{ $t('inventory.category') }}</th>
+                                <th class="pb-3">{{ $t('common.actions') }}</th>
+                                <th class="pb-3">{{ $t('common.notes') }}</th>
+                                <th class="pb-3">{{ $t('activity.ip_address') }}</th>
+                                <th class="pb-3 text-left">{{ $t('common.actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
+                            <tr v-for="log in logs.data" :key="log.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+                                <td class="py-3 font-mono text-slate-400">{{ log.id }}</td>
+                                <td class="py-3 font-mono text-slate-600 dark:text-slate-300">{{ log.created_at }}</td>
+                                <td class="py-3 font-bold text-slate-900 dark:text-white font-tajawal">{{ log.user_name }}</td>
+                                <td class="py-3 text-slate-600 dark:text-slate-300 font-tajawal">{{ log.store_name }}</td>
+                                <td class="py-3 font-tajawal">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                                        {{ getModuleBadge(log.module) }}
+                                    </span>
+                                </td>
+                                <td class="py-3 font-tajawal">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black" :class="getActionBadge(log.action).class">
+                                        {{ getActionBadge(log.action).label }}
+                                    </span>
+                                </td>
+                                <td class="py-3 text-slate-700 dark:text-slate-200 max-w-xs truncate">{{ log.description }}</td>
+                                <td class="py-3 font-mono text-slate-500 dark:text-slate-400">{{ log.ip_address || '-' }}</td>
+                                <td class="py-3 text-left font-tajawal">
+                                    <button
+                                        @click="selectedLog = log"
+                                        class="h-8 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-theme-primary font-bold text-[11px] cursor-pointer transition active:scale-95"
+                                    >
+                                        {{ $t('activity.inspect_btn') }}
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Cards -->
+                <div class="md:hidden space-y-3">
+                    <div
+                        v-for="log in logs.data"
+                        :key="log.id"
+                        class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-2.5 shadow-xs"
+                    >
+                        <div class="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+                            <div class="flex items-center gap-2">
                                 <span class="px-2 py-0.5 rounded-full text-[10px] font-black" :class="getActionBadge(log.action).class">
                                     {{ getActionBadge(log.action).label }}
                                 </span>
-                            </td>
-                            <td class="py-3 text-slate-700 dark:text-slate-200 max-w-xs truncate">{{ log.description }}</td>
-                            <td class="py-3 font-mono text-slate-500 dark:text-slate-400">{{ log.ip_address || '-' }}</td>
-                            <td class="py-3 text-left font-tajawal">
-                                <button
-                                    @click="selectedLog = log"
-                                    class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-theme-primary font-bold text-[11px] cursor-pointer"
-                                >
-                                    {{ $t('activity.inspect_btn') }}
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                                    {{ getModuleBadge(log.module) }}
+                                </span>
+                            </div>
+                            <span class="text-[10px] font-mono text-slate-400">{{ log.time_ago }}</span>
+                        </div>
+
+                        <p class="text-xs text-slate-800 dark:text-slate-200 font-sans leading-relaxed">
+                            {{ log.description }}
+                        </p>
+
+                        <div class="flex items-center justify-between text-[11px] pt-1.5 border-t border-slate-200 dark:border-slate-800">
+                            <span class="font-bold text-slate-900 dark:text-white">{{ log.user_name }} • <span class="text-slate-500 font-normal">{{ log.store_name }}</span></span>
+                            <button
+                                @click="selectedLog = log"
+                                class="h-8 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-theme-primary font-black text-xs cursor-pointer active:scale-95 shadow-xs"
+                            >
+                                {{ $t('activity.inspect_btn') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 <div v-if="logs.data.length === 0" class="py-12 text-center text-slate-500 text-xs font-bold">
                     {{ $t('activity.no_logs_data') }}
@@ -304,15 +342,15 @@ const getModuleBadge = (module) => {
             </div>
 
             <!-- Pagination -->
-            <div v-if="logs.links?.length > 3" class="flex justify-center gap-1.5 pt-2 font-sans">
+            <div v-if="logs.links?.length > 3" class="flex flex-wrap justify-center gap-1.5 pt-2 font-sans">
                 <button
                     v-for="(link, lIdx) in logs.links"
                     :key="lIdx"
                     :disabled="!link.url || link.active"
                     @click="router.visit(link.url)"
                     v-html="link.label"
-                    class="px-3.5 py-2 rounded-xl text-xs font-bold transition font-mono"
-                    :class="link.active ? 'tab-theme-active' : (link.url ? 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' : 'opacity-40 text-slate-400 dark:text-slate-600')"
+                    class="h-9 min-w-[36px] px-3 rounded-xl text-xs font-bold transition font-mono flex items-center justify-center active:scale-95"
+                    :class="link.active ? 'tab-theme-active' : (link.url ? 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 shadow-xs' : 'opacity-40 text-slate-400 dark:text-slate-600')"
                 ></button>
             </div>
 
@@ -323,14 +361,14 @@ const getModuleBadge = (module) => {
                 @apply="applyFilters"
                 @reset="resetFilters"
             >
-                <div class="space-y-4">
+                <div class="space-y-4 font-tajawal">
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('activity.search_filter_desc') }}</label>
                         <input
                             v-model="filterForm.search"
                             type="text"
                             :placeholder="$t('activity.search_filter_placeholder')"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
+                            class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
                         >
                     </div>
 
@@ -338,7 +376,7 @@ const getModuleBadge = (module) => {
                         <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('activity.module_filter') }}</label>
                         <select
                             v-model="filterForm.module"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
+                            class="w-full h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none shadow-inner"
                         >
                             <option value="all">{{ $t('activity.all_modules') }}</option>
                             <option v-for="(lbl, mod) in modules_list" :key="mod" :value="mod">{{ lbl }}</option>
@@ -349,7 +387,7 @@ const getModuleBadge = (module) => {
                         <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('activity.action_filter') }}</label>
                         <select
                             v-model="filterForm.action"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
+                            class="w-full h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none shadow-inner"
                         >
                             <option value="all">{{ $t('activity.all_actions') }}</option>
                             <option value="created">{{ $t('activity.action_created') }}</option>
@@ -365,7 +403,7 @@ const getModuleBadge = (module) => {
                         <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('activity.user_filter') }}</label>
                         <select
                             v-model="filterForm.user_id"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
+                            class="w-full h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none shadow-inner"
                         >
                             <option value="all">{{ $t('activity.all_users') }}</option>
                             <option v-for="u in users" :key="u.id" :value="u.id">{{ u.name }} ({{ u.phone }})</option>
@@ -376,7 +414,7 @@ const getModuleBadge = (module) => {
                         <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('activity.store_filter') }}</label>
                         <select
                             v-model="filterForm.store_id"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
+                            class="w-full h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none shadow-inner"
                         >
                             <option value="all">{{ $t('activity.all_stores') }}</option>
                             <option v-for="s in stores" :key="s.id" :value="s.id">{{ s.name }}</option>
@@ -391,21 +429,21 @@ const getModuleBadge = (module) => {
             </FilterDrawer>
 
             <!-- Inspection Modal -->
-            <div v-if="selectedLog" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-xl w-full p-6 space-y-4 shadow-2xl text-slate-900 dark:text-white">
+            <div v-if="selectedLog" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs font-tajawal" dir="rtl">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-xl w-full p-5 sm:p-6 space-y-4 shadow-2xl text-slate-900 dark:text-white">
                     <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                         <h3 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
                             <span>🔍 {{ $t('activity.log_details_title', { id: selectedLog.id }) }}</span>
                         </h3>
-                        <button @click="selectedLog = null" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs dark:hover:text-white transition">✕</button>
+                        <button @click="selectedLog = null" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs hover:text-slate-900 dark:hover:text-white transition active:scale-90 flex items-center justify-center cursor-pointer">✕</button>
                     </div>
 
                     <div class="space-y-3 text-xs">
                         <div class="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
-                            <div><span class="text-slate-500 dark:text-slate-400">{{ $t('common.user') }}:</span> <strong class="text-slate-900 dark:text-white">{{ selectedLog.user_name }}</strong></div>
-                            <div><span class="text-slate-500 dark:text-slate-400">{{ $t('common.store') }}:</span> <strong class="text-slate-900 dark:text-white">{{ selectedLog.store_name }}</strong></div>
-                            <div><span class="text-slate-500 dark:text-slate-400">{{ $t('common.date') }}:</span> <span class="text-slate-700 dark:text-slate-300 font-mono">{{ selectedLog.created_at }}</span></div>
-                            <div><span class="text-slate-500 dark:text-slate-400">{{ $t('activity.ip_address') }}:</span> <span class="text-slate-700 dark:text-slate-300 font-mono">{{ selectedLog.ip_address || '-' }}</span></div>
+                            <div><span class="text-slate-500 dark:text-slate-400">{{ $t('common.user') }}:</span> <strong class="text-slate-900 dark:text-white block mt-0.5">{{ selectedLog.user_name }}</strong></div>
+                            <div><span class="text-slate-500 dark:text-slate-400">{{ $t('common.store') }}:</span> <strong class="text-slate-900 dark:text-white block mt-0.5">{{ selectedLog.store_name }}</strong></div>
+                            <div><span class="text-slate-500 dark:text-slate-400">{{ $t('common.date') }}:</span> <span class="text-slate-700 dark:text-slate-300 font-mono block mt-0.5">{{ selectedLog.created_at }}</span></div>
+                            <div><span class="text-slate-500 dark:text-slate-400">{{ $t('activity.ip_address') }}:</span> <span class="text-slate-700 dark:text-slate-300 font-mono block mt-0.5">{{ selectedLog.ip_address || '-' }}</span></div>
                         </div>
 
                         <div>
@@ -431,7 +469,7 @@ const getModuleBadge = (module) => {
                     <div class="flex justify-end pt-2">
                         <button
                             @click="selectedLog = null"
-                            class="px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer transition border border-slate-200 dark:border-slate-700"
+                            class="h-11 px-6 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer transition active:scale-95 border border-slate-200 dark:border-slate-700 shadow-xs"
                         >
                             {{ $t('common.close') }}
                         </button>

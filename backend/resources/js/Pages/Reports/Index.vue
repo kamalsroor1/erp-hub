@@ -105,9 +105,9 @@ const printReport = () => {
     <AppLayout>
         <div class="space-y-6 font-tajawal">
             <!-- Header Banner -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-theme-light border-theme-light text-theme-primary flex items-center justify-center text-2xl font-bold">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-theme-light border border-theme-light text-theme-primary flex items-center justify-center text-2xl font-bold shrink-0">
                         📊
                     </div>
                     <div>
@@ -120,11 +120,11 @@ const printReport = () => {
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2.5">
+                <div class="flex items-center gap-2.5 w-full md:w-auto">
                     <button
                         @click="printReport"
                         type="button"
-                        class="h-11 px-5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 font-bold text-xs flex items-center gap-2 transition cursor-pointer"
+                        class="w-full md:w-auto h-11 px-5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-xs"
                     >
                         <span>🖨️</span>
                         <span>{{ $t('reports.print_full_report') }}</span>
@@ -133,8 +133,8 @@ const printReport = () => {
             </div>
 
             <!-- Global Filter Bar -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-xs space-y-3">
-                <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-xs space-y-3 font-tajawal">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <!-- Period Buttons -->
                     <div class="flex flex-wrap items-center gap-1.5 text-xs">
                         <span class="text-slate-500 dark:text-slate-400 font-bold text-[11px] px-1">{{ $t('common.date') }}:</span>
@@ -149,7 +149,7 @@ const printReport = () => {
                             :key="p.id"
                             @click="setPeriod(p.id)"
                             type="button"
-                            class="px-3 py-1.5 rounded-xl font-bold transition cursor-pointer text-xs"
+                            class="h-9 px-3 rounded-xl font-bold transition active:scale-95 cursor-pointer text-xs"
                             :class="filterForm.period === p.id ? 'tab-theme-active' : 'bg-slate-100 text-slate-600 border border-slate-200 hover:text-slate-900 dark:bg-slate-950 dark:text-slate-300 dark:border-slate-800 dark:hover:text-white'"
                         >
                             {{ p.label }}
@@ -162,7 +162,7 @@ const printReport = () => {
                         <select
                             v-model="filterForm.store_id"
                             @change="applyFilters"
-                            class="px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
+                            class="w-full sm:w-auto h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none shadow-inner"
                         >
                             <option value="all">{{ $t('common.all_stores') }}</option>
                             <option v-for="s in stores" :key="s.id" :value="s.id">{{ s.name }}</option>
@@ -178,16 +178,17 @@ const printReport = () => {
                         <button
                             @click="applyFilters"
                             type="button"
-                            class="w-full h-10 rounded-xl btn-primary-theme font-bold text-xs transition cursor-pointer"
+                            class="w-full h-11 rounded-2xl btn-primary-theme font-bold text-xs transition active:scale-95 cursor-pointer shadow-theme-primary flex items-center justify-center gap-1.5"
                         >
-                            {{ $t('reports.refresh_report') }}
+                            <span>🔄</span>
+                            <span>{{ $t('reports.refresh_report') }}</span>
                         </button>
                     </div>
                 </div>
             </div>
 
             <!-- 7 Navigation Tabs -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 bg-slate-100 dark:bg-slate-950 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs">
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1.5 sm:gap-2 bg-slate-100 dark:bg-slate-950 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs font-tajawal">
                 <button
                     v-for="tab in [
                         { id: 'sales', label: $t('reports.tab_sales'), icon: '💵' },
@@ -201,61 +202,61 @@ const printReport = () => {
                     :key="tab.id"
                     @click="switchTab(tab.id)"
                     type="button"
-                    class="py-2.5 px-2 rounded-xl font-bold transition cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-1.5 text-center"
+                    class="py-2.5 px-2 rounded-xl font-bold transition active:scale-95 cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-1.5 text-center min-h-[44px]"
                     :class="currentTab === tab.id ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
-                    <span>{{ tab.icon }}</span>
+                    <span class="text-sm">{{ tab.icon }}</span>
                     <span>{{ tab.label }}</span>
                 </button>
             </div>
 
             <!-- TAB 1: SALES & P&L SUMMARY -->
             <div v-if="currentTab === 'sales'" class="space-y-6">
-                <!-- 4 Top KPI Cards -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 space-y-2 shadow-xs">
+                <!-- 4 Top KPI Cards (Bento 2x2 on Mobile) -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 font-tajawal">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 space-y-1.5 shadow-xs">
                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ $t('reports.total_issued_sales') }}</span>
-                        <div class="text-2xl font-black font-mono text-slate-900 dark:text-white">
-                            {{ formatMoney(summary.total_sales) }} <span class="text-xs font-bold text-theme-primary">{{ $t('common.currency') }}</span>
+                        <div class="text-xl sm:text-2xl font-black font-mono text-slate-900 dark:text-white">
+                            {{ formatMoney(summary.total_sales) }} <span class="text-[11px] font-bold text-theme-primary">{{ $t('common.currency') }}</span>
                         </div>
-                        <div class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">
+                        <div class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-bold">
                             {{ $t('reports.approved_invoices_count', { count: summary.invoices_count }) }}
                         </div>
                     </div>
 
-                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 space-y-2 shadow-xs">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 space-y-1.5 shadow-xs">
                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ $t('reports.cogs') }}</span>
-                        <div class="text-2xl font-black font-mono text-indigo-600 dark:text-indigo-300">
-                            {{ formatMoney(summary.total_cogs) }} <span class="text-xs font-bold text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
+                        <div class="text-xl sm:text-2xl font-black font-mono text-indigo-600 dark:text-indigo-300">
+                            {{ formatMoney(summary.total_cogs) }} <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">{{ $t('common.currency') }}</span>
                         </div>
-                        <div class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">
+                        <div class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-bold">
                             {{ $t('reports.avg_invoice', { amount: formatMoney(summary.avg_invoice) }) }}
                         </div>
                     </div>
 
-                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 space-y-2 shadow-xs">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 space-y-1.5 shadow-xs">
                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ $t('reports.gross_profit_trade') }}</span>
-                        <div class="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
-                            {{ formatMoney(summary.gross_profit) }} <span class="text-xs font-bold text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
+                        <div class="text-xl sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                            {{ formatMoney(summary.gross_profit) }} <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">{{ $t('common.currency') }}</span>
                         </div>
-                        <div class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">
+                        <div class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-bold">
                             {{ $t('reports.gross_margin') }}: <strong class="text-slate-900 dark:text-white">{{ summary.margin_percentage }}%</strong>
                         </div>
                     </div>
 
-                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 space-y-2 shadow-xs">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 space-y-1.5 shadow-xs">
                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ $t('reports.net_profit_after_expenses') }}</span>
-                        <div class="text-2xl font-black font-mono" :class="summary.net_profit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
-                            {{ formatMoney(summary.net_profit) }} <span class="text-xs font-bold text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
+                        <div class="text-xl sm:text-2xl font-black font-mono" :class="summary.net_profit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
+                            {{ formatMoney(summary.net_profit) }} <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">{{ $t('common.currency') }}</span>
                         </div>
-                        <div class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">
+                        <div class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-bold">
                             {{ $t('reports.tab_expenses') }}: {{ formatMoney(summary.total_expenses) }} {{ $t('common.currency') }}
                         </div>
                     </div>
                 </div>
 
                 <!-- Financial Statement Summary Table -->
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-xs">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 space-y-4 shadow-xs font-tajawal">
                     <h3 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
                         <span>📑</span>
                         <span>{{ $t('reports.pnl_breakdown') }}</span>
@@ -291,13 +292,14 @@ const printReport = () => {
             </div>
 
             <!-- TAB 2: ITEM PROFITS -->
-            <div v-if="currentTab === 'items'" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-xs">
+            <div v-if="currentTab === 'items'" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 space-y-4 shadow-xs font-tajawal">
                 <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                     <h3 class="text-sm font-black text-slate-900 dark:text-white">{{ $t('reports.items_profit_detail') }}</h3>
                     <span class="text-xs font-mono text-slate-500 dark:text-slate-400">{{ $t('reports.items_sold_count', { count: item_profits.length }) }}</span>
                 </div>
 
-                <div class="overflow-x-auto">
+                <!-- Desktop Table -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
@@ -323,13 +325,48 @@ const printReport = () => {
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Mobile Cards -->
+                <div class="md:hidden space-y-3">
+                    <div
+                        v-for="item in item_profits"
+                        :key="item.item_id"
+                        class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-2.5 shadow-xs"
+                    >
+                        <div class="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+                            <div>
+                                <div class="font-black text-xs text-slate-900 dark:text-white">{{ item.name }}</div>
+                                <div class="text-[10px] text-slate-400 font-tajawal">{{ item.category || 'عام' }}</div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-mono font-black text-xs">
+                                {{ item.margin }}%
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 text-xs font-mono">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('invoices.quantity') }}</span>
+                                <span class="font-bold text-slate-900 dark:text-white">{{ item.total_qty }} {{ item.unit }}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('reports.sales_summary') }}</span>
+                                <span class="font-black text-slate-900 dark:text-white">{{ formatMoney(item.total_revenue) }}</span>
+                            </div>
+                            <div class="text-left">
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('reports.gross_profit_trade') }}</span>
+                                <span class="font-black text-emerald-600 dark:text-emerald-400">{{ formatMoney(item.profit) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- TAB 3: STORE COMPARISON -->
-            <div v-if="currentTab === 'stores'" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-xs">
+            <div v-if="currentTab === 'stores'" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 space-y-4 shadow-xs font-tajawal">
                 <h3 class="text-sm font-black text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-3">{{ $t('reports.stores_comparison_title') }}</h3>
 
-                <div class="overflow-x-auto">
+                <!-- Desktop Table -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
@@ -357,18 +394,54 @@ const printReport = () => {
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Mobile Cards -->
+                <div class="md:hidden space-y-3">
+                    <div
+                        v-for="st in store_breakdown"
+                        :key="st.id"
+                        class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-2.5 shadow-xs"
+                    >
+                        <div class="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+                            <div>
+                                <div class="font-black text-xs text-slate-900 dark:text-white">{{ st.name }}</div>
+                                <div class="text-[10px] text-slate-400 font-mono">{{ st.invoice_count }} فواتير</div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded-lg tab-theme-active font-mono font-black text-xs">
+                                {{ st.share_pct }}%
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('reports.total_issued_sales') }}</span>
+                                <span class="font-black text-slate-900 dark:text-white">{{ formatMoney(st.total_sales) }}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('reports.gross_profit_trade') }}</span>
+                                <span class="font-black text-emerald-600 dark:text-emerald-400">{{ formatMoney(st.gross_profit) }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs font-mono pt-1.5 border-t border-slate-200 dark:border-slate-800">
+                            <span class="text-emerald-600 dark:text-emerald-400 font-bold">المحصل: {{ formatMoney(st.total_paid) }}</span>
+                            <span class="text-rose-600 dark:text-rose-400 font-bold">المتبقي: {{ formatMoney(st.total_remaining) }}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- TAB 4: CUSTOMER SALES -->
-            <div v-if="currentTab === 'customers'" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-xs">
-                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+            <div v-if="currentTab === 'customers'" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 space-y-4 shadow-xs font-tajawal">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
                     <h3 class="text-sm font-black text-slate-900 dark:text-white">{{ $t('reports.top_customers_sales') }}</h3>
                     <div class="text-xs text-rose-600 dark:text-rose-400 font-bold">
                         {{ $t('reports.all_customers_debt') }}: <span class="font-mono font-black">{{ formatMoney(summary.total_customers_debt) }} {{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto">
+                <!-- Desktop Table -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
@@ -395,6 +468,43 @@ const printReport = () => {
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Mobile Cards -->
+                <div class="md:hidden space-y-3">
+                    <div
+                        v-for="c in customer_sales"
+                        :key="c.customer_id"
+                        class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-2.5 shadow-xs"
+                    >
+                        <div class="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+                            <div>
+                                <div class="font-black text-xs text-slate-900 dark:text-white">{{ c.name }}</div>
+                                <div class="text-[10px] text-slate-400 font-mono">{{ c.phone || 'بدون هاتف' }}</div>
+                            </div>
+                            <div class="text-left">
+                                <span class="text-[10px] text-slate-400 block font-tajawal">الرصيد التراكمي</span>
+                                <span class="font-mono font-black text-xs" :class="c.current_balance > 0 ? 'text-theme-primary' : 'text-slate-500 dark:text-slate-400'">
+                                    {{ formatMoney(c.current_balance) }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 text-xs font-mono">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('reports.total_bought') }}</span>
+                                <span class="font-bold text-slate-900 dark:text-white">{{ formatMoney(c.total_bought) }}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('reports.paid_in_period') }}</span>
+                                <span class="font-black text-emerald-600 dark:text-emerald-400">{{ formatMoney(c.total_paid) }}</span>
+                            </div>
+                            <div class="text-left">
+                                <span class="text-[10px] text-slate-400 block font-tajawal">{{ $t('reports.remaining_in_period') }}</span>
+                                <span class="font-black text-rose-600 dark:text-rose-400">{{ formatMoney(c.total_debt_in_period) }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -48,7 +48,7 @@ const submitProfile = () => {
 
             <form @submit.prevent="submitProfile" class="space-y-6">
                 <!-- User Info -->
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-4">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-4 font-tajawal">
                     <h2 class="text-sm font-black text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center gap-2">
                         <span>📋</span>
                         <span>{{ $t('profile.basic_info') }}</span>
@@ -61,7 +61,7 @@ const submitProfile = () => {
                                 v-model="form.name"
                                 type="text"
                                 required
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
+                                class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
                             >
                         </div>
 
@@ -71,7 +71,7 @@ const submitProfile = () => {
                                 v-model="form.phone"
                                 type="text"
                                 required
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
+                                class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
                             >
                         </div>
 
@@ -80,14 +80,14 @@ const submitProfile = () => {
                             <input
                                 v-model="form.email"
                                 type="email"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
+                                class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
                             >
                         </div>
                     </div>
                 </div>
 
                 <!-- Theme Preference -->
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-4">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-4 font-tajawal">
                     <h2 class="text-sm font-black text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center gap-2">
                         <span>🎨</span>
                         <span>{{ $t('profile.theme_pref') }}</span>
@@ -97,7 +97,7 @@ const submitProfile = () => {
                         <button
                             @click="form.theme_preference = 'dark'"
                             type="button"
-                            class="py-3 px-4 rounded-2xl border text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+                            class="h-12 px-4 rounded-2xl border text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-xs"
                             :class="form.theme_preference === 'dark' ? 'tab-theme-active border-theme-primary shadow-xs' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                         >
                             <span>🌙</span>
@@ -107,7 +107,7 @@ const submitProfile = () => {
                         <button
                             @click="form.theme_preference = 'light'"
                             type="button"
-                            class="py-3 px-4 rounded-2xl border text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+                            class="h-12 px-4 rounded-2xl border text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-xs"
                             :class="form.theme_preference === 'light' ? 'tab-theme-active border-theme-primary shadow-xs' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                         >
                             <span>☀️</span>
@@ -117,7 +117,7 @@ const submitProfile = () => {
                 </div>
 
                 <!-- Change Password -->
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-4">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xs space-y-4 font-tajawal">
                     <h2 class="text-sm font-black text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center gap-2">
                         <span>🔒</span>
                         <span>{{ $t('profile.change_password') }}</span>
@@ -130,7 +130,7 @@ const submitProfile = () => {
                                 v-model="form.current_password"
                                 type="password"
                                 placeholder="••••••••"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
+                                class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
                             >
                         </div>
 
@@ -141,7 +141,7 @@ const submitProfile = () => {
                                     v-model="form.new_password"
                                     type="password"
                                     placeholder="••••••••"
-                                    class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
                                 >
                             </div>
 
@@ -151,7 +151,7 @@ const submitProfile = () => {
                                     v-model="form.new_password_confirmation"
                                     type="password"
                                     placeholder="••••••••"
-                                    class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
+                                    class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none shadow-inner"
                                 >
                             </div>
                         </div>
@@ -163,7 +163,7 @@ const submitProfile = () => {
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="h-12 px-8 rounded-2xl btn-primary-theme font-black text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                        class="w-full sm:w-auto h-12 px-8 rounded-2xl btn-primary-theme font-black text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer disabled:opacity-50 shadow-theme-primary"
                     >
                         <span>💾</span>
                         <span>{{ form.processing ? $t('profile.saving_profile') : $t('profile.save_profile_btn') }}</span>

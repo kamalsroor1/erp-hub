@@ -129,10 +129,10 @@ const saveUserAssignment = () => {
                     </p>
                 </div>
 
-                <div class="flex items-center gap-2.5">
+                <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
                     <Link
                         href="/store-stocks"
-                        class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
+                        class="flex-1 sm:flex-none h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-xs"
                     >
                         <span>📊</span>
                         <span>{{ $t('inventory.store_stocks') }}</span>
@@ -141,7 +141,7 @@ const saveUserAssignment = () => {
                     <button
                         @click="openCreateModal"
                         type="button"
-                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
+                        class="flex-1 sm:flex-none h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer shadow-theme-primary"
                     >
                         <span class="text-base font-black">+</span>
                         <span>{{ $t('inventory.add_new_store') }}</span>
@@ -150,17 +150,17 @@ const saveUserAssignment = () => {
             </div>
 
             <!-- Stores Cards Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 <div
                     v-for="s in stores"
                     :key="s.id"
-                    class="bg-white dark:bg-slate-900 border rounded-3xl p-5 shadow-xs space-y-4 transition hover:border-theme-primary flex flex-col justify-between"
+                    class="bg-white dark:bg-slate-900 border rounded-3xl p-4 sm:p-5 shadow-xs space-y-4 transition hover:border-theme-primary flex flex-col justify-between"
                     :class="s.is_main ? 'border-theme-primary dark:bg-gradient-to-br dark:from-slate-900 dark:to-slate-950' : 'border-slate-200 dark:border-slate-800'"
                 >
                     <div class="space-y-4">
-                        <div class="flex items-start justify-between">
+                        <div class="flex items-start justify-between gap-2">
                             <div class="flex items-center gap-3">
-                                <div class="w-11 h-11 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl">
+                                <div class="w-11 h-11 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl shrink-0">
                                     <span v-if="s.type === 'wholesale_van' || s.type === 'van'">🚚</span>
                                     <span v-else-if="s.type === 'main_warehouse' || s.type === 'warehouse'">🏭</span>
                                     <span v-else>🏬</span>
@@ -182,7 +182,7 @@ const saveUserAssignment = () => {
                             <button
                                 @click="toggleActive(s)"
                                 type="button"
-                                class="px-2 py-0.5 rounded-full text-[10px] font-bold transition cursor-pointer"
+                                class="px-2.5 py-1 rounded-full text-[10px] font-bold transition cursor-pointer active:scale-95"
                                 :class="s.is_active ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/30' : 'bg-rose-500/20 text-rose-600 dark:text-rose-400 hover:bg-rose-500/30'"
                                 :title="s.is_active ? $t('common.active') : $t('common.inactive')"
                             >
@@ -216,7 +216,7 @@ const saveUserAssignment = () => {
                                 <button
                                     @click="openUserAssignmentModal(s)"
                                     type="button"
-                                    class="text-amber-600 dark:text-amber-400 hover:text-amber-500 text-[10px] font-black cursor-pointer"
+                                    class="text-theme-primary hover:underline text-[10px] font-black cursor-pointer"
                                 >
                                     + {{ $t('common.edit') || 'إدارة الموظفين' }}
                                 </button>
@@ -240,17 +240,17 @@ const saveUserAssignment = () => {
                     <div class="pt-3 flex items-center justify-between gap-2 border-t border-slate-100 dark:border-slate-800">
                         <Link
                             :href="`/store-stocks?store_id=${s.id}`"
-                            class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition flex items-center gap-1 border border-slate-200 dark:border-transparent"
+                            class="h-10 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 dark:border-transparent active:scale-95 shadow-xs"
                         >
                             <span>📦</span>
                             <span>{{ $t('inventory.store_stocks') }}</span>
                         </Link>
 
-                        <div class="flex items-center gap-1.5">
+                        <div class="flex items-center gap-2">
                             <button
                                 @click="openEditModal(s)"
                                 type="button"
-                                class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 text-xs font-bold transition cursor-pointer border border-slate-200 dark:border-transparent"
+                                class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 text-xs font-bold transition active:scale-90 cursor-pointer border border-slate-200 dark:border-transparent flex items-center justify-center"
                                 :title="$t('common.edit')"
                             >
                                 ✏️
@@ -259,7 +259,7 @@ const saveUserAssignment = () => {
                             <button
                                 @click="deleteStore(s)"
                                 type="button"
-                                class="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs transition cursor-pointer"
+                                class="w-10 h-10 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-rose-500/30 text-xs transition active:scale-90 cursor-pointer flex items-center justify-center"
                                 :class="!s.can_be_deleted ? 'opacity-40 cursor-not-allowed' : ''"
                                 :title="s.can_be_deleted ? $t('common.delete') : s.deletion_blockers.join(', ')"
                             >
@@ -278,32 +278,32 @@ const saveUserAssignment = () => {
             class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
             dir="rtl"
         >
-            <div @click.stop class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="font-black text-base text-white">
+            <div @click.stop class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <h3 class="font-black text-base text-slate-900 dark:text-white">
                         {{ editingStore ? $t('inventory.store_updated') : $t('inventory.add_new_store') }}
                     </h3>
-                    <button @click="showStoreModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
+                    <button @click="showStoreModal = false" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 text-xs hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition active:scale-90 cursor-pointer">✕</button>
                 </div>
 
                 <form @submit.prevent="saveStore" class="space-y-4">
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('inventory.store_name') }} *</label>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('inventory.store_name') }} *</label>
                         <input
                             v-model="storeForm.name"
                             type="text"
                             required
                             :placeholder="$t('inventory.store_name')"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                            class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none shadow-inner"
                         >
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.store_type') }} *</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('inventory.store_type') }} *</label>
                             <select
                                 v-model="storeForm.type"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                                class="w-full h-11 px-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none shadow-inner"
                             >
                                 <option value="retail_shop">{{ $t('inventory.store_type_branch') }} 🏬</option>
                                 <option value="wholesale_van">عربية توزيع جملة 🚚</option>
@@ -312,33 +312,33 @@ const saveUserAssignment = () => {
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.store_code') }}</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('inventory.store_code') }}</label>
                             <input
                                 v-model="storeForm.code"
                                 type="text"
                                 placeholder="STR-001"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-amber-500 focus:outline-none"
+                                class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono focus:border-theme-primary focus:outline-none shadow-inner"
                             >
                         </div>
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('common.address') }}</label>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.address') }}</label>
                         <input
                             v-model="storeForm.address"
                             type="text"
                             :placeholder="$t('common.address')"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                            class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none shadow-inner"
                         >
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('common.phone') }}</label>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.phone') }}</label>
                         <input
                             v-model="storeForm.phone"
                             type="text"
                             placeholder="01xxxxxxxxx"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-amber-500 focus:outline-none"
+                            class="w-full h-11 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-900 dark:text-white font-mono focus:border-theme-primary focus:outline-none shadow-inner"
                         >
                     </div>
 
@@ -347,25 +347,25 @@ const saveUserAssignment = () => {
                             id="is_main_check"
                             v-model="storeForm.is_main"
                             type="checkbox"
-                            class="rounded accent-amber-500 w-4 h-4 cursor-pointer"
+                            class="rounded accent-theme-primary w-4 h-4 cursor-pointer"
                         >
-                        <label for="is_main_check" class="text-xs font-bold text-amber-400 cursor-pointer">
+                        <label for="is_main_check" class="text-xs font-bold text-theme-primary cursor-pointer">
                             {{ $t('inventory.store_type_main') }} 👑
                         </label>
                     </div>
 
-                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
                         <button
                             @click="showStoreModal = false"
                             type="button"
-                            class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
+                            class="h-11 px-5 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95 cursor-pointer"
                         >
                             {{ $t('common.cancel') }}
                         </button>
                         <button
                             type="submit"
                             :disabled="storeForm.processing"
-                            class="px-5 py-2.5 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                            class="h-11 px-6 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50 shadow-theme-primary"
                         >
                             {{ storeForm.processing ? '...' : $t('common.save') }}
                         </button>
@@ -381,23 +381,23 @@ const saveUserAssignment = () => {
             class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
             dir="rtl"
         >
-            <div @click.stop class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="font-black text-base text-white flex items-center gap-2">
+            <div @click.stop class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <h3 class="font-black text-base text-slate-900 dark:text-white flex items-center gap-2">
                         <span>👥 {{ $t('users.title') || 'تعيين موظفي الفرع' }}:</span>
                         <span class="text-theme-primary">{{ targetStore?.name }}</span>
                     </h3>
-                    <button @click="showUserModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
+                    <button @click="showUserModal = false" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 text-xs hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition active:scale-90 cursor-pointer">✕</button>
                 </div>
 
                 <form @submit.prevent="saveUserAssignment" class="space-y-4">
-                    <p class="text-xs text-slate-400">حدد الموظفين والكاشيرات وسائقي التوزيع المسموح لهم بالعمل على هذا الفرع:</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">حدد الموظفين والكاشيرات وسائقي التوزيع المسموح لهم بالعمل على هذا الفرع:</p>
 
                     <div class="max-h-60 overflow-y-auto space-y-2 pr-1">
                         <label
                             v-for="u in all_users"
                             :key="u.id"
-                            class="flex items-center justify-between p-3 rounded-2xl bg-slate-950 border border-slate-800 hover:border-theme-primary cursor-pointer transition"
+                            class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-theme-primary cursor-pointer transition active:scale-98"
                         >
                             <div class="flex items-center gap-2.5">
                                 <input
@@ -406,24 +406,24 @@ const saveUserAssignment = () => {
                                     v-model="userAssignmentForm.user_ids"
                                     class="rounded accent-theme-primary w-4 h-4 cursor-pointer"
                                 >
-                                <span class="text-xs font-bold text-white">{{ u.name }}</span>
+                                <span class="text-xs font-bold text-slate-900 dark:text-white">{{ u.name }}</span>
                             </div>
-                            <span class="text-[10px] text-slate-500 font-mono">{{ u.email }}</span>
+                            <span class="text-[10px] text-slate-400 dark:text-slate-500 font-mono">{{ u.email }}</span>
                         </label>
                     </div>
 
-                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
                         <button
                             @click="showUserModal = false"
                             type="button"
-                            class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
+                            class="h-11 px-5 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95 cursor-pointer"
                         >
                             {{ $t('common.cancel') }}
                         </button>
                         <button
                             type="submit"
                             :disabled="userAssignmentForm.processing"
-                            class="px-5 py-2.5 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                            class="h-11 px-6 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50 shadow-theme-primary"
                         >
                             {{ userAssignmentForm.processing ? '...' : $t('common.save') }}
                         </button>
