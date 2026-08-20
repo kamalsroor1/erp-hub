@@ -300,9 +300,10 @@ const deleteItem = (item) => {
                 </div>
             </div>
 
-            <!-- Items Table -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4 overflow-hidden">
-                <div class="overflow-x-auto">
+            <!-- Items Table & Mobile Cards -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4 overflow-hidden">
+                <!-- Desktop Table (Hidden on Mobile) -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
@@ -404,11 +405,95 @@ const deleteItem = (item) => {
                             </tr>
                         </tbody>
                     </table>
+                </div>
 
-                    <div v-if="!items.data || items.data.length === 0" class="py-16 text-center space-y-3">
-                        <Package class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-700" />
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_items_found') }}</p>
+                <!-- Mobile Cards View (Visible on Small Screens) -->
+                <div class="md:hidden space-y-3">
+                    <div
+                        v-for="item in items.data"
+                        :key="item.id"
+                        class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 space-y-3 shadow-xs font-tajawal"
+                    >
+                        <!-- Top Row: Name + Code + Badge -->
+                        <div class="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-800/80 pb-2.5">
+                            <div class="space-y-1">
+                                <div class="font-black text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                                    <span>{{ item.name }}</span>
+                                    <span v-if="item.is_low_stock" class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-600 dark:text-rose-400 text-[10px] font-bold">
+                                        {{ $t('inventory.low_stock_only') }}
+                                    </span>
+                                </div>
+                                <p v-if="item.code" class="text-[11px] text-slate-400 font-mono" dir="ltr">#{{ item.code }}</p>
+                            </div>
+
+                            <span v-if="item.category" class="px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px]">
+                                {{ item.category }}
+                            </span>
+                        </div>
+
+                        <!-- Metrics Grid -->
+                        <div class="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center font-mono">
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-tajawal block">{{ $t('inventory.current_stock') }}</span>
+                                <span
+                                    class="text-xs font-black"
+                                    :class="item.is_low_stock ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'"
+                                >
+                                    {{ item.current_stock }} {{ item.unit }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-tajawal block">{{ $t('common.unit_cost') }}</span>
+                                <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{ formatMoney(item.cost_price) }}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-tajawal block">{{ $t('common.unit_price') }}</span>
+                                <span class="text-xs font-black text-emerald-600 dark:text-emerald-400">{{ formatMoney(item.selling_price) }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Mobile Card Action Bar -->
+                        <div class="flex items-center justify-between pt-1">
+                            <span class="text-[11px] text-slate-400 font-mono">
+                                {{ $t('inventory.min_stock_level') }}: {{ item.min_stock_level }} {{ item.unit }}
+                            </span>
+
+                            <div class="flex items-center gap-1.5">
+                                <Link
+                                    :href="`/items/${item.id}/movements`"
+                                    class="p-2 rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30"
+                                    :title="$t('inventory.view_movements')"
+                                >
+                                    <History class="w-4 h-4" />
+                                </Link>
+
+                                <button
+                                    @click="openEditModal(item)"
+                                    type="button"
+                                    class="p-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 cursor-pointer"
+                                    :title="$t('common.edit')"
+                                >
+                                    <Pencil class="w-4 h-4" />
+                                </button>
+
+                                <button
+                                    @click="deleteItem(item)"
+                                    type="button"
+                                    class="p-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 cursor-pointer"
+                                    :class="!item.can_be_deleted ? 'opacity-40 cursor-not-allowed' : ''"
+                                    :title="item.can_be_deleted ? $t('common.delete') : item.deletion_blockers.join(', ')"
+                                >
+                                    <Trash2 class="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <!-- Empty State -->
+                <div v-if="!items.data || items.data.length === 0" class="py-16 text-center space-y-3">
+                    <Package class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-700" />
+                    <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_items_found') }}</p>
                 </div>
 
                 <!-- Pagination -->

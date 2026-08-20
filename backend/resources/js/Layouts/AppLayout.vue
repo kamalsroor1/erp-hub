@@ -4,6 +4,7 @@ import { Link, usePage, router } from '@inertiajs/vue3';
 import FeatureGate from '@/Components/FeatureGate.vue';
 import { trans } from '@/helpers/trans';
 import { useTheme } from '@/Composables/useTheme';
+import { useNativeBridge } from '@/Composables/useNativeBridge';
 import { notifySuccess, notifyError } from '@/helpers/alert';
 import {
     LayoutDashboard,
@@ -66,6 +67,7 @@ const isSidebarCollapsed = ref(false);
 // Header user menu, Notification dropdown & Store modal state
 const showUserMenu = ref(false);
 const showNotifications = ref(false);
+const showNotificationsSheet = ref(false);
 const showStoreModal = ref(false);
 
 const notifications = computed(() => page.props.system_notifications || []);
@@ -73,6 +75,9 @@ const notifications = computed(() => page.props.system_notifications || []);
 // Theme Composable
 const systemThemeColor = computed(() => page.props.system_theme_color || 'amber');
 const { currentTheme, currentColor, toggleTheme, applyColorTheme, initTheme } = useTheme(user.value.theme_preference || 'dark', systemThemeColor.value);
+
+// Native Hardware Bridge Composable
+const { isNative, isOnline, triggerHaptic, setStatusBar } = useNativeBridge();
 
 // Live Arabic Clock & Date
 const currentTime = ref('');
@@ -127,10 +132,15 @@ onMounted(() => {
     window.addEventListener('keydown', handleKeydown);
 
     initTheme(systemThemeColor.value);
+    setStatusBar(currentTheme.value === 'dark' ? '#020617' : '#ffffff', currentTheme.value === 'light');
 
     // Initial Flash Check
     if (page.props.flash?.success) notifySuccess(page.props.flash.success);
     if (page.props.flash?.error) notifyError(page.props.flash.error);
+});
+
+watch(currentTheme, (newTheme) => {
+    setStatusBar(newTheme === 'dark' ? '#020617' : '#ffffff', newTheme === 'light');
 });
 
 watch(systemThemeColor, (newColor) => {
@@ -561,8 +571,8 @@ const getUserRoleLabel = computed(() => {
                 </div>
             </header>
 
-            <!-- Main Page Content Area (Scrolls cleanly) -->
-            <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+            <!-- Main Page Content Area (Scrolls cleanly with bottom padding for mobile bar) -->
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 space-y-6 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
                 <!-- Flash Alert Banners -->
                 <div v-if="$page.props.flash?.success" class="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-2 font-tajawal shadow-sm">
                     <CheckCircle2 class="w-4 h-4 shrink-0" />
@@ -575,6 +585,124 @@ const getUserRoleLabel = computed(() => {
 
                 <slot />
             </main>
+
+            <!-- Fixed Mobile Bottom Navigation Bar (Visible only on screens < lg) -->
+            <nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-2 py-1.5 flex items-center justify-around font-tajawal shadow-2xl safe-bottom select-none">
+                <!-- 1. Home / Dashboard -->
+                <Link
+                    href="/"
+                    class="flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition duration-150 active:scale-95"
+                    :class="page.url === '/' ? 'text-theme-primary font-black' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                >
+                    <LayoutDashboard class="w-5 h-5 mb-0.5" />
+                    <span class="text-[10px]">{{ $t('nav.dashboard') }}</span>
+                </Link>
+
+                <!-- 2. Invoices / Sales -->
+                <FeatureGate feature="invoices.create">
+                    <Link
+                        href="/invoices"
+                        class="flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition duration-150 active:scale-95"
+                        :class="page.url.startsWith('/invoices') && !page.url.startsWith('/invoices/create') ? 'text-theme-primary font-black' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                    >
+                        <Receipt class="w-5 h-5 mb-0.5" />
+                        <span class="text-[10px]">{{ $t('nav.invoices_log') }}</span>
+                    </Link>
+                </FeatureGate>
+
+                <!-- 3. Primary Center Action: Fast POS (Raised Circle) -->
+                <FeatureGate feature="pos.access">
+                    <Link
+                        href="/pos"
+                        class="relative -top-3.5 w-12 h-12 rounded-2xl btn-primary-theme flex items-center justify-center shadow-theme-primary transition-transform duration-200 active:scale-90 cursor-pointer"
+                        :title="$t('nav.pos_fast')"
+                    >
+                        <Zap class="w-6 h-6 fill-current text-white" />
+                    </Link>
+                </FeatureGate>
+
+                <!-- 4. Notifications with Badge -->
+                <button
+                    @click="showNotificationsSheet = true"
+                    type="button"
+                    class="relative flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition duration-150 active:scale-95 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                >
+                    <div class="relative">
+                        <Bell class="w-5 h-5 mb-0.5" />
+                        <span
+                            v-if="notifications.length > 0"
+                            class="absolute -top-1 -right-1.5 w-4 h-4 rounded-full bg-rose-500 text-white font-black text-[9px] flex items-center justify-center animate-pulse"
+                        >
+                            {{ notifications.length }}
+                        </span>
+                    </div>
+                    <span class="text-[10px]">{{ $t('nav.notifications_title') }}</span>
+                </button>
+
+                <!-- 5. More / Sidebar Drawer Toggle -->
+                <button
+                    @click="isSidebarOpen = true"
+                    type="button"
+                    class="flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition duration-150 active:scale-95 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                >
+                    <Menu class="w-5 h-5 mb-0.5" />
+                    <span class="text-[10px]">{{ $t('common.more') || 'المزيد' }}</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Mobile Notifications Bottom Sheet Modal -->
+        <div
+            v-if="showNotificationsSheet"
+            @click="showNotificationsSheet = false"
+            class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 font-tajawal lg:hidden"
+        >
+            <div
+                @click.stop
+                class="w-full max-w-lg bg-white dark:bg-slate-900 border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl space-y-4 max-h-[85vh] flex flex-col text-slate-900 dark:text-white"
+            >
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <div class="flex items-center gap-2">
+                        <Bell class="w-5 h-5 text-theme-primary" />
+                        <h3 class="font-black text-sm">{{ $t('nav.live_notifications_center') }}</h3>
+                        <span v-if="notifications.length > 0" class="px-2 py-0.5 rounded-full bg-rose-500 text-white font-mono text-[10px] font-black">
+                            {{ notifications.length }}
+                        </span>
+                    </div>
+                    <button @click="showNotificationsSheet = false" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs flex items-center justify-center cursor-pointer">
+                        <X class="w-4 h-4" />
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto space-y-2.5 pr-0.5">
+                    <div
+                        v-for="(n, nIdx) in notifications"
+                        :key="nIdx"
+                        class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 space-y-2 hover:border-slate-300 dark:hover:border-slate-700 transition"
+                    >
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-2.5 h-2.5 rounded-full shrink-0" :class="n.type === 'danger' ? 'bg-rose-500 animate-pulse' : (n.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500')"></span>
+                            <span class="text-xs font-black text-slate-900 dark:text-white">{{ n.title }}</span>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{{ n.description }}</p>
+                        <div class="pt-1 flex justify-end">
+                            <Link
+                                :href="n.link"
+                                @click="showNotificationsSheet = false"
+                                class="px-3 py-1.5 rounded-xl bg-theme-light border border-theme-light text-theme-primary text-xs font-bold transition flex items-center gap-1 hover:brightness-110"
+                            >
+                                <span>{{ n.link_label }}</span>
+                                <span>←</span>
+                            </Link>
+                        </div>
+                    </div>
+
+                    <div v-if="notifications.length === 0" class="py-12 text-center space-y-2">
+                        <Bell class="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700" />
+                        <p class="text-xs font-bold text-slate-400">{{ $t('nav.no_urgent_notifications') }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Store / Van Switcher Modal -->
@@ -586,7 +714,7 @@ const getUserRoleLabel = computed(() => {
             <div @click.stop class="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-2xl space-y-3 font-tajawal text-slate-900 dark:text-white">
                 <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2.5">
                     <h3 class="font-black text-sm">{{ $t('nav.select_store_modal_title') }}</h3>
-                    <button @click="showStoreModal = false" class="w-7 h-7 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs dark:hover:text-white transition flex items-center justify-center">
+                    <button @click="showStoreModal = false" class="w-7 h-7 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs dark:hover:text-white transition flex items-center justify-center cursor-pointer">
                         <X class="w-4 h-4" />
                     </button>
                 </div>
