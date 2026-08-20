@@ -106,16 +106,16 @@ const clearCache = () => {
     <AppLayout>
         <div class="space-y-6 font-tajawal">
             <!-- Header Banner -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center text-2xl font-bold">
+                    <div class="w-12 h-12 rounded-2xl bg-theme-light border border-theme-primary text-theme-primary flex items-center justify-center text-2xl font-bold">
                         ⚙️
                     </div>
                     <div>
-                        <h1 class="text-xl sm:text-2xl font-black text-white">
+                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                             {{ $t('settings.title') }}
                         </h1>
-                        <p class="text-xs text-slate-400 font-bold mt-0.5">
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">
                             {{ $t('settings.subtitle') }}
                         </p>
                     </div>
@@ -125,7 +125,7 @@ const clearCache = () => {
                     <button
                         @click="clearCache"
                         type="button"
-                        class="h-10 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold transition cursor-pointer flex items-center gap-1.5"
+                        class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold transition cursor-pointer flex items-center gap-1.5"
                     >
                         <span>⚡</span>
                         <span>{{ $t('settings.clear_cache_btn') }}</span>
