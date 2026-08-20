@@ -561,6 +561,7 @@ useKeyboardShortcuts({
                                     <input
                                         v-model.number="discountValue"
                                         type="number"
+                                        inputmode="decimal"
                                         min="0"
                                         class="w-16 h-7 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-center text-xs font-mono font-bold text-slate-900 dark:text-white"
                                     />
@@ -646,6 +647,7 @@ useKeyboardShortcuts({
                                 <input
                                     v-model.number="paidAmount"
                                     type="number"
+                                    inputmode="decimal"
                                     min="0"
                                     class="w-full h-10 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-2 text-center text-sm font-mono font-black text-slate-900 dark:text-white focus:outline-none focus:border-theme-primary"
                                 />

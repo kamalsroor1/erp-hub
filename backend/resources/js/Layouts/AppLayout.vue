@@ -578,25 +578,33 @@ const getUserRoleLabel = computed(() => {
             </header>
 
             <!-- Main Dynamic Page Content Container -->
-            <main class="flex-1 p-3.5 sm:p-5 lg:p-8 space-y-4 sm:space-y-6 overflow-y-auto pb-24 lg:pb-8">
+            <main class="flex-1 p-3.5 sm:p-5 lg:p-8 space-y-4 sm:space-y-6 overflow-y-auto pb-28 lg:pb-8">
                 <!-- Global Flash Messages Notification -->
-                <div v-if="$page.props.flash?.success" class="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-2 font-tajawal shadow-sm">
-                    <CheckCircle2 class="w-4 h-4 shrink-0" />
-                    <span>{{ $page.props.flash.success }}</span>
-                </div>
-                <div v-if="$page.props.flash?.error" class="p-3.5 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center gap-2 font-tajawal shadow-sm">
-                    <AlertTriangle class="w-4 h-4 shrink-0" />
-                    <span>{{ $page.props.flash.error }}</span>
-                </div>
+                <Transition name="fade">
+                    <div v-if="$page.props.flash?.success" class="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-black flex items-center gap-2.5 font-tajawal shadow-lg shadow-emerald-500/10">
+                        <CheckCircle2 class="w-4 h-4 shrink-0" />
+                        <span>{{ $page.props.flash.success }}</span>
+                    </div>
+                </Transition>
+                <Transition name="fade">
+                    <div v-if="$page.props.flash?.error" class="p-3.5 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-black flex items-center gap-2.5 font-tajawal shadow-lg shadow-rose-500/10">
+                        <AlertTriangle class="w-4 h-4 shrink-0" />
+                        <span>{{ $page.props.flash.error }}</span>
+                    </div>
+                </Transition>
 
-                <slot />
+                <!-- Native Page Slide-In Animated Wrapper -->
+                <div class="page-content-enter">
+                    <slot />
+                </div>
             </main>
 
             <!-- Fixed Mobile Bottom Navigation Bar (Visible only on screens < lg) -->
-            <nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/90 dark:border-slate-800/90 px-3 py-1.5 flex items-center justify-between font-tajawal shadow-2xl safe-bottom select-none">
+            <nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border-t border-slate-200/90 dark:border-slate-800/90 px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom,0.75rem))] flex items-center justify-between font-tajawal shadow-2xl select-none">
                 <!-- 1. Home / Dashboard -->
                 <Link
                     href="/"
+                    @click="triggerHaptic('light')"
                     class="flex-1 flex flex-col items-center justify-center py-1 rounded-2xl transition-all duration-150 active:scale-90"
                     :class="page.url === '/' ? 'text-theme-primary font-black scale-105' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white'"
                 >
@@ -608,6 +616,7 @@ const getUserRoleLabel = computed(() => {
                 <FeatureGate feature="invoices.create">
                     <Link
                         href="/invoices"
+                        @click="triggerHaptic('light')"
                         class="flex-1 flex flex-col items-center justify-center py-1 rounded-2xl transition-all duration-150 active:scale-90"
                         :class="page.url.startsWith('/invoices') && !page.url.startsWith('/invoices/create') ? 'text-theme-primary font-black scale-105' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white'"
                     >
@@ -616,11 +625,12 @@ const getUserRoleLabel = computed(() => {
                     </Link>
                 </FeatureGate>
 
-                <!-- 3. Primary Center Action: Fast POS (Raised Circle) -->
+                <!-- 3. Primary Center Action: Fast POS (Raised Circle with Ring & Haptic) -->
                 <FeatureGate feature="pos.access">
                     <Link
                         href="/pos"
-                        class="relative -top-4 w-13 h-13 rounded-2xl btn-primary-theme flex items-center justify-center shadow-theme-primary transition-all duration-200 active:scale-90 cursor-pointer ring-4 ring-white dark:ring-slate-900"
+                        @click="triggerHaptic('medium')"
+                        class="relative -top-5 w-14 h-14 rounded-2xl btn-primary-theme flex items-center justify-center shadow-theme-primary transition-all duration-200 active:scale-90 cursor-pointer ring-4 ring-white dark:ring-slate-900"
                         :title="$t('nav.pos_fast')"
                     >
                         <Zap class="w-6 h-6 fill-current text-white" />
@@ -629,7 +639,7 @@ const getUserRoleLabel = computed(() => {
 
                 <!-- 4. Notifications with Badge -->
                 <button
-                    @click="showNotificationsSheet = true"
+                    @click="triggerHaptic('light'); showNotificationsSheet = true;"
                     type="button"
                     class="flex-1 relative flex flex-col items-center justify-center py-1 rounded-2xl transition-all duration-150 active:scale-90 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
                 >
@@ -647,7 +657,7 @@ const getUserRoleLabel = computed(() => {
 
                 <!-- 5. More / Sidebar Drawer Toggle -->
                 <button
-                    @click="isSidebarOpen = true"
+                    @click="triggerHaptic('light'); isSidebarOpen = true;"
                     type="button"
                     class="flex-1 flex flex-col items-center justify-center py-1 rounded-2xl transition-all duration-150 active:scale-90 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
                 >
@@ -665,8 +675,11 @@ const getUserRoleLabel = computed(() => {
         >
             <div
                 @click.stop
-                class="w-full max-w-lg bg-white dark:bg-slate-900 border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl space-y-4 max-h-[85vh] flex flex-col text-slate-900 dark:text-white"
+                class="w-full max-w-lg bg-white dark:bg-slate-900 border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-3xl sm:rounded-3xl p-5 pb-safe shadow-2xl space-y-4 max-h-[85vh] flex flex-col text-slate-900 dark:text-white"
             >
+                <!-- Native Drag Handle -->
+                <div class="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto -mt-1"></div>
+
                 <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                     <div class="flex items-center gap-2">
                         <Bell class="w-5 h-5 text-theme-primary" />

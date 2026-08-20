@@ -1,4 +1,18 @@
 import Swal from 'sweetalert2';
+import { Capacitor } from '@capacitor/core';
+import { Haptics, NotificationType } from '@capacitor/haptics';
+
+const triggerToastHaptic = async (type = 'success') => {
+    try {
+        if (Capacitor.isNativePlatform()) {
+            await Haptics.notification({
+                type: type === 'error' ? NotificationType.Error : NotificationType.Success
+            });
+        } else if (typeof navigator !== 'undefined' && navigator.vibrate) {
+            navigator.vibrate(type === 'error' ? [40, 60, 40] : 30);
+        }
+    } catch (e) {}
+};
 
 // 🎨 Base ERP SweetAlert2 Dark Configuration
 const DarkSwal = Swal.mixin({
@@ -39,6 +53,7 @@ export const Toast = Swal.mixin({
  * Show Success Toast / Alert
  */
 export const notifySuccess = (title, message = '') => {
+    triggerToastHaptic('success');
     return Toast.fire({
         icon: 'success',
         title: title,
@@ -50,6 +65,7 @@ export const notifySuccess = (title, message = '') => {
  * Show Error Toast / Alert
  */
 export const notifyError = (title, message = '') => {
+    triggerToastHaptic('error');
     return Toast.fire({
         icon: 'error',
         title: title,

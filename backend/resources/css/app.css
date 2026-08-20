@@ -21,7 +21,91 @@ body {
     font-family: 'Cairo', 'Tajawal', sans-serif;
 }
 
-/* 🎨 Sleek Modern Slim Custom Scrollbar */
+/* 📱 Native Mobile App UX Foundations */
+html, body {
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+    -webkit-tap-highlight-color: transparent !important;
+    touch-action: manipulation;
+}
+
+/* 🔒 Prevent Web-like accidental text selection on UI chrome and controls */
+body, button, nav, header, [role="button"], .select-none-mobile {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Allow text selection specifically inside editable text controls */
+input, textarea, [contenteditable="true"] {
+    -webkit-user-select: text !important;
+    user-select: text !important;
+}
+
+/* 🚀 Seamless Native Page Transition Animation */
+.page-content-enter {
+    animation: nativePageSlideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes nativePageSlideIn {
+    from {
+        opacity: 0.88;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 📐 Modern Mobile Safe Areas */
+.pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem)) !important;
+}
+.pt-safe {
+    padding-top: max(0.5rem, env(safe-area-inset-top, 0.5rem)) !important;
+}
+.safe-bottom {
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0.5rem)) !important;
+}
+
+/* 📱 Hide Web Scrollbars on Mobile while retaining silky smooth touch scrolling */
+@media (max-width: 767px) {
+    ::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+    * {
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+    }
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+}
+.no-scrollbar::-webkit-scrollbar {
+    display: none !important;
+}
+
+/* ⚡ Tactile Native Tap Micro-Interactions */
+.btn-native-tap {
+    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), filter 0.1s ease !important;
+}
+.btn-native-tap:active {
+    transform: scale(0.95) !important;
+    filter: brightness(0.92) !important;
+}
+
+.card-native-tap {
+    transition: transform 0.12s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.12s ease !important;
+}
+.card-native-tap:active {
+    transform: scale(0.98) !important;
+}
+
+/* 🎨 Sleek Modern Slim Custom Scrollbar (Desktop) */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;

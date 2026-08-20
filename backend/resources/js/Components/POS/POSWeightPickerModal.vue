@@ -82,6 +82,7 @@ const handleConfirm = () => {
                 <input
                     v-model="customWeightInput"
                     type="number"
+                    inputmode="decimal"
                     step="0.001"
                     placeholder="0.750"
                     class="w-full h-11 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 text-center text-sm font-mono font-black text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 shadow-inner"

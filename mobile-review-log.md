@@ -259,5 +259,54 @@
 ### ملاحظات لسه محتاجة متابعة / مراجعة يدوية
 - [ ] تجربة الطباعة الحرارية من متصفحات الهواتف المحمولة والتأكد من توافق قياسات 80mm و 58mm مع الطابعات المتصلة عبر البلوتوث / الواي فاي.
 
+---
 
+## مراجعة Native App Feel بتاريخ 2026-08-21
 
+### التحسينات اللي اتطبقت
+
+1. **التنقل وشريط الملاحة السفلي والانتقالات (Navigation & Transitions):**
+   * `backend/resources/js/Layouts/AppLayout.vue`: 
+     - تثبيت شريط التنقل السفلي العائم (Floating Bottom Nav) بمظهر زجاجي ناعم `backdrop-blur-2xl`، مع مراعاة كاملة لـ Safe Area Insets في أسفل الشاشة `pb-[max(0.75rem,env(safe-area-inset-bottom,0.75rem))]` حتى لا يتداخل مع شريط الإيماءات (Home Bar) في iOS و Android.
+     - زر البيع السريع المركزي (POS Fast Action) تم ترقيته إلى زر دائري عائم وبارز بحلقة تأطير ناصعة مع استجابة اهتزاز لمسي (Haptic Feedback) متوسطة القوة.
+     - تفعيل الـ Haptic Feedback اللمسي الخفيف عند الضغط على أي تبويب في شريط التنقل السفلي ليعطي إحساس تطبيق مثبت حقيقي.
+   * `backend/resources/css/app.css`:
+     - إضافة حركة انتقال ناعمة للصفحات `page-content-enter` (Slide-in + Fade بمعدل 0.22s) لمنع الوميض أو الفتح المفاجئ لصفحات الويب التقليدية.
+
+2. **اللمس والـ Touch Ergonomics والتفاعل اللمسي:**
+   * `backend/resources/css/app.css`:
+     - إلغاء الوميض الأزرق والرمادي الافتراضي للمتصفح نهائياً `-webkit-tap-highlight-color: transparent !important;`.
+     - منع التكبير والتأخير عند النقر المزدوج `touch-action: manipulation;`.
+     - إضافة تأثيرات الضغط والتصغير الفوري `.btn-native-tap` و `.card-native-tap` (`active:scale-95` و `active:scale-98`) لكافة الأزرار والكروت بدل الاعتماد على الـ Hover غير الفعال في شاشات اللمس.
+
+3. **الاسكرول والـ Scrolling Behavior:**
+   * `backend/resources/css/app.css`:
+     - منع ارتداد واهتزاز الصفحة وسحب التحديث العشوائي للمتصفح عبر `overscroll-behavior-y: none;`.
+     - تفعيل التمرير الفيزيائي الانسيابي السلس `-webkit-overflow-scrolling: touch;`.
+     - إخفاء السكرول بارز بصرياً بالكامل على شاشات الموبايل (`::-webkit-scrollbar { display: none !important; }` و `scrollbar-width: none !important;`) مع الحفاظ التام على وظيفة التمرير السلس.
+
+4. **مناطق الأمان والشاشات الحديثة (Safe Areas & Notches):**
+   * `backend/resources/views/app.blade.php`:
+     - ضبط `viewport-fit=cover` و `user-scalable=no` و `mobile-web-app-capable="yes"` و `apple-mobile-web-app-status-bar-style="black-translucent"`.
+   * `backend/resources/js/Layouts/AppLayout.vue`:
+     - إضافة دعم النتوء العلوي (Notch / Dynamic Island) للترويسة العلوية بـ `pt-[env(safe-area-inset-top,0px)]` ومساحة أمان سفلية `pb-28` لمنع اختفاء المحتوى خلف الـ Bottom Bar.
+
+5. **إزالة شوائب الويب (Removing Web Artifacts):**
+   * `backend/resources/css/app.css`:
+     - منع التحديد العشوائي للنصوص على عناصر التحكم والترويسات والشارات والقوائم `user-select: none;` مع السماح بالتحديد فقط داخل حقول الإدخال.
+   * `backend/resources/js/Components/POS/POSCartItem.vue` & `POSWeightPickerModal.vue` & `POS/Index.vue`:
+     - ضبط نوع الكيبورد الافتراضي على الموبايل ليفتح مباشرة على لوحة الأرقام والفواصل العشرية عبر `inputmode="decimal"` لحقول المبالغ، الأسعار، والكميات، و `inputmode="tel"` لأرقام الهواتف.
+
+6. **الإشعارات والـ Feedback اللمسي:**
+   * `backend/resources/js/helpers/alert.js`:
+     - دمج Capacitor Haptics مع الـ Vibration API بحيث تهتز هواتف المستخدمين بنبضة لمسية حقيقية وناعمة عند ظهور إشعارات النجاح أو التنبيهات والأخطاء.
+   * `backend/resources/js/Components/ActionMenu.vue` & `AppLayout.vue`:
+     - إضافة مقابض السحب (Native Drag Handles) للقوائم السفلية المنبثقة (Bottom Sheets) ومحاذاة شاشات الإشعارات لترتفع كأوراق عمل أصلية.
+
+7. **الشاشات والإعدادات:**
+   * `backend/resources/js/Pages/Settings/Index.vue`:
+     - تحويل تبويبات الإعدادات الخمسة إلى شريط أزرار انسيابي قابل للتمرير الأفقي (Native Segmented Horizontal Scrollable Bar) بدون تكسر السطور أو تشويه المظهر.
+
+### حاجات لسه محتاجة شغل (زي gestures معقدة أو PWA setup)
+- [ ] إضافة إيماءة السحب للحذف (Swipe to Delete gesture) في سطور سلة الـ POS وعناصر الجداول.
+- [ ] إعداد ملف `manifest.json` وأيقونات PWA وخادم Service Worker للتخزين المؤقت في وضع عدم الاتصال (Offline Mode).

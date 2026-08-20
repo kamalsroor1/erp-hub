@@ -49,6 +49,7 @@ const increaseQty = () => {
                         v-model.number="line.unit_price"
                         @input="emit('change')"
                         type="number"
+                        inputmode="decimal"
                         min="0"
                         class="w-18 h-7 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-1.5 text-center font-mono font-bold text-slate-900 dark:text-white text-xs focus:outline-none focus:border-amber-500"
                     />
@@ -70,6 +71,7 @@ const increaseQty = () => {
                     v-model.number="line.quantity"
                     @input="emit('change')"
                     type="number"
+                    inputmode="decimal"
                     step="0.001"
                     class="w-16 h-8 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-center text-xs font-mono font-black text-amber-600 dark:text-amber-400 focus:outline-none focus:border-amber-500"
                 />

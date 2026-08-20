@@ -220,12 +220,12 @@ const clearCache = () => {
                 </div>
             </div>
 
-            <!-- Navigation Tabs (5 Tabs) -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2 bg-slate-100 dark:bg-slate-950 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 font-tajawal">
+            <!-- Navigation Tabs (5 Tabs - Segmented Horizontal Pill Bar on Mobile) -->
+            <div class="flex sm:grid sm:grid-cols-5 gap-1.5 sm:gap-2 bg-slate-100 dark:bg-slate-950 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 font-tajawal overflow-x-auto no-scrollbar">
                 <button
                     @click="currentTab = 'branding'"
                     type="button"
-                    class="min-h-[44px] py-2.5 px-3 rounded-xl font-bold text-xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-center"
+                    class="min-h-[44px] py-2.5 px-3.5 sm:px-3 rounded-xl font-bold text-xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-center shrink-0 sm:shrink"
                     :class="currentTab === 'branding' ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
                     <Building2 class="w-4 h-4" />
@@ -235,7 +235,7 @@ const clearCache = () => {
                 <button
                     @click="currentTab = 'theme'"
                     type="button"
-                    class="min-h-[44px] py-2.5 px-3 rounded-xl font-bold text-xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-center"
+                    class="min-h-[44px] py-2.5 px-3.5 sm:px-3 rounded-xl font-bold text-xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-center shrink-0 sm:shrink"
                     :class="currentTab === 'theme' ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
                     <Palette class="w-4 h-4" />
@@ -245,7 +245,7 @@ const clearCache = () => {
                 <button
                     @click="currentTab = 'telegram'"
                     type="button"
-                    class="min-h-[44px] py-2.5 px-3 rounded-xl font-bold text-xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-center"
+                    class="min-h-[44px] py-2.5 px-3.5 sm:px-3 rounded-xl font-bold text-xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-center shrink-0 sm:shrink"
                     :class="currentTab === 'telegram' ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
                     <Send class="w-4 h-4" />
@@ -255,7 +255,7 @@ const clearCache = () => {
                 <button
                     @click="currentTab = 'backup'"
                     type="button"
-                    class="min-h-[44px] py-2.5 px-3 rounded-xl font-bold text-xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-center"
+                    class="min-h-[44px] py-2.5 px-3.5 sm:px-3 rounded-xl font-bold text-xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-center shrink-0 sm:shrink"
                     :class="currentTab === 'backup' ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
                     <HardDrive class="w-4 h-4" />
@@ -265,7 +265,7 @@ const clearCache = () => {
                 <button
                     @click="currentTab = 'system'"
                     type="button"
-                    class="min-h-[44px] py-2.5 px-3 rounded-xl font-bold text-xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-center col-span-2 sm:col-span-1"
+                    class="min-h-[44px] py-2.5 px-3.5 sm:px-3 rounded-xl font-bold text-xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-2 text-center shrink-0 sm:shrink"
                     :class="currentTab === 'system' ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
                     <Cpu class="w-4 h-4" />
