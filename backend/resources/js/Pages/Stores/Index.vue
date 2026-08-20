@@ -141,7 +141,7 @@ const saveUserAssignment = () => {
                     <button
                         @click="openCreateModal"
                         type="button"
-                        class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
+                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
                     >
                         <span class="text-base font-black">+</span>
                         <span>{{ $t('inventory.add_new_store') }}</span>
@@ -154,8 +154,8 @@ const saveUserAssignment = () => {
                 <div
                     v-for="s in stores"
                     :key="s.id"
-                    class="bg-white dark:bg-slate-900 border rounded-3xl p-5 shadow-xs space-y-4 transition hover:border-amber-500/50 flex flex-col justify-between"
-                    :class="s.is_main ? 'border-amber-500/40 dark:bg-gradient-to-br dark:from-slate-900 dark:to-amber-950/15' : 'border-slate-200 dark:border-slate-800'"
+                    class="bg-white dark:bg-slate-900 border rounded-3xl p-5 shadow-xs space-y-4 transition hover:border-theme-primary flex flex-col justify-between"
+                    :class="s.is_main ? 'border-theme-primary dark:bg-gradient-to-br dark:from-slate-900 dark:to-slate-950' : 'border-slate-200 dark:border-slate-800'"
                 >
                     <div class="space-y-4">
                         <div class="flex items-start justify-between">
@@ -168,7 +168,7 @@ const saveUserAssignment = () => {
                                 <div>
                                     <h3 class="font-black text-slate-900 dark:text-white text-sm flex items-center gap-2">
                                         <span>{{ s.name }}</span>
-                                        <span v-if="s.is_main" class="px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 text-[10px] font-black">{{ $t('inventory.store_type_main') }} 👑</span>
+                                        <span v-if="s.is_main" class="px-2 py-0.5 rounded-md tab-theme-active text-[10px] font-black">{{ $t('inventory.store_type_main') }} 👑</span>
                                     </h3>
                                     <div class="flex items-center gap-2 mt-0.5">
                                         <span class="text-xs text-slate-400 dark:text-slate-500 font-mono font-bold">{{ s.code }}</span>
@@ -365,7 +365,7 @@ const saveUserAssignment = () => {
                         <button
                             type="submit"
                             :disabled="storeForm.processing"
-                            class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                            class="px-5 py-2.5 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
                             {{ storeForm.processing ? '...' : $t('common.save') }}
                         </button>
@@ -385,7 +385,7 @@ const saveUserAssignment = () => {
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <h3 class="font-black text-base text-white flex items-center gap-2">
                         <span>👥 {{ $t('users.title') || 'تعيين موظفي الفرع' }}:</span>
-                        <span class="text-amber-400">{{ targetStore?.name }}</span>
+                        <span class="text-theme-primary">{{ targetStore?.name }}</span>
                     </h3>
                     <button @click="showUserModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
                 </div>
@@ -397,14 +397,14 @@ const saveUserAssignment = () => {
                         <label
                             v-for="u in all_users"
                             :key="u.id"
-                            class="flex items-center justify-between p-3 rounded-2xl bg-slate-950 border border-slate-800 hover:border-amber-500/40 cursor-pointer transition"
+                            class="flex items-center justify-between p-3 rounded-2xl bg-slate-950 border border-slate-800 hover:border-theme-primary cursor-pointer transition"
                         >
                             <div class="flex items-center gap-2.5">
                                 <input
                                     type="checkbox"
                                     :value="u.id"
                                     v-model="userAssignmentForm.user_ids"
-                                    class="rounded accent-amber-500 w-4 h-4 cursor-pointer"
+                                    class="rounded accent-theme-primary w-4 h-4 cursor-pointer"
                                 >
                                 <span class="text-xs font-bold text-white">{{ u.name }}</span>
                             </div>
@@ -423,7 +423,7 @@ const saveUserAssignment = () => {
                         <button
                             type="submit"
                             :disabled="userAssignmentForm.processing"
-                            class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                            class="px-5 py-2.5 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
                             {{ userAssignmentForm.processing ? '...' : $t('common.save') }}
                         </button>

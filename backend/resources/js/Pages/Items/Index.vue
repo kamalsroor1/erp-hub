@@ -175,7 +175,7 @@ const deleteItem = (item) => {
                     <button
                         @click="openCreateModal"
                         type="button"
-                        class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
+                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
                     >
                         <span class="text-base font-black">+</span>
                         <span>{{ $t('inventory.add_new_item') }}</span>
@@ -218,7 +218,7 @@ const deleteItem = (item) => {
                             v-model="search"
                             type="text"
                             :placeholder="$t('inventory.search_item_placeholder')"
-                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition shadow-inner"
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
                             🔍
@@ -232,7 +232,7 @@ const deleteItem = (item) => {
                                 @click="stockStatus = 'all'; applyFilters();"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                                :class="stockStatus === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                                :class="stockStatus === 'all' ? 'tab-theme-active' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('common.all') }}
                             </button>
@@ -256,7 +256,7 @@ const deleteItem = (item) => {
                             <span>{{ $t('common.filter') }}</span>
                             <span
                                 v-if="activeFiltersCount > 0"
-                                class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-mono font-black text-[11px] flex items-center justify-center"
+                                class="w-5 h-5 rounded-full bg-theme-primary text-white font-mono font-black text-[11px] flex items-center justify-center"
                             >
                                 {{ activeFiltersCount }}
                             </span>
@@ -268,7 +268,7 @@ const deleteItem = (item) => {
                 <div v-if="activeFiltersCount > 0" class="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 text-xs">
                     <span class="text-slate-500 text-[11px] font-bold">{{ $t('dashboard.quick_filter') || 'الفلاتر النشطة' }}:</span>
 
-                    <span v-if="category !== 'all'" class="px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center gap-1.5 font-bold">
+                    <span v-if="category !== 'all'" class="px-2.5 py-1 rounded-xl bg-theme-light border border-theme-light text-theme-primary flex items-center gap-1.5 font-bold">
                         <span>{{ $t('inventory.category') }}: {{ category }}</span>
                         <button @click="category = 'all'; applyFilters();" class="hover:text-rose-400">✕</button>
                     </span>
@@ -584,7 +584,7 @@ const deleteItem = (item) => {
                         <button
                             type="submit"
                             :disabled="itemForm.processing"
-                            class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                            class="px-5 py-2.5 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
                             {{ itemForm.processing ? '...' : (editingItem ? $t('common.save') : $t('inventory.add_new_item')) }}
                         </button>

@@ -190,7 +190,7 @@ const toggleActive = (c) => {
                 <button
                     @click="openCreateModal"
                     type="button"
-                    class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
+                    class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
                 >
                     <span class="text-base font-black">+</span>
                     <span>{{ $t('contacts.add_new_customer') }}</span>
@@ -208,7 +208,7 @@ const toggleActive = (c) => {
 
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.debtors_count') }}</span>
-                    <div class="text-2xl font-black font-mono text-amber-600 dark:text-amber-400">
+                    <div class="text-2xl font-black font-mono text-theme-primary">
                         {{ metrics.debtors_count || 0 }} <span class="text-xs text-slate-400 font-tajawal">{{ $t('contacts.customer_unit') }}</span>
                     </div>
                 </div>
@@ -221,7 +221,7 @@ const toggleActive = (c) => {
                 </div>
             </div>
 
-            <!-- Quick Filter Bar -->
+            <!-- Filter & Search Bar -->
             <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-xs space-y-3">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-3">
                     <div class="w-full md:w-96 relative">
@@ -229,7 +229,7 @@ const toggleActive = (c) => {
                             v-model="search"
                             type="text"
                             :placeholder="$t('contacts.search_customer_placeholder')"
-                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition shadow-inner"
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
                             🔍
@@ -242,7 +242,7 @@ const toggleActive = (c) => {
                                 @click="debtStatus = 'all'; applyFilters();"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                                :class="debtStatus === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                                :class="debtStatus === 'all' ? 'tab-theme-active' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('common.all') }}
                             </button>
@@ -263,7 +263,7 @@ const toggleActive = (c) => {
                         >
                             <span>⚙️</span>
                             <span>{{ $t('common.filter') }}</span>
-                            <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-mono font-black text-[11px] flex items-center justify-center">
+                            <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full bg-theme-primary text-white font-mono font-black text-[11px] flex items-center justify-center">
                                 {{ activeFiltersCount }}
                             </span>
                         </button>
@@ -526,7 +526,7 @@ const toggleActive = (c) => {
                         <button
                             type="submit"
                             :disabled="customerForm.processing"
-                            class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                            class="px-5 py-2.5 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
                             {{ customerForm.processing ? '...' : (editingCustomer ? $t('common.save') : $t('contacts.add_new_customer')) }}
                         </button>

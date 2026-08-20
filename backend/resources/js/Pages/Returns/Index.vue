@@ -96,18 +96,18 @@ const deleteReturn = (r) => {
                 <div class="space-y-1">
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">🔄</span>
-                        <h1 class="text-xl sm:text-2xl font-black text-white">
+                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                             {{ $t('returns.title') }}
                         </h1>
                     </div>
-                    <p class="text-xs text-slate-400 font-bold">
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
                         {{ $t('returns.subtitle') }}
                     </p>
                 </div>
 
                 <Link
                     href="/returns/create"
-                    class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
+                    class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
                 >
                     <span class="text-base font-black">+</span>
                     <span>{{ $t('returns.new_return_btn') }}</span>
@@ -116,37 +116,37 @@ const deleteReturn = (r) => {
 
             <!-- KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">{{ $t('returns.total_returns_val') }}</span>
-                    <div class="text-2xl font-black font-mono text-white">
-                        {{ formatMoney(metrics.total_returns) }} <span class="text-xs text-amber-400">{{ $t('common.currency') }}</span>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('returns.total_returns_val') }}</span>
+                    <div class="text-2xl font-black font-mono text-slate-900 dark:text-white">
+                        {{ formatMoney(metrics.total_returns) }} <span class="text-xs text-theme-primary">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">{{ $t('returns.sales_returns_count') }}</span>
-                    <div class="text-2xl font-black font-mono text-rose-400">
-                        {{ metrics.sales_returns_count || 0 }} <span class="text-xs text-slate-500 font-tajawal">{{ $t('returns.doc_unit') }}</span>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('returns.sales_returns_count') }}</span>
+                    <div class="text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
+                        {{ metrics.sales_returns_count || 0 }} <span class="text-xs text-slate-400 font-tajawal">{{ $t('returns.doc_unit') }}</span>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-2">
-                    <span class="text-xs text-slate-400 font-bold">{{ $t('returns.purchase_returns_count') }}</span>
-                    <div class="text-2xl font-black font-mono text-emerald-400">
-                        {{ metrics.purchase_returns_count || 0 }} <span class="text-xs text-slate-500 font-tajawal">{{ $t('returns.doc_unit') }}</span>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('returns.purchase_returns_count') }}</span>
+                    <div class="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                        {{ metrics.purchase_returns_count || 0 }} <span class="text-xs text-slate-400 font-tajawal">{{ $t('returns.doc_unit') }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- Quick Filter Bar -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-sm space-y-3">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-xs space-y-3">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-3">
                     <div class="w-full md:w-96 relative">
                         <input
                             v-model="search"
                             type="text"
                             :placeholder="$t('returns.search_placeholder')"
-                            class="w-full pr-10 pl-4 py-2.5 bg-slate-950/80 border border-slate-800 rounded-2xl text-xs text-white placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition"
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
                             🔍
@@ -154,12 +154,12 @@ const deleteReturn = (r) => {
                     </div>
 
                     <div class="w-full md:w-auto flex flex-wrap items-center justify-between md:justify-end gap-2">
-                        <div class="flex items-center gap-1 bg-slate-950/80 p-1 rounded-2xl border border-slate-800 text-xs">
+                        <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-950/80 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs">
                             <button
                                 @click="type = 'all'; applyFilters();"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                                :class="type === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'"
+                                :class="type === 'all' ? 'tab-theme-active' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('common.all') }}
                             </button>
@@ -167,7 +167,7 @@ const deleteReturn = (r) => {
                                 @click="type = 'sales_return'; applyFilters();"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                                :class="type === 'sales_return' ? 'bg-rose-500 text-white font-black' : 'text-slate-400 hover:text-white'"
+                                :class="type === 'sales_return' ? 'bg-rose-500 text-white font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('returns.sales_return') }}
                             </button>
@@ -175,7 +175,7 @@ const deleteReturn = (r) => {
                                 @click="type = 'purchase_return'; applyFilters();"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                                :class="type === 'purchase_return' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white'"
+                                :class="type === 'purchase_return' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('returns.purchase_return') }}
                             </button>
@@ -184,11 +184,11 @@ const deleteReturn = (r) => {
                         <button
                             @click="isDrawerOpen = true"
                             type="button"
-                            class="h-10 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+                            class="h-10 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
                         >
                             <span>⚙️</span>
                             <span>{{ $t('common.filter') }}</span>
-                            <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-mono font-black text-[11px] flex items-center justify-center">
+                            <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full bg-theme-primary text-white font-mono font-black text-[11px] flex items-center justify-center">
                                 {{ activeFiltersCount }}
                             </span>
                         </button>
@@ -197,11 +197,11 @@ const deleteReturn = (r) => {
             </div>
 
             <!-- Returns Table -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4 overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                 <th class="pb-3">{{ $t('returns.return_number') }}</th>
                                 <th class="pb-3">{{ $t('returns.return_type') }}</th>
                                 <th class="pb-3">{{ $t('returns.party_name') }}</th>
@@ -211,34 +211,34 @@ const deleteReturn = (r) => {
                                 <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/60 font-sans">
-                            <tr v-for="r in returns.data" :key="r.id" class="hover:bg-slate-800/30 transition">
-                                <td class="py-3.5 font-mono font-bold text-amber-400">
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
+                            <tr v-for="r in returns.data" :key="r.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
+                                <td class="py-3.5 font-mono font-black text-theme-primary">
                                     {{ r.return_number }}
                                 </td>
 
                                 <td class="py-3.5">
                                     <span
                                         class="px-2 py-0.5 rounded-full text-[10px] font-bold font-tajawal"
-                                        :class="r.return_type === 'sales_return' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'"
+                                        :class="r.return_type === 'sales_return' ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30' : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'"
                                     >
                                         {{ r.return_type === 'sales_return' ? $t('returns.sales_return') : $t('returns.purchase_return') }}
                                     </span>
                                 </td>
 
-                                <td class="py-3.5 font-bold text-white font-tajawal">
+                                <td class="py-3.5 font-bold text-slate-900 dark:text-white font-tajawal">
                                     {{ r.party_name }}
                                 </td>
 
-                                <td class="py-3.5 font-mono text-slate-400 text-[11px]">
+                                <td class="py-3.5 font-mono text-slate-500 dark:text-slate-400 text-[11px]">
                                     {{ r.return_date }}
                                 </td>
 
-                                <td class="py-3.5 font-mono font-black text-white text-sm">
+                                <td class="py-3.5 font-mono font-black text-slate-900 dark:text-white text-sm">
                                     {{ formatMoney(r.net_total) }} {{ $t('common.currency') }}
                                 </td>
 
-                                <td class="py-3.5 font-tajawal text-slate-400 text-[11px]">
+                                <td class="py-3.5 font-tajawal text-slate-500 dark:text-slate-400 text-[11px]">
                                     {{ r.reason || '—' }}
                                 </td>
 
@@ -247,7 +247,7 @@ const deleteReturn = (r) => {
                                         <button
                                             @click="openDetailsModal(r)"
                                             type="button"
-                                            class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition cursor-pointer"
+                                            class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition cursor-pointer"
                                         >
                                             {{ $t('returns.details_btn', { count: r.items_count }) }}
                                         </button>
@@ -255,7 +255,7 @@ const deleteReturn = (r) => {
                                         <button
                                             @click="deleteReturn(r)"
                                             type="button"
-                                            class="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition cursor-pointer"
+                                            class="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 transition cursor-pointer"
                                             :title="$t('common.delete')"
                                         >
                                             🗑️
@@ -273,8 +273,8 @@ const deleteReturn = (r) => {
                 </div>
 
                 <!-- Pagination -->
-                <div v-if="returns.links && returns.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
-                    <span class="text-xs text-slate-400 font-tajawal">
+                <div v-if="returns.links && returns.links.length > 3" class="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between font-sans">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-tajawal">
                         {{ $t('common.actions') ? `عرض ${returns.from || 0} إلى ${returns.to || 0} من إجمالي ${returns.total || 0}` : `Showing ${returns.from || 0} to ${returns.to || 0} of ${returns.total || 0}` }}
                     </span>
 
@@ -284,12 +284,12 @@ const deleteReturn = (r) => {
                                 v-if="link.url"
                                 :href="link.url"
                                 class="px-3 py-1.5 rounded-xl text-xs font-bold transition"
-                                :class="link.active ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'"
+                                :class="link.active ? 'tab-theme-active' : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'"
                                 v-html="link.label"
                             />
                             <span
                                 v-else
-                                class="px-3 py-1.5 rounded-xl text-xs text-slate-600 font-bold"
+                                class="px-3 py-1.5 rounded-xl text-xs text-slate-400 dark:text-slate-600 font-bold"
                                 v-html="link.label"
                             />
                         </template>
@@ -308,17 +308,17 @@ const deleteReturn = (r) => {
         >
             <div class="space-y-5">
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🔍 {{ $t('common.search') }}</label>
+                    <label class="text-xs font-black text-slate-700 dark:text-slate-300">🔍 {{ $t('common.search') }}</label>
                     <input
                         v-model="search"
                         type="text"
                         :placeholder="$t('common.search')"
-                        class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none transition"
+                        class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none transition"
                     >
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black text-slate-300">🔄 {{ $t('returns.return_type') }}</label>
+                    <label class="text-xs font-black text-slate-700 dark:text-slate-300">🔄 {{ $t('returns.return_type') }}</label>
                     <SearchableSelect
                         v-model="type"
                         :options="typeOptions"
@@ -328,11 +328,11 @@ const deleteReturn = (r) => {
 
                 <div class="grid grid-cols-2 gap-2">
                     <div class="space-y-1.5">
-                        <label class="text-xs font-black text-slate-300">{{ $t('contacts.from_date') }}</label>
+                        <label class="text-xs font-black text-slate-700 dark:text-slate-300">{{ $t('contacts.from_date') }}</label>
                         <DatePicker v-model="dateFrom" :placeholder="$t('contacts.from_date')" />
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-xs font-black text-slate-300">{{ $t('contacts.to_date') }}</label>
+                        <label class="text-xs font-black text-slate-700 dark:text-slate-300">{{ $t('contacts.to_date') }}</label>
                         <DatePicker v-model="dateTo" :placeholder="$t('contacts.to_date')" />
                     </div>
                 </div>
@@ -346,39 +346,39 @@ const deleteReturn = (r) => {
             class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
             dir="rtl"
         >
-            <div @click.stop class="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div @click.stop class="w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-900 dark:text-white">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                     <div>
-                        <h3 class="font-black text-base text-white">{{ $t('returns.return_details') }}: {{ selectedReturn.return_number }}</h3>
-                        <p class="text-xs text-amber-400 font-bold mt-0.5">{{ selectedReturn.party_name }} | {{ selectedReturn.return_date }}</p>
+                        <h3 class="font-black text-base text-slate-900 dark:text-white">{{ $t('returns.return_details') }}: {{ selectedReturn.return_number }}</h3>
+                        <p class="text-xs text-theme-primary font-bold mt-0.5">{{ selectedReturn.party_name }} | {{ selectedReturn.return_date }}</p>
                     </div>
-                    <button @click="showDetailsModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
+                    <button @click="showDetailsModal = false" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs dark:hover:text-white transition">✕</button>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                 <th class="pb-2">{{ $t('inventory.item_name') }}</th>
                                 <th class="pb-2 font-mono">{{ $t('common.quantity') }}</th>
                                 <th class="pb-2 font-mono">{{ $t('invoices.unit_price') }}</th>
                                 <th class="pb-2 font-mono">{{ $t('common.total') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/60 font-sans">
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
                             <tr v-for="it in selectedReturn.items" :key="it.id">
-                                <td class="py-2.5 font-bold text-white font-tajawal">{{ it.item_name }}</td>
-                                <td class="py-2.5 font-mono font-bold text-amber-400">{{ it.quantity }}</td>
-                                <td class="py-2.5 font-mono text-slate-300">{{ formatMoney(it.unit_price) }}</td>
-                                <td class="py-2.5 font-mono font-black text-emerald-400">{{ formatMoney(it.subtotal) }} {{ $t('common.currency') }}</td>
+                                <td class="py-2.5 font-bold text-slate-900 dark:text-white font-tajawal">{{ it.item_name }}</td>
+                                <td class="py-2.5 font-mono font-black text-theme-primary">{{ it.quantity }}</td>
+                                <td class="py-2.5 font-mono text-slate-600 dark:text-slate-300">{{ formatMoney(it.unit_price) }}</td>
+                                <td class="py-2.5 font-mono font-black text-emerald-600 dark:text-emerald-400">{{ formatMoney(it.subtotal) }} {{ $t('common.currency') }}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <div class="p-4 bg-slate-950/80 rounded-2xl border border-slate-800 flex items-center justify-between font-mono">
-                    <span class="text-xs text-slate-400 font-tajawal">{{ $t('returns.total_returns_val') }}:</span>
-                    <span class="text-lg font-black text-amber-400">{{ formatMoney(selectedReturn.net_total) }} {{ $t('common.currency') }}</span>
+                <div class="p-4 bg-slate-50 dark:bg-slate-950/80 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-between font-mono">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('returns.total_returns_val') }}:</span>
+                    <span class="text-lg font-black text-theme-primary">{{ formatMoney(selectedReturn.net_total) }} {{ $t('common.currency') }}</span>
                 </div>
             </div>
         </div>

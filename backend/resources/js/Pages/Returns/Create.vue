@@ -99,14 +99,14 @@ const submitReturn = () => {
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="space-y-1">
                     <div class="flex items-center gap-3">
-                        <Link href="/returns" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                        <Link href="/returns" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition">
                             →
                         </Link>
-                        <h1 class="text-xl sm:text-2xl font-black text-white">
+                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                             {{ $t('returns.create_title') }}
                         </h1>
                     </div>
-                    <p class="text-xs text-slate-400 font-bold">
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
                         {{ $t('returns.create_subtitle') }}
                     </p>
                 </div>
@@ -116,8 +116,8 @@ const submitReturn = () => {
                 <!-- Left 2 Cols: Form Info & Items Table -->
                 <div class="lg:col-span-2 space-y-5">
                     <!-- Return Type & Party -->
-                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
-                        <h2 class="text-sm font-black text-white border-b border-slate-800 pb-2 flex items-center gap-2">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4">
+                        <h2 class="text-sm font-black text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2 flex items-center gap-2">
                             <span>🔄</span>
                             <span>{{ $t('returns.return_type') }} & {{ $t('returns.party_name') }}</span>
                         </h2>
@@ -128,7 +128,7 @@ const submitReturn = () => {
                                 @click="form.return_type = 'sales_return'"
                                 type="button"
                                 class="py-3 px-4 rounded-2xl border text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
-                                :class="form.return_type === 'sales_return' ? 'bg-rose-500 text-white font-black border-rose-400 shadow-md shadow-rose-500/20' : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'"
+                                :class="form.return_type === 'sales_return' ? 'bg-rose-500 text-white font-black border-rose-400 shadow-md shadow-rose-500/20' : 'bg-slate-100 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 <span>↩️</span>
                                 <span>{{ $t('returns.sales_return') }}</span>
@@ -138,7 +138,7 @@ const submitReturn = () => {
                                 @click="form.return_type = 'purchase_return'"
                                 type="button"
                                 class="py-3 px-4 rounded-2xl border text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
-                                :class="form.return_type === 'purchase_return' ? 'bg-emerald-500 text-slate-950 font-black border-emerald-400 shadow-md shadow-emerald-500/20' : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'"
+                                :class="form.return_type === 'purchase_return' ? 'bg-emerald-500 text-slate-950 font-black border-emerald-400 shadow-md shadow-emerald-500/20' : 'bg-slate-100 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 <span>↪️</span>
                                 <span>{{ $t('returns.purchase_return') }}</span>
@@ -147,7 +147,7 @@ const submitReturn = () => {
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                             <div v-if="form.return_type === 'sales_return'" class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">{{ $t('returns.customer_from') }}</label>
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('returns.customer_from') }}</label>
                                 <SearchableSelect
                                     v-model="form.customer_id"
                                     :options="customerOptions"
@@ -156,7 +156,7 @@ const submitReturn = () => {
                             </div>
 
                             <div v-else class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">{{ $t('returns.supplier_to') }}</label>
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('returns.supplier_to') }}</label>
                                 <SearchableSelect
                                     v-model="form.supplier_id"
                                     :options="supplierOptions"
@@ -165,25 +165,25 @@ const submitReturn = () => {
                             </div>
 
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-300">{{ $t('returns.return_date') }} *</label>
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('returns.return_date') }} *</label>
                                 <DatePicker v-model="form.return_date" :placeholder="$t('returns.return_date')" />
                             </div>
 
                             <div class="space-y-1.5 sm:col-span-2">
-                                <label class="text-xs font-bold text-slate-300">{{ $t('returns.reason') }}</label>
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('returns.reason') }}</label>
                                 <input
                                     v-model="form.reason"
                                     type="text"
                                     :placeholder="$t('returns.reason_placeholder')"
-                                    class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                                    class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
                                 >
                             </div>
                         </div>
                     </div>
 
                     <!-- Items Selection -->
-                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
-                        <h2 class="text-sm font-black text-white border-b border-slate-800 pb-2 flex items-center gap-2">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4">
+                        <h2 class="text-sm font-black text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2 flex items-center gap-2">
                             <span>📦</span>
                             <span>{{ $t('returns.return_items') }}</span>
                         </h2>
@@ -200,7 +200,7 @@ const submitReturn = () => {
                             <button
                                 @click="addItemRow"
                                 type="button"
-                                class="h-10 px-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer"
+                                class="h-10 px-4 rounded-2xl btn-primary-theme text-xs font-black transition cursor-pointer"
                             >
                                 + {{ $t('common.add') }}
                             </button>
@@ -210,7 +210,7 @@ const submitReturn = () => {
                         <div class="overflow-x-auto pt-2">
                             <table class="w-full text-right text-xs">
                                 <thead>
-                                    <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                                    <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                         <th class="pb-2">{{ $t('inventory.item_name') }}</th>
                                         <th class="pb-2 w-28">{{ $t('common.quantity') }}</th>
                                         <th class="pb-2 w-28">{{ $t('invoices.unit_price') }}</th>
@@ -218,11 +218,11 @@ const submitReturn = () => {
                                         <th class="pb-2 text-center w-10">✕</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-800/60 font-sans">
+                                <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
                                     <tr v-for="(it, itIdx) in form.items" :key="it.item_id">
-                                        <td class="py-2.5 font-bold text-white font-tajawal">
+                                        <td class="py-2.5 font-bold text-slate-900 dark:text-white font-tajawal">
                                             {{ it.name }}
-                                            <span class="text-[10px] text-slate-500 mr-1">({{ it.unit }})</span>
+                                            <span class="text-[10px] text-slate-400 dark:text-slate-500 mr-1">({{ it.unit }})</span>
                                         </td>
 
                                         <td class="py-2.5">
@@ -232,7 +232,7 @@ const submitReturn = () => {
                                                 step="0.001"
                                                 min="0.001"
                                                 required
-                                                class="w-24 px-2 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono font-bold text-amber-400 focus:outline-none"
+                                                class="w-24 px-2 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-mono font-bold text-theme-primary focus:outline-none"
                                             >
                                         </td>
 
@@ -243,11 +243,11 @@ const submitReturn = () => {
                                                 step="0.01"
                                                 min="0"
                                                 required
-                                                class="w-24 px-2 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono font-bold text-white focus:outline-none"
+                                                class="w-24 px-2 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none"
                                             >
                                         </td>
 
-                                        <td class="py-2.5 font-mono font-black text-emerald-400">
+                                        <td class="py-2.5 font-mono font-black text-emerald-600 dark:text-emerald-400">
                                             {{ formatMoney((it.quantity || 0) * (it.unit_price || 0)) }} {{ $t('common.currency') }}
                                         </td>
 
@@ -255,7 +255,7 @@ const submitReturn = () => {
                                             <button
                                                 @click="removeItemRow(itIdx)"
                                                 type="button"
-                                                class="w-7 h-7 rounded-xl bg-rose-500/15 hover:bg-rose-500/30 text-rose-400 flex items-center justify-center transition cursor-pointer"
+                                                class="w-7 h-7 rounded-xl bg-rose-500/15 hover:bg-rose-500/30 text-rose-500 dark:text-rose-400 flex items-center justify-center transition cursor-pointer"
                                             >
                                                 ✕
                                             </button>
@@ -264,7 +264,7 @@ const submitReturn = () => {
                                 </tbody>
                             </table>
 
-                            <div v-if="form.items.length === 0" class="py-8 text-center text-slate-500 text-xs font-bold font-tajawal">
+                            <div v-if="form.items.length === 0" class="py-8 text-center text-slate-400 text-xs font-bold font-tajawal">
                                 {{ $t('returns.empty_return_items') }}
                             </div>
                         </div>
@@ -273,25 +273,25 @@ const submitReturn = () => {
 
                 <!-- Right Col: Financial Summary & Confirmation -->
                 <div class="space-y-5">
-                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4 sticky top-20">
-                        <h2 class="text-base font-black text-white border-b border-slate-800 pb-3">{{ $t('returns.summary_title') }}</h2>
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xl space-y-4 sticky top-20">
+                        <h2 class="text-base font-black text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-3">{{ $t('returns.summary_title') }}</h2>
 
                         <div class="space-y-3 font-mono">
                             <div class="flex items-center justify-between text-xs">
-                                <span class="text-slate-200 font-bold font-tajawal">{{ $t('returns.total_returns_val') }}:</span>
-                                <span class="text-xl font-black text-amber-400">{{ formatMoney(netTotal) }} {{ $t('common.currency') }}</span>
+                                <span class="text-slate-600 dark:text-slate-300 font-bold font-tajawal">{{ $t('returns.total_returns_val') }}:</span>
+                                <span class="text-xl font-black text-theme-primary">{{ formatMoney(netTotal) }} {{ $t('common.currency') }}</span>
                             </div>
 
-                            <div class="space-y-1 pt-2 border-t border-slate-800">
-                                <label class="text-xs font-bold text-slate-300 font-tajawal">{{ $t('returns.refund_amount_cash') }}</label>
+                            <div class="space-y-1 pt-2 border-t border-slate-200 dark:border-slate-800">
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300 font-tajawal">{{ $t('returns.refund_amount_cash') }}</label>
                                 <input
                                     v-model.number="form.refund_amount"
                                     type="number"
                                     step="0.01"
                                     min="0"
-                                    class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-emerald-400 font-mono font-black focus:outline-none"
+                                    class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-emerald-600 dark:text-emerald-400 font-mono font-black focus:outline-none"
                                 >
-                                <p class="text-[10px] text-slate-500 font-tajawal mt-0.5">
+                                <p class="text-[10px] text-slate-400 font-tajawal mt-0.5">
                                     {{ $t('returns.refund_hint') }}
                                 </p>
                             </div>
@@ -300,7 +300,7 @@ const submitReturn = () => {
                         <button
                             type="submit"
                             :disabled="form.processing || form.items.length === 0"
-                            class="w-full h-12 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                            class="w-full h-12 rounded-2xl btn-primary-theme text-xs font-black flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
                             <span>🔄</span>
                             <span>{{ form.processing ? '...' : $t('returns.confirm_return_save') }}</span>

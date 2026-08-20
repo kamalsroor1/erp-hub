@@ -373,7 +373,7 @@ useKeyboardShortcuts({
                                 @click="selectedCategory = 'all'"
                                 type="button"
                                 class="px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 cursor-pointer"
-                                :class="selectedCategory === 'all' ? 'bg-amber-500 text-slate-950 font-black shadow-md' : 'bg-slate-100 text-slate-600 hover:text-slate-900 dark:bg-slate-950 dark:text-slate-400 dark:hover:text-white border border-slate-200 dark:border-slate-800'"
+                                :class="selectedCategory === 'all' ? 'tab-theme-active' : 'bg-slate-100 text-slate-600 hover:text-slate-900 dark:bg-slate-950 dark:text-slate-400 dark:hover:text-white border border-slate-200 dark:border-slate-800'"
                             >
                                 {{ $t('common.all') }} ({{ items.length }})
                             </button>
@@ -384,7 +384,7 @@ useKeyboardShortcuts({
                                 @click="selectedCategory = cat"
                                 type="button"
                                 class="px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 cursor-pointer"
-                                :class="selectedCategory === cat ? 'bg-amber-500 text-slate-950 font-black shadow-md' : 'bg-slate-100 text-slate-600 hover:text-slate-900 dark:bg-slate-950 dark:text-slate-400 dark:hover:text-white border border-slate-200 dark:border-slate-800'"
+                                :class="selectedCategory === cat ? 'tab-theme-active' : 'bg-slate-100 text-slate-600 hover:text-slate-900 dark:bg-slate-950 dark:text-slate-400 dark:hover:text-white border border-slate-200 dark:border-slate-800'"
                             >
                                 {{ cat }}
                             </button>
@@ -560,7 +560,7 @@ useKeyboardShortcuts({
                                 @click="paymentMethod = 'cash'"
                                 type="button"
                                 class="py-1 rounded-lg border transition text-center cursor-pointer"
-                                :class="paymentMethod === 'cash' ? 'bg-amber-500/15 border-amber-500 text-amber-600 dark:text-amber-400 font-black' : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'"
+                                :class="paymentMethod === 'cash' ? 'bg-theme-light border-theme-primary text-theme-primary font-black' : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'"
                             >
                                 {{ $t('treasury.cash_drawer') }}
                             </button>
@@ -598,11 +598,11 @@ useKeyboardShortcuts({
                                     v-model.number="paidAmount"
                                     type="number"
                                     min="0"
-                                    class="w-full h-8 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-2 text-center text-xs font-mono font-black text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
+                                    class="w-full h-8 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-2 text-center text-xs font-mono font-black text-slate-900 dark:text-white focus:outline-none focus:border-theme-primary"
                                 />
                             </div>
 
-                            <div v-if="changeDue > 0" class="px-2.5 py-1 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-amber-300 font-mono font-black text-xs">
+                            <div v-if="changeDue > 0" class="px-2.5 py-1 rounded-xl bg-theme-light border border-theme-light text-theme-primary font-mono font-black text-xs">
                                 {{ $t('pos.change_due') }}: {{ formatMoney(changeDue) }} {{ $t('common.currency') }}
                             </div>
                         </div>
@@ -610,7 +610,7 @@ useKeyboardShortcuts({
                         <!-- Quick Cash Amount Chips -->
                         <div v-if="paymentType !== 'credit'" class="flex items-center gap-1 overflow-x-auto text-[10px] font-mono">
                             <span class="text-slate-500 text-[9px] px-1 font-tajawal">{{ $t('contacts.voucher_amount') }}:</span>
-                            <button @click="quickSetPaidExact" type="button" class="px-2 py-0.5 rounded bg-slate-200 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold transition">{{ $t('common.net') }}</button>
+                            <button @click="quickSetPaidExact" type="button" class="px-2 py-0.5 rounded bg-slate-200 hover:bg-theme-primary hover:text-white dark:bg-slate-800 text-theme-primary font-bold transition">{{ $t('common.net') }}</button>
                             <button v-for="amt in [50, 100, 200, 500]" :key="amt" @click="quickSetPaidAmount(amt)" type="button" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition">{{ amt }}</button>
                         </div>
 
@@ -629,7 +629,7 @@ useKeyboardShortcuts({
                                 :disabled="isSubmitting || cart.length === 0"
                                 @click="submitCheckout"
                                 type="button"
-                                class="flex-1 h-11 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 disabled:opacity-50 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 transition transform active:scale-95 cursor-pointer"
+                                class="flex-1 h-11 rounded-2xl btn-primary-theme disabled:opacity-50 font-black text-sm flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
                             >
                                 <span>⚡</span>
                                 <span>{{ isSubmitting ? $t('common.save') + '...' : $t('pos.confirm_invoice') + ' (Enter)' }}</span>

@@ -217,7 +217,7 @@ const getUserRoleLabel = computed(() => {
                 <div class="p-3 border-b border-slate-200 dark:border-slate-800/80 shrink-0">
                     <Link
                         href="/pos"
-                        class="w-full flex items-center justify-center gap-2 py-3 px-3.5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-400 text-white font-black rounded-2xl shadow-lg shadow-amber-600/30 transition-all duration-200 active:scale-95 font-tajawal cursor-pointer group"
+                        class="w-full flex items-center justify-center gap-2 py-3 px-3.5 bg-theme-gradient text-white font-black rounded-2xl shadow-theme-primary transition-all duration-200 active:scale-95 font-tajawal cursor-pointer group"
                         :title="$t('nav.new_sale_invoice_btn')"
                     >
                         <span class="text-lg font-black shrink-0 transition-transform group-hover:rotate-90 duration-300">+</span>
@@ -248,7 +248,7 @@ const getUserRoleLabel = computed(() => {
                                     class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 group"
                                     :class="[
                                         item.active
-                                            ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 shadow-xs font-black'
+                                            ? 'bg-theme-light text-theme-primary border border-theme-light shadow-xs font-black'
                                             : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-white',
                                         isSidebarCollapsed ? 'justify-center px-2' : ''
                                     ]"
@@ -319,7 +319,7 @@ const getUserRoleLabel = computed(() => {
                     <button
                         @click="toggleSidebar()"
                         type="button"
-                        class="hidden lg:flex p-2 rounded-xl text-slate-500 hover:text-amber-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-amber-400 dark:hover:bg-slate-800 transition cursor-pointer"
+                        class="hidden lg:flex p-2 rounded-xl text-slate-500 hover:text-theme-primary hover:bg-slate-100 dark:text-slate-400 dark:hover:text-theme-primary dark:hover:bg-slate-800 transition cursor-pointer"
                         :title="$t('nav.toggle_sidebar')"
                     >
                         <svg class="w-5 h-5 transition-transform duration-300" :class="isSidebarCollapsed ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -331,7 +331,7 @@ const getUserRoleLabel = computed(() => {
                     <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 text-xs font-bold font-tajawal text-slate-700 dark:text-slate-300">
                         <span class="text-slate-500 dark:text-slate-400 hidden xl:inline">{{ currentDate }}</span>
                         <span class="text-slate-300 dark:text-slate-600 hidden xl:inline">|</span>
-                        <span class="text-amber-600 dark:text-amber-400 font-mono font-bold">{{ currentTime }}</span>
+                        <span class="text-theme-primary font-mono font-bold">{{ currentTime }}</span>
                     </div>
                 </div>
 
@@ -402,7 +402,7 @@ const getUserRoleLabel = computed(() => {
                                     <span>🔔</span>
                                     <span>{{ $t('nav.live_notifications_center') }}</span>
                                 </span>
-                                <span class="text-[10px] text-amber-600 dark:text-amber-400 font-bold">
+                                <span class="text-[10px] text-theme-primary font-bold">
                                     {{ notifications.length }} {{ $t('nav.notifications_count') }}
                                 </span>
                             </div>
@@ -422,7 +422,7 @@ const getUserRoleLabel = computed(() => {
                                         <Link
                                             :href="n.link"
                                             @click="showNotifications = false"
-                                            class="text-[10px] font-bold text-amber-600 dark:text-amber-400 hover:underline transition"
+                                            class="text-[10px] font-bold text-theme-primary hover:underline transition"
                                         >
                                             {{ n.link_label }} ←
                                         </Link>
@@ -440,7 +440,7 @@ const getUserRoleLabel = computed(() => {
                     <button
                         @click="toggleTheme"
                         type="button"
-                        class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center transition cursor-pointer shrink-0 shadow-xs hover:text-amber-600 dark:hover:text-amber-400"
+                        class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center transition cursor-pointer shrink-0 shadow-xs hover:text-theme-primary"
                         :title="currentTheme === 'dark' ? 'التحويل للوضع النهاري (Light)' : 'التحويل للوضع الليلي (Dark)'"
                     >
                         <span class="text-sm">{{ currentTheme === 'dark' ? '☀️' : '🌙' }}</span>
@@ -453,7 +453,7 @@ const getUserRoleLabel = computed(() => {
                             type="button"
                             class="flex items-center gap-2 p-1.5 pr-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition cursor-pointer text-slate-800 dark:text-slate-200"
                         >
-                            <div class="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-600 dark:text-amber-400 font-bold text-xs flex items-center justify-center">
+                            <div class="w-7 h-7 rounded-lg bg-theme-light border border-theme-light text-theme-primary font-bold text-xs flex items-center justify-center">
                                 {{ user.name ? user.name.charAt(0) : 'U' }}
                             </div>
                             <span class="text-xs font-bold hidden lg:inline max-w-[120px] truncate">
@@ -469,8 +469,8 @@ const getUserRoleLabel = computed(() => {
                         >
                             <div class="p-2 border-b border-slate-200 dark:border-slate-800">
                                 <p class="text-xs font-black text-slate-900 dark:text-white truncate">{{ user.name }}</p>
-                                <p class="text-[11px] text-amber-600 dark:text-amber-400 font-mono mt-0.5">{{ user.phone }}</p>
-                                <span class="mt-1.5 inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                <p class="text-[11px] text-theme-primary font-mono mt-0.5">{{ user.phone }}</p>
+                                <span class="mt-1.5 inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-theme-light text-theme-primary border border-theme-light">
                                     {{ getUserRoleLabel }}
                                 </span>
                             </div>
@@ -538,7 +538,7 @@ const getUserRoleLabel = computed(() => {
                         :key="store.id"
                         @click="switchStore(store.id)"
                         class="p-3 rounded-2xl border flex items-center justify-between cursor-pointer transition"
-                        :class="activeStore?.id === store.id ? 'bg-amber-500/15 border-amber-500/40 text-amber-600 dark:text-amber-400 font-black' : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'"
+                        :class="activeStore?.id === store.id ? 'bg-theme-light border-theme-primary text-theme-primary font-black' : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'"
                     >
                         <div class="flex items-center gap-2.5">
                             <span class="text-lg">{{ store.type === 'van' ? '🚐' : '🏬' }}</span>
@@ -547,7 +547,7 @@ const getUserRoleLabel = computed(() => {
                                 <p class="text-[10px] text-slate-400 dark:text-slate-500 font-sans">{{ store.type === 'van' ? $t('nav.van_store') : $t('nav.branch_store') }}</p>
                             </div>
                         </div>
-                        <span v-if="activeStore?.id === store.id" class="text-sm font-bold text-amber-600 dark:text-amber-400">✓</span>
+                        <span v-if="activeStore?.id === store.id" class="text-sm font-bold text-theme-primary">✓</span>
                     </div>
                 </div>
             </div>

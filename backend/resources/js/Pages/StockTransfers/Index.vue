@@ -54,18 +54,18 @@ const openDetailsModal = (t) => {
                 <div class="space-y-1">
                     <div class="flex items-center gap-2">
                         <span class="text-2xl">🚚</span>
-                        <h1 class="text-xl sm:text-2xl font-black text-white">
+                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                             {{ $t('inventory.transfers_title') }}
                         </h1>
                     </div>
-                    <p class="text-xs text-slate-400 font-bold">
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
                         {{ $t('inventory.transfers_subtitle') }}
                     </p>
                 </div>
 
                 <Link
                     href="/stock-transfers/create"
-                    class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
+                    class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
                 >
                     <span class="text-base font-black">+</span>
                     <span>{{ $t('inventory.new_transfer') }}</span>
@@ -73,11 +73,11 @@ const openDetailsModal = (t) => {
             </div>
 
             <!-- Transfers Table -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-sm space-y-4 overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                 <th class="pb-3">{{ $t('contacts.reference_no') }}</th>
                                 <th class="pb-3">{{ $t('inventory.from_store') }}</th>
                                 <th class="pb-3">{{ $t('inventory.to_store') }}</th>
@@ -87,30 +87,30 @@ const openDetailsModal = (t) => {
                                 <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/60 font-sans">
-                            <tr v-for="t in transfers.data" :key="t.id" class="hover:bg-slate-800/30 transition">
-                                <td class="py-3.5 font-mono font-bold text-amber-400">
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
+                            <tr v-for="t in transfers.data" :key="t.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
+                                <td class="py-3.5 font-mono font-black text-theme-primary">
                                     {{ t.transfer_number }}
                                 </td>
 
-                                <td class="py-3.5 font-bold text-rose-300 font-tajawal">
+                                <td class="py-3.5 font-bold text-rose-600 dark:text-rose-400 font-tajawal">
                                     {{ t.from_store_name }}
                                 </td>
 
-                                <td class="py-3.5 font-bold text-emerald-300 font-tajawal">
+                                <td class="py-3.5 font-bold text-emerald-600 dark:text-emerald-400 font-tajawal">
                                     {{ t.to_store_name }}
                                 </td>
 
-                                <td class="py-3.5 font-mono text-slate-400 text-[11px]">
+                                <td class="py-3.5 font-mono text-slate-500 dark:text-slate-400 text-[11px]">
                                     {{ t.transfer_date }}
                                 </td>
 
-                                <td class="py-3.5 text-slate-300 font-tajawal">
+                                <td class="py-3.5 text-slate-700 dark:text-slate-300 font-tajawal font-bold">
                                     {{ t.items_count }} {{ $t('inventory.item_unit') }}
                                 </td>
 
                                 <td class="py-3.5 text-center">
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                                         {{ $t('common.success') }} 🟢
                                     </span>
                                 </td>
@@ -119,7 +119,7 @@ const openDetailsModal = (t) => {
                                     <button
                                         @click="openDetailsModal(t)"
                                         type="button"
-                                        class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition cursor-pointer"
+                                        class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition cursor-pointer"
                                     >
                                         {{ $t('inventory.view_items') }}
                                     </button>
@@ -143,27 +143,27 @@ const openDetailsModal = (t) => {
             class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
             dir="rtl"
         >
-            <div @click.stop class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div @click.stop class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-900 dark:text-white">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                     <div>
-                        <h3 class="font-black text-base text-white">{{ $t('inventory.transfers_title') }}: {{ selectedTransfer.transfer_number }}</h3>
-                        <p class="text-xs text-amber-400 font-bold mt-0.5">{{ selectedTransfer.from_store_name }} ← {{ selectedTransfer.to_store_name }}</p>
+                        <h3 class="font-black text-base text-slate-900 dark:text-white">{{ $t('inventory.transfers_title') }}: {{ selectedTransfer.transfer_number }}</h3>
+                        <p class="text-xs text-theme-primary font-bold mt-0.5">{{ selectedTransfer.from_store_name }} ← {{ selectedTransfer.to_store_name }}</p>
                     </div>
-                    <button @click="showDetailsModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
+                    <button @click="showDetailsModal = false" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs dark:hover:text-white transition">✕</button>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                 <th class="pb-2">{{ $t('inventory.item_name') }}</th>
                                 <th class="pb-2 font-mono">{{ $t('inventory.transferred_quantity') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/60 font-sans">
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
                             <tr v-for="it in selectedTransfer.items" :key="it.id">
-                                <td class="py-2.5 font-bold text-white font-tajawal">{{ it.item_name }}</td>
-                                <td class="py-2.5 font-mono font-bold text-amber-400">{{ it.quantity }}</td>
+                                <td class="py-2.5 font-bold text-slate-900 dark:text-white font-tajawal">{{ it.item_name }}</td>
+                                <td class="py-2.5 font-mono font-black text-theme-primary">{{ it.quantity }}</td>
                             </tr>
                         </tbody>
                     </table>

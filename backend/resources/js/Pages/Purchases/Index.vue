@@ -129,7 +129,7 @@ const cancelPurchase = (p) => {
 
                     <Link
                         href="/purchases/create"
-                        class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
+                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
                     >
                         <span class="text-base font-black">+</span>
                         <span>{{ $t('purchases.create_po_title') }}</span>
@@ -141,8 +141,8 @@ const cancelPurchase = (p) => {
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('purchases.kpi_total_purchases') }}</span>
-                    <div class="text-2xl font-black font-mono text-slate-900 dark:text-white">
-                        {{ formatMoney(metrics.total_purchases) }} <span class="text-xs text-amber-600 dark:text-amber-400">{{ $t('common.currency') }}</span>
+                    <div class="text-2xl font-black font-mono text-theme-primary">
+                        {{ formatMoney(metrics.total_purchases) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
@@ -169,7 +169,7 @@ const cancelPurchase = (p) => {
                             v-model="search"
                             type="text"
                             :placeholder="$t('purchases.search_placeholder')"
-                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition shadow-inner"
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
                             🔍
@@ -182,7 +182,7 @@ const cancelPurchase = (p) => {
                                 @click="status = 'all'; applyFilters();"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                                :class="status === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                                :class="status === 'all' ? 'tab-theme-active' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('common.all') }}
                             </button>
@@ -211,7 +211,7 @@ const cancelPurchase = (p) => {
                         >
                             <span>⚙️</span>
                             <span>{{ $t('invoices.advanced_filters') }}</span>
-                            <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-mono font-black text-[11px] flex items-center justify-center">
+                            <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full bg-theme-primary text-white font-mono font-black text-[11px] flex items-center justify-center">
                                 {{ activeFiltersCount }}
                             </span>
                         </button>
@@ -226,11 +226,12 @@ const cancelPurchase = (p) => {
                         <thead>
                             <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                 <th class="pb-3">{{ $t('invoices.invoice_number') }}</th>
-                                <th class="pb-3">{{ $t('purchases.supplier') }}</th>
+                                <th class="pb-3">{{ $t('contacts.supplier_title') }}</th>
+                                <th class="pb-3">{{ $t('inventory.store') }}</th>
                                 <th class="pb-3">{{ $t('common.date') }}</th>
-                                <th class="pb-3 font-mono">{{ $t('purchases.total_cost') }}</th>
-                                <th class="pb-3 font-mono">{{ $t('common.paid') }}</th>
-                                <th class="pb-3 font-mono">{{ $t('common.remaining') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('invoices.grand_total') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('invoices.paid') }}</th>
+                                <th class="pb-3 font-mono">{{ $t('invoices.remaining') }}</th>
                                 <th class="pb-3 text-center">{{ $t('common.status') }}</th>
                                 <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
@@ -238,8 +239,10 @@ const cancelPurchase = (p) => {
                         <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
                             <tr v-for="p in purchases.data" :key="p.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
                                 <!-- Number -->
-                                <td class="py-3.5 font-mono font-bold text-amber-600 dark:text-amber-400">
-                                    {{ p.purchase_number }}
+                                <td class="py-3.5 font-mono font-black text-theme-primary">
+                                    <Link :href="`/purchases/${p.id}`" class="hover:underline">
+                                        #{{ p.purchase_number }}
+                                    </Link>
                                 </td>
 
                                 <!-- Supplier -->

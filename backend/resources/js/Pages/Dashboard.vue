@@ -46,7 +46,7 @@ const getPaymentTypeBadge = (type) => {
     <AppLayout>
         <div class="space-y-6 font-tajawal">
             <!-- Welcome Header Banner -->
-            <div class="bg-gradient-to-l from-amber-500/20 via-white to-slate-50 dark:from-amber-600/30 dark:via-slate-900 dark:to-slate-900 rounded-3xl p-6 lg:p-8 border border-amber-500/30 dark:border-amber-500/20 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-colors">
+            <div class="bg-gradient-to-l from-slate-100 via-white to-slate-50 dark:from-slate-900/90 dark:via-slate-900 dark:to-slate-950 rounded-3xl p-6 lg:p-8 border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-colors">
                 <div class="space-y-2">
                     <div class="flex items-center gap-3">
                         <span class="text-3xl">☕</span>
@@ -56,7 +56,7 @@ const getPaymentTypeBadge = (type) => {
                     </div>
                     <p class="text-sm lg:text-base text-slate-600 dark:text-slate-300 font-bold flex flex-wrap items-center gap-2">
                         <span>{{ $t('dashboard.current_branch_label') }}</span>
-                        <span class="px-2.5 py-0.5 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-black">
+                        <span class="px-2.5 py-0.5 rounded-xl bg-theme-light text-theme-primary border border-theme-light font-black">
                             {{ activeStore?.name || $t('common.main_store_default') }}
                         </span>
                         <span class="text-slate-400 dark:text-slate-500 hidden sm:inline">•</span>
@@ -67,11 +67,11 @@ const getPaymentTypeBadge = (type) => {
                 <div class="flex items-center gap-3 w-full md:w-auto">
                     <Link
                         href="/pos"
-                        class="flex-1 md:flex-none h-12 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-sm flex items-center justify-center gap-2.5 shadow-xl shadow-amber-500/25 transition transform active:scale-95 cursor-pointer"
+                        class="flex-1 md:flex-none h-12 px-6 rounded-2xl btn-primary-theme font-black text-sm flex items-center justify-center gap-2.5 transition transform active:scale-95 cursor-pointer"
                     >
                         <span class="text-base">⚡</span>
                         <span>{{ $t('dashboard.pos_fast_btn') }}</span>
-                        <span class="px-2 py-0.5 rounded-lg bg-slate-950/20 text-xs font-mono font-black">F2</span>
+                        <span class="px-2 py-0.5 rounded-lg bg-black/20 text-xs font-mono font-black">F2</span>
                     </Link>
 
                     <Link
@@ -106,15 +106,15 @@ const getPaymentTypeBadge = (type) => {
                 </div>
 
                 <!-- Card 2: Monthly Profit Margin -->
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-3 relative overflow-hidden group hover:border-amber-500/40 transition">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-3 relative overflow-hidden group hover:border-theme-primary transition">
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-bold text-slate-600 dark:text-slate-300">{{ $t('dashboard.monthly_gross_profit_card') }}</span>
-                        <div class="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg font-black">
+                        <div class="w-10 h-10 rounded-2xl bg-theme-light text-theme-primary flex items-center justify-center text-lg font-black">
                             📈
                         </div>
                     </div>
                     <div>
-                        <div class="text-3xl lg:text-4xl font-black font-mono text-amber-600 dark:text-amber-400 tracking-tight">
+                        <div class="text-3xl lg:text-4xl font-black font-mono text-theme-primary tracking-tight">
                             {{ formatMoney(summary?.monthly_gross_profit) }} <span class="text-sm font-bold text-slate-900 dark:text-white">{{ $t('common.currency') }}</span>
                         </div>
                         <div class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-1.5 flex items-center gap-1">
@@ -197,7 +197,7 @@ const getPaymentTypeBadge = (type) => {
                             <div class="w-full bg-slate-100 dark:bg-slate-800/80 rounded-2xl overflow-hidden flex items-end h-32">
                                 <div
                                     :style="{ height: `${Math.max(8, Math.round((day.sales / maxDailySales) * 100))}%` }"
-                                    class="w-full rounded-2xl transition-all duration-500 bg-gradient-to-t from-amber-500 to-amber-400 group-hover:from-amber-400 shadow-md shadow-amber-500/15"
+                                    class="w-full rounded-2xl transition-all duration-500 bg-theme-gradient shadow-theme-sm"
                                 ></div>
                             </div>
 
@@ -216,7 +216,7 @@ const getPaymentTypeBadge = (type) => {
                                 <span>⚡</span>
                                 <span>{{ $t('dashboard.peak_hours_title') }}</span>
                             </h3>
-                            <span v-if="analytics?.peak_hour?.label" class="text-xs font-black px-2.5 py-1 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                            <span v-if="analytics?.peak_hour?.label" class="text-xs font-black px-2.5 py-1 rounded-xl bg-theme-light text-theme-primary border border-theme-light">
                                 {{ $t('dashboard.peak_hour_badge', { hour: analytics.peak_hour.label }) }}
                             </span>
                         </div>
@@ -231,7 +231,7 @@ const getPaymentTypeBadge = (type) => {
                             >
                                 <div
                                     v-if="h.intensity > 0"
-                                    class="w-full bg-amber-500 rounded-b-lg"
+                                    class="w-full bg-theme-primary rounded-b-lg"
                                     :style="{ height: `${Math.max(20, h.intensity)}%` }"
                                 ></div>
                             </div>
@@ -250,7 +250,7 @@ const getPaymentTypeBadge = (type) => {
                                     </div>
                                     <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
                                         <div
-                                            class="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full"
+                                            class="h-full bg-theme-gradient rounded-full"
                                             :style="{ width: `${pm.percentage}%` }"
                                         ></div>
                                     </div>
@@ -270,7 +270,7 @@ const getPaymentTypeBadge = (type) => {
                             <span class="text-xl">🧾</span>
                             <h2 class="text-base lg:text-lg font-black text-slate-900 dark:text-white">{{ $t('dashboard.recent_invoices_title') }}</h2>
                         </div>
-                        <Link href="/invoices" class="text-xs font-black text-amber-600 dark:text-amber-400 hover:underline transition">
+                        <Link href="/invoices" class="text-xs font-black text-theme-primary hover:underline transition">
                             {{ $t('dashboard.view_all') }}
                         </Link>
                     </div>
@@ -289,7 +289,7 @@ const getPaymentTypeBadge = (type) => {
                             </thead>
                             <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
                                 <tr v-for="inv in recent_invoices" :key="inv.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
-                                    <td class="py-3.5 font-mono font-black text-amber-600 dark:text-amber-400">
+                                    <td class="py-3.5 font-mono font-black text-theme-primary">
                                         <Link :href="`/invoices/${inv.id}`" class="hover:underline">
                                             #{{ inv.invoice_number }}
                                         </Link>
@@ -320,7 +320,7 @@ const getPaymentTypeBadge = (type) => {
                             <span class="text-xl">🚨</span>
                             <h2 class="text-base font-black text-slate-900 dark:text-white">{{ $t('dashboard.low_stock_radar_title') }}</h2>
                         </div>
-                        <Link href="/purchases/smart-reorder" class="text-xs font-black text-amber-600 dark:text-amber-400 hover:underline transition">
+                        <Link href="/purchases/smart-reorder" class="text-xs font-black text-theme-primary hover:underline transition">
                             {{ $t('dashboard.purchases_assistant') }}
                         </Link>
                     </div>

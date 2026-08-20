@@ -232,7 +232,7 @@ const submitBlendInvoice = () => {
                                         @click="targetWeightGrams = w.value"
                                         type="button"
                                         class="py-2.5 px-3 rounded-2xl border text-xs font-bold transition cursor-pointer"
-                                        :class="targetWeightGrams === w.value ? 'bg-amber-500 text-slate-950 font-black border-amber-400 shadow-md shadow-amber-500/20' : 'bg-slate-100 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                                        :class="targetWeightGrams === w.value ? 'tab-theme-active border-theme-primary shadow-xs' : 'bg-slate-100 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                                     >
                                         {{ w.label }}
                                     </button>
@@ -247,7 +247,7 @@ const submitBlendInvoice = () => {
                                         v-model.number="targetWeightGrams"
                                         type="number"
                                         step="1"
-                                        class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-amber-600 dark:text-amber-400 font-mono font-black focus:border-amber-500 focus:outline-none"
+                                        class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-theme-primary font-mono font-black focus:border-theme-primary focus:outline-none"
                                     >
                                 </div>
 
@@ -255,7 +255,7 @@ const submitBlendInvoice = () => {
                                     <label class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ $t('inventory.roast_type') }}</label>
                                     <select
                                         v-model="roastType"
-                                        class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none"
+                                        class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
                                     >
                                         <option value="فاتح">{{ $t('inventory.roast_light') }}</option>
                                         <option value="وسط">{{ $t('inventory.roast_medium') }}</option>
@@ -268,7 +268,7 @@ const submitBlendInvoice = () => {
                                     <label class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ $t('inventory.grind_level') }}</label>
                                     <select
                                         v-model="grindLevel"
-                                        class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none"
+                                        class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
                                     >
                                         <option value="تركي ناعم">{{ $t('inventory.grind_turkish') }}</option>
                                         <option value="إسبريسو">{{ $t('inventory.grind_espresso') }}</option>
@@ -307,7 +307,7 @@ const submitBlendInvoice = () => {
                             <button
                                 @click="addComponent"
                                 type="button"
-                                class="h-10 px-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer"
+                                class="h-10 px-4 rounded-2xl btn-primary-theme text-xs font-black transition cursor-pointer"
                             >
                                 + {{ $t('inventory.add_new_item') }}
                             </button>
@@ -335,7 +335,7 @@ const submitBlendInvoice = () => {
                                         min="0"
                                         max="100"
                                         step="5"
-                                        class="w-full accent-amber-500"
+                                        class="w-full accent-theme-primary cursor-pointer"
                                     >
                                     <div class="w-14 flex items-center">
                                         <input
@@ -343,7 +343,7 @@ const submitBlendInvoice = () => {
                                             type="number"
                                             min="0"
                                             max="100"
-                                            class="w-12 px-1.5 py-1 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono font-black text-amber-600 dark:text-amber-400 focus:outline-none"
+                                            class="w-12 px-1.5 py-1 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono font-black text-theme-primary focus:outline-none"
                                         >
                                         <span class="text-xs text-slate-500 dark:text-slate-400 mr-1">%</span>
                                     </div>
@@ -377,7 +377,7 @@ const submitBlendInvoice = () => {
                                     min="0"
                                     step="1"
                                     placeholder="0"
-                                    class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-emerald-600 dark:text-emerald-400 font-mono font-bold focus:border-amber-500 focus:outline-none"
+                                    class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-emerald-600 dark:text-emerald-400 font-mono font-bold focus:border-theme-primary focus:outline-none"
                                 >
                             </div>
 
@@ -387,7 +387,7 @@ const submitBlendInvoice = () => {
                                     v-model="notes"
                                     type="text"
                                     :placeholder="$t('inventory.blend_notes')"
-                                    class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none"
+                                    class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
                                 >
                             </div>
                         </div>
@@ -396,10 +396,10 @@ const submitBlendInvoice = () => {
 
                 <!-- Right Col: Financial Summary & Direct Cashier Action -->
                 <div class="space-y-5">
-                    <div class="bg-white dark:bg-slate-900 border border-amber-500/30 rounded-3xl p-5 shadow-xl space-y-5 bg-gradient-to-br from-white to-amber-50/50 dark:from-slate-900 dark:to-amber-950/20 sticky top-20">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xl space-y-5 sticky top-20">
                         <div class="border-b border-slate-200 dark:border-slate-800 pb-3">
                             <h2 class="text-base font-black text-slate-900 dark:text-white">{{ $t('inventory.blend_cost_summary') }}</h2>
-                            <p class="text-xs text-amber-600 dark:text-amber-400 font-mono mt-0.5">{{ targetWeightGrams }} جرام ({{ (targetWeightGrams / 1000).toFixed(3) }} {{ $t('inventory.unit_weight_short') }})</p>
+                            <p class="text-xs text-theme-primary font-mono mt-0.5">{{ targetWeightGrams }} جرام ({{ (targetWeightGrams / 1000).toFixed(3) }} {{ $t('inventory.unit_weight_short') }})</p>
                         </div>
 
                         <div class="space-y-3 font-mono">
@@ -415,7 +415,7 @@ const submitBlendInvoice = () => {
 
                             <div class="flex items-center justify-between text-xs">
                                 <span class="text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('inventory.profit_margin') }}:</span>
-                                <span class="text-amber-600 dark:text-amber-400 font-bold">{{ profitMargin }}% ({{ formatMoney(totalCalculatedPrice - totalCalculatedCost) }} {{ $t('common.currency') }})</span>
+                                <span class="text-theme-primary font-bold">{{ profitMargin }}% ({{ formatMoney(totalCalculatedPrice - totalCalculatedCost) }} {{ $t('common.currency') }})</span>
                             </div>
                         </div>
 
@@ -434,7 +434,7 @@ const submitBlendInvoice = () => {
                             @click="submitBlendInvoice"
                             type="button"
                             :disabled="form.processing || components.length === 0"
-                            class="w-full h-12 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                            class="w-full h-12 rounded-2xl btn-primary-theme font-black text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
                             <span>🧾</span>
                             <span>{{ form.processing ? $t('common.save') + '...' : $t('pos.confirm_invoice') + ' (F2)' }}</span>

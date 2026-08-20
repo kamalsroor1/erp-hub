@@ -183,7 +183,7 @@ const deleteExpense = (e) => {
                 <button
                     @click="openCreateModal"
                     type="button"
-                    class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
+                    class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
                 >
                     <span class="text-base font-black">+</span>
                     <span>{{ $t('expenses.add_expense') }}</span>
@@ -201,15 +201,15 @@ const deleteExpense = (e) => {
 
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('expenses.total_cash') }}</span>
-                    <div class="text-2xl font-black font-mono text-amber-600 dark:text-amber-400">
+                    <div class="text-2xl font-black font-mono text-theme-primary">
                         {{ formatMoney(metrics.total_cash) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
 
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('expenses.total_filtered') }}</span>
-                    <div class="text-2xl font-black font-mono text-slate-900 dark:text-white">
-                        {{ formatMoney(metrics.total_filtered) }} <span class="text-xs text-amber-600 dark:text-amber-400">{{ $t('common.currency') }}</span>
+                    <div class="text-2xl font-black font-mono text-theme-primary">
+                        {{ formatMoney(metrics.total_filtered) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
             </div>
@@ -481,7 +481,7 @@ const deleteExpense = (e) => {
                                 @click="expenseForm.category = c"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl text-[11px] font-bold border transition cursor-pointer"
-                                :class="expenseForm.category === c ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'"
+                                :class="expenseForm.category === c ? 'bg-theme-light text-theme-primary border-theme-primary' : 'bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ c }}
                             </button>
@@ -509,7 +509,7 @@ const deleteExpense = (e) => {
                         <button
                             type="submit"
                             :disabled="expenseForm.processing"
-                            class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                            class="px-5 py-2.5 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
                             {{ expenseForm.processing ? $t('common.save') + '...' : $t('common.save') }}
                         </button>

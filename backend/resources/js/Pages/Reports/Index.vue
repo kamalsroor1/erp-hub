@@ -107,7 +107,7 @@ const printReport = () => {
             <!-- Header Banner -->
             <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl font-bold">
+                    <div class="w-12 h-12 rounded-2xl bg-theme-light border-theme-light text-theme-primary flex items-center justify-center text-2xl font-bold">
                         📊
                     </div>
                     <div>
@@ -124,7 +124,7 @@ const printReport = () => {
                     <button
                         @click="printReport"
                         type="button"
-                        class="h-11 px-5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 border border-slate-200 dark:border-slate-700 font-bold text-xs flex items-center gap-2 transition cursor-pointer"
+                        class="h-11 px-5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 font-bold text-xs flex items-center gap-2 transition cursor-pointer"
                     >
                         <span>🖨️</span>
                         <span>{{ $t('reports.print_full_report') }}</span>
@@ -150,7 +150,7 @@ const printReport = () => {
                             @click="setPeriod(p.id)"
                             type="button"
                             class="px-3 py-1.5 rounded-xl font-bold transition cursor-pointer text-xs"
-                            :class="filterForm.period === p.id ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-100 text-slate-600 border border-slate-200 hover:text-slate-900 dark:bg-slate-950 dark:text-slate-300 dark:border-slate-800 dark:hover:text-white'"
+                            :class="filterForm.period === p.id ? 'tab-theme-active' : 'bg-slate-100 text-slate-600 border border-slate-200 hover:text-slate-900 dark:bg-slate-950 dark:text-slate-300 dark:border-slate-800 dark:hover:text-white'"
                         >
                             {{ p.label }}
                         </button>
@@ -162,7 +162,7 @@ const printReport = () => {
                         <select
                             v-model="filterForm.store_id"
                             @change="applyFilters"
-                            class="px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none"
+                            class="px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
                         >
                             <option value="all">{{ $t('common.all_stores') }}</option>
                             <option v-for="s in stores" :key="s.id" :value="s.id">{{ s.name }}</option>
@@ -178,7 +178,7 @@ const printReport = () => {
                         <button
                             @click="applyFilters"
                             type="button"
-                            class="w-full h-10 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-white border border-slate-200 dark:border-transparent font-bold text-xs transition cursor-pointer"
+                            class="w-full h-10 rounded-xl btn-primary-theme font-bold text-xs transition cursor-pointer"
                         >
                             {{ $t('reports.refresh_report') }}
                         </button>
@@ -202,7 +202,7 @@ const printReport = () => {
                     @click="switchTab(tab.id)"
                     type="button"
                     class="py-2.5 px-2 rounded-xl font-bold transition cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-1.5 text-center"
-                    :class="currentTab === tab.id ? 'bg-amber-500 text-slate-950 font-black shadow-md' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
+                    :class="currentTab === tab.id ? 'tab-theme-active' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'"
                 >
                     <span>{{ tab.icon }}</span>
                     <span>{{ tab.label }}</span>
@@ -216,7 +216,7 @@ const printReport = () => {
                     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 space-y-2 shadow-xs">
                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ $t('reports.total_issued_sales') }}</span>
                         <div class="text-2xl font-black font-mono text-slate-900 dark:text-white">
-                            {{ formatMoney(summary.total_sales) }} <span class="text-xs font-bold text-amber-600 dark:text-amber-400">{{ $t('common.currency') }}</span>
+                            {{ formatMoney(summary.total_sales) }} <span class="text-xs font-bold text-theme-primary">{{ $t('common.currency') }}</span>
                         </div>
                         <div class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">
                             {{ $t('reports.approved_invoices_count', { count: summary.invoices_count }) }}

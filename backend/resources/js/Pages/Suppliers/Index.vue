@@ -189,7 +189,7 @@ const toggleActive = (s) => {
                 <button
                     @click="openCreateModal"
                     type="button"
-                    class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
+                    class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
                 >
                     <span class="text-base font-black">+</span>
                     <span>{{ $t('contacts.add_new_supplier') }}</span>
@@ -200,7 +200,7 @@ const toggleActive = (s) => {
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
                     <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.total_payable_suppliers') }}</span>
-                    <div class="text-2xl font-black font-mono text-amber-600 dark:text-amber-400">
+                    <div class="text-2xl font-black font-mono text-theme-primary">
                         {{ formatMoney(metrics.total_payable) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
                     </div>
                 </div>
@@ -228,7 +228,7 @@ const toggleActive = (s) => {
                             v-model="search"
                             type="text"
                             :placeholder="$t('contacts.search_supplier_placeholder')"
-                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition shadow-inner"
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
                             🔍
@@ -241,7 +241,7 @@ const toggleActive = (s) => {
                                 @click="debtStatus = 'all'; applyFilters();"
                                 type="button"
                                 class="px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                                :class="debtStatus === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                                :class="debtStatus === 'all' ? 'tab-theme-active' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
                             >
                                 {{ $t('common.all') }}
                             </button>
@@ -262,7 +262,7 @@ const toggleActive = (s) => {
                         >
                             <span>⚙️</span>
                             <span>{{ $t('common.filter') }}</span>
-                            <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-mono font-black text-[11px] flex items-center justify-center">
+                            <span v-if="activeFiltersCount > 0" class="w-5 h-5 rounded-full bg-theme-primary text-white font-mono font-black text-[11px] flex items-center justify-center">
                                 {{ activeFiltersCount }}
                             </span>
                         </button>
@@ -531,7 +531,7 @@ const toggleActive = (s) => {
                         <button
                             type="submit"
                             :disabled="supplierForm.processing"
-                            class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                            class="px-5 py-2.5 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
                             {{ supplierForm.processing ? '...' : (editingSupplier ? $t('common.save') : $t('contacts.add_new_supplier')) }}
                         </button>

@@ -78,14 +78,14 @@ const submitTransfer = () => {
             <div class="flex items-center justify-between">
                 <div class="space-y-1">
                     <div class="flex items-center gap-3">
-                        <Link href="/stock-transfers" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                        <Link href="/stock-transfers" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition">
                             →
                         </Link>
                         <div>
-                            <h1 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+                            <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                                 <span>🚚 {{ $t('inventory.new_transfer') }}</span>
                             </h1>
-                            <p class="text-xs text-slate-400 font-bold mt-0.5">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">
                                 {{ $t('inventory.transfers_subtitle') }}
                             </p>
                         </div>
@@ -95,19 +95,19 @@ const submitTransfer = () => {
 
             <!-- Main Form Card -->
             <form @submit.prevent="submitTransfer" class="space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm space-y-5">
-                    <h2 class="text-sm font-black text-white border-b border-slate-800 pb-3 flex items-center gap-2">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-5">
+                    <h2 class="text-sm font-black text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center gap-2">
                         <span>🏢</span>
                         <span>{{ $t('inventory.stores_title') }}</span>
                     </h2>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.from_store') }} *</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('inventory.from_store') }} *</label>
                             <select
                                 v-model="form.from_store_id"
                                 required
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
                             >
                                 <option v-for="st in stores" :key="st.id" :value="st.id">
                                     {{ st.name }} ({{ st.type }})
@@ -116,11 +116,11 @@ const submitTransfer = () => {
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('inventory.to_store') }} *</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('inventory.to_store') }} *</label>
                             <select
                                 v-model="form.to_store_id"
                                 required
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
                             >
                                 <option v-for="st in stores" :key="st.id" :value="st.id" :disabled="st.id === form.from_store_id">
                                     {{ st.name }} ({{ st.type }})
@@ -129,25 +129,25 @@ const submitTransfer = () => {
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('common.date') }} *</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.date') }} *</label>
                             <DatePicker v-model="form.transfer_date" :placeholder="$t('common.date')" />
                         </div>
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-300">{{ $t('common.notes') }}</label>
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('common.notes') }}</label>
                         <input
                             v-model="form.notes"
                             type="text"
                             :placeholder="$t('common.notes')"
-                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
                         >
                     </div>
                 </div>
 
                 <!-- Items Picker Card -->
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm space-y-5">
-                    <h2 class="text-sm font-black text-white border-b border-slate-800 pb-3 flex items-center gap-2">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-5">
+                    <h2 class="text-sm font-black text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center gap-2">
                         <span>📦</span>
                         <span>{{ $t('inventory.transfer_items') }}</span>
                     </h2>
@@ -163,7 +163,7 @@ const submitTransfer = () => {
                         <button
                             @click="addItemRow"
                             type="button"
-                            class="h-11 px-5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition cursor-pointer"
+                            class="h-11 px-5 rounded-2xl btn-primary-theme font-black text-xs transition cursor-pointer"
                         >
                             + {{ $t('inventory.add_new_item') }}
                         </button>
@@ -173,18 +173,18 @@ const submitTransfer = () => {
                     <div class="overflow-x-auto">
                         <table class="w-full text-right text-xs">
                             <thead>
-                                <tr class="border-b border-slate-800 text-slate-400 font-bold">
+                                <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                                     <th class="pb-3">{{ $t('inventory.item_name') }}</th>
                                     <th class="pb-3 font-mono">{{ $t('inventory.transferred_quantity') }}</th>
                                     <th class="pb-3">{{ $t('inventory.unit') }}</th>
                                     <th class="pb-3 text-center w-16">{{ $t('common.actions') }}</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-800/60 font-sans">
-                                <tr v-for="(it, idx) in form.items" :key="idx" class="hover:bg-slate-800/30 transition">
-                                    <td class="py-3 font-bold text-white font-tajawal">
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
+                                <tr v-for="(it, idx) in form.items" :key="idx" class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
+                                    <td class="py-3 font-bold text-slate-900 dark:text-white font-tajawal">
                                         {{ it.name }}
-                                        <span class="text-[10px] text-slate-500 font-mono block">{{ it.code }}</span>
+                                        <span class="text-[10px] text-slate-400 dark:text-slate-500 font-mono block">{{ it.code }}</span>
                                     </td>
 
                                     <td class="py-3 font-mono font-black">
@@ -194,11 +194,11 @@ const submitTransfer = () => {
                                             step="0.001"
                                             min="0.001"
                                             required
-                                            class="w-28 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono font-black text-emerald-400 focus:border-amber-500 focus:outline-none"
+                                            class="w-28 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-mono font-black text-emerald-600 dark:text-emerald-400 focus:border-theme-primary focus:outline-none"
                                         >
                                     </td>
 
-                                    <td class="py-3 text-slate-300 font-tajawal">
+                                    <td class="py-3 text-slate-700 dark:text-slate-300 font-tajawal">
                                         {{ it.unit || 'كجم' }}
                                     </td>
 
@@ -206,7 +206,7 @@ const submitTransfer = () => {
                                         <button
                                             @click="removeItemRow(idx)"
                                             type="button"
-                                            class="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition cursor-pointer"
+                                            class="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 transition cursor-pointer"
                                         >
                                             ✕
                                         </button>
@@ -215,7 +215,7 @@ const submitTransfer = () => {
                             </tbody>
                         </table>
 
-                        <div v-if="form.items.length === 0" class="py-12 text-center space-y-2 border border-dashed border-slate-800 rounded-2xl">
+                        <div v-if="form.items.length === 0" class="py-12 text-center space-y-2 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
                             <span class="text-2xl">📦</span>
                             <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_items_found') }}</p>
                         </div>
@@ -226,7 +226,7 @@ const submitTransfer = () => {
                 <div class="flex items-center justify-end gap-3">
                     <Link
                         href="/stock-transfers"
-                        class="px-5 py-3 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition"
+                        class="px-5 py-3 rounded-2xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                     >
                         {{ $t('common.cancel') }}
                     </Link>
@@ -234,7 +234,7 @@ const submitTransfer = () => {
                     <button
                         type="submit"
                         :disabled="form.processing || form.items.length === 0"
-                        class="h-12 px-8 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                        class="h-12 px-8 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <span>🚚</span>
                         <span>{{ form.processing ? '...' : $t('inventory.new_transfer') }}</span>

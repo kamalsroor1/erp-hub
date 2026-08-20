@@ -11,6 +11,10 @@
     --font-sans: 'Cairo', 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-tajawal: 'Tajawal', 'Cairo', sans-serif;
     --font-cairo: 'Cairo', 'Tajawal', sans-serif;
+    --color-primary: var(--color-primary);
+    --color-primary-hover: var(--color-primary-hover);
+    --color-primary-light: var(--color-primary-light);
+    --color-primary-border: var(--color-primary-border);
 }
 
 body {
@@ -34,7 +38,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(245, 158, 11, 0.6);
+    background: var(--color-primary, rgba(245, 158, 11, 0.6));
 }
 
 /* Firefox standard scrollbar support */
@@ -108,4 +112,72 @@ body {
     --color-primary-border: rgba(99, 102, 241, 0.35);
 }
 
+/* 🎯 High-Performance Dynamic Theme Utility Engine */
+.bg-theme-primary {
+    background-color: var(--color-primary) !important;
+}
 
+.bg-theme-hover:hover {
+    background-color: var(--color-primary-hover) !important;
+}
+
+.bg-theme-gradient {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%) !important;
+}
+
+.bg-theme-gradient:hover {
+    filter: brightness(1.08);
+}
+
+.bg-theme-light {
+    background-color: var(--color-primary-light) !important;
+}
+
+.text-theme-primary {
+    color: var(--color-primary) !important;
+}
+
+.border-theme-primary {
+    border-color: var(--color-primary) !important;
+}
+
+.border-theme-light {
+    border-color: var(--color-primary-border) !important;
+}
+
+.shadow-theme-primary {
+    box-shadow: 0 10px 25px -5px rgba(var(--color-primary-rgb), 0.35) !important;
+}
+
+.shadow-theme-sm {
+    box-shadow: 0 4px 14px 0 rgba(var(--color-primary-rgb), 0.25) !important;
+}
+
+.tab-theme-active {
+    background-color: var(--color-primary) !important;
+    color: #020617 !important;
+    font-weight: 900 !important;
+    box-shadow: 0 4px 14px 0 rgba(var(--color-primary-rgb), 0.3) !important;
+}
+
+.btn-primary-theme {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 25px -5px rgba(var(--color-primary-rgb), 0.35) !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-primary-theme:hover {
+    filter: brightness(1.08);
+}
+
+.badge-theme {
+    background-color: var(--color-primary-light) !important;
+    color: var(--color-primary) !important;
+    border: 1px solid var(--color-primary-border) !important;
+}
+
+::selection {
+    background-color: var(--color-primary) !important;
+    color: #ffffff !important;
+}

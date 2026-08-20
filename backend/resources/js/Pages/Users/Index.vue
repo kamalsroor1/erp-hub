@@ -129,7 +129,7 @@ const deleteUser = (u) => {
                 <div class="flex items-center gap-2.5">
                     <Link
                         href="/roles"
-                        class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
+                        class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
                     >
                         <span>🛡️</span>
                         <span>{{ $t('users.matrix_btn') }}</span>
@@ -138,7 +138,7 @@ const deleteUser = (u) => {
                     <button
                         @click="openCreateModal"
                         type="button"
-                        class="h-11 px-5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
+                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
                     >
                         <span class="text-base font-black">+</span>
                         <span>{{ $t('users.create_btn') }}</span>
@@ -154,7 +154,7 @@ const deleteUser = (u) => {
                             v-model="search"
                             type="text"
                             :placeholder="$t('users.search_placeholder')"
-                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:outline-none transition shadow-inner"
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner"
                         >
                         <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
                             🔍
@@ -164,7 +164,7 @@ const deleteUser = (u) => {
                     <div class="w-full md:w-auto flex items-center gap-2">
                         <select
                             v-model="roleFilter"
-                            class="px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-amber-500 focus:outline-none"
+                            class="px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
                         >
                             <option value="all">{{ $t('users.all_roles') }}</option>
                             <option value="admin">{{ $t('users.role_admin') }}</option>
@@ -197,7 +197,7 @@ const deleteUser = (u) => {
                                     <div v-if="u.email" class="text-[10px] text-slate-400 dark:text-slate-500 font-mono">{{ u.email }}</div>
                                 </td>
 
-                                <td class="py-3.5 font-mono font-bold text-amber-600 dark:text-amber-400 text-xs">
+                                <td class="py-3.5 font-mono font-bold text-slate-700 dark:text-slate-300 text-xs">
                                     {{ u.phone }}
                                 </td>
 
@@ -205,8 +205,8 @@ const deleteUser = (u) => {
                                     <span
                                         class="px-2.5 py-1 rounded-xl text-xs font-bold"
                                         :class="[
-                                            u.primary_role === 'admin' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30' :
-                                            (u.primary_role === 'cashier' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-transparent')
+                                            u.primary_role === 'admin' ? 'bg-theme-light text-theme-primary border-theme-primary' :
+                                            (u.primary_role === 'cashier' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-transparent')
                                         ]"
                                     >
                                         {{ u.primary_role === 'admin' ? $t('users.role_admin') : (u.primary_role === 'cashier' ? $t('users.role_cashier') : (u.primary_role === 'storekeeper' ? $t('users.role_storekeeper') : $t('users.role_accountant'))) }}
@@ -222,7 +222,7 @@ const deleteUser = (u) => {
                                         @click="toggleUser(u)"
                                         type="button"
                                         class="px-2.5 py-0.5 rounded-full text-[10px] font-bold font-tajawal transition cursor-pointer"
-                                        :class="u.is_active ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30'"
+                                        :class="u.is_active ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30'"
                                     >
                                         {{ u.is_active ? $t('users.status_active') : $t('users.status_inactive') }}
                                     </button>
@@ -233,7 +233,7 @@ const deleteUser = (u) => {
                                         <button
                                             @click="openEditModal(u)"
                                             type="button"
-                                            class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 text-xs font-bold transition cursor-pointer border border-slate-200 dark:border-transparent"
+                                            class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition cursor-pointer border border-slate-200 dark:border-transparent"
                                         >
                                             {{ $t('common.edit') }} ✏️
                                         </button>
@@ -258,8 +258,8 @@ const deleteUser = (u) => {
                 </div>
 
                 <!-- Pagination -->
-                <div v-if="users.links && users.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
-                    <span class="text-xs text-slate-400 font-tajawal">
+                <div v-if="users.links && users.links.length > 3" class="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between font-sans">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-tajawal">
                         {{ $t('common.showing') }} {{ users.from || 0 }} {{ $t('common.to') }} {{ users.to || 0 }} {{ $t('common.of') }} {{ users.total || 0 }}
                     </span>
 
@@ -269,12 +269,12 @@ const deleteUser = (u) => {
                                 v-if="link.url"
                                 :href="link.url"
                                 class="px-3 py-1.5 rounded-xl text-xs font-bold transition"
-                                :class="link.active ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'"
+                                :class="link.active ? 'tab-theme-active' : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'"
                                 v-html="link.label"
                             />
                             <span
                                 v-else
-                                class="px-3 py-1.5 rounded-xl text-xs text-slate-600 font-bold"
+                                class="px-3 py-1.5 rounded-xl text-xs text-slate-400 dark:text-slate-600 font-bold"
                                 v-html="link.label"
                             />
                         </template>
@@ -290,50 +290,50 @@ const deleteUser = (u) => {
             class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 font-tajawal"
             dir="rtl"
         >
-            <div @click.stop class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="font-black text-base text-white">
+            <div @click.stop class="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 text-slate-900 dark:text-white">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <h3 class="font-black text-base text-slate-900 dark:text-white">
                         {{ editingUser ? $t('users.edit_title') : $t('users.create_title') }}
                     </h3>
-                    <button @click="showModal = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white">✕</button>
+                    <button @click="showModal = false" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs dark:hover:text-white transition">✕</button>
                 </div>
 
                 <form @submit.prevent="saveUser" class="space-y-4">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('users.full_name') }}</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('users.full_name') }}</label>
                             <input
                                 v-model="userForm.name"
                                 type="text"
                                 required
                                 placeholder="مثال: أحمد محمد"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
                             >
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('users.phone_for_login') }}</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('users.phone_for_login') }}</label>
                             <input
                                 v-model="userForm.phone"
                                 type="text"
                                 required
                                 placeholder="01xxxxxxxxx"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-amber-500 focus:outline-none"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
                             >
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('users.email_optional') }}</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('users.email_optional') }}</label>
                             <input
                                 v-model="userForm.email"
                                 type="email"
                                 placeholder="user@example.com"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-amber-500 focus:outline-none"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
                             >
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">
                                 {{ editingUser ? $t('users.password_leave_blank') : $t('users.password_required') }}
                             </label>
                             <input
@@ -341,15 +341,15 @@ const deleteUser = (u) => {
                                 type="password"
                                 :required="!editingUser"
                                 placeholder="••••••••"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-amber-500 focus:outline-none"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-theme-primary focus:outline-none"
                             >
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('users.role_field') }}</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('users.role_field') }}</label>
                             <select
                                 v-model="userForm.role"
-                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                                class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:border-theme-primary focus:outline-none"
                             >
                                 <option value="cashier">{{ $t('users.role_cashier') }}</option>
                                 <option value="storekeeper">{{ $t('users.role_storekeeper') }}</option>
@@ -359,7 +359,7 @@ const deleteUser = (u) => {
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-300">{{ $t('users.assigned_store') }}</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $t('users.assigned_store') }}</label>
                             <SearchableSelect
                                 v-model="userForm.default_store_id"
                                 :options="storeOptions"
@@ -368,18 +368,18 @@ const deleteUser = (u) => {
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
                         <button
                             @click="showModal = false"
                             type="button"
-                            class="px-4 py-2.5 rounded-2xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
+                            class="px-4 py-2.5 rounded-2xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                         >
                             {{ $t('common.cancel') }}
                         </button>
                         <button
                             type="submit"
                             :disabled="userForm.processing"
-                            class="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition transform active:scale-95 cursor-pointer disabled:opacity-50"
+                            class="px-5 py-2.5 rounded-2xl btn-primary-theme text-xs font-black transition transform active:scale-95 cursor-pointer disabled:opacity-50"
                         >
                             {{ userForm.processing ? $t('users.saving_user') : $t('users.save_user') }}
                         </button>
