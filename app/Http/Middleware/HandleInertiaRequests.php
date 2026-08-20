@@ -134,6 +134,25 @@ class HandleInertiaRequests extends Middleware
                     ];
                 }
 
+                // 3. High Cash in Drawer Alert
+                if ($user->can('daily_journal.view') || $user->hasRole('admin')) {
+                    try {
+                        $treasuryService = app(\App\Services\TreasuryService::class);
+                        $balances = $treasuryService->getBalances($activeStore?->id);
+                        $cashExpected = (float)($balances['cash']['balance'] ?? 0);
+                        if ($cashExpected >= 10000) {
+                            $alerts[] = [
+                                'type' => 'info',
+                                'icon' => '💰',
+                                'title' => 'سيولة نقدية عالية بالدرج',
+                                'description' => 'يوجد حالياً ' . number_format($cashExpected, 0) . ' ج.م نقداً بالدرج. يُنصح بتوريد الفائض.',
+                                'link' => '/daily-journal',
+                                'link_label' => 'دفتر اليومية والخزينة',
+                            ];
+                        }
+                    } catch (\Throwable $e) {}
+                }
+
                 return $alerts;
             },
         ];
