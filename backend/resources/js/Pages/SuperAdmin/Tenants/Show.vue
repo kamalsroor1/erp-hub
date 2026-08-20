@@ -40,6 +40,10 @@ const updateStatus = () => {
         preserveScroll: true,
     });
 };
+
+const impersonate = () => {
+    router.post(`/admin/super/tenants/${props.tenant.id}/impersonate`);
+};
 </script>
 
 <template>
@@ -66,6 +70,16 @@ const updateStatus = () => {
                 </div>
 
                 <div class="flex items-center gap-2.5">
+                    <button
+                        @click="impersonate"
+                        type="button"
+                        class="h-10 px-4 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-black text-xs flex items-center gap-2 shadow-lg shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
+                        title="تسجيل الدخول الفوري كمسؤول المتجر"
+                    >
+                        <span>⚡</span>
+                        <span>تسجيل الدخول كمسؤول المتجر</span>
+                    </button>
+
                     <a
                         :href="`http://${tenant.domain}`"
                         target="_blank"

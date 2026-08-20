@@ -53,6 +53,16 @@ const navItems = computed(() => [
                     <div class="text-xs font-black text-white">{{ user?.name || 'مدير المنصة' }}</div>
                     <div class="text-[10px] text-indigo-400 font-mono font-bold">SUPER ADMIN</div>
                 </div>
+
+                <button
+                    @click="$inertia.post('/admin/logout')"
+                    type="button"
+                    class="h-9 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-xs font-bold text-rose-400 flex items-center gap-1.5 transition cursor-pointer"
+                    title="تسجيل الخروج من لوحة السوبر أدمن"
+                >
+                    <span>🚪</span>
+                    <span class="hidden sm:inline">خروج</span>
+                </button>
             </div>
         </header>
 

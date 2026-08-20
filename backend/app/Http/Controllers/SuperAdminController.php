@@ -29,7 +29,8 @@ class SuperAdminController extends Controller
         protected ToggleTenantStatusAction $toggleStatusAction,
         protected OverrideTenantFeatureAction $overrideFeatureAction,
         protected GetSuperAdminPlansDataAction $getPlansDataAction,
-        protected UpdatePlanAction $updatePlanAction
+        protected UpdatePlanAction $updatePlanAction,
+        protected \App\Actions\SuperAdmin\ImpersonateTenantAction $impersonateTenantAction
     ) {}
 
     /**
@@ -135,5 +136,20 @@ class SuperAdminController extends Controller
         $this->updatePlanAction->execute($plan, $request->validated());
 
         return back()->with('success', __('super.plan_updated_success', ['name' => $plan->name]));
+    }
+
+    /**
+     * Impersonate / Fast Login into a Tenant Account
+     */
+    public function impersonateTenant(Request $request, string $id)
+    {
+        try {
+            $targetUserId = $request->input('user_id') ? (int)$request->input('user_id') : null;
+            $redirectUrl = $this->impersonateTenantAction->execute($id, $targetUserId);
+
+            return Inertia::location($redirectUrl);
+        } catch (\Throwable $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 }

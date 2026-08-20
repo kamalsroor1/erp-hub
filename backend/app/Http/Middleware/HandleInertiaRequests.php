@@ -72,6 +72,7 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $user ? (new \App\Http\Resources\UserResource($user))->resolve() : null,
+                'is_impersonating' => (bool)session('is_impersonating', false),
             ],
             'tenant' => $tenant ? (new \App\Http\Resources\TenantResource($tenant))->resolve() : null,
             'activeStore' => $activeStore ? [

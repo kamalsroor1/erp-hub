@@ -23,6 +23,10 @@ const applyFilter = () => {
         preserveScroll: true,
     });
 };
+
+const impersonate = (tenantId) => {
+    router.post(`/admin/super/tenants/${tenantId}/impersonate`);
+};
 </script>
 
 <template>
@@ -128,12 +132,23 @@ const applyFilter = () => {
                                     </span>
                                 </td>
                                 <td class="py-3 text-left">
-                                    <Link
-                                        :href="`/admin/super/tenants/${t.id}`"
-                                        class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold transition inline-block"
-                                    >
-                                        {{ $t('common.view') }}
-                                    </Link>
+                                    <div class="flex items-center justify-end gap-2">
+                                        <button
+                                            @click="impersonate(t.id)"
+                                            type="button"
+                                            class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-400 border border-amber-500/30 font-bold transition flex items-center gap-1 cursor-pointer"
+                                            title="تسجيل الدخول المباشر كمسؤول المتجر"
+                                        >
+                                            <span>⚡</span>
+                                            <span>دخول للمتجر</span>
+                                        </button>
+                                        <Link
+                                            :href="`/admin/super/tenants/${t.id}`"
+                                            class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold transition inline-block"
+                                        >
+                                            {{ $t('common.view') }}
+                                        </Link>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>

@@ -310,16 +310,30 @@ Route::middleware('auth')->group(function () {
 });
 
 // 4. Central Platform Super Admin Management Routes (Multi-Tenant Hub)
-Route::prefix('admin/super')->name('super.')->group(function () {
-    Route::get('/', [\App\Http\Controllers\SuperAdminController::class, 'dashboard'])->name('dashboard');
-    Route::get('/tenants', [\App\Http\Controllers\SuperAdminController::class, 'tenants'])->name('tenants.index');
-    Route::get('/tenants/create', [\App\Http\Controllers\SuperAdminController::class, 'createTenant'])->name('tenants.create');
-    Route::post('/tenants', [\App\Http\Controllers\SuperAdminController::class, 'storeTenant'])->name('tenants.store');
-    Route::get('/tenants/{id}', [\App\Http\Controllers\SuperAdminController::class, 'showTenant'])->name('tenants.show');
-    Route::post('/tenants/{id}/override-feature', [\App\Http\Controllers\SuperAdminController::class, 'overrideFeature'])->name('tenants.override_feature');
-    Route::post('/tenants/{id}/toggle-status', [\App\Http\Controllers\SuperAdminController::class, 'toggleStatus'])->name('tenants.toggle_status');
-    Route::get('/plans', [\App\Http\Controllers\SuperAdminController::class, 'plans'])->name('plans.index');
-    Route::put('/plans/{id}', [\App\Http\Controllers\SuperAdminController::class, 'updatePlan'])->name('plans.update');
+Route::prefix('admin')->group(function () {
+    // Super Admin Guest Auth
+    Route::middleware('guest')->group(function () {
+        Route::get('/login', [\App\Http\Controllers\Auth\SuperAdminAuthController::class, 'showLogin'])->name('super.login');
+        Route::post('/login', [\App\Http\Controllers\Auth\SuperAdminAuthController::class, 'login']);
+    });
+
+    // Super Admin Protected Routes
+    Route::middleware('auth')->group(function () {
+        Route::post('/logout', [\App\Http\Controllers\Auth\SuperAdminAuthController::class, 'logout'])->name('super.logout');
+
+        Route::prefix('super')->name('super.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\SuperAdminController::class, 'dashboard'])->name('dashboard');
+            Route::get('/tenants', [\App\Http\Controllers\SuperAdminController::class, 'tenants'])->name('tenants.index');
+            Route::get('/tenants/create', [\App\Http\Controllers\SuperAdminController::class, 'createTenant'])->name('tenants.create');
+            Route::post('/tenants', [\App\Http\Controllers\SuperAdminController::class, 'storeTenant'])->name('tenants.store');
+            Route::get('/tenants/{id}', [\App\Http\Controllers\SuperAdminController::class, 'showTenant'])->name('tenants.show');
+            Route::post('/tenants/{id}/impersonate', [\App\Http\Controllers\SuperAdminController::class, 'impersonateTenant'])->name('tenants.impersonate');
+            Route::post('/tenants/{id}/override-feature', [\App\Http\Controllers\SuperAdminController::class, 'overrideFeature'])->name('tenants.override_feature');
+            Route::post('/tenants/{id}/toggle-status', [\App\Http\Controllers\SuperAdminController::class, 'toggleStatus'])->name('tenants.toggle_status');
+            Route::get('/plans', [\App\Http\Controllers\SuperAdminController::class, 'plans'])->name('plans.index');
+            Route::put('/plans/{id}', [\App\Http\Controllers\SuperAdminController::class, 'updatePlan'])->name('plans.update');
+        });
+    });
 });
 
 // PWA Assets Routing with dynamic canonical URLs and proper headers

@@ -165,6 +165,22 @@ const getUserRoleLabel = computed(() => {
 
 <template>
     <div class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-white transition-colors duration-200" dir="rtl">
+        <!-- Super Admin Impersonation Alert Banner -->
+        <div v-if="$page.props.auth?.is_impersonating" class="bg-gradient-to-r from-purple-900 via-indigo-950 to-purple-900 text-white px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-xs font-bold font-tajawal z-50 border-b border-purple-500/30 shadow-md">
+            <div class="flex items-center gap-2">
+                <span class="text-base animate-pulse">👑</span>
+                <span>أنت تتصفح متجر <strong class="text-amber-400 font-black">({{ tenant?.name }})</strong> حالياً كمسؤول من لوحة السوبر أدمن المركزية</span>
+            </div>
+            <button
+                @click="router.post('/impersonate/leave')"
+                type="button"
+                class="h-7 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition transform active:scale-95 cursor-pointer shadow-xs flex items-center gap-1.5"
+            >
+                <span>✕</span>
+                <span>العودة للوحة السوبر أدمن المركزية</span>
+            </button>
+        </div>
+
         <!-- Top App Bar -->
         <header class="h-16 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40 shrink-0 shadow-xs">
             <!-- Right Section (in RTL: Start) -->

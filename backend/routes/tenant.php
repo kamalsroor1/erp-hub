@@ -29,6 +29,25 @@ Route::middleware([
         Route::post('/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
     });
 
+    // 1.1 Tenant Impersonation by Super Admin
+    Route::get('/impersonate/{token}', function (string $token) {
+        session(['is_impersonating' => true, 'impersonated_by_super' => true]);
+        return \Stancl\Tenancy\Features\UserImpersonation::makeResponse($token);
+    })->name('impersonate');
+
+    Route::post('/impersonate/leave', function () {
+        Auth::logout();
+        session()->forget(['is_impersonating', 'impersonated_by_super']);
+        session()->invalidate();
+        session()->regenerateToken();
+
+        $centralDomain = env('CENTRAL_DOMAIN', 'localhost');
+        $port = request()->getPort() ? (':' . request()->getPort()) : '';
+        $scheme = request()->getScheme();
+
+        return \Inertia\Inertia::location("{$scheme}://{$centralDomain}{$port}/admin/super/tenants");
+    })->name('impersonate.leave')->middleware('auth');
+
     // 2. Logout Route
     Route::post('/logout', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])->name('logout')->middleware('auth');
 
