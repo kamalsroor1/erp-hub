@@ -294,7 +294,10 @@ Route::middleware([
             if (in_array($theme, ['dark', 'light']) && Auth::check()) {
                 Auth::user()->update(['theme_preference' => $theme]);
             }
-            return response()->json(['status' => 'success', 'theme' => $theme]);
+            if ($request->wantsJson() && !$request->header('X-Inertia')) {
+                return response()->json(['status' => 'success', 'theme' => $theme]);
+            }
+            return back();
         })->name('theme.toggle');
 
         // Store Switcher (Fast active branch/van switch for authorized users)
@@ -306,11 +309,17 @@ Route::middleware([
                 $user = Auth::user();
                 if ($user->hasRole('admin') || $user->stores()->where('stores.id', $storeId)->exists() || (int)$user->default_store_id === $storeId) {
                     session(['current_store_id' => $storeId]);
-                    return response()->json(['status' => 'success', 'store' => $store]);
+                    if ($request->wantsJson() && !$request->header('X-Inertia')) {
+                        return response()->json(['status' => 'success', 'store' => $store]);
+                    }
+                    return back()->with('success', "تم التبديل إلى ({$store->name}) بنجاح");
                 }
             }
 
-            return response()->json(['status' => 'error', 'message' => 'غير مصرح'], 403);
+            if ($request->wantsJson() && !$request->header('X-Inertia')) {
+                return response()->json(['status' => 'error', 'message' => 'غير مصرح'], 403);
+            }
+            return back()->with('error', 'غير مصرح بالوصول إلى هذا الفرع');
         })->name('store.switch');
     });
 });
