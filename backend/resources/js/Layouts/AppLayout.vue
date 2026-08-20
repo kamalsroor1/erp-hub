@@ -241,14 +241,11 @@ const getUserRoleLabel = computed(() => {
 
 <template>
     <div class="h-screen flex bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-hidden font-sans selection:bg-amber-500 selection:text-white transition-colors duration-200" dir="rtl">
-        <!-- Sidebar Navigation (Full Height Column on Right in RTL) -->
+        <!-- Desktop Sidebar Navigation (Static in Flow on lg) -->
         <aside
             id="main-sidebar"
-            class="h-full bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 flex flex-col shadow-2xl z-50 shrink-0 transition-all duration-300 select-none"
-            :class="[
-                isSidebarOpen ? 'fixed inset-y-0 right-0 w-72 flex' : 'hidden lg:flex',
-                isSidebarCollapsed ? 'lg:w-20' : 'lg:w-72'
-            ]"
+            class="hidden lg:flex h-full bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 flex-col shadow-2xl z-40 shrink-0 transition-[width] duration-300 ease-out select-none"
+            :class="isSidebarCollapsed ? 'w-20' : 'w-72'"
         >
             <!-- Brand Header -->
             <div class="h-20 px-3.5 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/95 shrink-0">
@@ -256,7 +253,7 @@ const getUserRoleLabel = computed(() => {
                     <Link
                         href="/"
                         class="rounded-2xl bg-white dark:bg-slate-800 p-1 flex items-center justify-center shadow-xs border border-slate-200 dark:border-slate-700/80 shrink-0 transition-transform duration-200 hover:scale-105 group"
-                        :class="isSidebarCollapsed ? 'w-14 h-14 lg:w-12 lg:h-12' : 'w-14 h-14'"
+                        :class="isSidebarCollapsed ? 'w-12 h-12' : 'w-14 h-14'"
                         :title="tenant?.name || 'سرور كوفي'"
                     >
                         <!-- Light Mode Logo -->
@@ -274,14 +271,6 @@ const getUserRoleLabel = computed(() => {
                         <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold truncate">{{ $t('nav.cloud_erp_subtitle') }}</p>
                     </div>
                 </div>
-
-                <button
-                    @click="isSidebarOpen = false"
-                    type="button"
-                    class="lg:hidden w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center font-black text-sm transition active:scale-90 cursor-pointer shadow-xs"
-                >
-                    ✕
-                </button>
             </div>
 
             <!-- Primary Action: + New Sale Invoice (F2) -->
@@ -317,7 +306,6 @@ const getUserRoleLabel = computed(() => {
                             <FeatureGate :feature="item.feature">
                                 <Link
                                     :href="item.href"
-                                    @click="isSidebarOpen = false"
                                     class="flex items-center gap-3 px-3.5 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-150 group min-h-[44px] active:scale-98"
                                     :class="[
                                         item.active
@@ -351,11 +339,110 @@ const getUserRoleLabel = computed(() => {
         </aside>
 
         <!-- Mobile Drawer Backdrop Overlay -->
-        <div
-            v-if="isSidebarOpen"
-            @click="isSidebarOpen = false"
-            class="fixed inset-0 z-40 bg-black/70 backdrop-blur-xs lg:hidden"
-        ></div>
+        <Transition name="fade">
+            <div
+                v-if="isSidebarOpen"
+                @click="isSidebarOpen = false"
+                class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs lg:hidden select-none"
+            />
+        </Transition>
+
+        <!-- Mobile Drawer Sidebar (Smooth Spring Glide from Right) -->
+        <Transition name="sidebar-drawer">
+            <aside
+                v-if="isSidebarOpen"
+                class="fixed inset-y-0 right-0 w-72 max-w-[85vw] h-full bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 flex flex-col shadow-2xl z-50 select-none lg:hidden font-tajawal"
+            >
+                <!-- Brand Header -->
+                <div class="h-20 px-3.5 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/95 shrink-0">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <Link
+                            href="/"
+                            @click="isSidebarOpen = false"
+                            class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 p-1 flex items-center justify-center shadow-xs border border-slate-200 dark:border-slate-700/80 shrink-0"
+                            :title="tenant?.name || 'سرور كوفي'"
+                        >
+                            <img :src="logoLightSrc" alt="Logo" class="w-full h-full object-contain filter drop-shadow-xs dark:hidden">
+                            <img :src="logoDarkSrc" alt="Logo" class="w-full h-full object-contain filter drop-shadow-xs hidden dark:block">
+                        </Link>
+                        <div class="truncate min-w-0">
+                            <h1 class="font-black text-sm tracking-tight text-slate-900 dark:text-white font-tajawal line-clamp-1 leading-snug">
+                                {{ tenant?.name || 'سرور كوفي' }}
+                            </h1>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold truncate">{{ $t('nav.cloud_erp_subtitle') }}</p>
+                        </div>
+                    </div>
+
+                    <button
+                        @click="isSidebarOpen = false"
+                        type="button"
+                        class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center font-black text-sm transition active:scale-90 cursor-pointer shadow-xs"
+                    >
+                        ✕
+                    </button>
+                </div>
+
+                <!-- Primary Action: + New Sale Invoice (F2) -->
+                <FeatureGate feature="pos.access">
+                    <div class="p-3 border-b border-slate-200 dark:border-slate-800/80 shrink-0">
+                        <Link
+                            href="/pos"
+                            @click="isSidebarOpen = false"
+                            class="w-full flex items-center justify-center gap-2 py-3 px-3.5 btn-primary-theme font-black rounded-2xl shadow-theme-primary transition-all duration-200 active:scale-95 font-tajawal cursor-pointer group"
+                            :title="$t('nav.new_sale_invoice_btn')"
+                        >
+                            <Plus class="w-4.5 h-4.5 shrink-0" />
+                            <span class="truncate text-xs font-black">{{ $t('nav.new_sale_invoice_btn') }}</span>
+                        </Link>
+                    </div>
+                </FeatureGate>
+
+                <!-- Nav Items (Scrollable) -->
+                <nav class="flex-1 px-3 py-3 space-y-4 overflow-y-auto font-tajawal">
+                    <div v-for="(group, gIdx) in navigationGroups" :key="gIdx" class="space-y-1">
+                        <div
+                            v-if="group.title"
+                            class="pt-2 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 truncate"
+                        >
+                            {{ group.title }}
+                        </div>
+
+                        <div class="space-y-1">
+                            <template v-for="item in group.items" :key="item.href">
+                                <FeatureGate :feature="item.feature">
+                                    <Link
+                                        :href="item.href"
+                                        @click="isSidebarOpen = false"
+                                        class="flex items-center gap-3 px-3.5 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-150 group min-h-[44px] active:scale-98"
+                                        :class="[
+                                            item.active
+                                                ? 'bg-theme-light text-theme-primary border border-theme-light shadow-xs font-black'
+                                                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-white'
+                                        ]"
+                                        :title="item.name"
+                                    >
+                                        <component :is="item.icon" class="w-4.5 h-4.5 shrink-0" />
+                                        <span class="truncate flex-1">{{ item.name }}</span>
+                                    </Link>
+                                </FeatureGate>
+                            </template>
+                        </div>
+                    </div>
+                </nav>
+
+                <!-- Sidebar Footer (Super Admin Button) -->
+                <div v-if="isAdmin" class="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/90 shrink-0 pb-safe">
+                    <a
+                        href="/admin/super"
+                        class="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/60 dark:hover:bg-purple-900 border border-purple-200 dark:border-purple-800/80 text-purple-700 dark:text-purple-300 text-xs font-bold transition font-tajawal shadow-xs"
+                        :title="$t('nav.super_admin')"
+                    >
+                        <Crown class="w-4 h-4 shrink-0 text-purple-600 dark:text-purple-400" />
+                        <span class="truncate">{{ $t('nav.super_admin') }}</span>
+                    </a>
+                </div>
+            </aside>
+        </Transition>
 
         <!-- Main Wrapper: Impersonation Banner + Header + Page Content -->
         <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
@@ -474,48 +561,50 @@ const getUserRoleLabel = computed(() => {
                             </span>
                         </button>
 
-                        <!-- Notifications Dropdown Panel -->
-                        <div
-                            v-if="showNotifications"
-                            class="absolute left-0 mt-2 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-3 z-50 space-y-2 font-tajawal text-slate-900 dark:text-slate-100"
-                        >
-                            <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800 px-1">
-                                <span class="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
-                                    <Bell class="w-3.5 h-3.5 text-theme-primary" />
-                                    <span>{{ $t('nav.live_notifications_center') }}</span>
-                                </span>
-                                <span class="text-[10px] text-theme-primary font-bold">
-                                    {{ notifications.length }} {{ $t('nav.notifications_count') }}
-                                </span>
-                            </div>
-
-                            <div class="space-y-2 max-h-72 overflow-y-auto">
-                                <div
-                                    v-for="(n, nIdx) in notifications"
-                                    :key="nIdx"
-                                    class="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 space-y-1 hover:border-slate-300 dark:hover:border-slate-700 transition"
-                                >
-                                    <div class="flex items-center gap-2">
-                                        <Bell class="w-3.5 h-3.5 text-theme-primary shrink-0" />
-                                        <span class="text-xs font-black text-slate-900 dark:text-white">{{ n.title }}</span>
-                                    </div>
-                                    <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-snug">{{ n.description }}</p>
-                                    <div class="pt-1 flex justify-end">
-                                        <Link
-                                            :href="n.link"
-                                            @click="showNotifications = false"
-                                            class="text-[10px] font-bold text-theme-primary hover:underline transition"
-                                        >
-                                            {{ n.link_label }} ←
-                                        </Link>
-                                    </div>
+                        <!-- Notifications Dropdown Panel (Smooth Pop Animation) -->
+                        <Transition name="dropdown-pop">
+                            <div
+                                v-if="showNotifications"
+                                class="absolute left-0 mt-2 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-3 z-50 space-y-2 font-tajawal text-slate-900 dark:text-slate-100"
+                            >
+                                <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800 px-1">
+                                    <span class="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                                        <Bell class="w-3.5 h-3.5 text-theme-primary" />
+                                        <span>{{ $t('nav.live_notifications_center') }}</span>
+                                    </span>
+                                    <span class="text-[10px] text-theme-primary font-bold">
+                                        {{ notifications.length }} {{ $t('nav.notifications_count') }}
+                                    </span>
                                 </div>
 
-                                <div v-if="notifications.length === 0" class="py-6 text-center text-xs text-slate-400 font-bold">
-                                    {{ $t('nav.no_urgent_notifications') }}
+                                <div class="space-y-2 max-h-72 overflow-y-auto">
+                                    <div
+                                        v-for="(n, nIdx) in notifications"
+                                        :key="nIdx"
+                                        class="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 space-y-1 hover:border-slate-300 dark:hover:border-slate-700 transition"
+                                    >
+                                        <div class="flex items-center gap-2">
+                                            <Bell class="w-3.5 h-3.5 text-theme-primary shrink-0" />
+                                            <span class="text-xs font-black text-slate-900 dark:text-white">{{ n.title }}</span>
+                                        </div>
+                                        <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-snug">{{ n.description }}</p>
+                                        <div class="pt-1 flex justify-end">
+                                            <Link
+                                                :href="n.link"
+                                                @click="showNotifications = false"
+                                                class="text-[10px] font-bold text-theme-primary hover:underline transition"
+                                            >
+                                                {{ n.link_label }} ←
+                                            </Link>
+                                        </div>
+                                    </div>
+
+                                    <div v-if="notifications.length === 0" class="py-6 text-center text-xs text-slate-400 font-bold">
+                                        {{ $t('nav.no_urgent_notifications') }}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </Transition>
                     </div>
 
                     <!-- Theme Toggle Switch Button -->
@@ -546,33 +635,35 @@ const getUserRoleLabel = computed(() => {
                             <ChevronDown class="w-3.5 h-3.5 text-slate-400 hidden sm:inline shrink-0" />
                         </button>
 
-                        <!-- User Profile Dropdown Menu -->
-                        <div
-                            v-if="showUserMenu"
-                            class="absolute left-0 mt-2 w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-2 z-50 space-y-1 font-tajawal text-slate-800 dark:text-slate-200"
-                        >
-                            <div class="p-2 border-b border-slate-100 dark:border-slate-800">
-                                <p class="text-xs font-black text-slate-900 dark:text-white truncate">{{ user.name }}</p>
-                                <p class="text-[10px] text-slate-400 truncate">{{ user.email || user.phone }}</p>
+                        <!-- User Profile Dropdown Menu (Smooth Pop Animation) -->
+                        <Transition name="dropdown-pop">
+                            <div
+                                v-if="showUserMenu"
+                                class="absolute left-0 mt-2 w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-2 z-50 space-y-1 font-tajawal text-slate-800 dark:text-slate-200"
+                            >
+                                <div class="p-2 border-b border-slate-100 dark:border-slate-800">
+                                    <p class="text-xs font-black text-slate-900 dark:text-white truncate">{{ user.name }}</p>
+                                    <p class="text-[10px] text-slate-400 truncate">{{ user.email || user.phone }}</p>
+                                </div>
+
+                                <Link
+                                    href="/settings"
+                                    class="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                                >
+                                    <Settings class="w-3.5 h-3.5" />
+                                    <span>{{ $t('nav.settings') }}</span>
+                                </Link>
+
+                                <button
+                                    @click="logout"
+                                    type="button"
+                                    class="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                                >
+                                    <LogOut class="w-3.5 h-3.5" />
+                                    <span>{{ $t('nav.logout') }}</span>
+                                </button>
                             </div>
-
-                            <Link
-                                href="/settings"
-                                class="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                            >
-                                <Settings class="w-3.5 h-3.5" />
-                                <span>{{ $t('nav.settings') }}</span>
-                            </Link>
-
-                            <button
-                                @click="logout"
-                                type="button"
-                                class="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
-                            >
-                                <LogOut class="w-3.5 h-3.5" />
-                                <span>{{ $t('nav.logout') }}</span>
-                            </button>
-                        </div>
+                        </Transition>
                     </div>
                 </div>
             </header>
@@ -667,97 +758,101 @@ const getUserRoleLabel = computed(() => {
             </nav>
         </div>
 
-        <!-- Mobile Notifications Bottom Sheet Modal -->
-        <div
-            v-if="showNotificationsSheet"
-            @click="showNotificationsSheet = false"
-            class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 font-tajawal lg:hidden"
-        >
+        <!-- Mobile Notifications Bottom Sheet Modal (Smooth Slide Up) -->
+        <Transition name="sheet-slide">
             <div
-                @click.stop
-                class="w-full max-w-lg bg-white dark:bg-slate-900 border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-3xl sm:rounded-3xl p-5 pb-safe shadow-2xl space-y-4 max-h-[85vh] flex flex-col text-slate-900 dark:text-white"
+                v-if="showNotificationsSheet"
+                @click="showNotificationsSheet = false"
+                class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 font-tajawal lg:hidden"
             >
-                <!-- Native Drag Handle -->
-                <div class="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto -mt-1"></div>
+                <div
+                    @click.stop
+                    class="w-full max-w-lg bg-white dark:bg-slate-900 border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-3xl sm:rounded-3xl p-5 pb-safe shadow-2xl space-y-4 max-h-[85vh] flex flex-col text-slate-900 dark:text-white"
+                >
+                    <!-- Native Drag Handle -->
+                    <div class="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto -mt-1"></div>
 
-                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-                    <div class="flex items-center gap-2">
-                        <Bell class="w-5 h-5 text-theme-primary" />
-                        <h3 class="font-black text-sm">{{ $t('nav.live_notifications_center') }}</h3>
-                        <span v-if="notifications.length > 0" class="px-2 py-0.5 rounded-full bg-rose-500 text-white font-mono text-[10px] font-black">
-                            {{ notifications.length }}
-                        </span>
-                    </div>
-                    <button @click="showNotificationsSheet = false" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs flex items-center justify-center cursor-pointer">
-                        <X class="w-4 h-4" />
-                    </button>
-                </div>
-
-                <div class="flex-1 overflow-y-auto space-y-2.5 pr-0.5">
-                    <div
-                        v-for="(n, nIdx) in notifications"
-                        :key="nIdx"
-                        class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 space-y-2 hover:border-slate-300 dark:hover:border-slate-700 transition"
-                    >
-                        <div class="flex items-center gap-2.5">
-                            <span class="w-2.5 h-2.5 rounded-full shrink-0" :class="n.type === 'danger' ? 'bg-rose-500 animate-pulse' : (n.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500')"></span>
-                            <span class="text-xs font-black text-slate-900 dark:text-white">{{ n.title }}</span>
+                    <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                        <div class="flex items-center gap-2">
+                            <Bell class="w-5 h-5 text-theme-primary" />
+                            <h3 class="font-black text-sm">{{ $t('nav.live_notifications_center') }}</h3>
+                            <span v-if="notifications.length > 0" class="px-2 py-0.5 rounded-full bg-rose-500 text-white font-mono text-[10px] font-black">
+                                {{ notifications.length }}
+                            </span>
                         </div>
-                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{{ n.description }}</p>
-                        <div class="pt-1 flex justify-end">
-                            <Link
-                                :href="n.link"
-                                @click="showNotificationsSheet = false"
-                                class="px-3 py-1.5 rounded-xl bg-theme-light border border-theme-light text-theme-primary text-xs font-bold transition flex items-center gap-1 hover:brightness-110"
-                            >
-                                <span>{{ n.link_label }}</span>
-                                <span>←</span>
-                            </Link>
-                        </div>
+                        <button @click="showNotificationsSheet = false" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs flex items-center justify-center cursor-pointer">
+                            <X class="w-4 h-4" />
+                        </button>
                     </div>
 
-                    <div v-if="notifications.length === 0" class="py-12 text-center space-y-2">
-                        <Bell class="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700" />
-                        <p class="text-xs font-bold text-slate-400">{{ $t('nav.no_urgent_notifications') }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Store / Van Switcher Modal -->
-        <div
-            v-if="showStoreModal"
-            @click="showStoreModal = false"
-            class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4"
-        >
-            <div @click.stop class="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-2xl space-y-3 font-tajawal text-slate-900 dark:text-white">
-                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2.5">
-                    <h3 class="font-black text-sm">{{ $t('nav.select_store_modal_title') }}</h3>
-                    <button @click="showStoreModal = false" class="w-7 h-7 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs dark:hover:text-white transition flex items-center justify-center cursor-pointer">
-                        <X class="w-4 h-4" />
-                    </button>
-                </div>
-
-                <div class="space-y-2 max-h-64 overflow-y-auto pt-1">
-                    <div
-                        v-for="store in stores"
-                        :key="store.id"
-                        @click="switchStore(store.id)"
-                        class="p-3 rounded-2xl border flex items-center justify-between cursor-pointer transition"
-                        :class="activeStore?.id === store.id ? 'bg-theme-light border-theme-primary text-theme-primary font-black' : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'"
-                    >
-                        <div class="flex items-center gap-2.5">
-                            <Truck v-if="store.type === 'van'" class="w-4 h-4 text-theme-primary" />
-                            <Store v-else class="w-4 h-4 text-theme-primary" />
-                            <div>
-                                <p class="text-xs font-bold">{{ store.name }}</p>
-                                <p class="text-[10px] text-slate-400 dark:text-slate-500 font-sans">{{ store.type === 'van' ? $t('nav.van_store') : $t('nav.branch_store') }}</p>
+                    <div class="flex-1 overflow-y-auto space-y-2.5 pr-0.5">
+                        <div
+                            v-for="(n, nIdx) in notifications"
+                            :key="nIdx"
+                            class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 space-y-2 hover:border-slate-300 dark:hover:border-slate-700 transition"
+                        >
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-2.5 h-2.5 rounded-full shrink-0" :class="n.type === 'danger' ? 'bg-rose-500 animate-pulse' : (n.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500')"></span>
+                                <span class="text-xs font-black text-slate-900 dark:text-white">{{ n.title }}</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{{ n.description }}</p>
+                            <div class="pt-1 flex justify-end">
+                                <Link
+                                    :href="n.link"
+                                    @click="showNotificationsSheet = false"
+                                    class="px-3 py-1.5 rounded-xl bg-theme-light border border-theme-light text-theme-primary text-xs font-bold transition flex items-center gap-1 hover:brightness-110"
+                                >
+                                    <span>{{ n.link_label }}</span>
+                                    <span>←</span>
+                                </Link>
                             </div>
                         </div>
-                        <CheckCircle2 v-if="activeStore?.id === store.id" class="w-4 h-4 text-theme-primary shrink-0" />
+
+                        <div v-if="notifications.length === 0" class="py-12 text-center space-y-2">
+                            <Bell class="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700" />
+                            <p class="text-xs font-bold text-slate-400">{{ $t('nav.no_urgent_notifications') }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Transition>
+
+        <!-- Store / Van Switcher Modal (Smooth Center Pop) -->
+        <Transition name="modal-zoom">
+            <div
+                v-if="showStoreModal"
+                @click="showStoreModal = false"
+                class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4"
+            >
+                <div @click.stop class="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-2xl space-y-3 font-tajawal text-slate-900 dark:text-white">
+                    <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2.5">
+                        <h3 class="font-black text-sm">{{ $t('nav.select_store_modal_title') }}</h3>
+                        <button @click="showStoreModal = false" class="w-7 h-7 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs dark:hover:text-white transition flex items-center justify-center cursor-pointer">
+                            <X class="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    <div class="space-y-2 max-h-64 overflow-y-auto pt-1">
+                        <div
+                            v-for="store in stores"
+                            :key="store.id"
+                            @click="switchStore(store.id)"
+                            class="p-3 rounded-2xl border flex items-center justify-between cursor-pointer transition"
+                            :class="activeStore?.id === store.id ? 'bg-theme-light border-theme-primary text-theme-primary font-black' : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'"
+                        >
+                            <div class="flex items-center gap-2.5">
+                                <Truck v-if="store.type === 'van'" class="w-4 h-4 text-theme-primary" />
+                                <Store v-else class="w-4 h-4 text-theme-primary" />
+                                <div>
+                                    <p class="text-xs font-bold">{{ store.name }}</p>
+                                    <p class="text-[10px] text-slate-400 dark:text-slate-500 font-sans">{{ store.type === 'van' ? $t('nav.van_store') : $t('nav.branch_store') }}</p>
+                                </div>
+                            </div>
+                            <CheckCircle2 v-if="activeStore?.id === store.id" class="w-4 h-4 text-theme-primary shrink-0" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Transition>
     </div>
 </template>

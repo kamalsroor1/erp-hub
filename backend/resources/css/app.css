@@ -57,6 +57,69 @@ input, textarea, [contenteditable="true"] {
     }
 }
 
+/* 📱 Native Vue UI Component Transitions */
+/* 1. Sidebar Drawer Slide (RTL Right to Left) */
+.sidebar-drawer-enter-active,
+.sidebar-drawer-leave-active {
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease !important;
+}
+.sidebar-drawer-enter-from,
+.sidebar-drawer-leave-to {
+    transform: translateX(100%) !important;
+    opacity: 0.95 !important;
+}
+
+/* 2. Dropdown Menu Spring Pop */
+.dropdown-pop-enter-active,
+.dropdown-pop-leave-active {
+    transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transform-origin: top right !important;
+}
+.dropdown-pop-enter-from,
+.dropdown-pop-leave-to {
+    opacity: 0 !important;
+    transform: scale(0.92) translateY(-8px) !important;
+}
+
+/* 3. Bottom Sheet Slide */
+.sheet-slide-enter-active,
+.sheet-slide-leave-active {
+    transition: opacity 0.25s ease !important;
+}
+.sheet-slide-enter-from,
+.sheet-slide-leave-to {
+    opacity: 0 !important;
+}
+.sheet-slide-enter-active > div,
+.sheet-slide-leave-active > div {
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.sheet-slide-enter-from > div,
+.sheet-slide-leave-to > div {
+    transform: translateY(100%) !important;
+}
+
+/* 4. Global Smooth Fade */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.2s ease !important;
+}
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0 !important;
+}
+
+/* 5. Modal Center Pop */
+.modal-zoom-enter-active,
+.modal-zoom-leave-active {
+    transition: opacity 0.2s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.modal-zoom-enter-from,
+.modal-zoom-leave-to {
+    opacity: 0 !important;
+    transform: scale(0.94) !important;
+}
+
 /* 📐 Modern Mobile Safe Areas */
 .pb-safe {
     padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem)) !important;

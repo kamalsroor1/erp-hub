@@ -77,22 +77,26 @@ const navItems = computed(() => [
             </div>
         </header>
 
-        <!-- Mobile Drawer Overlay -->
-        <div
-            v-if="mobileMenuOpen"
-            @click="mobileMenuOpen = false"
-            class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs md:hidden"
-        >
+        <!-- Mobile Drawer Overlay & Sidebar (Smooth Native Transitions) -->
+        <Transition name="fade">
+            <div
+                v-if="mobileMenuOpen"
+                @click="mobileMenuOpen = false"
+                class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs md:hidden"
+            />
+        </Transition>
+
+        <Transition name="sidebar-drawer">
             <aside
-                @click.stop
-                class="w-72 max-w-[85vw] h-full bg-slate-900 border-l border-indigo-900/40 p-4 flex flex-col space-y-6 shadow-2xl"
+                v-if="mobileMenuOpen"
+                class="fixed inset-y-0 right-0 z-50 w-72 max-w-[85vw] h-full bg-slate-900 border-l border-indigo-900/40 p-4 flex flex-col space-y-6 shadow-2xl md:hidden"
             >
                 <div class="flex items-center justify-between border-b border-indigo-900/40 pb-3">
                     <div class="flex items-center gap-2">
                         <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm">🛡️</div>
                         <span class="font-black text-xs text-white">{{ $t('super.platform_title') }}</span>
                     </div>
-                    <button @click="mobileMenuOpen = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">✕</button>
+                    <button @click="mobileMenuOpen = false" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center cursor-pointer">✕</button>
                 </div>
 
                 <div class="space-y-1.5">
@@ -119,7 +123,7 @@ const navItems = computed(() => [
                     </p>
                 </div>
             </aside>
-        </div>
+        </Transition>
 
         <!-- Body Shell -->
         <div class="flex-1 flex overflow-hidden">
