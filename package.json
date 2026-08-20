@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently --kill-others-on-fail --prefix-colors \"bgBlue.bold,bgGreen.bold,bgMagenta.bold\" --names \"SERVER,FRONTEND,MOBILE\" \"npm:serve:backend\" \"npm:dev:backend\" \"npm:dev:mobile\"",
-    "serve:backend": "cd backend && php artisan serve --port=8000",
+    "serve:backend": "php backend/artisan serve --port=8000",
     "dev:backend": "npm --prefix backend run dev",
     "dev:mobile": "npm --prefix mobile run dev",
     "build": "concurrently \"npm:build:backend\" \"npm:build:mobile\"",
