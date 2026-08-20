@@ -32,3 +32,47 @@ test_api_auth.php
 test_*.php
 tests_e2e/screenshots/
 tests_e2e/__pycache__/
+
+# Credentials & Keys
+*.key
+credentials/
+/credentials/
+*.keystore
+*.jks
+
+# Mobile Specific Ignores
+/mobile/node_modules/
+/mobile/vendor/
+/mobile/.env
+/mobile/.env.backup
+/mobile/.env.production
+/mobile/credentials/
+/mobile/dist/
+/mobile/public/build/
+/mobile/public/storage/
+/mobile/storage/*.key
+/mobile/storage/framework/cache/*
+/mobile/storage/framework/sessions/*
+/mobile/storage/framework/views/*
+/mobile/storage/logs/*
+!/mobile/storage/framework/.gitignore
+!/mobile/storage/logs/.gitignore
+
+# NativePHP Mobile Build Artifacts & Binaries
+*.apk
+*.aab
+*.tar.gz
+*.zip
+*.7z
+7z.exe
+/mobile/7z.exe
+/mobile/nativephp/android/.gradle/
+/mobile/nativephp/android/build/
+/mobile/nativephp/android/app/build/
+/mobile/nativephp/android/app/src/main/assets/app.tar.gz
+/mobile/nativephp/android-build.log
+/mobile/nativephp/binaries/
+
+# Testing & Reports
+/test-results/
+/playwright-report/

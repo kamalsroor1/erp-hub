@@ -157,6 +157,30 @@ $this->app->bind(
 * **Never Expose Raw Eloquent Models:** All data passed to Inertia views or returned from APIs must be transformed via dedicated `JsonResource` classes.
 * Clean and format dates, mask sensitive fields, compute human-readable values, and append authorization flags (`can_edit`, `can_delete`).
 
+### Example:
+```php
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class TenantResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'email' => $this->email,
+            'status' => $this->status,
+            'created_at' => $this->created_at?->toDateString(),
+            'can_manage' => $request->user()?->can('tenants.manage'),
+        ];
+    }
+}
+```
+
 ---
 
 ## 10. 🧩 Vue 3 Composables Pattern (`resources/js/Composables/`)
@@ -176,3 +200,4 @@ $this->app->bind(
 ### Rule:
 * **Asynchronous Heavy Data:** Heavy queries, chart telemetry, and secondary logs must be declared via `Inertia::lazy(fn() => ...)` so initial page load renders instantly.
 * In Vue 3: Reload deferred props on demand using `router.reload({ only: ['heavyData'] })`.
+
