@@ -345,9 +345,9 @@ useKeyboardShortcuts({
             </div>
 
             <!-- Mobile View Tab Switcher (Visible on small screens < lg) -->
-            <div class="lg:hidden grid grid-cols-2 gap-2 mb-2.5 shrink-0">
+            <div class="lg:hidden grid grid-cols-2 gap-2 mb-2.5 shrink-0 select-none">
                 <button
-                    @click="mobileTab = 'catalog'"
+                    @click="triggerHaptic('light'); mobileTab = 'catalog'"
                     type="button"
                     class="h-11 rounded-2xl font-black text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-xs"
                     :class="mobileTab === 'catalog' ? 'btn-primary-theme shadow-theme-primary' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'"
@@ -357,7 +357,7 @@ useKeyboardShortcuts({
                 </button>
 
                 <button
-                    @click="mobileTab = 'cart'"
+                    @click="triggerHaptic('light'); mobileTab = 'cart'"
                     type="button"
                     class="h-11 rounded-2xl font-black text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-xs relative"
                     :class="mobileTab === 'cart' ? 'btn-primary-theme shadow-theme-primary' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'"
@@ -461,6 +461,19 @@ useKeyboardShortcuts({
                     class="w-full lg:w-[420px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl flex-col h-full overflow-hidden shrink-0 shadow-xs"
                     :class="mobileTab === 'cart' ? 'flex' : 'hidden lg:flex'"
                 >
+                    <!-- Mobile Back to Catalog Bar -->
+                    <div class="lg:hidden p-2.5 bg-slate-100 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                        <button
+                            @click="triggerHaptic('light'); mobileTab = 'catalog'"
+                            type="button"
+                            class="h-8.5 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-black text-slate-800 dark:text-slate-200 flex items-center gap-1.5 active:scale-95 transition cursor-pointer shadow-xs"
+                        >
+                            <span>←</span>
+                            <span>{{ $t('inventory.items_catalog') || 'العودة لقائمة الأصناف' }}</span>
+                        </button>
+                        <span class="text-xs font-bold font-mono text-slate-500">{{ cart.length }} {{ $t('common.items') || 'أصناف' }}</span>
+                    </div>
+
                     <!-- Customer Selector Bar -->
                     <div class="p-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 bg-slate-50 dark:bg-slate-950/60 shrink-0">
                         <div
