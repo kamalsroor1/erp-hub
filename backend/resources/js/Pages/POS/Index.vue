@@ -5,6 +5,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { useMoney } from '@/Composables/useMoney';
 import { usePOSCart } from '@/Composables/usePOSCart';
 import { useKeyboardShortcuts } from '@/Composables/useKeyboardShortcuts';
+import { useNativeBridge } from '@/Composables/useNativeBridge';
 import { posService } from '@/Services/posService';
 import { trans } from '@/helpers/trans';
 
@@ -30,6 +31,7 @@ const tenant = computed(() => page.props.tenant);
 
 // Composables
 const { formatMoney } = useMoney();
+const { triggerHaptic } = useNativeBridge();
 
 // Search & Category filter
 const searchQuery = ref('');
