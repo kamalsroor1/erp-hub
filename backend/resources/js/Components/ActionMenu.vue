@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { Link } from '@inertiajs/vue3';
-import { MoreVertical, X } from 'lucide-vue-next';
+import { MoreHorizontal, MoreVertical, X } from 'lucide-vue-next';
 import { useNativeBridge } from '@/Composables/useNativeBridge';
 
 const props = defineProps({
@@ -25,6 +25,10 @@ const props = defineProps({
     mode: {
         type: String,
         default: 'dropdown' // 'dropdown' | 'sheet'
+    },
+    orientation: {
+        type: String,
+        default: 'horizontal' // 'horizontal' (•••) | 'vertical' (⋮)
     }
 });
 
@@ -66,15 +70,16 @@ onUnmounted(() => {
 
 <template>
     <div ref="menuRef" class="relative inline-block text-right font-tajawal">
-        <!-- Trigger Button -->
+        <!-- Trigger Button (•••) -->
         <button
             @click.stop="toggleMenu"
             type="button"
-            class="h-9.5 min-w-[38px] px-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700/70 flex items-center justify-center gap-1 transition active:scale-90 cursor-pointer shadow-xs"
+            class="h-9 min-w-[36px] px-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700/70 flex items-center justify-center gap-1 transition active:scale-90 cursor-pointer shadow-xs"
             :class="buttonClass"
             :title="title || $t('common.actions') || 'الإجراءات'"
         >
-            <MoreVertical class="w-4 h-4 text-slate-600 dark:text-slate-300" />
+            <MoreHorizontal v-if="orientation === 'horizontal'" class="w-4.5 h-4.5 text-current" />
+            <MoreVertical v-else class="w-4 h-4 text-current" />
             <slot name="trigger" />
         </button>
 
