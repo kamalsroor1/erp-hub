@@ -5,6 +5,10 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import SearchableSelect from '@/Components/SearchableSelect.vue';
 import DatePicker from '@/Components/DatePicker.vue';
 import FilterDrawer from '@/Components/FilterDrawer.vue';
+import PageHeader from '@/Components/Common/PageHeader.vue';
+import MetricCard from '@/Components/Common/MetricCard.vue';
+import EmptyState from '@/Components/Common/EmptyState.vue';
+import Pagination from '@/Components/Common/Pagination.vue';
 import { useMoney } from '@/Composables/useMoney';
 
 const props = defineProps({
@@ -174,51 +178,45 @@ const toggleActive = (c) => {
     <AppLayout>
         <div class="space-y-6 font-tajawal">
             <!-- Header -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                        <span class="text-2xl">👥</span>
-                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                            {{ $t('contacts.customers_title') }}
-                        </h1>
-                    </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
-                        {{ $t('contacts.customers_subtitle') }}
-                    </p>
-                </div>
-
-                <button
-                    @click="openCreateModal"
-                    type="button"
-                    class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
-                >
-                    <span class="text-base font-black">+</span>
-                    <span>{{ $t('contacts.add_new_customer') }}</span>
-                </button>
-            </div>
+            <PageHeader
+                :title="$t('contacts.customers_title')"
+                :subtitle="$t('contacts.customers_subtitle')"
+                icon="👥"
+            >
+                <template #actions>
+                    <button
+                        @click="openCreateModal"
+                        type="button"
+                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer shadow-theme-sm"
+                    >
+                        <span class="text-base font-black">+</span>
+                        <span>{{ $t('contacts.add_new_customer') }}</span>
+                    </button>
+                </template>
+            </PageHeader>
 
             <!-- KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.total_customer_debts') }}</span>
-                    <div class="text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
-                        {{ formatMoney(metrics.total_debt) }} <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('contacts.total_customer_debts')"
+                    :value="formatMoney(metrics.total_debt)"
+                    :currency="$t('common.currency')"
+                    variant="danger"
+                />
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.debtors_count') }}</span>
-                    <div class="text-2xl font-black font-mono text-theme-primary">
-                        {{ metrics.debtors_count || 0 }} <span class="text-xs text-slate-400 font-tajawal">{{ $t('contacts.customer_unit') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('contacts.debtors_count')"
+                    :value="metrics.debtors_count || 0"
+                    :currency="$t('contacts.customer_unit')"
+                    variant="primary"
+                />
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-2">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.total_customers_count') }}</span>
-                    <div class="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
-                        {{ metrics.total_customers || 0 }} <span class="text-xs text-slate-400 font-tajawal">{{ $t('contacts.customer_unit') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('contacts.total_customers_count')"
+                    :value="metrics.total_customers || 0"
+                    :currency="$t('contacts.customer_unit')"
+                    variant="success"
+                />
             </div>
 
             <!-- Filter & Search Bar -->
@@ -453,34 +451,22 @@ const toggleActive = (c) => {
                     </div>
                 </div>
 
-                <div v-if="!customers.data || customers.data.length === 0" class="py-16 text-center space-y-2">
-                    <span class="text-3xl">👥</span>
-                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('contacts.no_customers_found') }}</p>
-                </div>
+                <!-- Empty State -->
+                <EmptyState
+                    v-if="!customers.data || customers.data.length === 0"
+                    icon="👥"
+                    :title="$t('contacts.no_customers_found')"
+                    :action-label="$t('contacts.add_new_customer')"
+                    @action="openCreateModal"
+                />
 
                 <!-- Pagination -->
-                <div v-if="customers.links && customers.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
-                    <span class="text-xs text-slate-400 font-tajawal">
-                        {{ $t('common.actions') ? `عرض ${customers.from || 0} إلى ${customers.to || 0} من إجمالي ${customers.total || 0}` : `Showing ${customers.from || 0} to ${customers.to || 0} of ${customers.total || 0}` }}
-                    </span>
-
-                    <div class="flex items-center gap-1">
-                        <template v-for="(link, lIdx) in customers.links" :key="lIdx">
-                            <Link
-                                v-if="link.url"
-                                :href="link.url"
-                                class="px-3 py-1.5 rounded-xl text-xs font-bold transition"
-                                :class="link.active ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'"
-                                v-html="link.label"
-                            />
-                            <span
-                                v-else
-                                class="px-3 py-1.5 rounded-xl text-xs text-slate-600 font-bold"
-                                v-html="link.label"
-                            />
-                        </template>
-                    </div>
-                </div>
+                <Pagination
+                    :links="customers.links"
+                    :from="customers.from"
+                    :to="customers.to"
+                    :total="customers.total"
+                />
             </div>
         </div>
 

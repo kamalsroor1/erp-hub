@@ -3,6 +3,8 @@ import { ref, watch } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import DatePicker from '@/Components/DatePicker.vue';
+import PageHeader from '@/Components/Common/PageHeader.vue';
+import EmptyState from '@/Components/Common/EmptyState.vue';
 
 const props = defineProps({
     transfers: { type: Object, required: true },
@@ -50,27 +52,21 @@ const openDetailsModal = (t) => {
     <AppLayout>
         <div class="space-y-6 font-tajawal">
             <!-- Header -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                        <span class="text-2xl">🚚</span>
-                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                            {{ $t('inventory.transfers_title') }}
-                        </h1>
-                    </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
-                        {{ $t('inventory.transfers_subtitle') }}
-                    </p>
-                </div>
-
-                <Link
-                    href="/stock-transfers/create"
-                    class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
-                >
-                    <span class="text-base font-black">+</span>
-                    <span>{{ $t('inventory.new_transfer') }}</span>
-                </Link>
-            </div>
+            <PageHeader
+                :title="$t('inventory.transfers_title')"
+                :subtitle="$t('inventory.transfers_subtitle')"
+                icon="🚚"
+            >
+                <template #actions>
+                    <Link
+                        href="/stock-transfers/create"
+                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer shadow-theme-sm"
+                    >
+                        <span class="text-base font-black">+</span>
+                        <span>{{ $t('inventory.new_transfer') }}</span>
+                    </Link>
+                </template>
+            </PageHeader>
 
             <!-- Transfers Table & Mobile Cards -->
             <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-4 overflow-hidden font-tajawal">
@@ -174,10 +170,14 @@ const openDetailsModal = (t) => {
                     </div>
                 </div>
 
-                <div v-if="!transfers.data || transfers.data.length === 0" class="py-16 text-center space-y-2">
-                    <span class="text-3xl">🚚</span>
-                    <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_transfers_found') }}</p>
-                </div>
+                <!-- Empty State -->
+                <EmptyState
+                    v-if="!transfers.data || transfers.data.length === 0"
+                    icon="🚚"
+                    :title="$t('inventory.no_transfers_found')"
+                    :action-label="$t('inventory.new_transfer')"
+                    action-href="/stock-transfers/create"
+                />
             </div>
         </div>
 

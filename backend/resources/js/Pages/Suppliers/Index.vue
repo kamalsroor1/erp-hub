@@ -5,6 +5,10 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import SearchableSelect from '@/Components/SearchableSelect.vue';
 import DatePicker from '@/Components/DatePicker.vue';
 import FilterDrawer from '@/Components/FilterDrawer.vue';
+import PageHeader from '@/Components/Common/PageHeader.vue';
+import MetricCard from '@/Components/Common/MetricCard.vue';
+import EmptyState from '@/Components/Common/EmptyState.vue';
+import Pagination from '@/Components/Common/Pagination.vue';
 import { useMoney } from '@/Composables/useMoney';
 
 const props = defineProps({
@@ -173,51 +177,46 @@ const toggleActive = (s) => {
     <AppLayout>
         <div class="space-y-6 font-tajawal">
             <!-- Header -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                        <span class="text-2xl">🏭</span>
-                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                            {{ $t('contacts.suppliers_title') }}
-                        </h1>
-                    </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
-                        {{ $t('contacts.suppliers_subtitle') }}
-                    </p>
-                </div>
-
-                <button
-                    @click="openCreateModal"
-                    type="button"
-                    class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
-                >
-                    <span class="text-base font-black">+</span>
-                    <span>{{ $t('contacts.add_new_supplier') }}</span>
-                </button>
-            </div>
+            <PageHeader
+                :title="$t('contacts.suppliers_title')"
+                :subtitle="$t('contacts.suppliers_subtitle')"
+                icon="🏭"
+            >
+                <template #actions>
+                    <button
+                        @click="openCreateModal"
+                        type="button"
+                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer shadow-theme-sm"
+                    >
+                        <span class="text-base font-black">+</span>
+                        <span>{{ $t('contacts.add_new_supplier') }}</span>
+                    </button>
+                </template>
+            </PageHeader>
 
             <!-- KPI Summary Cards (Bento Style on mobile) -->
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.total_payable_suppliers') }}</span>
-                    <div class="text-lg sm:text-2xl font-black font-mono text-theme-primary">
-                        {{ formatMoney(metrics.total_payable) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('contacts.total_payable_suppliers')"
+                    :value="formatMoney(metrics.total_payable)"
+                    :currency="$t('common.currency')"
+                    variant="primary"
+                />
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.creditors_count') }}</span>
-                    <div class="text-lg sm:text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
-                        {{ metrics.creditors_count || 0 }} <span class="text-[11px] text-slate-400 font-tajawal">{{ $t('contacts.supplier_unit') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('contacts.creditors_count')"
+                    :value="metrics.creditors_count || 0"
+                    :currency="$t('contacts.supplier_unit')"
+                    variant="danger"
+                />
 
-                <div class="col-span-2 sm:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('contacts.total_suppliers_count') }}</span>
-                    <div class="text-lg sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
-                        {{ metrics.total_suppliers || 0 }} <span class="text-[11px] text-slate-400 font-tajawal">{{ $t('contacts.supplier_unit') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    class="col-span-2 sm:col-span-1"
+                    :title="$t('contacts.total_suppliers_count')"
+                    :value="metrics.total_suppliers || 0"
+                    :currency="$t('contacts.supplier_unit')"
+                    variant="success"
+                />
             </div>
 
             <!-- Quick Filter Bar -->
@@ -461,34 +460,22 @@ const toggleActive = (s) => {
                     </div>
                 </div>
 
-                <div v-if="!suppliers.data || suppliers.data.length === 0" class="py-16 text-center space-y-2">
-                    <span class="text-3xl">🏭</span>
-                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('contacts.no_suppliers_found') }}</p>
-                </div>
+                <!-- Empty State -->
+                <EmptyState
+                    v-if="!suppliers.data || suppliers.data.length === 0"
+                    icon="🏭"
+                    :title="$t('contacts.no_suppliers_found')"
+                    :action-label="$t('contacts.add_new_supplier')"
+                    @action="openCreateModal"
+                />
 
                 <!-- Pagination -->
-                <div v-if="suppliers.links && suppliers.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
-                    <span class="text-xs text-slate-400 font-tajawal">
-                        {{ $t('common.actions') ? `عرض ${suppliers.from || 0} إلى ${suppliers.to || 0} من إجمالي ${suppliers.total || 0}` : `Showing ${suppliers.from || 0} to ${suppliers.to || 0} of ${suppliers.total || 0}` }}
-                    </span>
-
-                    <div class="flex items-center gap-1">
-                        <template v-for="(link, lIdx) in suppliers.links" :key="lIdx">
-                            <Link
-                                v-if="link.url"
-                                :href="link.url"
-                                class="px-3 py-1.5 rounded-xl text-xs font-bold transition"
-                                :class="link.active ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'"
-                                v-html="link.label"
-                            />
-                            <span
-                                v-else
-                                class="px-3 py-1.5 rounded-xl text-xs text-slate-600 font-bold"
-                                v-html="link.label"
-                            />
-                        </template>
-                    </div>
-                </div>
+                <Pagination
+                    :links="suppliers.links"
+                    :from="suppliers.from"
+                    :to="suppliers.to"
+                    :total="suppliers.total"
+                />
             </div>
         </div>
 

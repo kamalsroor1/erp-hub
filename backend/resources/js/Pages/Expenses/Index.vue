@@ -5,6 +5,10 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import SearchableSelect from '@/Components/SearchableSelect.vue';
 import DatePicker from '@/Components/DatePicker.vue';
 import FilterDrawer from '@/Components/FilterDrawer.vue';
+import PageHeader from '@/Components/Common/PageHeader.vue';
+import MetricCard from '@/Components/Common/MetricCard.vue';
+import EmptyState from '@/Components/Common/EmptyState.vue';
+import Pagination from '@/Components/Common/Pagination.vue';
 import { useMoney } from '@/Composables/useMoney';
 import { trans } from '@/helpers/trans';
 
@@ -167,51 +171,46 @@ const deleteExpense = (e) => {
     <AppLayout>
         <div class="space-y-6 font-tajawal">
             <!-- Header -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                        <span class="text-2xl">💸</span>
-                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                            {{ $t('expenses.title') }}
-                        </h1>
-                    </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
-                        {{ $t('expenses.expenses_breakdown') }}
-                    </p>
-                </div>
-
-                <button
-                    @click="openCreateModal"
-                    type="button"
-                    class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
-                >
-                    <span class="text-base font-black">+</span>
-                    <span>{{ $t('expenses.add_expense') }}</span>
-                </button>
-            </div>
+            <PageHeader
+                :title="$t('expenses.title')"
+                :subtitle="$t('expenses.expenses_breakdown')"
+                icon="💸"
+            >
+                <template #actions>
+                    <button
+                        @click="openCreateModal"
+                        type="button"
+                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer shadow-theme-sm"
+                    >
+                        <span class="text-base font-black">+</span>
+                        <span>{{ $t('expenses.add_expense') }}</span>
+                    </button>
+                </template>
+            </PageHeader>
 
             <!-- KPI Summary Cards (Bento Style on mobile) -->
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('expenses.total_today') }}</span>
-                    <div class="text-lg sm:text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
-                        {{ formatMoney(metrics.total_today) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('expenses.total_today')"
+                    :value="formatMoney(metrics.total_today)"
+                    :currency="$t('common.currency')"
+                    variant="danger"
+                />
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('expenses.total_cash') }}</span>
-                    <div class="text-lg sm:text-2xl font-black font-mono text-theme-primary">
-                        {{ formatMoney(metrics.total_cash) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('expenses.total_cash')"
+                    :value="formatMoney(metrics.total_cash)"
+                    :currency="$t('common.currency')"
+                    variant="primary"
+                />
 
-                <div class="col-span-2 sm:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('expenses.total_filtered') }}</span>
-                    <div class="text-lg sm:text-2xl font-black font-mono text-theme-primary">
-                        {{ formatMoney(metrics.total_filtered) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    class="col-span-2 sm:col-span-1"
+                    :title="$t('expenses.total_filtered')"
+                    :value="formatMoney(metrics.total_filtered)"
+                    :currency="$t('common.currency')"
+                    variant="primary"
+                />
             </div>
 
             <!-- Quick Filter Bar -->
@@ -373,34 +372,22 @@ const deleteExpense = (e) => {
                     </div>
                 </div>
 
-                <div v-if="!expenses.data || expenses.data.length === 0" class="py-16 text-center space-y-2">
-                    <span class="text-3xl">💸</span>
-                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('expenses.no_expenses') }}</p>
-                </div>
+                <!-- Empty State -->
+                <EmptyState
+                    v-if="!expenses.data || expenses.data.length === 0"
+                    icon="💸"
+                    :title="$t('expenses.no_expenses')"
+                    :action-label="$t('expenses.add_expense')"
+                    @action="openCreateModal"
+                />
 
                 <!-- Pagination -->
-                <div v-if="expenses.links && expenses.links.length > 3" class="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between font-sans">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-tajawal">
-                        {{ $t('common.showing') }} {{ expenses.from || 0 }} {{ $t('common.to') }} {{ expenses.to || 0 }} {{ $t('common.of') }} {{ expenses.total || 0 }}
-                    </span>
-
-                    <div class="flex items-center gap-1">
-                        <template v-for="(link, lIdx) in expenses.links" :key="lIdx">
-                            <Link
-                                v-if="link.url"
-                                :href="link.url"
-                                class="px-3 py-1.5 rounded-xl text-xs font-bold transition"
-                                :class="link.active ? 'tab-theme-active' : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'"
-                                v-html="link.label"
-                            />
-                            <span
-                                v-else
-                                class="px-3 py-1.5 rounded-xl text-xs text-slate-400 dark:text-slate-600 font-bold"
-                                v-html="link.label"
-                            />
-                        </template>
-                    </div>
-                </div>
+                <Pagination
+                    :links="expenses.links"
+                    :from="expenses.from"
+                    :to="expenses.to"
+                    :total="expenses.total"
+                />
             </div>
         </div>
 

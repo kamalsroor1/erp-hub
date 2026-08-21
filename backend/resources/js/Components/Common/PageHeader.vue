@@ -1,0 +1,60 @@
+<script setup>
+import { computed } from 'vue';
+
+const props = defineProps({
+    title: {
+        type: String,
+        required: true
+    },
+    subtitle: {
+        type: String,
+        default: ''
+    },
+    icon: {
+        type: [Object, Function, String],
+        default: null
+    },
+    badge: {
+        type: String,
+        default: ''
+    }
+});
+</script>
+
+<template>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-tajawal">
+        <div class="space-y-1">
+            <div class="flex items-center gap-2.5 flex-wrap">
+                <div
+                    v-if="icon"
+                    class="w-10 h-10 rounded-2xl bg-theme-light border border-theme-primary/20 flex items-center justify-center text-theme-primary shadow-xs shrink-0"
+                >
+                    <component v-if="typeof icon === 'object' || typeof icon === 'function'" :is="icon" class="w-5 h-5" />
+                    <span v-else class="text-xl leading-none">{{ icon }}</span>
+                </div>
+
+                <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                    {{ title }}
+                </h1>
+
+                <span
+                    v-if="badge"
+                    class="px-2.5 py-0.5 rounded-full text-xs font-black bg-theme-light text-theme-primary border border-theme-primary/30"
+                >
+                    {{ badge }}
+                </span>
+            </div>
+
+            <p v-if="subtitle" class="text-xs text-slate-500 dark:text-slate-400 font-bold leading-relaxed">
+                {{ subtitle }}
+            </p>
+        </div>
+
+        <!-- Action Buttons Slot -->
+        <div v-if="$slots.actions || $slots.default" class="flex items-center gap-2 flex-wrap w-full sm:w-auto justify-start sm:justify-end">
+            <slot name="actions">
+                <slot />
+            </slot>
+        </div>
+    </div>
+</template>

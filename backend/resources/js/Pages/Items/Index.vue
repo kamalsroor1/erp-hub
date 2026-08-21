@@ -4,6 +4,10 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import SearchableSelect from '@/Components/SearchableSelect.vue';
 import FilterDrawer from '@/Components/FilterDrawer.vue';
+import PageHeader from '@/Components/Common/PageHeader.vue';
+import MetricCard from '@/Components/Common/MetricCard.vue';
+import EmptyState from '@/Components/Common/EmptyState.vue';
+import Pagination from '@/Components/Common/Pagination.vue';
 import { useMoney } from '@/Composables/useMoney';
 import { trans } from '@/helpers/trans';
 import {
@@ -171,62 +175,58 @@ const deleteItem = (item) => {
 
     <AppLayout>
         <div class="space-y-6 font-tajawal">
-            <!-- Header Section -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                        <Package class="w-6 h-6 text-theme-primary" />
-                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                            {{ $t('inventory.title') }}
-                        </h1>
-                    </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
-                        {{ $t('inventory.subtitle') }}
-                    </p>
-                </div>
+            <!-- Header -->
+            <PageHeader
+                :title="$t('inventory.items_title')"
+                :subtitle="$t('inventory.items_subtitle')"
+                :icon="Package"
+            >
+                <template #actions>
+                    <Link
+                        href="/items/movements"
+                        class="h-11 px-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95 shadow-xs"
+                    >
+                        <History class="w-4 h-4 text-theme-primary" />
+                        <span>{{ $t('inventory.stock_card_btn') }}</span>
+                    </Link>
 
-                <div class="flex items-center gap-2.5">
                     <button
                         @click="openCreateModal"
                         type="button"
-                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
+                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer shadow-theme-sm"
                     >
                         <Plus class="w-4 h-4" />
                         <span>{{ $t('inventory.add_new_item') }}</span>
                     </button>
-                </div>
-            </div>
+                </template>
+            </PageHeader>
 
             <!-- KPI Summary Cards (Bento style on mobile) -->
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('inventory.total_items_count') }}</span>
-                    <div class="text-lg sm:text-2xl font-black font-mono text-slate-900 dark:text-white flex items-center gap-1.5">
-                        <Package class="w-4 sm:w-5 h-4 sm:h-5 text-theme-primary" />
-                        <span>{{ metrics.total_items || 0 }}</span>
-                        <span class="text-[11px] text-slate-400 font-tajawal">{{ $t('inventory.item_unit') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('inventory.total_items_count')"
+                    :value="metrics.total_items || 0"
+                    :currency="$t('inventory.item_unit')"
+                    :icon="Package"
+                />
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('inventory.low_stock_count') }}</span>
-                    <div class="text-lg sm:text-2xl font-black font-mono text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
-                        <AlertTriangle class="w-4 sm:w-5 h-4 sm:h-5 text-rose-500" />
-                        <span>{{ metrics.low_stock_count || 0 }}</span>
-                        <span v-if="metrics.low_stock_count > 0" class="text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 font-tajawal">
-                            {{ $t('inventory.low_stock_warning') }}
-                        </span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('inventory.low_stock_count')"
+                    :value="metrics.low_stock_count || 0"
+                    :currency="$t('inventory.item_unit')"
+                    variant="danger"
+                    :icon="AlertTriangle"
+                    :subtitle="metrics.low_stock_count > 0 ? $t('inventory.low_stock_warning') : ''"
+                />
 
-                <div class="col-span-2 sm:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('inventory.total_inventory_value') }}</span>
-                    <div class="text-lg sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                        <Boxes class="w-4 sm:w-5 h-4 sm:h-5 text-emerald-500" />
-                        <span>{{ formatMoney(metrics.total_stock_value) }}</span>
-                        <span class="text-xs text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    class="col-span-2 sm:col-span-1"
+                    :title="$t('inventory.total_inventory_value')"
+                    :value="formatMoney(metrics.total_stock_value)"
+                    :currency="$t('common.currency')"
+                    variant="success"
+                    :icon="Boxes"
+                />
             </div>
 
             <!-- Filter & Search Quick Bar -->
@@ -491,34 +491,22 @@ const deleteItem = (item) => {
                 </div>
 
                 <!-- Empty State -->
-                <div v-if="!items.data || items.data.length === 0" class="py-16 text-center space-y-3">
-                    <Package class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-700" />
-                    <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('inventory.no_items_found') }}</p>
-                </div>
+                <EmptyState
+                    v-if="!items.data || items.data.length === 0"
+                    :icon="Package"
+                    :title="$t('inventory.no_items_found')"
+                    :action-label="$t('inventory.add_new_item')"
+                    @action="openCreateModal"
+                    :action-icon="Plus"
+                />
 
                 <!-- Pagination -->
-                <div v-if="items.links && items.links.length > 3" class="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between font-sans">
-                    <span class="text-xs text-slate-400 font-tajawal">
-                        {{ $t('common.actions') ? `عرض ${items.from || 0} إلى ${items.to || 0} من إجمالي ${items.total || 0}` : `Showing ${items.from || 0} to ${items.to || 0} of ${items.total || 0}` }}
-                    </span>
-
-                    <div class="flex items-center gap-1">
-                        <template v-for="(link, lIdx) in items.links" :key="lIdx">
-                            <Link
-                                v-if="link.url"
-                                :href="link.url"
-                                class="px-3 py-1.5 rounded-xl text-xs font-bold transition"
-                                :class="link.active ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'"
-                                v-html="link.label"
-                            />
-                            <span
-                                v-else
-                                class="px-3 py-1.5 rounded-xl text-xs text-slate-600 font-bold"
-                                v-html="link.label"
-                            />
-                        </template>
-                    </div>
-                </div>
+                <Pagination
+                    :links="items.links"
+                    :from="items.from"
+                    :to="items.to"
+                    :total="items.total"
+                />
             </div>
         </div>
 

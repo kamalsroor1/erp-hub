@@ -2,6 +2,9 @@
 import { ref, computed, watch } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import PageHeader from '@/Components/Common/PageHeader.vue';
+import EmptyState from '@/Components/Common/EmptyState.vue';
+import Pagination from '@/Components/Common/Pagination.vue';
 import { useMoney } from '@/Composables/useMoney';
 import { trans } from '@/helpers/trans';
 
@@ -73,19 +76,11 @@ const forceDeleteRecord = (id) => {
     <AppLayout>
         <div class="space-y-6 font-tajawal">
             <!-- Header -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                        <span class="text-2xl">🗑️</span>
-                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                            {{ $t('trash.title') }}
-                        </h1>
-                    </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
-                        {{ $t('trash.subtitle') }}
-                    </p>
-                </div>
-            </div>
+            <PageHeader
+                :title="$t('trash.title')"
+                :subtitle="$t('trash.subtitle')"
+                icon="🗑️"
+            />
 
             <!-- Tabs Navigation -->
             <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
@@ -100,56 +95,54 @@ const forceDeleteRecord = (id) => {
                     <span>{{ t.name }}</span>
                     <span
                         v-if="counts[t.countKey] > 0"
-                        class="px-2 py-0.5 rounded-full text-[10px] font-mono font-black"
-                        :class="currentTab === t.id ? 'bg-black/20 text-inherit' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'"
+                        class="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white"
                     >
                         {{ counts[t.countKey] }}
                     </span>
                 </button>
             </div>
 
-            <!-- Quick Search Bar -->
-            <div class="w-full md:w-96 relative">
-                <input
-                    v-model="search"
-                    type="text"
-                    :placeholder="$t('trash.search_placeholder')"
-                    class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-theme-primary focus:outline-none transition shadow-inner"
-                >
-                <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
-                    🔍
-                </span>
-            </div>
+            <!-- Table & List View -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-4 font-tajawal">
+                <!-- Search -->
+                <div class="w-full md:w-80 relative">
+                    <input
+                        v-model="search"
+                        type="text"
+                        :placeholder="$t('trash.search_trash')"
+                        class="w-full pr-10 pl-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-theme-primary focus:outline-none transition"
+                    >
+                    <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
+                        🔍
+                    </span>
+                </div>
 
-            <!-- Trashed Table -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4 overflow-hidden">
+                <!-- Table Content -->
                 <div class="overflow-x-auto">
-                    <table class="w-full text-right text-xs">
+                    <table v-if="records.data && records.data.length > 0" class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
-                                <th class="pb-3">{{ $t('trash.record_name') }}</th>
-                                <th class="pb-3">{{ $t('trash.record_details') }}</th>
-                                <th class="pb-3">{{ $t('trash.deleted_time') }}</th>
+                                <th class="pb-3">{{ $t('trash.record_name_col') }}</th>
+                                <th class="pb-3">{{ $t('trash.deleted_at_col') }}</th>
+                                <th class="pb-3">{{ $t('trash.additional_info_col') }}</th>
                                 <th class="pb-3 text-center">{{ $t('common.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-sans">
                             <tr v-for="r in records.data" :key="r.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
-                                <td class="py-3.5 font-bold text-slate-900 dark:text-white font-tajawal text-sm">
-                                    {{ r.name || r.title || r.return_number }}
+                                <td class="py-3.5 font-black text-slate-900 dark:text-white font-tajawal">
+                                    {{ r.name || r.title || r.invoice_number || r.transfer_number || `#${r.id}` }}
                                 </td>
 
-                                <td class="py-3.5 font-tajawal text-slate-600 dark:text-slate-400">
-                                    <span v-if="r.code" class="font-mono text-theme-primary font-bold">{{ r.code }} | </span>
-                                    <span v-if="r.category">{{ r.category }}</span>
-                                    <span v-if="r.amount" class="font-mono font-bold text-rose-600 dark:text-rose-400">{{ formatMoney(r.amount) }} {{ $t('common.currency') }}</span>
-                                    <span v-if="r.phone" class="font-mono">{{ r.phone }}</span>
-                                    <span v-if="r.company_name">{{ r.company_name }}</span>
-                                    <span v-if="r.net_total" class="font-mono text-emerald-600 dark:text-emerald-400">{{ formatMoney(r.net_total) }} {{ $t('common.currency') }}</span>
-                                </td>
-
-                                <td class="py-3.5 font-tajawal text-slate-500 dark:text-slate-400 text-[11px] font-mono">
+                                <td class="py-3.5 font-mono text-rose-500 text-[11px]">
                                     {{ r.deleted_at }}
+                                </td>
+
+                                <td class="py-3.5 text-slate-500 dark:text-slate-400 font-tajawal">
+                                    <span v-if="r.sku" class="font-mono text-xs">SKU: {{ r.sku }}</span>
+                                    <span v-else-if="r.phone" class="font-mono text-xs">{{ r.phone }}</span>
+                                    <span v-else-if="r.amount" class="font-mono text-xs font-bold">{{ formatMoney(r.amount) }} {{ $t('common.currency') }}</span>
+                                    <span v-else>-</span>
                                 </td>
 
                                 <td class="py-3.5 text-center">
@@ -175,35 +168,21 @@ const forceDeleteRecord = (id) => {
                         </tbody>
                     </table>
 
-                    <div v-if="!records.data || records.data.length === 0" class="py-16 text-center space-y-2">
-                        <span class="text-3xl">🎉</span>
-                        <p class="text-xs font-bold text-emerald-600 dark:text-emerald-400 font-tajawal">{{ $t('trash.empty_trash') }}</p>
-                    </div>
+                    <!-- Empty State -->
+                    <EmptyState
+                        v-if="!records.data || records.data.length === 0"
+                        icon="🎉"
+                        :title="$t('trash.empty_trash')"
+                    />
                 </div>
 
                 <!-- Pagination -->
-                <div v-if="records.links && records.links.length > 3" class="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between font-sans">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-tajawal">
-                        {{ $t('common.showing') }} {{ records.from || 0 }} {{ $t('common.to') }} {{ records.to || 0 }} {{ $t('common.of') }} {{ records.total || 0 }}
-                    </span>
-
-                    <div class="flex items-center gap-1">
-                        <template v-for="(link, lIdx) in records.links" :key="lIdx">
-                            <Link
-                                v-if="link.url"
-                                :href="link.url"
-                                class="px-3 py-1.5 rounded-xl text-xs font-bold transition"
-                                :class="link.active ? 'tab-theme-active' : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'"
-                                v-html="link.label"
-                            />
-                            <span
-                                v-else
-                                class="px-3 py-1.5 rounded-xl text-xs text-slate-400 dark:text-slate-600 font-bold"
-                                v-html="link.label"
-                            />
-                        </template>
-                    </div>
-                </div>
+                <Pagination
+                    :links="records.links"
+                    :from="records.from"
+                    :to="records.to"
+                    :total="records.total"
+                />
             </div>
         </div>
     </AppLayout>

@@ -5,6 +5,10 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import SearchableSelect from '@/Components/SearchableSelect.vue';
 import DatePicker from '@/Components/DatePicker.vue';
 import FilterDrawer from '@/Components/FilterDrawer.vue';
+import PageHeader from '@/Components/Common/PageHeader.vue';
+import MetricCard from '@/Components/Common/MetricCard.vue';
+import EmptyState from '@/Components/Common/EmptyState.vue';
+import Pagination from '@/Components/Common/Pagination.vue';
 import { useMoney } from '@/Composables/useMoney';
 import { trans } from '@/helpers/trans';
 
@@ -105,23 +109,15 @@ const cancelPurchase = (p) => {
     <AppLayout>
         <div class="space-y-6 font-tajawal">
             <!-- Header -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                        <span class="text-2xl">📦</span>
-                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                            {{ $t('purchases.purchases_list') }}
-                        </h1>
-                    </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
-                        {{ $t('purchases.purchases_list_sub') }}
-                    </p>
-                </div>
-
-                <div class="flex items-center gap-2.5">
+            <PageHeader
+                :title="$t('purchases.title')"
+                :subtitle="$t('purchases.subtitle')"
+                icon="📦"
+            >
+                <template #actions>
                     <Link
                         href="/purchases/smart-reorder"
-                        class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
+                        class="h-11 px-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-400 text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shadow-xs"
                     >
                         <span>🧠</span>
                         <span>{{ $t('purchases.smart_reorder') }}</span>
@@ -129,36 +125,37 @@ const cancelPurchase = (p) => {
 
                     <Link
                         href="/purchases/create"
-                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
+                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer shadow-theme-sm"
                     >
                         <span class="text-base font-black">+</span>
                         <span>{{ $t('purchases.create_po_title') }}</span>
                     </Link>
-                </div>
-            </div>
+                </template>
+            </PageHeader>
 
             <!-- KPI Summary Cards (Bento Style on mobile) -->
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4 font-tajawal">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('purchases.kpi_total_purchases') }}</span>
-                    <div class="text-lg sm:text-2xl font-black font-mono text-theme-primary">
-                        {{ formatMoney(metrics.total_purchases) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('purchases.kpi_total_purchases')"
+                    :value="formatMoney(metrics.total_purchases)"
+                    :currency="$t('common.currency')"
+                    variant="primary"
+                />
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('purchases.kpi_confirmed_count') }}</span>
-                    <div class="text-lg sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
-                        {{ metrics.confirmed_count || 0 }} <span class="text-[11px] text-slate-400 font-tajawal">{{ $t('invoices.title') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('purchases.kpi_confirmed_count')"
+                    :value="metrics.confirmed_count || 0"
+                    :currency="$t('invoices.title')"
+                    variant="success"
+                />
 
-                <div class="col-span-2 sm:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('purchases.kpi_unpaid_total') }}</span>
-                    <div class="text-lg sm:text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
-                        {{ formatMoney(metrics.unpaid_total) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    class="col-span-2 sm:col-span-1"
+                    :title="$t('purchases.kpi_unpaid_total')"
+                    :value="formatMoney(metrics.unpaid_total)"
+                    :currency="$t('common.currency')"
+                    variant="danger"
+                />
             </div>
 
             <!-- Quick Filter Bar -->
@@ -377,34 +374,22 @@ const cancelPurchase = (p) => {
                     </div>
                 </div>
 
-                <div v-if="!purchases.data || purchases.data.length === 0" class="py-16 text-center space-y-2">
-                    <span class="text-3xl">📦</span>
-                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('purchases.empty_purchases_search') }}</p>
-                </div>
+                <!-- Empty State -->
+                <EmptyState
+                    v-if="!purchases.data || purchases.data.length === 0"
+                    icon="📦"
+                    :title="$t('purchases.empty_purchases_search')"
+                    :action-label="$t('purchases.create_po_title')"
+                    action-href="/purchases/create"
+                />
 
                 <!-- Pagination -->
-                <div v-if="purchases.links && purchases.links.length > 3" class="pt-4 border-t border-slate-800/80 flex items-center justify-between font-sans">
-                    <span class="text-xs text-slate-400 font-tajawal">
-                        {{ purchases.from || 0 }} - {{ purchases.to || 0 }} / {{ purchases.total || 0 }}
-                    </span>
-
-                    <div class="flex items-center gap-1">
-                        <template v-for="(link, lIdx) in purchases.links" :key="lIdx">
-                            <Link
-                                v-if="link.url"
-                                :href="link.url"
-                                class="px-3 py-1.5 rounded-xl text-xs font-bold transition"
-                                :class="link.active ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'"
-                                v-html="link.label"
-                            />
-                            <span
-                                v-else
-                                class="px-3 py-1.5 rounded-xl text-xs text-slate-600 font-bold"
-                                v-html="link.label"
-                            />
-                        </template>
-                    </div>
-                </div>
+                <Pagination
+                    :links="purchases.links"
+                    :from="purchases.from"
+                    :to="purchases.to"
+                    :total="purchases.total"
+                />
             </div>
         </div>
 

@@ -5,6 +5,11 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import SearchableSelect from '@/Components/SearchableSelect.vue';
 import DatePicker from '@/Components/DatePicker.vue';
 import FilterDrawer from '@/Components/FilterDrawer.vue';
+import ActionMenu from '@/Components/ActionMenu.vue';
+import PageHeader from '@/Components/Common/PageHeader.vue';
+import MetricCard from '@/Components/Common/MetricCard.vue';
+import EmptyState from '@/Components/Common/EmptyState.vue';
+import Pagination from '@/Components/Common/Pagination.vue';
 import { useMoney } from '@/Composables/useMoney';
 import { trans } from '@/helpers/trans';
 import {
@@ -262,65 +267,54 @@ const printA4 = (id) => {
     <AppLayout>
         <div class="space-y-6">
             <!-- Header Section -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                        <Receipt class="w-6 h-6 text-theme-primary" />
-                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-tajawal">
-                            {{ $t('invoices.title') }}
-                        </h1>
-                    </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
-                        {{ $t('invoices.subtitle') }}
-                    </p>
-                </div>
-
-                <Link
-                    href="/pos"
-                    class="h-11 px-5 rounded-2xl btn-primary-theme font-black text-xs flex items-center justify-center gap-2 transition transform active:scale-95 font-tajawal cursor-pointer"
-                >
-                    <Plus class="w-4 h-4" />
-                    <span>{{ $t('invoices.new_sale_invoice') }}</span>
-                </Link>
-            </div>
+            <PageHeader
+                :title="$t('invoices.title')"
+                :subtitle="$t('invoices.subtitle')"
+                :icon="Receipt"
+            >
+                <template #actions>
+                    <Link
+                        href="/pos"
+                        class="h-11 px-5 rounded-2xl btn-primary-theme font-black text-xs flex items-center justify-center gap-2 transition transform active:scale-95 font-tajawal cursor-pointer shadow-theme-sm"
+                    >
+                        <Plus class="w-4 h-4" />
+                        <span>{{ $t('invoices.new_sale_invoice') }}</span>
+                    </Link>
+                </template>
+            </PageHeader>
 
             <!-- 4 Top KPI Summary Cards -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 font-tajawal">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-1 shadow-xs">
-                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('invoices.total_invoices_count') }}</span>
-                    <div class="text-xl font-black font-mono text-slate-900 dark:text-white flex items-center gap-2">
-                        <Receipt class="w-5 h-5 text-theme-primary" />
-                        <span>{{ stats.total_count }}</span>
-                        <span class="text-xs font-tajawal text-slate-400 font-normal">{{ $t('invoices.invoice_unit') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('invoices.total_invoices_count')"
+                    :value="stats.total_count"
+                    :currency="$t('invoices.invoice_unit')"
+                    :icon="Receipt"
+                />
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-1 shadow-xs">
-                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('invoices.total_sales_net') }}</span>
-                    <div class="text-xl font-black font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
-                        <Banknote class="w-5 h-5 text-emerald-500" />
-                        <span>{{ formatMoney(stats.total_net) }}</span>
-                        <span class="text-xs font-tajawal text-slate-400 font-normal">{{ $t('common.currency') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('invoices.total_sales_net')"
+                    :value="formatMoney(stats.total_net)"
+                    :currency="$t('common.currency')"
+                    variant="success"
+                    :icon="Banknote"
+                />
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-1 shadow-xs">
-                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('invoices.total_paid_actual') }}</span>
-                    <div class="text-xl font-black font-mono text-amber-600 dark:text-amber-400 flex items-center gap-2">
-                        <Wallet class="w-5 h-5 text-amber-500" />
-                        <span>{{ formatMoney(stats.total_paid) }}</span>
-                        <span class="text-xs font-tajawal text-slate-400 font-normal">{{ $t('common.currency') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('invoices.total_paid_actual')"
+                    :value="formatMoney(stats.total_paid)"
+                    :currency="$t('common.currency')"
+                    variant="warning"
+                    :icon="Wallet"
+                />
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 space-y-1 shadow-xs">
-                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">{{ $t('invoices.total_remaining_credit') }}</span>
-                    <div class="text-xl font-black font-mono text-rose-600 dark:text-rose-400 flex items-center gap-2">
-                        <Clock class="w-5 h-5 text-rose-500" />
-                        <span>{{ formatMoney(stats.total_remaining) }}</span>
-                        <span class="text-xs font-tajawal text-slate-400 font-normal">{{ $t('common.currency') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('invoices.total_remaining_credit')"
+                    :value="formatMoney(stats.total_remaining)"
+                    :currency="$t('common.currency')"
+                    variant="danger"
+                    :icon="Clock"
+                />
             </div>
 
             <!-- Quick Action Bar & Drawer Toggle -->
@@ -634,34 +628,22 @@ const printA4 = (id) => {
                 </div>
 
                 <!-- Empty State -->
-                <div v-if="!invoices.data || invoices.data.length === 0" class="py-16 text-center space-y-3">
-                    <Receipt class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-700" />
-                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 font-tajawal">{{ $t('invoices.no_invoices_found') }}</p>
-                </div>
+                <EmptyState
+                    v-if="!invoices.data || invoices.data.length === 0"
+                    :icon="Receipt"
+                    :title="$t('invoices.no_invoices_found')"
+                    :action-label="$t('invoices.new_sale_invoice')"
+                    action-href="/pos"
+                    :action-icon="Plus"
+                />
 
                 <!-- Pagination Links -->
-                <div v-if="invoices.links && invoices.links.length > 3" class="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between font-sans">
-                    <span class="text-xs text-slate-400 font-tajawal">
-                        {{ $t('common.actions') ? `عرض ${invoices.from || 0} إلى ${invoices.to || 0} من إجمالي ${invoices.total || 0}` : `Showing ${invoices.from || 0} to ${invoices.to || 0} of ${invoices.total || 0}` }}
-                    </span>
-
-                    <div class="flex items-center gap-1">
-                        <template v-for="(link, lIdx) in invoices.links" :key="lIdx">
-                            <Link
-                                v-if="link.url"
-                                :href="link.url"
-                                class="px-3 py-1.5 rounded-xl text-xs font-bold transition"
-                                :class="link.active ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'"
-                                v-html="link.label"
-                            />
-                            <span
-                                v-else
-                                class="px-3 py-1.5 rounded-xl text-xs text-slate-600 font-bold"
-                                v-html="link.label"
-                            />
-                        </template>
-                    </div>
-                </div>
+                <Pagination
+                    :links="invoices.links"
+                    :from="invoices.from"
+                    :to="invoices.to"
+                    :total="invoices.total"
+                />
             </div>
         </div>
 

@@ -5,6 +5,10 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import SearchableSelect from '@/Components/SearchableSelect.vue';
 import DatePicker from '@/Components/DatePicker.vue';
 import FilterDrawer from '@/Components/FilterDrawer.vue';
+import PageHeader from '@/Components/Common/PageHeader.vue';
+import MetricCard from '@/Components/Common/MetricCard.vue';
+import EmptyState from '@/Components/Common/EmptyState.vue';
+import Pagination from '@/Components/Common/Pagination.vue';
 import { useMoney } from '@/Composables/useMoney';
 import { trans } from '@/helpers/trans';
 
@@ -92,50 +96,45 @@ const deleteReturn = (r) => {
     <AppLayout>
         <div class="space-y-6 font-tajawal">
             <!-- Header -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                        <span class="text-2xl">🔄</span>
-                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                            {{ $t('returns.title') }}
-                        </h1>
-                    </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
-                        {{ $t('returns.subtitle') }}
-                    </p>
-                </div>
-
-                <Link
-                    href="/returns/create"
-                    class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
-                >
-                    <span class="text-base font-black">+</span>
-                    <span>{{ $t('returns.new_return_btn') }}</span>
-                </Link>
-            </div>
+            <PageHeader
+                :title="$t('returns.title')"
+                :subtitle="$t('returns.subtitle')"
+                icon="🔄"
+            >
+                <template #actions>
+                    <Link
+                        href="/returns/create"
+                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer shadow-theme-sm"
+                    >
+                        <span class="text-base font-black">+</span>
+                        <span>{{ $t('returns.new_return_btn') }}</span>
+                    </Link>
+                </template>
+            </PageHeader>
 
             <!-- KPI Summary Cards (Bento Style on mobile) -->
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4 font-tajawal">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('returns.total_returns_amount') }}</span>
-                    <div class="text-lg sm:text-2xl font-black font-mono text-theme-primary">
-                        {{ formatMoney(metrics.total_amount) }} <span class="text-[11px] text-slate-700 dark:text-white">{{ $t('common.currency') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('returns.total_returns_amount')"
+                    :value="formatMoney(metrics.total_amount)"
+                    :currency="$t('common.currency')"
+                    variant="primary"
+                />
 
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('returns.sales_returns_count') }}</span>
-                    <div class="text-lg sm:text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
-                        {{ metrics.sales_returns_count || 0 }} <span class="text-[11px] text-slate-400 font-tajawal">{{ $t('returns.doc_unit') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    :title="$t('returns.sales_returns_count')"
+                    :value="metrics.sales_returns_count || 0"
+                    :currency="$t('returns.doc_unit')"
+                    variant="danger"
+                />
 
-                <div class="col-span-2 sm:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-1.5">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">{{ $t('returns.purchase_returns_count') }}</span>
-                    <div class="text-lg sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
-                        {{ metrics.purchase_returns_count || 0 }} <span class="text-[11px] text-slate-400 font-tajawal">{{ $t('returns.doc_unit') }}</span>
-                    </div>
-                </div>
+                <MetricCard
+                    class="col-span-2 sm:col-span-1"
+                    :title="$t('returns.purchase_returns_count')"
+                    :value="metrics.purchase_returns_count || 0"
+                    :currency="$t('returns.doc_unit')"
+                    variant="success"
+                />
             </div>
 
             <!-- Quick Filter Bar -->
@@ -321,34 +320,22 @@ const deleteReturn = (r) => {
                     </div>
                 </div>
 
-                <div v-if="!returns.data || returns.data.length === 0" class="py-16 text-center space-y-2">
-                    <span class="text-3xl">🔄</span>
-                    <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('returns.no_returns_found') }}</p>
-                </div>
+                <!-- Empty State -->
+                <EmptyState
+                    v-if="!returns.data || returns.data.length === 0"
+                    icon="🔄"
+                    :title="$t('returns.no_returns_found')"
+                    :action-label="$t('returns.new_return_btn')"
+                    action-href="/returns/create"
+                />
 
                 <!-- Pagination -->
-                <div v-if="returns.links && returns.links.length > 3" class="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between font-sans">
-                    <span class="text-xs text-slate-500 dark:border-slate-400 font-tajawal">
-                        {{ $t('common.showing') }} {{ returns.from || 0 }} {{ $t('common.to') }} {{ returns.to || 0 }} {{ $t('common.of') }} {{ returns.total || 0 }}
-                    </span>
-
-                    <div class="flex items-center gap-1">
-                        <template v-for="(link, lIdx) in returns.links" :key="lIdx">
-                            <Link
-                                v-if="link.url"
-                                :href="link.url"
-                                class="px-3 py-1.5 rounded-xl text-xs font-bold transition"
-                                :class="link.active ? 'tab-theme-active' : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'"
-                                v-html="link.label"
-                            />
-                            <span
-                                v-else
-                                class="px-3 py-1.5 rounded-xl text-xs text-slate-400 dark:text-slate-600 font-bold"
-                                v-html="link.label"
-                            />
-                        </template>
-                    </div>
-                </div>
+                <Pagination
+                    :links="returns.links"
+                    :from="returns.from"
+                    :to="returns.to"
+                    :total="returns.total"
+                />
             </div>
         </div>
 

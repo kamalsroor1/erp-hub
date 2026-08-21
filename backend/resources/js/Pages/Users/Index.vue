@@ -3,6 +3,9 @@ import { ref, computed, watch } from 'vue';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import SearchableSelect from '@/Components/SearchableSelect.vue';
+import PageHeader from '@/Components/Common/PageHeader.vue';
+import EmptyState from '@/Components/Common/EmptyState.vue';
+import Pagination from '@/Components/Common/Pagination.vue';
 import { trans } from '@/helpers/trans';
 
 const props = defineProps({
@@ -113,23 +116,15 @@ const deleteUser = (u) => {
     <AppLayout>
         <div class="space-y-6 font-tajawal">
             <!-- Header -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                        <span class="text-2xl">👥</span>
-                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                            {{ $t('users.title') }}
-                        </h1>
-                    </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">
-                        {{ $t('users.subtitle') }}
-                    </p>
-                </div>
-
-                <div class="flex items-center gap-2.5">
+            <PageHeader
+                :title="$t('users.title')"
+                :subtitle="$t('users.subtitle')"
+                icon="👥"
+            >
+                <template #actions>
                     <Link
                         href="/roles"
-                        class="h-11 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 transition"
+                        class="h-11 px-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shadow-xs"
                     >
                         <span>🛡️</span>
                         <span>{{ $t('users.matrix_btn') }}</span>
@@ -138,13 +133,13 @@ const deleteUser = (u) => {
                     <button
                         @click="openCreateModal"
                         type="button"
-                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer"
+                        class="h-11 px-5 rounded-2xl btn-primary-theme font-bold text-xs flex items-center justify-center gap-2 transition transform active:scale-95 cursor-pointer shadow-theme-sm"
                     >
                         <span class="text-base font-black">+</span>
                         <span>{{ $t('users.create_btn') }}</span>
                     </button>
-                </div>
-            </div>
+                </template>
+            </PageHeader>
 
             <!-- Quick Filter Bar -->
             <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-xs space-y-3">
@@ -251,35 +246,23 @@ const deleteUser = (u) => {
                         </tbody>
                     </table>
 
-                    <div v-if="!users.data || users.data.length === 0" class="py-16 text-center space-y-2">
-                        <span class="text-3xl">👥</span>
-                        <p class="text-xs font-bold text-slate-400 font-tajawal">{{ $t('users.empty_users') }}</p>
-                    </div>
+                    <!-- Empty State -->
+                    <EmptyState
+                        v-if="!users.data || users.data.length === 0"
+                        icon="👥"
+                        :title="$t('users.empty_users')"
+                        :action-label="$t('users.create_btn')"
+                        @action="openCreateModal"
+                    />
                 </div>
 
                 <!-- Pagination -->
-                <div v-if="users.links && users.links.length > 3" class="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between font-sans">
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-tajawal">
-                        {{ $t('common.showing') }} {{ users.from || 0 }} {{ $t('common.to') }} {{ users.to || 0 }} {{ $t('common.of') }} {{ users.total || 0 }}
-                    </span>
-
-                    <div class="flex items-center gap-1">
-                        <template v-for="(link, lIdx) in users.links" :key="lIdx">
-                            <Link
-                                v-if="link.url"
-                                :href="link.url"
-                                class="px-3 py-1.5 rounded-xl text-xs font-bold transition"
-                                :class="link.active ? 'tab-theme-active' : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'"
-                                v-html="link.label"
-                            />
-                            <span
-                                v-else
-                                class="px-3 py-1.5 rounded-xl text-xs text-slate-400 dark:text-slate-600 font-bold"
-                                v-html="link.label"
-                            />
-                        </template>
-                    </div>
-                </div>
+                <Pagination
+                    :links="users.links"
+                    :from="users.from"
+                    :to="users.to"
+                    :total="users.total"
+                />
             </div>
         </div>
 
