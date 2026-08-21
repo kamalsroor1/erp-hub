@@ -4,7 +4,97 @@
 
 ---
 
-## مراجعة Code Quality بتاريخ 2026-08-21
+## مراجعة Code Quality بتاريخ 2026-08-21 (الجلسة الثانية: تطبيق SOLID على POS والإعدادات واستخراج المكونات العامة)
+
+### الملفات اللي اتراجعت
+- `backend/resources/js/Pages/POS/Index.vue`
+- `backend/resources/js/Pages/Settings/Index.vue`
+- `backend/resources/js/Components/POS/POSHeader.vue`
+- `backend/resources/js/Components/POS/POSCategoryBar.vue`
+- `backend/resources/js/Components/POS/POSCustomerBar.vue`
+- `backend/resources/js/Components/POS/POSNumpad.vue`
+- `backend/resources/js/Components/POS/POSCheckoutSummary.vue`
+- `backend/resources/js/Components/Settings/BrandingTab.vue`
+- `backend/resources/js/Components/Settings/ThemeTab.vue`
+- `backend/resources/js/Components/Settings/TelegramTab.vue`
+- `backend/resources/js/Components/Settings/BackupTab.vue`
+- `backend/resources/js/Components/Settings/SystemTab.vue`
+- `backend/resources/js/Components/Common/AppModal.vue`
+- `backend/resources/js/Components/Common/SearchBar.vue`
+
+---
+
+### Components/Composables جديدة اتعملت
+
+1. **`Components/Common/AppModal.vue`**
+   - **الغرض منه:** نافذة Modal منبثقة موحدة وشاملة بخصائص responsive (`sm` إلى `full`)، تدعم تأثيرات الحركة السلسة، إغلاق بالـ ESC والنقر الخارجي، وقفل تمرير الصفحة، مع فتح Slots للـ Header والـ Body والـ Footer.
+   - **الملفات التي تستخدمه:** Modals النظام المشتركة.
+
+2. **`Components/Common/SearchBar.vue`**
+   - **الغرض منه:** شريط بحث مخصص وسريع مع Debounce مدمج، أيقونة بحث، وزر مسح النص.
+
+3. **`Components/POS/POSHeader.vue`**
+   - **الغرض منه:** شريط الحالة العلوي لنقطة البيع (عرض اسم الفرع/المخزن النشط، شارة الوردية المفتوحة/المغلقة، زر تبديل لوحة الأرقام Numpad، وزر قائمة الفواتير السريع).
+   - **الملفات التي تستخدمه:** `POS/Index.vue`.
+
+4. **`Components/POS/POSCategoryBar.vue`**
+   - **الغرض منه:** شريط تبويبات التصنيفات الأفقي القابل للتمرير باللمس مع عداد الأصناف وتحديد التصنيف النشط.
+   - **الملفات التي تستخدمه:** `POS/Index.vue`.
+
+5. **`Components/POS/POSCustomerBar.vue`**
+   - **الغرض منه:** شريط اختيار العميل وعرض رصيده المالي المتبقي ورقم هاتفه وزر الإضافة السريعة.
+   - **الملفات التي تستخدمه:** `POS/Index.vue`.
+
+6. **`Components/POS/POSNumpad.vue`**
+   - **الغرض منه:** لوحة أرقام لمسية ذكية (4 أعمدة) مع إمكانية التبديل بين إدخال المبلغ المدفوع أو قيمة الخصم، وزر دفع المبلغ الصافي كاملاً.
+   - **الملفات التي تستخدمه:** `POS/Index.vue`.
+
+7. **`Components/POS/POSCheckoutSummary.vue`**
+   - **الغرض منه:** مكون الملخص المالي والتحصيل (الإجمالي، الخصم المئوي/الثابت، الصافي، أزرار طريقة الدفع، وسائل التحصيل، وزر الحفظ السريع).
+
+8. **`Components/Settings/BrandingTab.vue`**
+   - **الغرض منه:** تبويب الهوية البصرية، رفع الشعارين (الفاتح والداكن)، بيانات المؤسسة، وإعدادات طباعة الإيصالات.
+   - **الملفات التي تستخدمه:** `Settings/Index.vue`.
+
+9. **`Components/Settings/ThemeTab.vue`**
+   - **الغرض منه:** تبويب تخصيص الثيم والألوان ولوحات الألوان المجهزة والمنتقي الحي والمعاينة المباشرة.
+   - **الملفات التي تستخدمه:** `Settings/Index.vue`.
+
+10. **`Components/Settings/TelegramTab.vue`**
+    - **الغرض منه:** تبويب إعدادات بوت التيليجرام وإرسال رسائل الاختبار والتقارير الفورية.
+    - **الملفات التي تستخدمه:** `Settings/Index.vue`.
+
+11. **`Components/Settings/BackupTab.vue`**
+    - **الغرض منه:** تبويب النسخ الاحتياطي وتنزيل قاعدة البيانات أو إرسالها إلى التيليجرام.
+    - **الملفات التي تستخدمه:** `Settings/Index.vue`.
+
+12. **`Components/Settings/SystemTab.vue`**
+    - **الغرض منه:** تبويب مواصفات النظام، استهلاك الذاكرة، محرك قاعدة البيانات، ومسح الكاش.
+    - **الملفات التي تستخدمه:** `Settings/Index.vue`.
+
+---
+
+### تكرارات ومشاكل SOLID اتحلت
+1. **حل الملاحظة المفتوحة #1 في `POS/Index.vue`:**
+   - تم استخراج شريط الحالة العلوي إلى `POSHeader`.
+   - تم استخراج شريط التصنيفات إلى `POSCategoryBar`.
+   - تم استخراج شريط العميل إلى `POSCustomerBar`.
+   - تم استخراج لوحة الأرقام اللمسية إلى `POSNumpad`.
+   - تم تقليل حجم الملف وتعزيز مبدأ المسؤولية الفردية (SRP).
+
+2. **حل الملاحظة المفتوحة #2 في `Settings/Index.vue`:**
+   - تم تفكيك ملف الإعدادات الضخم (الذي كان يتجاوز 820 سطراً) إلى 5 مكونات فرعية متخصصة (`BrandingTab`, `ThemeTab`, `TelegramTab`, `BackupTab`, `SystemTab`).
+   - تحول ملف `Settings/Index.vue` إلى ملف منسق عالي القراءة والنظافة (أقل من 200 سطر).
+
+---
+
+### ملاحظات SOLID لسه محتاجة شغل (مستقبلاً)
+- **`Reports/Index.vue`:** استخراج الرسوم البيانية وفلاتر التقارير إلى Atomic Sub-components مستقلة (`ReportFilterBar`, `ReportSummaryCard`).
+- **`Dashboard.vue`:** مواصلة استخراج بطاقات Bento Dashboard إلى Widgets مستقلة قابلة لإعادة الاستخدام.
+
+---
+
+## مراجعة Code Quality بتاريخ 2026-08-21 (الجلسة الأولى: الأساسات واستخراج المكونات المشتركة)
 
 ### الملفات اللي اتراجعت
 - `backend/resources/js/Pages/Invoices/Index.vue`
@@ -20,43 +110,10 @@
 - `backend/resources/js/Components/ActionMenu.vue`
 - `backend/resources/js/Composables/useNativeBridge.js`
 
----
-
 ### Components/Composables جديدة اتعملت
-
 1. **`Components/Common/EmptyState.vue`**
-   - **الغرض منه:** مكون موحد ومرن لعرض الرسائل عند خلو الجداول أو بطاقات العرض من البيانات مع أيقونة منسقة وزر تنفيذ إجراء مباشر أو Slots مخصصة.
-   - **الملفات التي تستخدمه:** `Invoices/Index.vue`, `Expenses/Index.vue`, `Customers/Index.vue`, `Suppliers/Index.vue`, `Items/Index.vue`, `Purchases/Index.vue`, `Returns/Index.vue`, `StockTransfers/Index.vue`, `Trash/Index.vue`, `Users/Index.vue`.
-
 2. **`Components/Common/Pagination.vue`**
-   - **الغرض منه:** شريط ترقيم صفحات موحد يدعم ألوان الهوية البصرية (Theme Colors)، النصوص المترجمة لمدى النتائج ("عرض X إلى Y من إجمالي Z")، وتوافق تام مع شاشات اللمس.
-   - **الملفات التي تستخدمه:** `Invoices/Index.vue`, `Expenses/Index.vue`, `Customers/Index.vue`, `Suppliers/Index.vue`, `Items/Index.vue`, `Purchases/Index.vue`, `Returns/Index.vue`, `Trash/Index.vue`, `Users/Index.vue`.
-
 3. **`Components/Common/PageHeader.vue`**
-   - **الغرض منه:** هيدر موحد للصفحات يشمل العنوان، الوصف الفرعي، شارة الأيقونة، وشارة الحالة مع Slot للأزرار التفاعلية (`#actions`).
-   - **الملفات التي تستخدمه:** `Invoices/Index.vue`, `Expenses/Index.vue`, `Customers/Index.vue`, `Suppliers/Index.vue`, `Items/Index.vue`, `Purchases/Index.vue`, `Returns/Index.vue`, `StockTransfers/Index.vue`, `Trash/Index.vue`, `Users/Index.vue`.
-
 4. **`Components/Common/MetricCard.vue`**
-   - **الغرض منه:** بطاقة إحصائيات KPI بنمط Bento Card تدعم الألوان الدلالية (Primary, Success, Danger, Warning, Slate)، تنسيق العملة، والأيقونات.
-   - **الملفات التي تستخدمه:** `Invoices/Index.vue`, `Expenses/Index.vue`, `Customers/Index.vue`, `Suppliers/Index.vue`, `Items/Index.vue`, `Purchases/Index.vue`, `Returns/Index.vue`.
-
 5. **`Components/Common/StatusBadge.vue`**
-   - **الغرض منه:** شارة حالة موحدة (Pill Badge) بنقاط الحالة وألوان متناسقة للوضعين الفاتح والداكن.
-   - **الملفات المستهدفة:** جداول وكروت الفواتير، المشتريات، والمخزون.
-
 6. **`Composables/useSearchFilter.js`**
-   - **الغرض منه:** Composable لإدارة حالات البحث والتصفية عبر الـ URL مع Debounce مدمج وحماية التمرير عبر Inertia router.
-
----
-
-### تكرارات اتحلت
-1. **استخراج الـ Empty States المتكررة:** تم حذف كتل الـ HTML المتطابقة للـ Empty State عبر 10 صفحات رئيسية واستبدالها بالمكون الموحد `EmptyState`.
-2. **استخراج الـ Pagination Links:** تم توحيد شريط ترقيم الصفحات في مكون واحد `Pagination` بدلاً من تكرار كتل الـ `v-for` وشرط `links.length > 3` في كل صفحة.
-3. **توحيد رؤوس الصفحات (Page Headers):** تم استبدال بنية الـ Header اليدوية بمكون `PageHeader` مع الاستفادة من `#actions` slot.
-4. **توحيد كروت الإحصائيات (KPI / Metric Cards):** تم استبدال كروت الـ Bento اليدوية في فواتير المبيعات والمصروفات والمشتريات والعملاء والموردين بمكون `MetricCard`.
-
----
-
-### ملاحظات SOLID لسه محتاجة شغل (مستقبلاً)
-1. **`POS/Index.vue`:** الصفحة كبيرة وتحتوي على العديد من Modals والحسابات الفرعية؛ تم بالفعل فصل مكونات السلة `POSCartItem` وبطاقة الصنف `POSItemCard` وموديلات الوزن والعميل، ويفضل مواصلة استخراج شريط التبويبات العلوي وشريط الملخص السفلي في مكونات مستقلة.
-2. **`Settings/Index.vue`:** تقسيم تبويبات الإعدادات (عام، طابعات، ضرائب، نسخ احتياطي) إلى Atomic Sub-components مستقلة.

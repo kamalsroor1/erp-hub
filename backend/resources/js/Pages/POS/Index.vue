@@ -10,6 +10,10 @@ import { posService } from '@/Services/posService';
 import { trans } from '@/helpers/trans';
 
 // Atomic POS Components (SOLID - SRP)
+import POSHeader from '@/Components/POS/POSHeader.vue';
+import POSCategoryBar from '@/Components/POS/POSCategoryBar.vue';
+import POSCustomerBar from '@/Components/POS/POSCustomerBar.vue';
+import POSNumpad from '@/Components/POS/POSNumpad.vue';
 import POSItemCard from '@/Components/POS/POSItemCard.vue';
 import POSCartItem from '@/Components/POS/POSCartItem.vue';
 import POSWeightPickerModal from '@/Components/POS/POSWeightPickerModal.vue';
@@ -296,49 +300,12 @@ useKeyboardShortcuts({
     <AppLayout :default-collapsed="true">
         <div class="h-[calc(100vh-6.5rem)] flex flex-col font-tajawal select-none">
             <!-- Top POS Status & Touch Toolbar -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3 mb-3 flex flex-wrap items-center justify-between gap-3 shrink-0 shadow-xs">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-black text-lg flex items-center justify-center">
-                        ⚡
-                    </div>
-                    <div>
-                        <h1 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
-                            <span>{{ $t('pos.title') }}</span>
-                        </h1>
-                        <div class="flex items-center gap-2 mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
-                            <span>{{ $t('common.store') }}:</span>
-                            <span class="text-amber-600 dark:text-amber-400 font-bold font-mono">{{ active_store?.name || $t('common.main_store_default') }}</span>
-                            <span>•</span>
-                            <span
-                                class="px-2 py-0.2 rounded-md font-mono font-bold"
-                                :class="active_shift ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-rose-500/20 text-rose-600 dark:text-rose-400'"
-                            >
-                                {{ active_shift ? `${$t('nav.active_shift')} #${active_shift.shift_number || active_shift.id}` : $t('nav.closed_shift') }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <button
-                        @click="showNumpad = !showNumpad"
-                        type="button"
-                        class="h-9 px-3 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
-                        :class="showNumpad ? 'bg-amber-500 text-slate-950 font-black border-amber-400 shadow-md' : 'bg-slate-100 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'"
-                    >
-                        <span>🔢</span>
-                        <span>{{ $t('pos.numpad') }}</span>
-                    </button>
-
-                    <Link
-                        href="/invoices"
-                        class="h-9 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-950 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 text-xs font-bold flex items-center gap-1.5 transition"
-                    >
-                        <span>🧾</span>
-                        <span>{{ $t('pos.invoices_list') }}</span>
-                    </Link>
-                </div>
-            </div>
+            <POSHeader
+                :active-store="active_store"
+                :active-shift="active_shift"
+                :show-numpad="showNumpad"
+                @toggle-numpad="showNumpad = !showNumpad"
+            />
 
             <!-- Error Banner -->
             <div v-if="errorMessage" class="p-3 mb-3 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-700 dark:text-rose-300 text-xs font-bold flex items-center justify-between shrink-0">
@@ -400,27 +367,12 @@ useKeyboardShortcuts({
                         </div>
 
                         <!-- Category Chips -->
-                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-                            <button
-                                @click="selectedCategory = 'all'"
-                                type="button"
-                                class="h-9 px-3.5 rounded-xl font-black transition shrink-0 cursor-pointer flex items-center justify-center"
-                                :class="selectedCategory === 'all' ? 'tab-theme-active' : 'bg-slate-100 text-slate-600 hover:text-slate-900 dark:bg-slate-950 dark:text-slate-400 dark:hover:text-white border border-slate-200 dark:border-slate-800'"
-                            >
-                                {{ $t('common.all') }} ({{ items.length }})
-                            </button>
-
-                            <button
-                                v-for="cat in categories"
-                                :key="cat"
-                                @click="selectedCategory = cat"
-                                type="button"
-                                class="h-9 px-3.5 rounded-xl font-black transition shrink-0 cursor-pointer flex items-center justify-center"
-                                :class="selectedCategory === cat ? 'tab-theme-active' : 'bg-slate-100 text-slate-600 hover:text-slate-900 dark:bg-slate-950 dark:text-slate-400 dark:hover:text-white border border-slate-200 dark:border-slate-800'"
-                            >
-                                {{ cat }}
-                            </button>
-                        </div>
+                        <POSCategoryBar
+                            :categories="categories"
+                            :selected-category="selectedCategory"
+                            :total-items-count="items.length"
+                            @select-category="(cat) => selectedCategory = cat"
+                        />
                     </div>
 
                     <!-- Items Grid -->
@@ -477,30 +429,11 @@ useKeyboardShortcuts({
                     </div>
 
                     <!-- Customer Selector Bar -->
-                    <div class="p-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 bg-slate-50 dark:bg-slate-950/60 shrink-0">
-                        <div
-                            @click="showCustomerModal = true"
-                            class="flex-1 flex items-center gap-2 p-2.5 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 cursor-pointer transition shadow-xs"
-                        >
-                            <span class="text-base">👤</span>
-                            <div class="flex-1 truncate">
-                                <div class="text-xs font-black text-slate-900 dark:text-white truncate">{{ selectedCustomer?.name || $t('pos.cash_customer') }}</div>
-                                <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
-                                    {{ selectedCustomer?.phone || '-' }} • {{ $t('contacts.balance') }}: {{ formatMoney(selectedCustomer?.current_balance) }} {{ $t('common.currency') }}
-                                </div>
-                            </div>
-                            <span class="text-slate-400 text-xs">▼</span>
-                        </div>
-
-                        <button
-                            @click="showNewCustomerModal = true"
-                            type="button"
-                            class="h-10 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-black text-xs flex items-center gap-1 transition cursor-pointer active:scale-95 shadow-xs shrink-0"
-                            :title="$t('pos.add_new_customer')"
-                        >
-                            <span>➕</span>
-                        </button>
-                    </div>
+                    <POSCustomerBar
+                        :selected-customer="selectedCustomer"
+                        @open-customer-modal="showCustomerModal = true"
+                        @open-new-customer-modal="showNewCustomerModal = true"
+                    />
 
                     <!-- Cart Lines -->
                     <div class="flex-1 overflow-y-auto p-3 space-y-2">
@@ -521,38 +454,13 @@ useKeyboardShortcuts({
                     </div>
 
                     <!-- Touch Numpad Popup / Panel -->
-                    <div v-if="showNumpad" class="p-3 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 shrink-0 space-y-2">
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-slate-600 dark:text-slate-400 font-bold">{{ $t('pos.numpad_title') }}</span>
-                            <div class="flex items-center gap-2">
-                                <button
-                                    @click="numpadTarget = 'paid_amount'"
-                                    type="button"
-                                    class="px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer"
-                                    :class="numpadTarget === 'paid_amount' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-600 dark:text-slate-400'"
-                                >
-                                    {{ $t('invoices.paid') }}
-                                </button>
-                                <button
-                                    @click="numpadTarget = 'discount_value'"
-                                    type="button"
-                                    class="px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer"
-                                    :class="numpadTarget === 'discount_value' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-600 dark:text-slate-400'"
-                                >
-                                    {{ $t('invoices.discount') }}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-4 gap-1.5 font-mono font-bold text-xs">
-                            <button v-for="num in ['7','8','9','C']" :key="num" @click="pressNumpad(num)" type="button" class="h-11 sm:h-9 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-transparent flex items-center justify-center cursor-pointer shadow-xs active:scale-95 text-sm font-black">{{ num }}</button>
-                            <button v-for="num in ['4','5','6','backspace']" :key="num" @click="pressNumpad(num)" type="button" class="h-11 sm:h-9 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-transparent flex items-center justify-center cursor-pointer shadow-xs active:scale-95 text-sm font-black">{{ num === 'backspace' ? '⌫' : num }}</button>
-                            <button v-for="num in ['1','2','3','0']" :key="num" @click="pressNumpad(num)" type="button" class="h-11 sm:h-9 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-transparent flex items-center justify-center cursor-pointer shadow-xs active:scale-95 text-sm font-black">{{ num }}</button>
-                            <button @click="pressNumpad('.')" type="button" class="h-11 sm:h-9 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-transparent flex items-center justify-center cursor-pointer shadow-xs active:scale-95 text-sm font-black">.</button>
-                            <button @click="pressNumpad('00')" type="button" class="h-11 sm:h-9 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-transparent flex items-center justify-center cursor-pointer shadow-xs active:scale-95 text-sm font-black">00</button>
-                            <button @click="quickSetPaidExact" type="button" class="col-span-2 h-11 sm:h-9 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-tajawal font-black flex items-center justify-center cursor-pointer active:scale-95 text-xs shadow-xs">{{ $t('pos.quick_amount_full') }}</button>
-                        </div>
-                    </div>
+                    <POSNumpad
+                        v-if="showNumpad"
+                        :target="numpadTarget"
+                        @press="pressNumpad"
+                        @set-target="(t) => numpadTarget = t"
+                        @quick-exact="quickSetPaidExact"
+                    />
 
                     <!-- Financial Totals & Payment (Fixed Bottom Area) -->
                     <div class="p-3.5 sm:p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 space-y-2.5 shrink-0">
